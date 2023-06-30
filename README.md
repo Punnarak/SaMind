@@ -1,6 +1,6 @@
 # SaMind
 
-Project จบ
+Senior Project
 
 รายชื่อสมาชิก
 
