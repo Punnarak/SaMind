@@ -43,7 +43,7 @@ export default function Login() {
     //   Alert.alert("Login Failed", "Invalid email or password.");
     // }
   };
-  console.log("App executed!");
+  console.log("SignUp Screen");
 
   return (
     <View style={styles.container1}>

@@ -34,7 +34,7 @@ export default function Notification() {
   const [isButtonVisible, setButtonVisible] = useState(false);
 
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Avatar Screen");
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
     setButtonVisible(!isButtonVisible);

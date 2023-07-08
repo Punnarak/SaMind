@@ -90,9 +90,9 @@ class MyCalendar extends React.Component {
               height: 18,
               textAlign: "center",
               // Highlight header
-              backgroundColor: rowIndex == 0 ? "#ddd" : "#fff",
+              // backgroundColor: rowIndex == 0 ? "#ddd" : "#fff",
               // Highlight Sundays
-              color: colIndex == 0 ? "#a00" : "#000",
+              // color: colIndex == 0 ? "#a00" : "#000",
               // Highlight current date
               fontWeight: item == this.state.activeDate.getDate() ? "bold" : "",
             }}
@@ -132,9 +132,9 @@ class MyCalendar extends React.Component {
         </RN.Text>
         {rows}
 
-        <RN.Button title="Previous" onPress={() => this.changeMonth(-1)} />
+        <RN.Button title="<" onPress={() => this.changeMonth(-1)} />
 
-        <RN.Button title="Next" onPress={() => this.changeMonth(+1)} />
+        <RN.Button title=">" onPress={() => this.changeMonth(+1)} />
       </RN.View>
     );
   }

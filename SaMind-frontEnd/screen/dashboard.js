@@ -28,7 +28,7 @@ export default function Login() {
   const navigation = useNavigation();
 
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Dashboard Screen");
 
   return (
     // <View style={styles.container1}>
@@ -342,7 +342,7 @@ export default function Login() {
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Loginscreen")}
+            onPress={() => navigation.navigate("Avatarscreen")}
           />
         </View>
       </View>

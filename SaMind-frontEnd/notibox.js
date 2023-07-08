@@ -35,7 +35,7 @@ const NotificationBox = ({ item, index }) => {
             marginTop: "8.5%",
             transform: [{ rotateY: "180deg" }],
           }}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate(item.target)}
         />
       </View>
     </View>

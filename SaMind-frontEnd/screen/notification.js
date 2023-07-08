@@ -31,7 +31,7 @@ export default function Notification() {
   const navigation = useNavigation();
 
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Notification Screen");
 
   return (
     // <View style={styles.container1}>

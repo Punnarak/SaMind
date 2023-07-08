@@ -28,7 +28,7 @@ export default function Login() {
   const navigation = useNavigation();
 
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Calendar Screen");
 
   return (
     <View style={styles.container1}>

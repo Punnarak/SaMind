@@ -36,7 +36,7 @@ export default function Login() {
   //   });
   // }
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Home Screen");
 
   return (
     <View style={styles.container1}>
@@ -46,8 +46,8 @@ export default function Login() {
           alignItems: "center",
         }}
       >
-        <View style={styles.box}>
-          <Text style={styles.wel}>LV.1 Beginner</Text>
+        <View style={styles.boxlevel}>
+          <Text style={styles.level}>LV.1 Beginner</Text>
         </View>
         <TouchableOpacity
           style={styles.boxper}
@@ -64,7 +64,7 @@ export default function Login() {
       </View>
       <Text style={styles.n}>
         Hi{"  "}
-        <Text style={styles.hyper}>Punya</Text>
+        <Text style={styles.name}>Punya</Text>
       </Text>
       <Text style={styles.n1}>How are you feeling today?</Text>
       <View
@@ -81,134 +81,116 @@ export default function Login() {
         <Image source={require("../assets/m5.png")} style={styles.icon} />
       </View>
       <TouchableOpacity
-        style={styles.loginb}
-        onPress={() => navigation.navigate("Loginscreen")}
+        style={styles.checkinb}
+        onPress={() => navigation.navigate("Loginscreen")} // ต้องเปลี่ยนเป็นใส่ไอคอน
       >
-        <Text style={styles.text}>Check - in</Text>
+        <Text style={styles.checkin}>Check - in</Text>
       </TouchableOpacity>
       <View style={styles.container2}>
         <Text style={styles.textf}>What do you want to do ?</Text>
         <View
           style={{
-            flexDirection: "row",
+            flex: 1,
             alignItems: "center",
-            marginTop: "10%",
           }}
         >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Loginscreen")}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: "10%",
+            }}
           >
-            <Text
-              style={styles.Textb}
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => navigation.navigate("Loginscreen")}
             >
-              APPOINTMENT
-            </Text>
-            <Icon
-              name="alarm"
-              style={styles.picb}
-              size={57}
-              type="ionicon"
-              color="#847872"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Calendarscreen")}
-          >
-            <Text
-              style={styles.Textb}
+              <Text style={styles.Textb}>APPOINTMENT</Text>
+              <Icon
+                name="alarm"
+                style={styles.picb}
+                size={57}
+                type="ionicon"
+                color="#847872"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => navigation.navigate("Calendarscreen")}
             >
-              CALENDAR
-            </Text>
-            <I
-              name="calendar-today"
-              style={styles.picb1}
-              size={57}
-              color="#847872"
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: "7%",
-          }}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Dashboardscreen")}
+              <Text style={styles.Textb}>CALENDAR</Text>
+              <I
+                name="calendar-today"
+                style={styles.picb1}
+                size={57}
+                color="#847872"
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: "7%",
+            }}
           >
-            <Text
-              style={styles.Textb}
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => navigation.navigate("Dashboardscreen")}
             >
-              DASHBOARD
-            </Text>
-            <I
-              name="dashboard"
-              style={styles.picb2}
-              size={57}
-              color="#847872"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Loginscreen")}
-          >
-            <Text
-              style={styles.Textb}
+              <Text style={styles.Textb}>DASHBOARD</Text>
+              <I
+                name="dashboard"
+                style={styles.picb2}
+                size={57}
+                color="#847872"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => navigation.navigate("Loginscreen")}
             >
-              GAME
-            </Text>
-            <I
-              name="videogame-asset"
-              style={styles.picb1}
-              size={57}
-              color="#847872"
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: "7%",
-          }}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Libraryscreen")}
+              <Text style={styles.Textb}>GAME</Text>
+              <I
+                name="videogame-asset"
+                style={styles.picb1}
+                size={57}
+                color="#847872"
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: "7%",
+            }}
           >
-            <Text
-              style={styles.Textb}
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => navigation.navigate("Libraryscreen")}
             >
-              LIBRARY
-            </Text>
-            <I
-              name="menu-book"
-              style={styles.picb2}
-              size={57}
-              color="#847872"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Testscreen")}
-          >
-            <Text style={styles.Textb}>TEST</Text>
-            <I
-              name="format-list-bulleted"
-              style={styles.picb1}
-              size={57}
-              color="#847872"
-            />
-          </TouchableOpacity>
+              <Text style={styles.Textb}>LIBRARY</Text>
+              <I
+                name="menu-book"
+                style={styles.picb2}
+                size={57}
+                color="#847872"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("Testscreen")}
+            >
+              <Text style={styles.Textb}>TEST</Text>
+              <I
+                name="format-list-bulleted"
+                style={styles.picb1}
+                size={57}
+                color="#847872"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.undertag}>
           <Feather
@@ -232,24 +214,23 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
+  // blue background
   container1: {
     flex: 1,
     backgroundColor: "#C6E3FF",
     alignItems: "center",
-    // fontFamily: "poppins-bold",
   },
+  //white background
   container2: {
+    flex: 1,
     backgroundColor: "white",
     alignItems: "center",
     marginTop: "3%",
     width: "100%",
-    height: "100%",
-    // justifyContent: "center",
-    paddingVertical: 0,
     paddingHorizontal: 30,
     borderRadius: 25,
-    // fontFamily: "poppins-bold",
   },
+  // Topic: What do you want to do ?
   textf: {
     fontSize: 15,
     fontWeight: "bold",
@@ -257,6 +238,7 @@ const styles = StyleSheet.create({
     color: "#25271C",
     marginTop: "10%",
   },
+  // profile setting icon
   per: {
     alignItems: "center",
     marginTop: "10%",
@@ -264,6 +246,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     // resizeMode: "contain",
   },
+  // circle background of profile setting icon
   boxper: {
     marginTop: "10%",
     backgroundColor: "rgba(255, 255, 255, 0.6)",
@@ -272,7 +255,8 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
   },
-  box: {
+  // Box of Level Text
+  boxlevel: {
     borderWidth: 1,
     backgroundColor: "#3C9BF2",
     borderColor: "#3C9BF2",
@@ -282,11 +266,13 @@ const styles = StyleSheet.create({
     marginRight: "50%",
     marginBottom: "4%",
   },
-  wel: {
+  // Level Text
+  level: {
     fontSize: 15,
     color: "white",
     fontWeight: "bold",
   },
+  // Feature Text
   Textb: {
     fontSize: 14,
     lineHeight: 21,
@@ -294,18 +280,17 @@ const styles = StyleSheet.create({
     marginTop: "5%",
     // letterSpacing: 0.25,
     color: "#847872",
-    // width: "25%",
   },
-
-  hyper: {
+  // UserName -> Hi (Name)
+  name: {
     fontSize: 23,
     color: "black",
     marginTop: "1%",
     marginLeft: "55%",
     fontWeight: "bold",
   },
-
-  loginb: {
+  // checkin button
+  checkinb: {
     marginTop: "3.6%",
     alignItems: "center",
     justifyContent: "center",
@@ -315,13 +300,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#FBBB00",
     width: "28%",
   },
-  text: {
+  // checkin Text
+  checkin: {
     fontSize: 15,
     lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "black",
   },
+  // Hi
   n: {
     fontSize: 23,
     color: "#6AA6FF",
@@ -329,6 +316,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: "62%",
   },
+  // How are you feeling today?
   n1: {
     fontSize: 20,
     color: "#6AA6FF",
@@ -336,7 +324,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: "23%",
   },
-
+  // 5 mood icon
   icon: {
     width: 75,
     height: 75,
@@ -345,6 +333,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     tintColor: "#000000",
   },
+  // 6 Box of Feature
   button: {
     marginTop: "-6%",
     margin: "2%",
@@ -356,24 +345,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9E5DB",
     width: "50%",
   },
+  // Appointment icon
   picb: {
     alignItems: "center",
     margin: "4%",
     resizeMode: "contain",
   },
+  // Test Game Calendar icon
   picb1: {
     alignItems: "center",
     margin: "5%",
     resizeMode: "contain",
   },
+  // Library Dashboard icon
   picb2: {
     alignItems: "center",
     margin: "5%",
     resizeMode: "contain",
   },
+  // bottom bar
   undertag: {
     width: "120%",
-    height: "8.65%",
+    height: 69.8,
     marginTop: "2%",
     backgroundColor: "white",
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
@@ -384,9 +377,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // marginTop: "7%",
   },
+  // Avatar icon
   picur: {
     marginLeft: "70%",
   },
+  // Noti icon
   picul: {
     marginLeft: "9%",
   },

@@ -36,7 +36,7 @@ export default function Login() {
     setIsChecked(!isChecked);
   };
   const handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Edit Profile Screen");
 
   return (
     <View style={styles.container1}>

@@ -31,7 +31,7 @@ export default function Notification() {
   const navigation = useNavigation();
 
   handleLogin = async () => {};
-  console.log("App executed!");
+  console.log("Test Screen");
 
   return (
     // <View style={styles.container1}>
@@ -67,31 +67,32 @@ export default function Notification() {
       ></View>
 
       <View style={styles.container2}>
-        <View style={styles.box}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "bold",
-              color: "#569AFF",
-              fontStyle: "italic",
-            }}
-          >
-            General Test
-          </Text>
+        <View style={styles.container3}>
+          <View style={styles.box}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#569AFF",
+                fontStyle: "italic",
+              }}
+            >
+              General Test
+            </Text>
+          </View>
+          <View style={styles.indibox}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#00C236",
+                fontStyle: "italic",
+              }}
+            >
+              Individual Test
+            </Text>
+          </View>
         </View>
-        <View style={styles.indibox}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "bold",
-              color: "#00C236",
-              fontStyle: "italic",
-            }}
-          >
-            Individual Test
-          </Text>
-        </View>
-
         <View style={styles.undertag}>
           <Feather
             name="bell"
@@ -131,6 +132,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     borderRadius: 25,
+    zIndex: 0,
+  },
+  container3: {
+    backgroundColor: "white",
+    alignItems: "center",
+    width: "100%",
+    height: "77%",
+    paddingTop: 25,
+    flex: 1,
     zIndex: 0,
   },
   box: {
