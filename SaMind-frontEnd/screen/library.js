@@ -5,15 +5,11 @@ import {
   Text,
   View,
   Button,
-  Alert,
   Image,
   Linking,
-  Pressable,
   TouchableOpacity,
   TextInput,
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   ImageBackground,
   FlatList,
 } from "react-native";
@@ -248,6 +244,7 @@ export default function Login() {
               flexDirection: "row",
               alignItems: "center",
               marginTop: "2%",
+              flex: 1,
             }}
           >
             <TouchableOpacity onPress={toggleModal1}>
@@ -302,8 +299,6 @@ export default function Login() {
 const styles = StyleSheet.create({
   container1: {
     flex: 1,
-    // backgroundColor: "#BED8FF",
-    // alignItems: "center",
   },
   list: {
     position: "absolute",
@@ -313,7 +308,6 @@ const styles = StyleSheet.create({
   },
   link: {
     backgroundColor: "white",
-    // position: "absolute"
     width: "100%",
     paddingHorizontal: "1.5%",
     paddingVertical: 10,
@@ -322,12 +316,9 @@ const styles = StyleSheet.create({
     borderColor: "#EEF7FF",
   },
   container2: {
-    // flex: 1,
-    // position: "relative",
     backgroundColor: "#EEF7FF",
     alignItems: "center",
     marginTop: "2%",
-
     width: "100%",
     height: "40%",
     paddingHorizontal: 30,
@@ -350,14 +341,12 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: "-10%",
-
     fontSize: 16,
     color: "black",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   undertag: {
-    // alignItems: "flex-end",
     width: "120%",
     height: "20.5%",
     marginBottom: "0%",
@@ -368,7 +357,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
     flexDirection: "row",
     alignItems: "center",
-    // position: "absolute",
   },
   picur: {
     marginLeft: "70%",

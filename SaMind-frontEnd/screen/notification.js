@@ -1,28 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Svg, Path } from "react-native-svg";
 import {
   StyleSheet,
   Text,
   View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   ImageBackground,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import I from "react-native-vector-icons/MaterialIcons";
-import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 
 import data from "../notiData";
@@ -34,7 +20,6 @@ export default function Notification() {
   console.log("Notification Screen");
 
   return (
-    // <View style={styles.container1}>
     <ImageBackground
       source={require("../assets/Game.png")}
       style={{ alignItems: "center", flex: 1, postition: "absolute" }}
@@ -42,7 +27,7 @@ export default function Notification() {
       <View
         style={{
           flexDirection: "row",
-          // alignItems: "center",
+
           marginTop: "15%",
         }}
       >
@@ -51,9 +36,7 @@ export default function Notification() {
           size={30}
           color="#3987FD"
           style={{
-            // position: "absolute",
             marginRight: "80%",
-            // marginTop: "20%",
           }}
           onPress={() => navigation.goBack()}
         />
@@ -97,9 +80,7 @@ const styles = StyleSheet.create({
   container1: {
     flex: 1,
     justifyContent: "flex-end",
-    // backgroundColor: "#BED8FF",
     alignItems: "center",
-    // fontFamily: "poppins-bold",
   },
   container2: {
     marginTop: "30%",
@@ -128,7 +109,6 @@ const styles = StyleSheet.create({
     width: "120%",
     height: 69.8,
     marginBottom: 0,
-    // paddingHorizontal: 25,
     backgroundColor: "white",
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
@@ -136,8 +116,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
     flexDirection: "row",
     alignItems: "center",
-    // marginBottom: 10,
-    // position: "absolute",
   },
   picur: {
     marginLeft: "70%",

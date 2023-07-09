@@ -4,11 +4,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
   TouchableOpacity,
   TextInput,
 } from "react-native";
@@ -17,8 +12,6 @@ import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
-import { Icon } from "react-native-elements";
-import useCheck from "../usecheck";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Login() {

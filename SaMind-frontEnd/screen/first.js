@@ -7,7 +7,6 @@ import CarouselCardItem, {
 } from "../CarouselCardItem";
 import { useNavigation } from "@react-navigation/native";
 import data from "../data";
-import { autoCorrect } from "deprecated-react-native-prop-types/DeprecatedTextInputPropTypes";
 
 const CarouselCards = () => {
   const navigation = useNavigation();

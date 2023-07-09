@@ -1,32 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Svg, Path } from "react-native-svg";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  ImageBackground,
-} from "react-native";
+import { StyleSheet, Text, View, ImageBackground } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import I from "react-native-vector-icons/MaterialIcons";
-import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 
-import data from "../notiData";
-import NotiBox from "../notibox";
 export default function Notification() {
   const navigation = useNavigation();
 

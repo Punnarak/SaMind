@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as RN from "react-native";
-
+import { Ionicons } from "@expo/vector-icons";
 class MyCalendar extends React.Component {
   months = [
     "January",
@@ -18,18 +18,29 @@ class MyCalendar extends React.Component {
   ];
 
   _onPress = (item) => {
-    this.setState(() => {
-      if (!item.match && item != -1) {
-        this.state.activeDate.setDate(item);
-        return this.state;
-      }
-    });
+    if (
+      this.state.highlightedDates.find(
+        (date) =>
+          date.getDate() === item &&
+          date.getMonth() === this.state.activeDate.getMonth() &&
+          date.getFullYear() === this.state.activeDate.getFullYear()
+      )
+    ) {
+      console.log(item);
+      console.log("Input --> " + this.state.highlightedDates);
+      this.props.onDateSelected(
+        item,
+        this.state.activeDate.getMonth(),
+        this.state.activeDate.getFullYear()
+      );
+    }
   };
 
   changeMonth = (n) => {
-    this.setState(() => {
-      this.state.activeDate.setMonth(this.state.activeDate.getMonth() + n);
-      return this.state;
+    this.setState((prevState) => {
+      const newActiveDate = new Date(prevState.activeDate);
+      newActiveDate.setMonth(prevState.activeDate.getMonth() + n);
+      return { activeDate: newActiveDate };
     });
   };
 
@@ -39,76 +50,154 @@ class MyCalendar extends React.Component {
 
   state = {
     activeDate: new Date(),
+    counter: 1,
+    maxDays: 0,
+    matrix: [], // เพิ่ม state matrix เป็นสถานะสำหรับเก็บข้อมูล matrix
+    highlightedDates: [],
   };
+  componentDidMount() {
+    this.generateMatrix();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.highlightedDates !== this.props.highlightedDates) {
+      this.setState(
+        { highlightedDates: this.props.highlightedDates || [] },
+        () => {
+          this.generateMatrix();
+        }
+      );
+    }
+  }
 
   generateMatrix() {
-    var matrix = [];
+    const matrix = [];
     // Create header
     matrix[0] = this.weekDays;
 
-    var year = this.state.activeDate.getFullYear();
-    var month = this.state.activeDate.getMonth();
-    var firstDay = new Date(year, month, 1).getDay();
+    const year = this.state.activeDate.getFullYear();
+    const month = this.state.activeDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const maxDays = this.nDays[month];
 
-    var maxDays = this.nDays[month];
-    if (month == 1) {
+    if (month === 1) {
       // February
-      if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+      if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
         maxDays += 1;
       }
     }
 
-    var counter = 1;
-    for (var row = 1; row < 7; row++) {
+    this.setState({ maxDays }); // อัปเดตค่า maxDays ใน state
+
+    let counter = 1;
+    let rowIndex = 1;
+    let prevMonthDays = this.nDays[(month - 1 + 12) % 12];
+    let nextMonthDays = 1;
+
+    for (let row = 1; row < 7; row++) {
       matrix[row] = [];
-      for (var col = 0; col < 7; col++) {
-        matrix[row][col] = -1;
-        if (row == 1 && col >= firstDay) {
-          // Fill in rows only after the first day of the month
+      for (let col = 0; col < 7; col++) {
+        if (row === 1 && col >= firstDay) {
           matrix[row][col] = counter++;
         } else if (row > 1 && counter <= maxDays) {
-          // Fill in rows only if the counter's not greater than
-          // the number of days in the month
           matrix[row][col] = counter++;
+        } else if (rowIndex === 1) {
+          matrix[row][col] = prevMonthDays - firstDay + col + 1;
+        } else {
+          matrix[row][col] = nextMonthDays++;
         }
       }
+      rowIndex++;
     }
 
-    return matrix;
+    this.setState({ matrix }); // อัปเดต matrix ใน state
   }
 
   render() {
-    var matrix = this.generateMatrix();
+    const matrix = this.state.matrix;
+    const currentDate = new Date().getDate();
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
 
-    var rows = [];
-    rows = matrix.map((row, rowIndex) => {
-      var rowItems = row.map((item, colIndex) => {
+    const rows = matrix.map((row, rowIndex) => {
+      const rowItems = row.map((item, colIndex) => {
+        let textColor = "black"; // กำหนดสีเทาเป็นค่าเริ่มต้น
+
+        if (rowIndex === 0) {
+          textColor = "black"; // กำหนดสีดำสำหรับวันที่ในเดือนปัจจุบันในแถวแรก (header row)
+        } else if (rowIndex === 1 && item <= 31 && item >= 25) {
+          textColor = "lightgray"; // กำหนดสีเทาสำหรับวันที่ไม่ใช่ของเดือนปัจจุบันในแถวแรก
+        } else if (
+          (rowIndex === 5 && item < 31 && item < 20) ||
+          (rowIndex === 6 && item < 31 && item < 30)
+        ) {
+          textColor = "lightgray"; // กำหนดสีดำสำหรับวันที่ไม่ใช่ของเดือนปัจจุบันในแถวอื่นๆ
+        }
+        if (
+          this.state.highlightedDates.find(
+            (date) =>
+              date.getDate() === item &&
+              date.getMonth() === this.state.activeDate.getMonth() &&
+              date.getFullYear() === this.state.activeDate.getFullYear()
+          ) &&
+          rowIndex === 1 &&
+          item < 31
+        ) {
+          textColor = "#f00";
+        } else if (
+          this.state.highlightedDates.find(
+            (date) =>
+              date.getDate() === item &&
+              date.getMonth() === this.state.activeDate.getMonth() &&
+              date.getFullYear() === this.state.activeDate.getFullYear()
+          ) &&
+          rowIndex >= 2 &&
+          rowIndex <= 5
+        ) {
+          textColor = "#f00";
+        } else if (
+          this.state.highlightedDates.find(
+            (date) =>
+              date.getDate() === item &&
+              date.getMonth() === this.state.activeDate.getMonth() &&
+              date.getFullYear() === this.state.activeDate.getFullYear()
+          ) &&
+          rowIndex === 6 &&
+          item < 31
+        ) {
+        }
+
+        if (
+          item === currentDate &&
+          currentMonth === this.state.activeDate.getMonth() &&
+          currentYear === this.state.activeDate.getFullYear()
+        ) {
+          // textColor = "blue"; // กำหนดสีแดงสำหรับวันที่ปัจจุบันที่ตรงกันทั้งวันเดือนปี
+        }
         return (
           <RN.Text
+            key={`${rowIndex}-${colIndex}`}
             style={{
               flex: 1,
               height: 18,
               textAlign: "center",
-              // Highlight header
-              // backgroundColor: rowIndex == 0 ? "#ddd" : "#fff",
-              // Highlight Sundays
-              // color: colIndex == 0 ? "#a00" : "#000",
-              // Highlight current date
-              fontWeight: item == this.state.activeDate.getDate() ? "bold" : "",
+              color: textColor,
+              fontWeight: rowIndex === 0 ? "bold" : "normal",
             }}
             onPress={() => this._onPress(item)}
           >
-            {item != -1 ? item : ""}
+            {item !== -1 ? item : ""}
           </RN.Text>
         );
       });
 
       return (
         <RN.View
+          key={rowIndex}
           style={{
             flex: 1,
             flexDirection: "row",
-            padding: 15,
+            padding: 20,
             justifyContent: "space-around",
             alignItems: "center",
           }}
@@ -120,21 +209,52 @@ class MyCalendar extends React.Component {
 
     return (
       <RN.View>
-        <RN.Text
+        <RN.View
           style={{
-            fontWeight: "bold",
-            fontSize: 18,
-            textAlign: "center",
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: "15%",
           }}
         >
-          {this.months[this.state.activeDate.getMonth()]} &nbsp;
-          {this.state.activeDate.getFullYear()}
-        </RN.Text>
+          <RN.Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 18,
+              textAlign: "left",
+              marginLeft: "8%",
+            }}
+          >
+            {this.months[this.state.activeDate.getMonth()]} &nbsp;
+            {this.state.activeDate.getFullYear()}
+          </RN.Text>
+          <RN.View
+            style={{
+              position: "absolute",
+              flexDirection: "row",
+              alignItems: "center",
+              marginLeft: "75%",
+            }}
+          >
+            <Ionicons
+              name="chevron-back-outline"
+              size={25}
+              color="black"
+              style={{}}
+              onPress={() => this.changeMonth(-1)}
+            />
+            <RN.Text>{"   "}</RN.Text>
+            <Ionicons
+              name="chevron-back-outline"
+              size={25}
+              color="black"
+              style={{
+                transform: [{ rotateY: "180deg" }],
+              }}
+              onPress={() => this.changeMonth(+1)}
+            />
+          </RN.View>
+        </RN.View>
         {rows}
-
-        <RN.Button title="<" onPress={() => this.changeMonth(-1)} />
-
-        <RN.Button title=">" onPress={() => this.changeMonth(+1)} />
       </RN.View>
     );
   }

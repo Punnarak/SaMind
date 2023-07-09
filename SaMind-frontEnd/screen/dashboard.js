@@ -1,28 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Svg, Path } from "react-native-svg";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  ImageBackground,
-} from "react-native";
+import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import I from "react-native-vector-icons/MaterialIcons";
-import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 export default function Login() {
   const navigation = useNavigation();
@@ -31,7 +12,6 @@ export default function Login() {
   console.log("Dashboard Screen");
 
   return (
-    // <View style={styles.container1}>
     <ImageBackground
       source={require("../assets/Game.png")}
       style={{ alignItems: "center", flex: 1, postition: "absolute" }}
@@ -39,7 +19,6 @@ export default function Login() {
       <View
         style={{
           flexDirection: "row",
-          // alignItems: "center",
           marginTop: "20%",
         }}
       >
@@ -48,9 +27,7 @@ export default function Login() {
           size={30}
           color="#3987FD"
           style={{
-            // position: "absolute",
             marginRight: "80%",
-            // marginTop: "20%",
           }}
           onPress={() => navigation.goBack()}
         />
@@ -132,7 +109,6 @@ export default function Login() {
         <View
           style={{
             flexDirection: "co;umn",
-            // alignItems: "center",
             marginTop: "-20%",
             marginLeft: "40%",
             zIndex: 7,
@@ -208,8 +184,6 @@ export default function Login() {
           <View
             style={{
               flexDirection: "row",
-              // alignItems: "center",
-              // marginTop: "4%",
             }}
           >
             <Svg
@@ -351,23 +325,15 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container1: {
-    flex: 1,
-    // backgroundColor: "#BED8FF",
-    alignItems: "center",
-    // fontFamily: "poppins-bold",
-  },
   container2: {
+    flex: 1,
     backgroundColor: "white",
     alignItems: "center",
-    // marginTop: "50%",
     width: "100%",
     height: "100%",
-
     paddingVertical: 0,
     paddingHorizontal: 30,
     borderRadius: 25,
-    // fontFamily: "poppins-bold",
   },
   header: {
     fontSize: 16,
@@ -396,8 +362,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF4DD",
     borderColor: "#FFF4DD",
     borderRadius: 16,
-    // paddingHorizontal: "40%",
-    // paddingVertical: "3%",
     marginTop: "3%",
     marginBottom: "7%",
   },
@@ -418,7 +382,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-    // height:"15%",
     paddingVertical: "3%",
     width: "99.8%",
   },
@@ -452,23 +415,17 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    //  marginRight: "43%",
-    // marginTop: "90%",
     marginBottom: "4%",
     fontSize: 11,
     color: "black",
     fontWeight: "bold",
-    // fontStyle: "italic",
   },
   moodavgbox: {
-    // marginTop: "5%",
     marginBottom: "1%",
     borderWidth: 1,
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-    // height:"15%",
-    // paddingVertical: "1%",
     width: "99.8%",
   },
   moodN: {
@@ -541,7 +498,7 @@ const styles = StyleSheet.create({
   },
   undertag: {
     width: "120%",
-    height: "8.65%",
+    height: 69.8,
     marginTop: "2%",
     backgroundColor: "white",
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
@@ -550,7 +507,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
     flexDirection: "row",
     alignItems: "center",
-    // marginTop: "7%",
   },
   picur: {
     marginLeft: "70%",

@@ -1,8 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
-import { ViewPropTypes } from "deprecated-react-native-prop-types";
 import Loginscreen from "./screen/login";
 
 import Signupscreen from "./screen/signup";
@@ -16,10 +14,8 @@ import Libraryscreen from "./screen/library";
 import Notiscreen from "./screen/notification";
 import Testscreen from "./screen/test";
 import Avatarscreen from "./screen/avatar";
-
-import { ScreenStackHeaderBackButtonImage } from "react-native-screens";
-import { Ionicons } from "@expo/vector-icons";
-import { height } from "deprecated-react-native-prop-types/DeprecatedImagePropType";
+import Upcomingscreen from "./screen/upcoming";
+import Appointmentscreen from "./screen/appointment";
 const Stack = createStackNavigator();
 
 function App() {
@@ -47,8 +43,18 @@ function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="Appointmentscreen"
+          component={Appointmentscreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="Calendarscreen"
           component={Calendarscreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Upcomingscreen"
+          component={Upcomingscreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

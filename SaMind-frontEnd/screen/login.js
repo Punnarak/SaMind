@@ -4,11 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  Alert,
   Image,
-  Linking,
-  Pressable,
   TouchableOpacity,
   TextInput,
   ImageBackground,
@@ -17,10 +13,6 @@ import {
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import {
-  resizeMode,
-  width,
-} from "deprecated-react-native-prop-types/DeprecatedImagePropType";
 
 //View -> UIView
 export default function Login() {
@@ -183,7 +175,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   eyeI: {
-    dposition: "absolute",
     marginLeft: "70%",
     marginTop: "-12%",
   },

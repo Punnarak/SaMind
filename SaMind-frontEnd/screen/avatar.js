@@ -1,33 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Svg, Path } from "react-native-svg";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  ImageBackground,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 
 import Modal from "react-native-modal";
 import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
-import I from "react-native-vector-icons/MaterialIcons";
-import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 
-import data from "../notiData";
-import NotiBox from "../notibox";
 export default function Notification() {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
@@ -60,13 +38,10 @@ export default function Notification() {
           size={30}
           color="#3987FD"
           style={{
-            // position: "absolute",
             marginRight: "80%",
-            // marginTop: "20%",
           }}
           onPress={() => navigation.goBack()}
         />
-
         <Feather
           name={"info"}
           size={25}
@@ -90,40 +65,11 @@ export default function Notification() {
           <Text
             style={{
               fontSize: 17,
-              alignItems: "center",
+              textAlign: "center",
             }}
           >
-            วิธีใช้งาน
-          </Text>
-          <Text
-            style={{
-              // fontFamily: "Inter",
-              fontSize: 17,
-              // marginBottom: 30,
-              paddingHorizontal: 20,
-            }}
-          >
-            สามารถเริ่มพูดคุยได้โดยการพูด
-          </Text>
-          <Text
-            style={{
-              // fontFamily: "Inter",
-              fontSize: 17,
-              // marginBottom: 30,
-              paddingHorizontal: 20,
-            }}
-          >
-            WakeWord รอน้องตอบ
-          </Text>
-          <Text
-            style={{
-              // fontFamily: "Inter",
-              fontSize: 17,
-              marginBottom: 30,
-              paddingHorizontal: 20,
-            }}
-          >
-            แล้วคุยกับน้องได้เลย !!!
+            วิธีใช้งาน{"\n"}สามารถเริ่มพูดคุยได้โดยการพูด{"\n"}WakeWord
+            รอน้องตอบ{"\n"} แล้วคุยกับน้องได้เลย !!!
           </Text>
           <TouchableOpacity
             style={styles.buttonInfo}
@@ -145,23 +91,6 @@ export default function Notification() {
           flex: 1,
         }}
       />
-      {/* 
-      <View style={styles.undertag}>
-        <Feather
-          name="bell"
-          style={styles.picul}
-          size={25}
-          color="#222222"
-          onPress={() => navigation.goBack()}
-        />
-        <Feather
-          name="smile"
-          style={styles.picur}
-          size={25}
-          color="#222222"
-          onPress={() => navigation.navigate("Loginscreen")}
-        />
-      </View> */}
     </View>
   );
 }
@@ -177,7 +106,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "5%",
   },
   buttonInfo: {
-    marginTop: 30,
+    marginTop: 50,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 11,
@@ -194,25 +123,4 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
     color: "white",
   },
-  // undertag: {
-  //   width: "117%",
-  //   height: 69.8,
-  //   // marginBottom: 45,
-  //   // paddingHorizontal: 25,
-  //   backgroundColor: "white",
-  //   shadowColor: "rgba(0,0,0, 0.3)", // IOS
-  //   shadowOffset: { height: 1, width: 1 }, // IOS
-  //   shadowOpacity: 1, // IOS
-  //   shadowRadius: 1, //IOS
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   // marginBottom: 10,
-  //   // position: "absolute",
-  // },
-  // picur: {
-  //   marginLeft: "70%",
-  // },
-  // picul: {
-  //   marginLeft: "9%",
-  // },
 });
