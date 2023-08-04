@@ -2,8 +2,9 @@ const client = require('./connection.js')
 const validateForm = require('./function.js')
  
 const express = require('express')
-const cors = require('cors')
-const app = express()
+// const cors = require('cors')
+// const app = express()
+const router = express.Router();
   
 const _ = require('lodash')
 const axios = require('axios');
@@ -16,17 +17,13 @@ const saltRounds = 10
 const jwt = require('jsonwebtoken');
 const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
 
-app.use(cors())
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// app.use(cors())
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}));
 
 client.connect();
 
-app.listen(4343, function () {
-  console.log('CORS-enabled web server listening on port 4343')
-})
-
-app.post('/register',jsonParser, function (req, res, next) {
+router.post('/register',jsonParser, function (req, res, next) {
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
     const id = req.body.id;
     const email = req.body.email;
@@ -59,7 +56,7 @@ function authenticate(req, res, next) {
     next();
   }
   
-  app.post('/login', authenticate, jsonParser, function (req, res, next) {
+router.post('/login', authenticate, jsonParser, function (req, res, next) {
     const email = req.body.email;
     const query = {
       text: 'SELECT * FROM users WHERE email = $1',
@@ -90,8 +87,7 @@ function authenticate(req, res, next) {
     });
   });
 
-
-app.post('/authen',jsonParser, function (req, res, next) {
+router.post('/authen',jsonParser, function (req, res, next) {
     try{
         const token = req.headers.authorization.split(' ')[1]
         var decoded = jwt.verify(token, secret);
@@ -102,7 +98,7 @@ app.post('/authen',jsonParser, function (req, res, next) {
     client.end;
 })
 
-app.post('/sendotp', (req,res) => {
+router.post('/sendotp', (req,res) => {
   var phoneNo = _.get(req, ["body", "phoneNo"]);
   console.log(phoneNo)
 
@@ -180,7 +176,7 @@ app.post('/sendotp', (req,res) => {
   }
 })
 
-app.post('/verifyotp', (req,res) => {
+router.post('/verifyotp', (req,res) => {
   var phoneNo = _.get(req, ["body", "phoneNo"]);
   var otp = _.get(req, ["body", "otp"]);
   var TransId = _.get(req, ["body", "TransId"]);
@@ -254,25 +250,4 @@ app.post('/verifyotp', (req,res) => {
 
 })
 
-// app.post('/signin/facebook', async (req, res) => {
-//   console.log('Request -->', req.body.user)
-
-//   try {
-//     const response = await axios({
-//       method: 'get',
-//       url: `https://graph.facebook.com/v6.0/oauth/access_token?grant_type=fb_exchange_token&
-//       client_id=637914574962445=26b99fc49e78bf82ad746bb6034a1c66
-//       &fb_exchange_token=${req.body.user.accessToken}`
-//     })
-//     const result = response.data
-//     console.log('Result -->', result)
-
-//     // If (result) --> process signup (new user) / signin (exiting user)
-//   } catch (error) {}
-// })
-
-exports.module = app; //add
-
-
-
-
+module.exports = router;
