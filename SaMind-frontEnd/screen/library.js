@@ -20,6 +20,7 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -312,7 +313,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: "1.5%",
     paddingVertical: 10,
     borderWidth: 1,
-
     borderColor: "#EEF7FF",
   },
   container2: {

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native";
+import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
 
 export const SLIDER_WIDTH = Dimensions.get("window").width;
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH);
@@ -38,17 +39,21 @@ const ImageLink = ({ imageSource, link }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    marginTop: "10%",
+    marginTop: verticalScale(37.5),
+    // marginTop: "10%",
     width: ITEM_WIDTH,
-    height: "74%",
+    height: verticalScale(290),
+    // height: "74%",
   },
 
   header: {},
   body: {},
   image: {
-    width: "100%",
+    width: horizontalScale(375),
+    // width: "100%",
     // marginTop: "10%",
-    height: "100%",
+    height: verticalScale(290),
+    // height: "100%",
     // alignItems: "center",
     // height: "100%",
 

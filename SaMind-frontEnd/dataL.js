@@ -4,7 +4,7 @@ const data = [
     url: "https://www.lovecarestation.com/10-ตุลาคม-วันสุขภาพจิตโลก",
     imgUrl: require("./assets/p1.jpg"),
     header: {
-      alignItem: "center",
+      alignItems: "center",
       fontSize: 16,
       fontWeight: "bold",
       paddingLeft: 20,
@@ -18,7 +18,7 @@ const data = [
     url: "https://www.thailandplus.tv/archives/403806",
     imgUrl: require("./assets/p2.jpg"),
     header: {
-      alignItem: "center",
+      alignItems: "center",
       fontSize: 16,
       fontWeight: "bold",
       paddingLeft: 20,
@@ -32,7 +32,7 @@ const data = [
     url: "https://www.hitap.net/166484",
     imgUrl: require("./assets/p3.jpg"),
     header: {
-      alignItem: "center",
+      alignItems: "center",
       fontSize: 16,
       fontWeight: "bold",
       paddingLeft: 20,

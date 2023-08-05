@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import Modal from "react-native-modal";
 import "moment-timezone";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Calendar({ route }) {
   console.log("Calendar Screen");
@@ -20,6 +21,7 @@ export default function Calendar({ route }) {
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalVisible2, setModalVisible2] = useState(false);
+
   const [isButtonVisible, setButtonVisible] = useState(false);
   const [isButtonVisible2, setButtonVisible2] = useState(false);
   const [showdate, setshowdate] = useState([]);
@@ -27,7 +29,7 @@ export default function Calendar({ route }) {
   const { date, month, year } = route.params || {};
 
   useEffect(() => {
-    const dateStrings = ["2023-07-01", "2023-07-05"];
+    const dateStrings = ["2023-08-01", "2023-08-05"];
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>
       moment(dateString, dateFormat).toDate()
@@ -86,14 +88,24 @@ export default function Calendar({ route }) {
     // setCalendarVisible(!isCalendarVisible)
     setModalVisible(!isModalVisible);
     setButtonVisible(!isButtonVisible);
+    // setModalVisible2(!isModalVisible2);
+    // setButtonVisible2(!isButtonVisible2);
   };
 
   const toggleModal2 = () => {
-    setModalVisible(false);
-    setButtonVisible(false);
-    setModalVisible2(true);
-    setButtonVisible2(true);
-    console.log("innnn");
+    setModalVisible(!isModalVisible);
+    setButtonVisible(!isButtonVisible);
+    setModalVisible2(!isModalVisible2);
+    setButtonVisible2(!isButtonVisible2);
+
+    console.log("innnn 1 --->", isModalVisible2);
+    console.log("isModalVisible2 --->", isModalVisible2);
+  };
+
+  const toggleModal3 = () => {
+    setModalVisible2(!isModalVisible2);
+    setButtonVisible2(!isModalVisible2);
+    console.log("outt");
   };
 
   return (
@@ -118,14 +130,14 @@ export default function Calendar({ route }) {
           onPress={() => navigation.goBack()}
         />
       </View>
-      <Text style={styles.header}>Calendar</Text>
+      <Text style={styles.header}>Choose date Appointment</Text>
       <View style={styles.container2}>
         <MyCalendar
           highlightedDates={highlightedDates}
           onDateSelected={handleDateSelected}
         />
-
-        <Modal isVisible={isModalVisible2}>
+        {/* first Modal */}
+        <Modal isVisible={isModalVisible}>
           <View style={styles.Modal}>
             <Text
               style={{
@@ -163,20 +175,22 @@ export default function Calendar({ route }) {
             <TouchableOpacity
               style={styles.confirmb}
               onPress={toggleModal2}
-              isVisible={isButtonVisible2}
+              isVisible={isButtonVisible}
             >
               <Text style={styles.text}>Confirm</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelb}
               onPress={toggleModal}
-              isVisible={isButtonVisible2}
+              isVisible={isButtonVisible}
             >
               <Text style={styles.text}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </Modal>
-        <Modal isVisible={isModalVisible}>
+
+        {/*Second Modal */}
+        <Modal isVisible={isModalVisible2}>
           <View style={styles.Modal}>
             <Text
               style={{
@@ -194,8 +208,8 @@ export default function Calendar({ route }) {
             <Ionicons name="calendar-outline" size={100} color="black" />
             <TouchableOpacity
               style={styles.confirmb}
-              onPress={toggleModal2}
-              isVisible={isButtonVisible}
+              onPress={toggleModal3}
+              isVisible={isButtonVisible2}
             >
               <Text style={styles.text}>I understand</Text>
             </TouchableOpacity>
@@ -214,9 +228,11 @@ const styles = StyleSheet.create({
   },
   container2: {
     backgroundColor: "white",
-    marginTop: "20%",
-    width: "94%",
-    height: "50%",
+    marginTop: verticalScale(75),
+    // marginTop: "20%",
+    width: horizontalScale(353),
+    // width: "94%",
+    paddingVertical: verticalScale(31.5),
     justifyContent: "center",
     borderRadius: 25,
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
@@ -225,19 +241,23 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   header: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
+    // fontSize: 16,
     fontWeight: "bold",
     color: "#25271C",
-    marginTop: "-7%",
+    marginTop: verticalScale(-26),
+    // marginTop: "-7%",
   },
   Modal: {
-    justifyContent: "center",
+    // justifyContent: "center",
+    position: "relative",
     alignItems: "center",
     backgroundColor: "white",
     borderColor: "black",
     borderWidth: 5,
     borderRadius: 8,
     marginHorizontal: "5%",
+    zIndex: 1,
   },
   text: {
     fontSize: 15,

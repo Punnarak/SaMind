@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as RN from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
 class MyCalendar extends React.Component {
   months = [
     "January",
@@ -34,16 +35,22 @@ class MyCalendar extends React.Component {
         this.state.activeDate.getFullYear()
       );
     }
+    // console.log(this.state.activeDate.getMonth()); // เดือนจริงๆคือ month +1
   };
 
   changeMonth = (n) => {
-    this.setState((prevState) => {
-      const newActiveDate = new Date(prevState.activeDate);
-      newActiveDate.setMonth(prevState.activeDate.getMonth() + n);
-      return { activeDate: newActiveDate };
-    });
+    this.setState(
+      (prevState) => {
+        const newActiveDate = new Date(prevState.activeDate);
+        newActiveDate.setMonth(prevState.activeDate.getMonth() + n);
+        return { activeDate: newActiveDate };
+      },
+      () => {
+        // Call generateMatrix after the state update is completed
+        this.generateMatrix();
+      }
+    );
   };
-
   weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -78,7 +85,7 @@ class MyCalendar extends React.Component {
     const year = this.state.activeDate.getFullYear();
     const month = this.state.activeDate.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
-    const maxDays = this.nDays[month];
+    let maxDays = this.nDays[month];
 
     if (month === 1) {
       // February
@@ -152,7 +159,9 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex >= 2 &&
-          rowIndex <= 5
+          rowIndex <= 5 &&
+          item > 24 &&
+          item <= 31
         ) {
           textColor = "#f00";
         } else if (
@@ -179,7 +188,8 @@ class MyCalendar extends React.Component {
             key={`${rowIndex}-${colIndex}`}
             style={{
               flex: 1,
-              height: 18,
+              height: verticalScale(17),
+              // height: 18,
               textAlign: "center",
               color: textColor,
               fontWeight: rowIndex === 0 ? "bold" : "normal",
@@ -213,13 +223,15 @@ class MyCalendar extends React.Component {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: "15%",
+            marginBottom: verticalScale(53),
+            // marginBottom: "15%",
           }}
         >
           <RN.Text
             style={{
               fontWeight: "bold",
-              fontSize: 18,
+              fontSize: moderateScale(17.7),
+              // fontSize: 18,
               textAlign: "left",
               marginLeft: "8%",
             }}

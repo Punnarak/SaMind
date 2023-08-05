@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
   TextInput,
   ImageBackground,
+  Platform,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 //View -> UIView
 export default function Login() {
@@ -89,7 +91,7 @@ export default function Login() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: "10%",
+              marginTop: verticalScale(32),
             }}
           >
             <View
@@ -147,39 +149,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container2: {
+    marginTop: verticalScale(244),
     backgroundColor: "white",
     alignItems: "center",
-    marginTop: "65%",
     width: "100%",
     height: "100%",
-    // justifyContent: "center",
-    paddingVertical: 0,
-    paddingHorizontal: 30,
+    paddingHorizontal: horizontalScale(28.8),
     borderRadius: 25,
   },
   wel: {
-    marginTop: "25%",
-    marginBottom: "7%",
-    fontSize: 24,
+    marginTop: verticalScale(79),
+    marginBottom: verticalScale(22.4),
+    fontSize: moderateScale(24),
     color: "#569AFF",
     fontWeight: "bold",
   },
   TextInput: {
-    marginTop: "2%",
+    marginTop: verticalScale(6.5),
+    // marginTop: "2%",
+    // height: verticalScale(38.3),
     height: 40,
-    width: "80%",
-    marginBottom: "4%",
+    width: 266,
+    // width: horizontalScale(255),
+    // width: "80%",
+    marginBottom: verticalScale(12.7),
+    // marginBottom: "4%",
     borderColor: "#569AFF",
     borderBottomWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    // paddingHorizontal: 8,
+    // paddingVertical: 6,
   },
   eyeI: {
-    marginLeft: "70%",
-    marginTop: "-12%",
+    // marginLeft: horizontalScale(223),
+    marginLeft: 231.5,
+    // marginLeft: "70%",
+    // marginTop: verticalScale(-38.4),
+    marginTop: -39.8,
+    // marginTop: "-12%",
   },
   hyper: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
+    // fontSize: 13,
     color: "#569AFF",
     marginTop: "1%",
     marginLeft: "55%",
@@ -187,38 +197,46 @@ const styles = StyleSheet.create({
   },
 
   loginb: {
-    marginTop: "15%",
+    marginTop: verticalScale(47.85),
+    // marginTop: "15%",
     alignItems: "center",
     justifyContent: "center",
+    // paddingVertical: verticalScale(10.5),
     paddingVertical: 11,
+    // paddingHorizontal: horizontalScale(29.5),
     paddingHorizontal: 30,
     borderRadius: 25,
     backgroundColor: "#569AFF",
-    width: "60%",
+    width: verticalScale(190.5),
+    // width: "60%",
   },
   text: {
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: moderateScale(15),
+    lineHeight: verticalScale(20),
+    // lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
   },
   n: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     color: "black",
     marginTop: "4%",
     // fontWeight: "bold",
   },
   or: {
-    ontSize: 15,
+    fontSize: moderateScale(15),
     color: "#569AFF",
-    marginTop: "5%",
+    // marginTop: verticalScale(50),
+    // marginTop: "5%",
     borderBottomColor: "#569AFF",
-    // borderBottomWidth: StyleSheet.10,
   },
   icon: {
-    width: 50,
-    height: 50,
+    //Ipad เล็ก ใหญ่ไป
+    width: horizontalScale(48),
+    // width: 50,
+    height: horizontalScale(48),
+    // height: 50,
     alignItems: "center",
     margin: "7%",
     resizeMode: "contain",

@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -13,6 +14,7 @@ import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Ionicons } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -40,7 +42,7 @@ export default function Login() {
         style={{
           // position: "absolute",
           marginRight: "80%",
-          marginTop: "20%",
+          marginTop: verticalScale(75),
         }}
         onPress={() => navigation.goBack()}
       />
@@ -113,7 +115,8 @@ export default function Login() {
           style={{
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "8%",
+            marginTop: verticalScale(24),
+            // marginTop: "8%",
           }}
         >
           <TouchableOpacity
@@ -143,12 +146,13 @@ const styles = StyleSheet.create({
   container2: {
     backgroundColor: "white",
     alignItems: "center",
-    marginTop: "10%",
-    width: "95%",
-    height: "70%",
-    // justifyContent: "center",
-    paddingVertical: 0,
-    paddingHorizontal: 30,
+    marginTop: verticalScale(37.5),
+    // marginTop: "10%",
+    width: horizontalScale(356.5),
+    // width: "95%",
+    // paddingVertical: 0,
+    paddingHorizontal: horizontalScale(28.85),
+    // paddingHorizontal: 30,
     borderRadius: 25,
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
@@ -156,84 +160,107 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   wel: {
-    marginTop: "10%",
-    marginBottom: "7%",
-    fontSize: 24,
+    marginTop: verticalScale(30),
+    // marginTop: "10%",
+    marginBottom: verticalScale(21),
+    // marginBottom: "7%",
+    fontSize: moderateScale(23.6),
+    // fontSize: 24,
     color: "black",
     fontWeight: "bold",
   },
   title1: {
     marginRight: "82.1%",
-    marginTop: "0%",
-    marginBottom: "1%",
-    fontSize: 20,
+    // marginTop: "0%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19.6),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   title2: {
     marginRight: "72.5%",
-    marginTop: "0%",
-    marginBottom: "1%",
-    fontSize: 20,
+    // marginTop: "0%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19.6),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   title3: {
     marginRight: "69.5%",
-    marginTop: "0%",
-    marginBottom: "1%",
-    fontSize: 20,
+    // marginTop: "0%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19.6),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   title4: {
-    marginRight: "43%",
-    marginTop: "5%",
-    marginBottom: "1%",
-    fontSize: 20,
+    ...Platform.select({
+      android: {
+        marginRight: horizontalScale(140),
+      },
+      ios: {
+        marginRight: horizontalScale(128.5),
+      },
+    }),
+    // marginRight: horizontalScale(128.5),
+    // marginRight: "43%",
+    marginTop: verticalScale(15),
+    // marginTop: "5%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19.6),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   TextInput: {
-    marginTop: "1%",
-    height: 40,
+    marginTop: moderateScale(3.05),
+    // marginTop: "1%",
+    height: verticalScale(38.315),
+    // height: 40,
     width: "100%",
-    marginBottom: "2%",
+    marginBottom: verticalScale(6),
+    // marginBottom: "2%",
     borderWidth: 2,
     borderColor: "#569AFF",
     borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingHorizontal: horizontalScale(8),
+    // paddingHorizontal: 8,
+    paddingVertical: verticalScale(6),
+    // paddingVertical: 6,
   },
 
   eyeI: {
-    dposition: "absolute",
+    // dposition: "absolute",
     marginLeft: "85%",
-    marginTop: "-12%",
+    marginTop: verticalScale(-36),
+    // marginTop: "-12%",
   },
-  hyper: {
-    fontSize: 13,
-    color: "#569AFF",
-    marginTop: "0%",
-    marginLeft: "55%",
-    fontWeight: "bold",
-  },
-
   loginb: {
-    marginTop: "6%",
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: verticalScale(18),
+    // marginTop: "6%",
+    // alignItems: "center",
+    // justifyContent: "center",
     paddingVertical: 8,
     paddingHorizontal: 70,
     borderRadius: 25,
     backgroundColor: "#569AFF",
   },
   outb: {
-    marginTop: "4%",
+    marginTop: verticalScale(11.7),
+    // marginTop: "4%",
+    marginBottom: verticalScale(11.7),
+    // marginBottom: "4%",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
@@ -242,8 +269,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#C6E3FF",
   },
   text: {
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: moderateScale(14.7),
+    // fontSize: 15,
+    lineHeight: verticalScale(20.2),
+    // lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",

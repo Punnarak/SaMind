@@ -5,6 +5,7 @@ import Modal from "react-native-modal";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Notification() {
   const navigation = useNavigation();
@@ -53,7 +54,8 @@ export default function Notification() {
         <View style={styles.Modal}>
           <Text
             style={{
-              fontSize: 16,
+              fontSize: moderateScale(16),
+              // fontSize: 16,
               marginTop: 35,
               color: "#569AFF",
               fontWeight: "bold",
@@ -64,7 +66,8 @@ export default function Notification() {
           </Text>
           <Text
             style={{
-              fontSize: 17,
+              fontSize: moderateScale(16.69),
+              // fontSize: 17,
               textAlign: "center",
             }}
           >
@@ -84,8 +87,10 @@ export default function Notification() {
       <Image
         source={require("../assets/a1.gif")}
         style={{
-          width: 350,
-          height: 350,
+          width: horizontalScale(337),
+          // width: 350,
+          height: verticalScale(337),
+          // height: 350,
           marginLeft: 10,
           resizeMode: "contain",
           flex: 1,
@@ -103,7 +108,8 @@ const styles = StyleSheet.create({
     borderColor: "#3987FD",
     borderWidth: 5,
     borderRadius: 8,
-    marginHorizontal: "5%",
+    marginHorizontal: horizontalScale(16.5),
+    // marginHorizontal: "5%",
   },
   buttonInfo: {
     marginTop: 50,
@@ -113,12 +119,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 25,
     backgroundColor: "#569AFF",
-    width: "60%",
+    width: horizontalScale(177),
+    // width: "60%",
     marginBottom: 15,
   },
   text: {
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: moderateScale(14.5),
+    // fontSize: 15,
+    lineHeight: verticalScale(20.2),
+    // lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",

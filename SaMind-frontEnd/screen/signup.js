@@ -11,13 +11,14 @@ import {
   Pressable,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from "react-native";
-
+import { Picker } from "@react-native-picker/picker";
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
-import useCheck from "../usecheck";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -31,19 +32,22 @@ export default function Login() {
   const [Conpassword, setConPassword] = useState("");
   const [patientID, setID] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("a");
 
+  const pickerItems = [
+    { label: "Option A", value: "a" },
+    { label: "Option B", value: "b" },
+    { label: "Option C", value: "c" },
+  ];
   const handleCheckboxToggle = () => {
     setIsChecked(!isChecked);
   };
-  const handleLogin = async () => {
-    // const response = await login(email, password);
-    // if (response.success) {
-    //   navigation.navigate("Home");
-    // } else {
-    //   Alert.alert("Login Failed", "Invalid email or password.");
-    // }
-  };
+
   console.log("SignUp Screen");
+  const animatedNodeTag = Platform.select({
+    ios: "parent",
+    android: 37631,
+  });
 
   return (
     <View style={styles.container1}>
@@ -100,24 +104,34 @@ export default function Login() {
           />
         </TouchableOpacity>
         <TextInput
-          placeholder="Patient ID"
+          placeholder="Hospital"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput2}
           value={patientID}
           onChangeText={setID}
         />
+        {/* <Picker
+          selectedValue={selectedValue}
+          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+          style={styles.pickerStyle} // เพิ่ม style เพื่อปรับแต่ง dropdown
+        >
+          {pickerItems.map((item, index) => (
+            <Picker.Item key={index} label={item.label} value={item.value} />
+          ))}
+        </Picker> */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginTop: "8%",
+            marginTop: verticalScale(25.55),
+            // marginTop: "8%",
           }}
         >
           <TouchableOpacity onPress={handleCheckboxToggle}>
             <Feather
               name={isChecked ? "check-circle" : "circle"}
               size={20}
-              color="#22222"
+              color="black"
             />
           </TouchableOpacity>
           <Text style={styles.n}>
@@ -132,7 +146,7 @@ export default function Login() {
         </View>
         <TouchableOpacity
           style={styles.loginb}
-          onPress={() => navigation.navigate("Homescreen")}
+          onPress={() => navigation.navigate("Homescreen", { animatedNodeTag })}
         >
           <Text style={styles.text}>Sign up</Text>
         </TouchableOpacity>
@@ -140,7 +154,8 @@ export default function Login() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginTop: "10%",
+            marginTop: verticalScale(32),
+            // marginTop: "10%",
           }}
         >
           <View
@@ -159,7 +174,8 @@ export default function Login() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginTop: "2%",
+            marginTop: verticalScale(6),
+            // marginTop: "2%",
           }}
         >
           <Image source={require("../assets/Apple.png")} style={styles.icon} />
@@ -181,33 +197,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container2: {
+    // ...Platform.select({
+    //   android: {
+    //     marginTop: "25%",
+    //   },
+    //   ios: {
+    //     marginTop: "50%",
+    //   },
+    // }),
     backgroundColor: "white",
     alignItems: "center",
+    marginTop: verticalScale(188),
     // marginTop: "50%",
-    marginTop: 195,
+    // marginTop: 195,
     width: "100%",
     height: "100%",
     // justifyContent: "center",
-    paddingVertical: "0%",
+    // paddingVertical: "0%",
     // paddingHorizontal: 30,
     paddingHorizontal: "7.5%",
     borderRadius: 25,
   },
   wel: {
-    marginTop: "15%",
-    marginBottom: "7%",
-    fontSize: 24,
+    // marginBottom: "7%",
+    marginBottom: verticalScale(22.4),
+    marginTop: verticalScale(47.8),
+    // marginTop: "15%",
+    fontSize: moderateScale(23.5),
+    // fontSize: 24,
     color: "#569AFF",
     fontWeight: "bold",
   },
   TextInput: {
-    marginTop: "1%",
-    height: 40,
+    marginTop: verticalScale(3.15),
+    // marginTop: "1%",
+    height: verticalScale(38.35),
+    // height: 40,
     // height: "4.75%",
     // width: "80%",
     width: 265,
     // marginBottom: "2%",
-    marginBottom: 6.7,
+    marginBottom: verticalScale(6.5),
+    // marginBottom: 6.7,
     borderColor: "#569AFF",
     borderBottomWidth: 1,
     // paddingHorizontal: 8,
@@ -217,17 +248,22 @@ const styles = StyleSheet.create({
   },
   TextInput2: {
     // marginTop: "8%",
-    marginTop: 26.5,
-    height: 40,
+    marginTop: verticalScale(25.5),
+    // marginTop: 26.5,
+    height: verticalScale(38.35),
+    // height: 40,
     // height: "4.75%",
     // width: "80%",
+    // width: horizontalScale(255),
     width: 265,
     // marginBottom: "2%",
-    marginBottom: 6.7,
+    marginBottom: verticalScale(6.6),
+    // marginBottom: 6.7,
     borderColor: "#569AFF",
     borderBottomWidth: 1,
     // paddingHorizontal: 8,
-    paddingHorizontal: "2.5%",
+    paddingHorizontal: horizontalScale(7.9),
+    // paddingHorizontal: "2.5%",
     // paddingVertical: 6,
   },
   eyeI: {
@@ -235,10 +271,12 @@ const styles = StyleSheet.create({
     // marginLeft: "70%",
     marginLeft: 232,
     // marginTop: "-12%",
+    // marginTop: verticalScale(-38.5),
     marginTop: -40,
   },
   hyper: {
-    fontSize: 13,
+    fontSize: moderateScale(12.6),
+    // fontSize: 13,
     color: "#569AFF",
     marginTop: "0%",
     marginLeft: "55%",
@@ -246,34 +284,54 @@ const styles = StyleSheet.create({
   },
 
   loginb: {
-    marginTop: "5%",
+    marginTop: verticalScale(16),
+    // marginTop: "5%",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 11,
-    paddingHorizontal: 30,
+    paddingVertical: verticalScale(10.6),
+    // paddingVertical: 11,
+    paddingHorizontal: horizontalScale(30),
+    // paddingHorizontal: 30,
     borderRadius: 25,
     backgroundColor: "#569AFF",
+    // width: horizontalScale(191),
+    // width: 199,
     width: "60%",
   },
   text: {
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: moderateScale(14.7),
+    // fontSize: 15,
+    lineHeight: verticalScale(20),
+    // lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
   },
   n: {
-    fontSize: 13,
+    fontSize: moderateScale(12.4),
+    // fontSize: 13,
     color: "black",
     marginLeft: "3%",
     fontWeight: "bold",
   },
-
+  pickerStyle: {
+    marginTop: verticalScale(25.5), // ปรับตำแหน่งตามที่คุณต้องการ
+    width: 265, // ปรับความกว้างตามที่คุณต้องการ
+    height: verticalScale(38.35), // ปรับความสูงตามที่คุณต้องการ
+    borderColor: "#569AFF",
+    borderBottomWidth: 1,
+    paddingHorizontal: horizontalScale(7.9), // ปรับการเว้นระยะห่างแนวนอน
+    zIndex: 1,
+    // marginTop: "50%",
+  },
   icon: {
+    // width: horizontalScale(48),
     width: 50,
+    // height: horizontalScale(48),
     height: 50,
     alignItems: "center",
-    margin: "7%",
+    margin: verticalScale(22.4),
+    // margin: "7%",
     resizeMode: "contain",
   },
 });

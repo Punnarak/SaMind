@@ -15,7 +15,7 @@ export default function Notification() {
     // <View style={styles.container1}>
     <ImageBackground
       source={require("../assets/Game.png")}
-      style={{ alignItems: "center", flex: 1, postition: "absolute" }}
+      style={{ alignItems: "center", flex: 1 }}
     >
       <View
         style={{

@@ -10,13 +10,14 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { MainStack, FeaturesStack } from "../Navigation";
 
 import data from "../notiData";
 import NotiBox from "../notibox";
 export default function Notification() {
   const navigation = useNavigation();
 
-  handleLogin = async () => {};
+  // handleLogin = async () => {};
   console.log("Notification Screen");
 
   return (

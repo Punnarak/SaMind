@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Calendar() {
   console.log("Calendar Screen");
@@ -12,7 +13,7 @@ export default function Calendar() {
   const [highlightedDates, setHighlightedDates] = useState([]);
 
   useEffect(() => {
-    const dateStrings = ["2023-07-01", "2023-07-05"];
+    const dateStrings = ["2023-08-01", "2023-08-05"];
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>
       moment(dateString, dateFormat).toDate()
@@ -34,12 +35,13 @@ export default function Calendar() {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginTop: "20%",
+          marginTop: verticalScale(75),
+          // marginTop: "20%",
         }}
       >
         <Ionicons
           name="chevron-back-outline"
-          size={30}
+          size={moderateScale(30)}
           color="#3987FD"
           style={{
             marginRight: "80%",
@@ -66,9 +68,11 @@ const styles = StyleSheet.create({
   },
   container2: {
     backgroundColor: "white",
-    marginTop: "20%",
-    width: "94%",
-    height: "50%",
+    marginTop: verticalScale(75),
+    // marginTop: "20%",
+    width: horizontalScale(353),
+    // width: "94%",
+    paddingVertical: verticalScale(31.5),
     justifyContent: "center",
     borderRadius: 25,
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
@@ -77,9 +81,11 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   header: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
+    // fontSize: 16,
     fontWeight: "bold",
     color: "#25271C",
-    marginTop: "-7%",
+    marginTop: verticalScale(-26),
+    // marginTop: "-7%",
   },
 });

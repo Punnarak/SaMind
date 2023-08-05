@@ -1,27 +1,56 @@
 import React, { useState, useEffect } from "react";
 
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
-
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import { Ionicons } from "@expo/vector-icons";
 export default function Login() {
   const navigation = useNavigation();
+  const [selectedMenu, setSelectedMenu] = useState();
+  const [checkIn, setCheckIn] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const iconSize = Platform.select({
+    ios: 57,
+    android: 37,
+  });
 
-  // useEffect(() => {
-  //   // โหลดและตั้งค่า fontFamily
-  //   Font.loadAsync({
-  //     "poppins-regular": require("../assets/fonts/Poppins-Regular.ttf"),
-  //     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
-  //     "poppins-italic": require("../assets/fonts/Poppins-Italic.ttf"),
-  //     // เพิ่ม font อื่นๆ ตามต้องการ
-  //   });
-  // }
   handleLogin = async () => {};
   console.log("Home Screen");
-
+  const handleMenuPress = (menu) => {
+    setSelectedMenu(menu);
+    console.log(menu);
+  };
+  const isMenuSelected = (menu) => {
+    return menu === selectedMenu;
+  };
+  const handleCheckinPress = (selectedMenu) => {
+    console.log("checkin --> ", selectedMenu);
+    if (
+      selectedMenu == "a" ||
+      selectedMenu == "b" ||
+      selectedMenu == "c" ||
+      selectedMenu == "d" ||
+      selectedMenu == "e"
+    ) {
+      setDisabled(true);
+      setCheckIn(true);
+      console.log("checkin complete");
+    } else {
+      setDisabled(false);
+      setCheckIn(false);
+    }
+  };
   return (
     <View style={styles.container1}>
       <View
@@ -55,20 +84,90 @@ export default function Login() {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginTop: "5%",
+
+          ...Platform.select({
+            android: {
+              marginTop: "4%",
+            },
+            ios: {
+              marginTop: "5%",
+            },
+          }),
         }}
       >
-        <Image source={require("../assets/m1.png")} style={styles.icon} />
-        <Image source={require("../assets/m2.png")} style={styles.icon} />
-        <Image source={require("../assets/m3.png")} style={styles.icon} />
-        <Image source={require("../assets/m4.png")} style={styles.icon} />
-        <Image source={require("../assets/m5.png")} style={styles.icon} />
+        <TouchableOpacity
+          disabled={disabled}
+          style={[
+            styles.menuItem,
+            isMenuSelected("a") && styles.selectedMenuItem,
+          ]}
+          onPress={() => handleMenuPress("a")}
+        >
+          <Image
+            source={require("../assets/m1.png")}
+            style={[styles.icon]}
+            onPress={() => handleMenuPress("a")}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={disabled}
+          style={[
+            styles.menuItem,
+            isMenuSelected("b") && styles.selectedMenuItem,
+          ]}
+          onPress={() => handleMenuPress("b")}
+        >
+          <Image source={require("../assets/m2.png")} style={[styles.icon]} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={disabled}
+          style={[
+            styles.menuItem,
+            isMenuSelected("c") && styles.selectedMenuItem,
+          ]}
+          onPress={() => handleMenuPress("c")}
+        >
+          <Image source={require("../assets/m3.png")} style={[styles.icon]} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={disabled}
+          style={[
+            styles.menuItem,
+            isMenuSelected("d") && styles.selectedMenuItem,
+          ]}
+          onPress={() => handleMenuPress("d")}
+        >
+          <Image source={require("../assets/m4.png")} style={[styles.icon]} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={disabled}
+          style={[
+            styles.menuItem,
+            isMenuSelected("e") && styles.selectedMenuItem,
+          ]}
+          onPress={() => handleMenuPress("e")}
+        >
+          <Image source={require("../assets/m5.png")} style={[styles.icon]} />
+        </TouchableOpacity>
       </View>
       <TouchableOpacity
-        style={styles.checkinb}
-        onPress={() => navigation.navigate("Loginscreen")} // ต้องเปลี่ยนเป็นใส่ไอคอน
+        disabled={disabled}
+        style={[styles.checkinb]}
+        onPress={() => handleCheckinPress(selectedMenu)}
       >
         <Text style={styles.checkin}>Check - in</Text>
+        {checkIn == true && (
+          <TouchableOpacity
+            disabled={disabled}
+            style={{
+              backgroundColor: "#11dd66",
+              borderRadius: 100,
+              margin: 3,
+            }}
+          >
+            <Ionicons name="checkmark-circle-outline" size={17} />
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
       <View style={styles.container2}>
         <Text style={styles.textf}>What do you want to do ?</Text>
@@ -82,7 +181,8 @@ export default function Login() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: "10%",
+              marginTop: verticalScale(31.7),
+              // marginTop: "10%",
             }}
           >
             <TouchableOpacity
@@ -93,7 +193,7 @@ export default function Login() {
               <Icon
                 name="alarm"
                 style={styles.picb}
-                size={57}
+                size={iconSize}
                 type="ionicon"
                 color="#847872"
               />
@@ -106,7 +206,7 @@ export default function Login() {
               <I
                 name="calendar-today"
                 style={styles.picb1}
-                size={57}
+                size={iconSize}
                 color="#847872"
               />
             </TouchableOpacity>
@@ -115,7 +215,8 @@ export default function Login() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: "7%",
+              marginTop: verticalScale(22.3),
+              // marginTop: "7%",
             }}
           >
             <TouchableOpacity
@@ -126,7 +227,7 @@ export default function Login() {
               <I
                 name="dashboard"
                 style={styles.picb2}
-                size={57}
+                size={iconSize}
                 color="#847872"
               />
             </TouchableOpacity>
@@ -138,7 +239,7 @@ export default function Login() {
               <I
                 name="videogame-asset"
                 style={styles.picb1}
-                size={57}
+                size={iconSize}
                 color="#847872"
               />
             </TouchableOpacity>
@@ -147,7 +248,8 @@ export default function Login() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: "7%",
+              marginTop: verticalScale(22.3),
+              // marginTop: "7%",
             }}
           >
             <TouchableOpacity
@@ -158,7 +260,7 @@ export default function Login() {
               <I
                 name="menu-book"
                 style={styles.picb2}
-                size={57}
+                size={iconSize}
                 color="#847872"
               />
             </TouchableOpacity>
@@ -170,7 +272,7 @@ export default function Login() {
               <I
                 name="format-list-bulleted"
                 style={styles.picb1}
-                size={57}
+                size={iconSize}
                 color="#847872"
               />
             </TouchableOpacity>
@@ -209,30 +311,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     alignItems: "center",
-    marginTop: "3%",
+    marginTop: verticalScale(11.5),
+    // marginTop: "3%",
     width: "100%",
-    paddingHorizontal: 30,
+    paddingHorizontal: horizontalScale(28.95),
+    // paddingHorizontal: 30,
     borderRadius: 25,
   },
   // Topic: What do you want to do ?
   textf: {
-    fontSize: 15,
+    marginTop: verticalScale(31.45),
+    // marginTop: "10%",
+    fontSize: moderateScale(15),
+    // fontSize: 15,
     fontWeight: "bold",
     // letterSpacing: 0.25,
     color: "#25271C",
-    marginTop: "10%",
   },
   // profile setting icon
   per: {
     alignItems: "center",
+    // marginTop: verticalScale(31.45),
     marginTop: "10%",
     marginRight: "0%",
-    // borderWidth: 1,
-    // resizeMode: "contain",
   },
   // circle background of profile setting icon
   boxper: {
-    marginTop: "10%",
+    ...Platform.select({
+      android: {
+        marginTop: "4%",
+      },
+      ios: {
+        marginTop: "10%",
+      },
+    }),
+    // marginTop: "10%",
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     borderRadius: 40,
     borderColor: "rgba(255, 255, 255, 0.6)",
@@ -241,24 +354,36 @@ const styles = StyleSheet.create({
   },
   // Box of Level Text
   boxlevel: {
+    ...Platform.select({
+      android: {
+        marginTop: "8%",
+      },
+      ios: {
+        marginTop: "15%",
+      },
+    }),
     borderWidth: 1,
     backgroundColor: "#3C9BF2",
     borderColor: "#3C9BF2",
     borderRadius: 21,
     padding: "3%",
-    marginTop: "15%",
-    marginRight: "50%",
-    marginBottom: "4%",
+    // marginTop: "15%",
+    marginRight: horizontalScale(187.5),
+    // marginRight: "50%",
+    marginBottom: verticalScale(15),
+    // marginBottom: "4%",
   },
   // Level Text
   level: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
+    // fontSize: 15,
     color: "white",
     fontWeight: "bold",
   },
   // Feature Text
   Textb: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
+    // fontSize: 14,
     lineHeight: 21,
     fontWeight: "bold",
     marginTop: "5%",
@@ -267,7 +392,8 @@ const styles = StyleSheet.create({
   },
   // UserName -> Hi (Name)
   name: {
-    fontSize: 23,
+    fontSize: moderateScale(22.6),
+    // fontSize: 23,
     color: "black",
     marginTop: "1%",
     marginLeft: "55%",
@@ -275,18 +401,28 @@ const styles = StyleSheet.create({
   },
   // checkin button
   checkinb: {
-    marginTop: "3.6%",
+    flexDirection: "row",
+    marginTop: verticalScale(13.5),
+    // marginTop: "3.6%",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 5,
-    paddingHorizontal: 5,
+    paddingVertical: verticalScale(4.9),
+    // paddingVertical: 5,
+    paddingHorizontal: horizontalScale(5),
+    // paddingHorizontal: 5,
     borderRadius: 25,
     backgroundColor: "#FBBB00",
-    width: "28%",
+    width: horizontalScale(110),
+    // width: "28%",
+  },
+  selectedMenuItem: {
+    backgroundColor: "white",
+    borderRadius: 50, // Change to your desired color for the selected menu item
   },
   // checkin Text
   checkin: {
-    fontSize: 15,
+    fontSize: moderateScale(14.7),
+    // fontSize: 15,
     lineHeight: 21,
     fontWeight: "bold",
     letterSpacing: 0.25,
@@ -294,64 +430,111 @@ const styles = StyleSheet.create({
   },
   // Hi
   n: {
-    fontSize: 23,
+    fontSize: moderateScale(23),
+    // fontSize: 23,
     color: "#6AA6FF",
     marginTop: "0%",
     fontWeight: "bold",
-    marginRight: "62%",
+    // marginRight: "62%",
+    marginRight: horizontalScale(233.5),
   },
   // How are you feeling today?
   n1: {
-    fontSize: 20,
+    ...Platform.select({
+      android: {
+        marginRight: "26%",
+      },
+      ios: {
+        marginRight: "23%",
+        marginTop: "2%",
+      },
+    }),
+    // marginRight: horizontalScale(85),
+    fontSize: moderateScale(19.5),
+    // fontSize: 20,
     color: "#6AA6FF",
-    marginTop: "2%",
     fontWeight: "bold",
-    marginRight: "23%",
   },
   // 5 mood icon
   icon: {
-    width: 75,
-    height: 75,
-    // alignItems: "center",1
-    margin: "0%",
-    resizeMode: "contain",
+    //Ipad เละ
+    width: horizontalScale(72.1),
+    // width: 75,
+    height: horizontalScale(72.1),
+    // height: 75,
+    // margin: "0%",
     tintColor: "#000000",
   },
   // 6 Box of Feature
   button: {
-    marginTop: "-6%",
+    marginTop: verticalScale(-19),
+    // marginTop: "-6%",
     margin: "2%",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 11,
-    paddingHorizontal: 30,
+    paddingVertical: verticalScale(10.5),
+    // paddingVertical: 11,
+    paddingHorizontal: horizontalScale(28),
+    // paddingHorizontal: 30,
     borderRadius: 15,
     backgroundColor: "#F9E5DB",
-    width: "50%",
+    width: horizontalScale(158.5),
+    // width: "50%",
   },
   // Appointment icon
   picb: {
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "4%",
+      },
+    }),
     alignItems: "center",
-    margin: "4%",
-    resizeMode: "contain",
+    // margin: "4%",
   },
   // Test Game Calendar icon
   picb1: {
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "5%",
+      },
+    }),
     alignItems: "center",
-    margin: "5%",
-    resizeMode: "contain",
+    // margin: "5%",
   },
   // Library Dashboard icon
   picb2: {
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "5%",
+      },
+    }),
     alignItems: "center",
-    margin: "5%",
-    resizeMode: "contain",
+    // margin: "5%",
   },
   // bottom bar
   undertag: {
-    width: "120%",
-    height: 69.8,
-    marginTop: "2%",
+    // ...Platform.select({
+    //   android: {
+    //     height: 50.4,
+    //   },
+    //   ios: {
+    // height: 69.8,
+    //   },
+    // }),
+    height: verticalScale(67.8),
+    width: horizontalScale(380),
+    // width: "120%",
+    // height: 69.8,
+    // marginTop: "2%",
     backgroundColor: "white",
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
@@ -363,10 +546,12 @@ const styles = StyleSheet.create({
   },
   // Avatar icon
   picur: {
-    marginLeft: "70%",
+    marginLeft: horizontalScale(266.5),
+    // marginLeft: "70%",
   },
   // Noti icon
   picul: {
-    marginLeft: "9%",
+    marginLeft: horizontalScale(34),
+    // marginLeft: "9%",
   },
 });

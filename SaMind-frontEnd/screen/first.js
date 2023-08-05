@@ -7,6 +7,7 @@ import CarouselCardItem, {
 } from "../CarouselCardItem";
 import { useNavigation } from "@react-navigation/native";
 import data from "../data";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 const CarouselCards = () => {
   const navigation = useNavigation();
@@ -50,12 +51,7 @@ const CarouselCards = () => {
         style={styles.button}
         onPress={() => navigation.navigate("Loginscreen")}
       >
-        <Text
-          style={styles.text}
-          onPress={() => navigation.navigate("Loginscreen")}
-        >
-          Get started
-        </Text>
+        <Text style={styles.text}>Get started</Text>
       </TouchableOpacity>
       <Text style={styles.n}>
         Don't Have Any Account?{"  "}

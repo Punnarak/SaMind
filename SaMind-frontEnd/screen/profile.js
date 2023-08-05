@@ -11,6 +11,7 @@ import {
   Pressable,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -20,6 +21,7 @@ import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Icon } from "react-native-elements";
 import useCheck from "../usecheck";
 import { Ionicons } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -47,7 +49,8 @@ export default function Login() {
         style={{
           // position: "absolute",
           marginRight: "80%",
-          marginTop: "20%",
+          marginTop: verticalScale(75),
+          // marginTop: "20%",
         }}
         onPress={() => navigation.goBack()}
       />
@@ -109,16 +112,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#BED8FF",
     alignItems: "center",
+    // justifyContent: "flex-start",
   },
   container2: {
     backgroundColor: "white",
     alignItems: "center",
-    marginTop: "20%",
-    width: "95%",
-    height: "57%",
-    // justifyContent: "center",
+    marginTop: verticalScale(75),
+    // marginTop: "20%",
+    width: horizontalScale(356),
+    // width: "95%",
     paddingVertical: 0,
-    paddingHorizontal: 30,
+    paddingHorizontal: horizontalScale(28.5),
+    // paddingHorizontal: 30,
     borderRadius: 25,
     shadowColor: "rgba(0,0,0, 0.3)", // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
@@ -126,35 +131,45 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   wel: {
-    marginTop: "15%",
-    marginBottom: "7%",
-    fontSize: 24,
+    marginTop: verticalScale(44.7),
+    // marginTop: "15%",
+    marginBottom: verticalScale(21),
+    // marginBottom: "7%",
+    fontSize: moderateScale(23.5),
+    // fontSize: 24,
     color: "black",
     fontWeight: "bold",
   },
   title1: {
     marginRight: "80%",
-    marginTop: "0%",
-    marginBottom: "1%",
-    fontSize: 20,
+    // marginTop: "0%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   title2: {
     marginRight: "70%",
-    marginTop: "0%",
-    marginBottom: "1%",
-    fontSize: 20,
+    // marginTop: "0%",
+    marginBottom: verticalScale(3),
+    // marginBottom: "1%",
+    fontSize: moderateScale(19),
+    // fontSize: 20,
     color: "#569AFF",
     fontWeight: "bold",
     fontStyle: "italic",
   },
   TextInput: {
-    marginTop: "1%",
-    height: 40,
+    marginTop: verticalScale(3),
+    // marginTop: "1%",
+    height: verticalScale(38.36),
+    // height: 40,
     width: "100%",
-    marginBottom: "2%",
+    marginBottom: verticalScale(6),
+    // marginBottom: "2%",
     borderWidth: 2,
     borderColor: "#569AFF",
     borderRadius: 10,
@@ -162,21 +177,9 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
 
-  eyeI: {
-    dposition: "absolute",
-    marginLeft: "70%",
-    marginTop: "-12%",
-  },
-  hyper: {
-    fontSize: 13,
-    color: "#569AFF",
-    marginTop: "0%",
-    marginLeft: "55%",
-    fontWeight: "bold",
-  },
-
   loginb: {
-    marginTop: "6%",
+    marginTop: verticalScale(18.2),
+    // marginTop: "6%",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
@@ -185,7 +188,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#569AFF",
   },
   outb: {
-    marginTop: "4%",
+    marginTop: verticalScale(12.2),
+    // marginTop: "4%",
+    marginBottom: verticalScale(12.2),
+    // marginBottom: "4%",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
@@ -199,19 +205,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
-  },
-  n: {
-    fontSize: 13,
-    color: "black",
-    marginLeft: "3%",
-    fontWeight: "bold",
-  },
-
-  icon: {
-    width: 50,
-    height: 50,
-    alignItems: "center",
-    margin: "7%",
-    resizeMode: "contain",
   },
 });
