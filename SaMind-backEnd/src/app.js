@@ -19,6 +19,9 @@ const register = require('./login.js');
 const authen = require('./login.js');
 const sendotp = require('./login.js');
 const verifyotp = require('./login.js');
+const question = require('./question.js');
+const library = require('./library.js');
+
 
 
 // Use the API file
@@ -28,7 +31,8 @@ app.use(register);
 app.use(authen);
 app.use(sendotp);
 app.use(verifyotp);
-
+app.use(question);
+app.use(library);
 
  
 app.listen(4343, function () {
