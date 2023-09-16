@@ -4,21 +4,19 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  Alert,
   Image,
-  Linking,
-  Pressable,
   TouchableOpacity,
   TextInput,
   Platform,
+  FlatList,
+  ImageBackground,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -30,17 +28,45 @@ export default function Login() {
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
   const [Conpassword, setConPassword] = useState("");
-  const [patientID, setID] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("a");
-
-  const pickerItems = [
-    { label: "Option A", value: "a" },
-    { label: "Option B", value: "b" },
-    { label: "Option C", value: "c" },
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [isPickerVisible, setIsPickerVisible] = useState(false);
+  const items = [
+    { id: 1, name: "โรงพยาบาลศิริราช", value: "โรงพยาบาลศิริราช" },
+    {
+      id: 2,
+      name: "ศูนย์การแพทย์กาญจนาภิเษก",
+      value: "ศูนย์การแพทย์กาญจนาภิเษก",
+    },
+    { id: 3, name: "โรงพยาบาลรามาธิบดี", value: "โรงพยาบาลรามาธิบดี" },
+    { id: 4, name: "Hospital 4", value: "hospital4" },
+    { id: 5, name: "Hospital 5", value: "hospital5" },
+    { id: 6, name: "Hospital 6", value: "hospital6" },
   ];
+
   const handleCheckboxToggle = () => {
     setIsChecked(!isChecked);
+  };
+  const togglePicker = () => {
+    setIsPickerVisible(!isPickerVisible);
+  };
+
+  const handleItemPress = (itemValue) => {
+    console.log("Hospital --> ", itemValue);
+    // if (tapCount === 1) {
+    setSelectedValue(itemValue.name);
+    setIsPickerVisible(false);
+    // } else {
+    //   setTapCount(1);
+    // }
+  };
+
+  const renderLink = ({ item }) => {
+    return (
+      <Text style={styles.link} onPress={() => handleItemPress(item)}>
+        {item.name}
+      </Text>
+    );
   };
 
   console.log("SignUp Screen");
@@ -50,7 +76,11 @@ export default function Login() {
   });
 
   return (
-    <View style={styles.container1}>
+    // <View style={styles.container1}>
+    <ImageBackground
+      source={require("../assets/Game.png")}
+      style={{ width: "100%", resizeMode: "cover", flex: 1 }}
+    >
       <View style={styles.container2}>
         <Text style={styles.wel}>Let's get started</Text>
         <TextInput
@@ -103,27 +133,46 @@ export default function Login() {
             color="#569AFF"
           />
         </TouchableOpacity>
+        <Text style={styles.hospital}>Hospital</Text>
         <TextInput
-          placeholder="Hospital"
-          placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
-          style={styles.TextInput2}
-          value={patientID}
-          onChangeText={setID}
+          style={[
+            styles.hospitalInput,
+            {
+              height: isPickerVisible ? "20%" : "4.5%",
+              paddingBottom: isPickerVisible ? 130 : 0,
+            },
+          ]}
+          placeholder="Select Hospital"
+          placeholderTextColor={"rgba(96, 91, 91, 0.47)"}
+          editable={false}
+          value={selectedValue ? selectedValue : ""}
         />
-        {/* <Picker
-          selectedValue={selectedValue}
-          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-          style={styles.pickerStyle} // เพิ่ม style เพื่อปรับแต่ง dropdown
-        >
-          {pickerItems.map((item, index) => (
-            <Picker.Item key={index} label={item.label} value={item.value} />
-          ))}
-        </Picker> */}
+        <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker}>
+          <Ionicons
+            name="chevron-back-outline"
+            style={{
+              transform: [{ rotate: "270deg" }],
+              marginTop: isPickerVisible ? 52 : 52,
+            }}
+            size={20}
+            color="#3987FD"
+          />
+        </TouchableOpacity>
+
+        {isPickerVisible ? (
+          <FlatList
+            data={items}
+            renderItem={renderLink}
+            keyExtractor={(item) => item.id.toString()}
+            style={styles.list}
+          />
+        ) : null}
+
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginTop: verticalScale(25.55),
+            marginTop: verticalScale(30),
             // marginTop: "8%",
           }}
         >
@@ -146,7 +195,9 @@ export default function Login() {
         </View>
         <TouchableOpacity
           style={styles.loginb}
-          onPress={() => navigation.navigate("Homescreen", { animatedNodeTag })}
+          onPress={() =>
+            navigation.navigate("Signupinscreen", { animatedNodeTag })
+          }
         >
           <Text style={styles.text}>Sign up</Text>
         </TouchableOpacity>
@@ -186,7 +237,8 @@ export default function Login() {
           />
         </View>
       </View>
-    </View>
+      {/* </View> */}
+    </ImageBackground>
   );
 }
 
@@ -242,9 +294,39 @@ const styles = StyleSheet.create({
     borderColor: "#569AFF",
     borderBottomWidth: 1,
     // paddingHorizontal: 8,
-    paddingHorizontal: "2.5%",
+    // paddingHorizontal: "2.5%",
     // paddingVertical: 6,
     // paddingVertical: "3%",
+  },
+  hospital: {
+    textAlign: "left",
+    marginRight: "63%",
+    marginTop: 25,
+    color: "rgba(86, 154, 255, 0.52)",
+  },
+  hospitalInput: {
+    position: "absolute",
+
+    marginTop: verticalScale(330),
+    // height: verticalScale(38.35),
+    width: 265,
+    marginBottom: verticalScale(6.5),
+    borderColor: "#3987FD",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: "2.5%",
+    backgroundColor: "white",
+    zIndex: 1,
+  },
+  textInputBackground: {
+    position: "absolute", // กำหนดให้ pseudo-element เป็น absolute
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "blue", // กำหนดสีพื้นหลังทึบ
+    opacity: 0.5, // กำหนดความทึบ
+    zIndex: -1, // ให้ pseudo-element อยู่ต่ำกว่า TextInput
   },
   TextInput2: {
     // marginTop: "8%",
@@ -262,17 +344,18 @@ const styles = StyleSheet.create({
     borderColor: "#569AFF",
     borderBottomWidth: 1,
     // paddingHorizontal: 8,
-    paddingHorizontal: horizontalScale(7.9),
+    // paddingHorizontal: horizontalScale(7.9),
     // paddingHorizontal: "2.5%",
     // paddingVertical: 6,
   },
   eyeI: {
-    dposition: "absolute",
+    // position: "absolute",
     // marginLeft: "70%",
     marginLeft: 232,
     // marginTop: "-12%",
     // marginTop: verticalScale(-38.5),
-    marginTop: -40,
+    marginTop: -36,
+    zIndex: 2,
   },
   hyper: {
     fontSize: moderateScale(12.6),
@@ -314,16 +397,6 @@ const styles = StyleSheet.create({
     marginLeft: "3%",
     fontWeight: "bold",
   },
-  pickerStyle: {
-    marginTop: verticalScale(25.5), // ปรับตำแหน่งตามที่คุณต้องการ
-    width: 265, // ปรับความกว้างตามที่คุณต้องการ
-    height: verticalScale(38.35), // ปรับความสูงตามที่คุณต้องการ
-    borderColor: "#569AFF",
-    borderBottomWidth: 1,
-    paddingHorizontal: horizontalScale(7.9), // ปรับการเว้นระยะห่างแนวนอน
-    zIndex: 1,
-    // marginTop: "50%",
-  },
   icon: {
     // width: horizontalScale(48),
     width: 50,
@@ -333,5 +406,18 @@ const styles = StyleSheet.create({
     margin: verticalScale(22.4),
     // margin: "7%",
     resizeMode: "contain",
+  },
+  link: {
+    backgroundColor: "white",
+    paddingHorizontal: "1.5%",
+    paddingVertical: 8,
+    zIndex: 5,
+  },
+  list: {
+    position: "absolute",
+    width: "77.5%",
+    maxHeight: 130,
+    marginTop: "112.5%",
+    zIndex: 1,
   },
 });

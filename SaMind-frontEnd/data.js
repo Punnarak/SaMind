@@ -6,19 +6,11 @@ const data = [
     header: {
       color: "#569AFF",
       position: "absolute",
-      // fontSize: 64,
       fontWeight: "bold",
-      // paddingLeft: 20,
-      // marginLeft: "4%",
-      // paddingRight: "10%",
     },
     body: {
       color: "#569AFF",
       position: "absolute",
-      // marginTop: 275,
-      // // marginTop: "70%",
-      // fontSize: 36,
-      // marginLeft: "10%",
     },
   },
   {

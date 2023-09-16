@@ -70,6 +70,17 @@ export default function Login() {
               color="#569AFF"
             />
           </TouchableOpacity>
+          <Text
+            style={{
+              color: "#605B5B",
+              fontSize: 13,
+              marginTop: 15,
+              marginLeft: "50%",
+            }}
+            onPress={() => navigation.navigate("Forgotscreen")}
+          >
+            forget password?
+          </Text>
 
           <TouchableOpacity
             style={styles.loginb}

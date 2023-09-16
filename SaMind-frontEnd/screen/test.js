@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Notification() {
+  const [disabled, setDisabled] = useState(true);
   const navigation = useNavigation();
 
   handleLogin = async () => {};
@@ -15,7 +22,11 @@ export default function Notification() {
     // <View style={styles.container1}>
     <ImageBackground
       source={require("../assets/Game.png")}
-      style={{ alignItems: "center", flex: 1 }}
+      style={{
+        alignItems: "center",
+        flex: 1,
+        zIndex: 2,
+      }}
     >
       <View
         style={{
@@ -46,7 +57,10 @@ export default function Notification() {
 
       <View style={styles.container2}>
         <View style={styles.container3}>
-          <View style={styles.box}>
+          <TouchableOpacity
+            style={styles.box}
+            onPress={() => navigation.navigate("Generaltestscreen")}
+          >
             <Text
               style={{
                 fontSize: 16,
@@ -57,19 +71,32 @@ export default function Notification() {
             >
               General Test
             </Text>
-          </View>
-          <View style={styles.indibox}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={disabled ? styles.disabledindibox : styles.indibox}
+            disabled={disabled}
+            onPress={() => navigation.navigate("Homescreen")}
+          >
             <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "#00C236",
-                fontStyle: "italic",
-              }}
+              style={
+                disabled
+                  ? {
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "rgba(0,194,54, 0.2)",
+                      fontStyle: "italic",
+                    }
+                  : {
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#00C236",
+                      fontStyle: "italic",
+                    }
+              }
             >
               Individual Test
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.undertag}>
           <Feather
@@ -134,6 +161,16 @@ const styles = StyleSheet.create({
   indibox: {
     borderWidth: 5,
     borderColor: "#00C236",
+    borderRadius: 8,
+    marginTop: "5%",
+    width: "100%",
+    alignItems: "left",
+    paddingHorizontal: "3%",
+    paddingVertical: "10%",
+  },
+  disabledindibox: {
+    borderWidth: 5,
+    borderColor: "rgba(0,194,54, 0.1)",
     borderRadius: 8,
     marginTop: "5%",
     width: "100%",

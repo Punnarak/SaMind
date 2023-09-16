@@ -11,9 +11,10 @@ export default function Calendar() {
 
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);
-
+  const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
     const dateStrings = ["2023-08-01", "2023-08-05"];
+    setHighlightedDatesFormat(dateStrings);
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>
       moment(dateString, dateFormat).toDate()
@@ -23,7 +24,15 @@ export default function Calendar() {
 
   const handleDateSelected = (date, month, year) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
-    navigation.navigate("Upcomingscreen", { date, month, year });
+    month = (month + 1).toString().padStart(2, "0");
+    date = date.toString().padStart(2, "0");
+
+    const selectedDate = `${year}-${month}-${date}`;
+    console.log("Selected date:", selectedDate);
+
+    if (highlightedDatesFormat.includes(selectedDate)) {
+      navigation.navigate("Upcomingscreen", { date, month, year });
+    }
   };
 
   return (

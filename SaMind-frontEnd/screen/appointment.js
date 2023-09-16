@@ -20,10 +20,7 @@ export default function Calendar({ route }) {
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isModalVisible2, setModalVisible2] = useState(false);
-
-  const [isButtonVisible, setButtonVisible] = useState(false);
-  const [isButtonVisible2, setButtonVisible2] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const [showdate, setshowdate] = useState([]);
   //   const [isCalendarVisible, setCalendarVisible] = useState(true);
   const { date, month, year } = route.params || {};
@@ -39,22 +36,36 @@ export default function Calendar({ route }) {
 
   const handleDateSelected = (date, month, year) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
-    toggleModal();
     const dateString = year + "-" + (month + 1) + "-" + date;
     const dateFormat = "YYYY-MM-DD";
     const fulldate = moment(dateString, dateFormat).toDate();
     console.log("fulldate--> " + fulldate);
-    if (date > 3) {
-      date = date + "th";
-    } else {
-      if (date === 1) {
-        date = date + "st";
-      } else if (date === 2) {
-        date = date + "nd";
-      } else if (date === 3) {
-        date = date + "rd";
+    console.log("highlightedDates--> ", highlightedDates);
+
+    const isDateInHighlightedDates = highlightedDates.some(
+      (highlightedDate) => {
+        // Compare fulldate with each date in the highlightedDates array
+        return fulldate.getTime() === highlightedDate.getTime();
       }
+    );
+
+    if (isDateInHighlightedDates) {
+      toggleModal();
+      if (date > 3) {
+        date = date + "th";
+      } else {
+        if (date === 1) {
+          date = date + "st";
+        } else if (date === 2) {
+          date = date + "nd";
+        } else if (date === 3) {
+          date = date + "rd";
+        }
+      }
+    } else if (!isDateInHighlightedDates) {
+      navigation.navigate("Selectappointmentscreen", { date, month, year });
     }
+
     const day = fulldate.getDay();
     const Days = [
       "Sunday",
@@ -85,27 +96,17 @@ export default function Calendar({ route }) {
   };
 
   const toggleModal = () => {
-    // setCalendarVisible(!isCalendarVisible)
     setModalVisible(!isModalVisible);
-    setButtonVisible(!isButtonVisible);
-    // setModalVisible2(!isModalVisible2);
-    // setButtonVisible2(!isButtonVisible2);
   };
 
   const toggleModal2 = () => {
-    setModalVisible(!isModalVisible);
-    setButtonVisible(!isButtonVisible);
-    setModalVisible2(!isModalVisible2);
-    setButtonVisible2(!isButtonVisible2);
-
-    console.log("innnn 1 --->", isModalVisible2);
-    console.log("isModalVisible2 --->", isModalVisible2);
+    setConfirm(!confirm);
   };
 
-  const toggleModal3 = () => {
-    setModalVisible2(!isModalVisible2);
-    setButtonVisible2(!isModalVisible2);
-    console.log("outt");
+  const toggleUnderstand = () => {
+    setModalVisible(!isModalVisible);
+    setConfirm(!confirm);
+    navigation.navigate("Appointmentscreen");
   };
 
   return (
@@ -139,80 +140,87 @@ export default function Calendar({ route }) {
         {/* first Modal */}
         <Modal isVisible={isModalVisible}>
           <View style={styles.Modal}>
-            <Text
-              style={{
-                fontSize: 16,
-                marginTop: 35,
-                color: "black",
-                fontWeight: "bold",
-                marginBottom: 45,
-                textAlign: "center",
-              }}
-            >
-              Do you want to Postpone {"\n"}this appointment with
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                color: "#FF5656",
-                fontWeight: "bold",
-                marginBottom: 45,
-                textAlign: "center",
-              }}
-            >
-              DR.Somsak Saetang
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: "black",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              On {showdate}
-            </Text>
-            <TouchableOpacity
-              style={styles.confirmb}
-              onPress={toggleModal2}
-              isVisible={isButtonVisible}
-            >
-              <Text style={styles.text}>Confirm</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelb}
-              onPress={toggleModal}
-              isVisible={isButtonVisible}
-            >
-              <Text style={styles.text}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-        {/*Second Modal */}
-        <Modal isVisible={isModalVisible2}>
-          <View style={styles.Modal}>
-            <Text
-              style={{
-                fontSize: 16,
-                marginTop: 35,
-                color: "black",
-                fontWeight: "bold",
-                marginBottom: 20,
-                textAlign: "center",
-              }}
-            >
-              ระบบกำลังดำเนินการ{"\n"}หากการเลื่อนการนัดหมายสำเร็จ{"\n"}
-              ทางแอปพลิเคชันจะส่งการ{"\n"}แจ้งเตือนตอบกลับวันนัดหมาย
-            </Text>
-            <Ionicons name="calendar-outline" size={100} color="black" />
-            <TouchableOpacity
-              style={styles.confirmb}
-              onPress={toggleModal3}
-              isVisible={isButtonVisible2}
-            >
-              <Text style={styles.text}>I understand</Text>
-            </TouchableOpacity>
+            {confirm ? (
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginTop: 35,
+                  color: "black",
+                  fontWeight: "bold",
+                  marginBottom: 45,
+                  textAlign: "center",
+                }}
+              >
+                ระบบกำลังดำเนินการ{"\n"}หากการเลื่อนการนัดหมายสำเร็จ{"\n"}
+                ทางแอปพลิเคชันจะส่งการ{"\n"}แจ้งเตือนตอบกลับวันนัดหมาย
+              </Text>
+            ) : (
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginTop: 35,
+                  color: "black",
+                  fontWeight: "bold",
+                  marginBottom: 45,
+                  textAlign: "center",
+                }}
+              >
+                Do you want to Postpone {"\n"}this appointment with
+              </Text>
+            )}
+            {confirm ? (
+              <Ionicons name="calendar-outline" size={100} color="black" />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#FF5656",
+                  fontWeight: "bold",
+                  marginBottom: 45,
+                  textAlign: "center",
+                }}
+              >
+                DR.Somsak Saetang
+              </Text>
+            )}
+            {confirm ? null : (
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: "black",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                On {showdate}
+              </Text>
+            )}
+            {confirm ? (
+              <TouchableOpacity
+                style={styles.confirmb}
+                onPress={toggleUnderstand}
+                isVisible={isModalVisible}
+              >
+                <Text style={styles.text}>I understand</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.confirmb}
+                onPress={toggleModal2}
+                isVisible={isModalVisible}
+              >
+                <Text style={styles.text}>Confirm</Text>
+              </TouchableOpacity>
+            )}
+            {confirm ? null : (
+              <TouchableOpacity
+                style={styles.cancelb}
+                onPress={toggleModal}
+                isVisible={isModalVisible}
+              >
+                <Text style={styles.text}>Cancel</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </Modal>
       </View>

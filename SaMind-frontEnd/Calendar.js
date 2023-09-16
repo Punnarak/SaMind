@@ -34,6 +34,21 @@ class MyCalendar extends React.Component {
         this.state.activeDate.getMonth(),
         this.state.activeDate.getFullYear()
       );
+    } else {
+      console.log(
+        "Input --> " +
+          item +
+          " " +
+          (this.state.activeDate.getMonth() + 1) +
+          " " +
+          " " +
+          this.state.activeDate.getFullYear()
+      );
+      this.props.onDateSelected(
+        item,
+        this.state.activeDate.getMonth(),
+        this.state.activeDate.getFullYear()
+      );
     }
     // console.log(this.state.activeDate.getMonth()); // เดือนจริงๆคือ month +1
   };
