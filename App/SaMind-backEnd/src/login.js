@@ -1,11 +1,11 @@
 const client = require('./connection.js')
 const validateForm = require('./function.js')
- 
+
 const express = require('express')
 // const cors = require('cors')
 // const app = express()
 const router = express.Router();
-  
+
 const _ = require('lodash')
 const axios = require('axios');
 
@@ -23,30 +23,92 @@ const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by b
 
 client.connect();
 
-router.post('/register',jsonParser, function (req, res, next) {
-    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-    const id = req.body.id;
-    const email = req.body.email;
-    const password = req.body.password;
-    const fname = req.body.fname;
-    const lname = req.body.lname;
+// router.post('/register',jsonParser, function (req, res, next) {
+//     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+//     const id = req.body.id;
+//     const email = req.body.email;
+//     const password = req.body.password;
+//     const fname = req.body.fname;
+//     const lname = req.body.lname;
 
-    const query = {
-        text: 'INSERT INTO users (id,email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-        values: [id,email, hash, fname, lname]
+//     const query = {
+//         text: 'INSERT INTO users (id,email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+//         values: [id,email, hash, fname, lname]
+//     };
+
+//     client.query(query, function(err, results) {
+//             if (err) {
+//                 res.json({ status: 'error', message: err });
+//                 return;
+//             }
+//             res.json({ status: 'ok' });
+//         });
+//     });
+//     client.end;
+// })
+
+router.post('/register', jsonParser, function (req, res, next) {
+  const id = req.body.id;
+  const email = req.body.email;
+  const password = req.body.password;
+  const fname = req.body.fname;
+  const lname = req.body.lname;
+
+  const emailCheckQuery = {
+    text: 'SELECT * FROM users WHERE email = $1',
+    values: [email]
+  };
+
+  client.query(emailCheckQuery, function(err, emailCheckResult) {
+    if (err) {
+      res.json({ status: 'error', message: err });
+      return;
+    }
+
+    if (emailCheckResult.rows.length > 0) {
+      res.status(409).json({ status: 'error', message: 'Email already exists.' });
+      return;
+    }
+
+    const idCheckQuery = {
+      text: 'SELECT * FROM users WHERE id = $1',
+      values: [id]
     };
 
-    client.query(query, function(err, results) {
-            if (err) {
-                res.json({ status: 'error', message: err });
-                return;
-            }
-            res.json({ status: 'ok' });
-        });
-    });
-    client.end;
-})
+    client.query(idCheckQuery, function(err, idCheckResult) {
+      if (err) {
+        res.json({ status: 'error', message: err });
+        return;
+      }
 
+      if (idCheckResult.rows.length > 0) {
+        res.status(409).json({ status: 'error', message: 'ID already exists.' });
+        return;
+      }
+
+
+      bcrypt.hash(password, saltRounds, function(err, hash) {
+        if (err) {
+          res.json({ status: 'error', message: err });
+          return;
+        }
+
+        const query = {
+          text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+          values: [id, email, hash, fname, lname]
+        };
+
+        client.query(query, function(err, results) {
+          if (err) {
+            res.json({ status: 'error', message: err });
+            return;
+          }
+          res.json({ status: 'success' });
+        });
+      });
+    });
+  });
+});
 
 function authenticate(req, res, next) {
     // ตรวจสอบการยืนยันตัวตนที่นี่
@@ -54,7 +116,7 @@ function authenticate(req, res, next) {
   
     // หากผ่านการยืนยันตัวตน
     next();
-  }
+}
   
 router.post('/login', authenticate, jsonParser, function (req, res, next) {
     const email = req.body.email;
