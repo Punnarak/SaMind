@@ -1,0 +1,57 @@
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+const NotificationBox = ({ item, index }) => {
+  const navigation = useNavigation();
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        // alignItems: "center",
+      }}
+    >
+      <View style={styles.container} key={index}>
+        <Text style={[styles.header]}>{item.title}</Text>
+        <Text style={[styles.detail]}>Detail: {item.title}</Text>
+        <Text style={[styles.detail]}>Turn in Before: {item.title}</Text>
+
+        <Ionicons
+          name="chevron-back-outline"
+          size={30}
+          color="#3987FD"
+          style={{
+            position: "absolute",
+            zIndex: 1,
+            marginLeft: "90%",
+            marginTop: "8.5%",
+            transform: [{ rotateY: "180deg" }],
+          }}
+          onPress={() => navigation.navigate(item.target)}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    borderWidth: 5,
+    borderColor: "#569AFF",
+    borderRadius: 8,
+    marginTop: "5%",
+    width: "100%",
+    alignItems: "left",
+    paddingHorizontal: "3%",
+    paddingVertical: "5%",
+  },
+
+  header: {
+    fontSize: 16,
+    color: "#569AFF",
+    fontWeight: "bold",
+  },
+  detail: { fontSize: 10, color: "#569AFF" },
+});
+
+export default NotificationBox;
