@@ -68,33 +68,75 @@
         </v-list-item>
 
         <v-divider inset></v-divider>
-
         <!-- Question Section -->
-        <v-list-item v-for="(question, index) in questions" :key="index">
+        <v-list-item
+          v-for="(question, questionIndex) in questions"
+          :key="questionIndex"
+        >
           <v-col cols="12" sm="6" md="4">
-            <label>
+            <label col="12">
               Question
               <template v-if="questions.length > 1">
-                <v-btn icon @click="removeQuestion(index)">
-                  <v-icon color="red">mdi-delete</v-icon>
-                </v-btn>
+                <v-icon color="red" icon @click="removeQuestion(questionIndex)"
+                  >mdi-delete</v-icon
+                >
               </template>
             </label>
-            <v-row col="6">
+
+            <v-row cols="6">
               <v-text-field
-                v-model="questions[index]"
+                v-model="question.text"
                 class="mt-2 mb-4"
                 variant="outlined"
                 rounded="lg"
                 style="border-radius: 10px"
               ></v-text-field>
-              <v-btn icon @click="addQuestion(index + 1)">
+              <v-btn
+                style="background-color: #5686e1"
+                icon
+                @click="addQuestion(questionIndex)"
+              >
+                <v-icon color="white">mdi-plus</v-icon>
+              </v-btn>
+            </v-row>
+
+            <!-- Options for the question -->
+            <v-row
+              v-for="(option, optionIndex) in question.options"
+              :key="optionIndex"
+            >
+              <v-col cols="12">
+                <label>
+                  Option
+                  <template v-if="question.options.length > 1">
+                    <v-icon
+                      color="red"
+                      @click="removeQuestionOption(questionIndex, optionIndex)"
+                      >mdi-delete</v-icon
+                    >
+                  </template>
+                </label>
+              </v-col>
+
+              <v-col cols="3">
+                <v-text-field
+                  v-model="question.options[optionIndex]"
+                  class="mt-2 mb-4"
+                  variant="outlined"
+                  rounded="lg"
+                  style="border-radius: 10px; width: 100%"
+                ></v-text-field>
+              </v-col>
+              <v-btn
+                icon
+                @click="addQuestionOption(questionIndex, optionIndex)"
+              >
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </v-row>
-          </v-col>
 
-          <v-divider insert></v-divider>
+            <v-divider insert></v-divider>
+          </v-col>
         </v-list-item>
       </v-list>
     </v-card>
@@ -107,29 +149,37 @@ import { ref } from "vue";
 export default {
   data() {
     return {
-      questions: [""], // Initialize with an empty question
-      options: [""],
+      questions: [
+        {
+          text: "",
+          options: [""], // Initialize with an empty option for this question
+        },
+      ],
     };
   },
   methods: {
+    addQuestionOption(questionIndex, index) {
+      // Push an empty string as a new option for the specified question
+      // this.questions.options.push("");
+
+      this.questions[questionIndex].options.splice(index + 1, 0, "");
+    },
+    removeQuestionOption(questionIndex, optionIndex) {
+      // Remove the option for the specified question index and option index
+      this.questions[questionIndex].options.splice(optionIndex, 1);
+    },
     addQuestion(index) {
-      this.questions.splice(index, 0, ""); // Add a new empty question at the specified index
+      const newQuestion = { text: "", options: [""] }; // Create a new question with an empty option
+      this.questions.splice(index + 1, 0, newQuestion); // Add the new question to the list of questions
     },
     removeQuestion(index) {
-      this.questions.splice(index, 1); // Remove the question at the specified index
+      // Remove the question and corresponding options at the specified index
+      this.questions.splice(index, 1);
     },
   },
 };
 </script>
 
 <style scoped>
-:deep(.v-pagination__list) {
-  justify-content: end;
-}
-.title {
-  font-size: 40px;
-  font-weight: 800;
-  margin-bottom: 0px;
-  font-family: "Nunito", sans-serif;
-}
+/* Add any custom styles you need */
 </style>
