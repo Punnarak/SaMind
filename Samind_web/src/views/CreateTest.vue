@@ -73,16 +73,15 @@
           v-for="(question, questionIndex) in questions"
           :key="questionIndex"
         >
+          <label>
+            Question
+            <template v-if="questions.length > 1">
+              <v-icon color="red" icon @click="removeQuestion(questionIndex)"
+                >mdi-delete</v-icon
+              >
+            </template>
+          </label>
           <v-col cols="12" sm="6" md="4">
-            <label col="12">
-              Question
-              <template v-if="questions.length > 1">
-                <v-icon color="red" icon @click="removeQuestion(questionIndex)"
-                  >mdi-delete</v-icon
-                >
-              </template>
-            </label>
-
             <v-row cols="6">
               <v-text-field
                 v-model="question.text"
@@ -99,41 +98,42 @@
                 <v-icon color="white">mdi-plus</v-icon>
               </v-btn>
             </v-row>
-
             <!-- Options for the question -->
-            <v-row
-              v-for="(option, optionIndex) in question.options"
-              :key="optionIndex"
-            >
-              <v-col cols="12">
-                <label>
-                  Option
-                  <template v-if="question.options.length > 1">
-                    <v-icon
-                      color="red"
-                      @click="removeQuestionOption(questionIndex, optionIndex)"
-                      >mdi-delete</v-icon
-                    >
-                  </template>
-                </label>
-              </v-col>
-
-              <v-col cols="3">
-                <v-text-field
-                  v-model="question.options[optionIndex]"
-                  class="mt-2 mb-4"
-                  variant="outlined"
-                  rounded="lg"
-                  style="border-radius: 10px; width: 100%"
-                ></v-text-field>
-              </v-col>
-              <v-btn
-                icon
-                @click="addQuestionOption(questionIndex, optionIndex)"
+            <v-radio-group v-model="question.selectedOption">
+              <v-row
+                v-for="(option, optionIndex) in question.options"
+                :key="optionIndex"
               >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-            </v-row>
+                <v-col cols="3">
+                  <label>option</label><v-radio :value="optionIndex"></v-radio>
+                </v-col>
+                <template v-if="question.options.length > 1">
+                  <v-icon
+                    color="red"
+                    @click="removeQuestionOption(questionIndex, optionIndex)"
+                    >mdi-delete</v-icon
+                  >
+                </template>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="question.options[optionIndex]"
+                    class="mt-2 mb-4"
+                    variant="outlined"
+                    rounded="lg"
+                    style="border-radius: 10px; width: 100%"
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="2">
+                  <v-btn
+                    icon
+                    @click="addQuestionOption(questionIndex, optionIndex)"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-radio-group>
 
             <v-divider insert></v-divider>
           </v-col>
