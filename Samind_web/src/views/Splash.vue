@@ -1,7 +1,13 @@
 <template>
   <v-main>
     <v-row class="px-10 above-images" style="margin-top: 10%">
-      <v-col class="pl-10" cols="12" md="6" sm="12">
+      <v-col
+        class="pl-10"
+        cols="12"
+        md="6"
+        sm="12"
+        style="margin-left: 50px; margin-bottom: -90px"
+      >
         <div class="title">SaMind</div>
         <div class="subtitle">Website for Psychiatrist</div>
 
@@ -12,7 +18,7 @@
           min-width="140px"
           to="/signin"
           class="text-capitalize"
-          style="margin-top: 40px"
+          style="margin-top: 60px"
         >
           Sign in
         </v-btn>
@@ -23,9 +29,9 @@
         src="../assets/splash/sun.svg"
         style="
           position: absolute;
-          top: 30px;
-          left: 180px;
-          width: 550px;
+          top: 35px;
+          left: 250px;
+          width: 450px;
           z-index: 0;
         "
       />
@@ -33,9 +39,19 @@
         src="../assets/splash/avatar.svg"
         style="
           position: absolute;
-          bottom: 0px;
-          right: -550px;
-          width: 1600px;
+          bottom: -60px;
+          right: -580px;
+          /* width: 1600px; */
+          z-index: 1;
+        "
+      />
+      <img
+        src="../assets/splash/hospital.png"
+        style="
+          position: absolute;
+          right: 0px;
+          bottom: 80px;
+          /* width: 550px; */
           z-index: 0;
         "
       />
@@ -65,12 +81,27 @@
   font-size: 24px;
   font-weight: 400;
   font-family: "Inter", sans-serif;
+  margin-top: -30px;
 }
 
 .v-btn {
-  font-size: 18px;
-  font-weight: 600;
-  font-family: "Inter", sans-serif;
+  display: flex;
+  width: 150px;
+  padding: 25px 90px;
+  justify-content: center;
+  align-items: center;
+  /* gap: 10px; */
+
+  border-color: #3c9bf2;
+  border-radius: 100px;
+  background: #3c9bf2;
+
+  color: var(--color-p-10, #f1f3ff);
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
 }
 
 .above-images {

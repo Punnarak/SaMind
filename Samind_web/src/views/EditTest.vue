@@ -1,7 +1,7 @@
 <template>
   <v-col class="px-10">
     <v-row align="center">
-      <v-col cols="6" style="font-weight: 600"> PATIENTS LIST </v-col>
+      <v-col cols="6" style="font-weight: 600"> Edit Test </v-col>
       <v-spacer></v-spacer>
       <v-col cols="3">
         <v-text-field
@@ -15,62 +15,7 @@
       </v-col>
     </v-row>
 
-    <v-data-table
-      rounded="xl"
-      v-model:page="page"
-      :headers="headers"
-      :items="patients"
-      class="elevation-1"
-      style="border-radius: 10px"
-    >
-      <template v-slot:item.mood="{ item }">
-        <v-chip :color="getColor(item.columns.mood)">
-          <v-icon left size="10px" style="margin-right: 10px"
-            >mdi-circle</v-icon
-          >
-          {{
-            item.columns.mood > 400
-              ? "negative"
-              : item.columns.mood > 200
-              ? "neutral"
-              : "positive"
-          }}
-        </v-chip>
-      </template>
-
-      <template v-slot:item.action="{ item }">
-        <v-btn
-          icon="mdi-magnify"
-          color="blue"
-          size="30px"
-          @click="this.$router.push('/patientinfo')"
-        />
-        <!-- {{ item.columns.action }} -->
-      </template>
-
-      <template v-slot:bottom>
-        <v-row class="pt-2 px-2">
-          <v-col cols="auto">
-            <v-select
-              variant="solo-filled"
-              :hide-details="true"
-              flat
-              :items-per-page="itemsPerPage"
-              v-model="itemsPerPage"
-              :items="[10, 20, 30, 40, 50]"
-            ></v-select>
-          </v-col>
-          <v-spacer></v-spacer>
-          <v-col>
-            <v-pagination
-              active-color="primary"
-              v-model="page"
-              :length="2"
-            ></v-pagination>
-          </v-col>
-        </v-row>
-      </template>
-    </v-data-table>
+    <v-sheet :elevation="1" :height="200" :width="200"> </v-sheet>
   </v-col>
 </template>
 

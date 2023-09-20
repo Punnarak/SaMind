@@ -25,6 +25,16 @@ const router = createRouter({
           component: () => import("../views/Test.vue"),
         },
         {
+          path: "createtest",
+          component: () => import("../views/CreateTest.vue"),
+        },
+        {
+          path: "edittest/:id",
+          name: "edittest",
+          component: () => import("../views/EditTest.vue"),
+          props: true,
+        },
+        {
           path: "calendar",
           component: () => import("../views/Calendar.vue"),
         },
