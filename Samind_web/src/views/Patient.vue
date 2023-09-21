@@ -76,6 +76,23 @@
 
 <script setup>
 import { ref } from "vue";
+import axios from "../axios.js";
+import { onMounted } from "vue";
+
+// onMounted(async () => {
+//   try {
+//     let url = "/question";
+//     await axios
+//       .get(url)
+//       .then((response) => {
+//         console.log(response.data)
+//       })
+
+//   } catch (error) {
+//     console.error("Error fetching products:", error);
+//   }
+// });
+
 const page = ref(1);
 const itemsPerPage = ref(10);
 
