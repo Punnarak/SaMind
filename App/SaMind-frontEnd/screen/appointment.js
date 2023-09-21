@@ -118,7 +118,8 @@ export default function Calendar({ route }) {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginTop: "20%",
+          // marginTop: "20%",
+          marginTop: 78,
         }}
       >
         <Ionicons
@@ -236,10 +237,12 @@ const styles = StyleSheet.create({
   },
   container2: {
     backgroundColor: "white",
-    marginTop: verticalScale(75),
-    // marginTop: "20%",
+    // marginTop: verticalScale(75),
+    marginTop: "20%",
+    // marginTop: 100,
     width: horizontalScale(353),
     // width: "94%",
+    // width: 370,
     paddingVertical: verticalScale(31.5),
     justifyContent: "center",
     borderRadius: 25,

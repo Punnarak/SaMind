@@ -40,7 +40,12 @@
       <template v-slot:item.action="{ item }">
         <v-icon
           style="margin-right: 20px"
-          @click="this.$router.push({ path: `edittest/${item.columns.id}` })"
+          @click="
+            this.$router.push({
+              path: `edittest/${item.columns.id}`,
+              query: { item: JSON.stringify(item) },
+            })
+          "
           >mdi-pencil</v-icon
         >
         <v-icon>mdi-delete</v-icon>

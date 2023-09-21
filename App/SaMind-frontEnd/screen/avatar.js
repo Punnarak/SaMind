@@ -29,7 +29,8 @@ export default function Notification() {
     >
       <View
         style={{
-          marginTop: "15%",
+          // marginTop: "15%",
+          marginTop: 54,
           flexDirection: "row",
           zIndex: 2,
         }}

@@ -32,7 +32,8 @@ export default function Notification() {
         style={{
           flexDirection: "row",
           // alignItems: "center",
-          marginTop: "15%",
+          // marginTop: "15%",
+          marginTop: 58.5,
         }}
       >
         <Ionicons
@@ -178,16 +179,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: "3%",
     paddingVertical: "10%",
   },
-  header: {
-    fontSize: 16,
-    color: "#569AFF",
-    fontWeight: "bold",
-  },
+
   header: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#25271C",
-    marginTop: "-7%",
+    // marginTop: "-7%",
+    marginTop: -27.5,
   },
 
   noti: {

@@ -19,7 +19,8 @@ export default function Login() {
       <View
         style={{
           flexDirection: "row",
-          marginTop: "20%",
+          // marginTop: "20%",
+          marginTop: 78,
         }}
       >
         <Ionicons
@@ -339,25 +340,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#25271C",
-    marginTop: "-7%",
+    // marginTop: "-7%",
+    marginTop: -27.5,
   },
   con1: {
     fontSize: 13,
     fontWeight: "bold",
     // letterSpacing: 0.25,
     color: "#3C5A9A",
-    marginTop: "10%",
+    // marginTop: "10%",
+    marginTop: 39,
     marginRight: "12%",
   },
   con2: {
     fontSize: 13,
     color: "#3C5A9A",
-    marginTop: "10%",
+    // marginTop: "10%",
+    marginTop: 39,
     marginLeft: "15%",
   },
   mbox: {
     width: "80%",
+    // width: 312,
     height: "17%",
+    // height: 144,
     borderWidth: 1,
     backgroundColor: "#FFF4DD",
     borderColor: "#FFF4DD",

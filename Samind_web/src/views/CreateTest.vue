@@ -13,7 +13,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          to="createtest"
+          to="test"
         >
           <v-icon style="margin-right: 10px">mdi-close-circle-outline</v-icon
           >Cancel
@@ -28,7 +28,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          to="createtest"
+          @click="createTest"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Test
         </v-btn>
@@ -53,6 +53,8 @@
               class="mt-2 mb-4"
               variant="outlined"
               rounded="lg"
+              v-model="testName"
+              :rules="testNameRules"
               style="width: 245px; border-radius: 10px"
             ></v-text-field>
 
@@ -155,6 +157,13 @@ export default {
           options: [""], // Initialize with an empty option for this question
         },
       ],
+      testName: "",
+      testNameRules: [
+        (value) => {
+          if (value) return true;
+          return "You must enter a test name.";
+        },
+      ],
     };
   },
   methods: {
@@ -175,6 +184,21 @@ export default {
     removeQuestion(index) {
       // Remove the question and corresponding options at the specified index
       this.questions.splice(index, 1);
+    },
+    createTest() {
+      console.log("Test Name:", this.testName);
+
+      for (let i = 0; i < this.questions.length; i++) {
+        const question = this.questions[i];
+        console.log(`Question ${i + 1} Text:`, question.text);
+        console.log(`Question ${i + 1} Options:`, question.options);
+      }
+
+      // Add additional logic for creating the test if needed
+
+      // Placeholder message for now
+      console.log("Test creation logic to be implemented.");
+      this.$router.push("/dashboard/test");
     },
   },
 };

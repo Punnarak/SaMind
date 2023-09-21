@@ -337,15 +337,15 @@ const styles = StyleSheet.create({
   },
   // circle background of profile setting icon
   boxper: {
-    ...Platform.select({
-      android: {
-        marginTop: "4%",
-      },
-      ios: {
-        marginTop: "10%",
-      },
-    }),
-    // marginTop: "10%",
+    // ...Platform.select({
+    //   android: {
+    //     marginTop: "4%",
+    //   },
+    //   ios: {
+    marginTop: "10%",
+    //   },
+    // }),
+    marginTop: 40,
     backgroundColor: "rgba(255, 255, 255, 0.6)",
     borderRadius: 40,
     borderColor: "rgba(255, 255, 255, 0.6)",
@@ -354,22 +354,25 @@ const styles = StyleSheet.create({
   },
   // Box of Level Text
   boxlevel: {
-    ...Platform.select({
-      android: {
-        marginTop: "8%",
-      },
-      ios: {
-        marginTop: "15%",
-      },
-    }),
+    // ...Platform.select({
+    //   android: {
+    //     marginTop: "8%",
+    //   },
+    //   ios: {
+    marginTop: "15%",
+    //   },
+    // }),
+
     borderWidth: 1,
     backgroundColor: "#3C9BF2",
     borderColor: "#3C9BF2",
     borderRadius: 21,
-    padding: "3%",
-    // marginTop: "15%",
-    marginRight: horizontalScale(187.5),
-    // marginRight: "50%",
+    // padding: "3%",
+    padding: 11.5,
+    marginTop: 58,
+    // marginRight: horizontalScale(187.5),
+    marginRight: "50%",
+    // marginRight: 500,
     marginBottom: verticalScale(15),
     // marginBottom: "4%",
   },
@@ -458,10 +461,10 @@ const styles = StyleSheet.create({
   // 5 mood icon
   icon: {
     //Ipad เละ
-    width: horizontalScale(72.1),
-    // width: 75,
-    height: horizontalScale(72.1),
-    // height: 75,
+    // width: horizontalScale(72.1),
+    width: 75,
+    // height: horizontalScale(72.1),
+    height: 75,
     // margin: "0%",
     tintColor: "#000000",
   },

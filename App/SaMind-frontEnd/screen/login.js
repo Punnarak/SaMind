@@ -75,7 +75,8 @@ export default function Login() {
               color: "#605B5B",
               fontSize: 13,
               marginTop: 15,
-              marginLeft: "50%",
+              // marginLeft: "50%",
+              marginLeft: 160,
             }}
             onPress={() => navigation.navigate("Forgotscreen")}
           >

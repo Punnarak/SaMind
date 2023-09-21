@@ -203,13 +203,15 @@ export default function Notification() {
           overflow: "hidden",
 
           marginTop: -550,
+          // marginTop: -550,
           flex: 1,
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            marginTop: "155%",
+            // marginTop: "155%",
+            marginTop: 604,
           }}
         >
           <Ionicons
@@ -397,7 +399,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#569AFF",
-    marginTop: "-7%",
+    // marginTop: "-7%",
+    marginTop: -27.5,
   },
   question: { marginTop: 20, marginBottom: 20 },
   submitButton: {

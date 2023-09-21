@@ -1,134 +1,217 @@
 <template>
   <v-col class="px-10">
+    <!-- Header and buttons -->
     <v-row align="center">
       <v-col cols="6" style="font-weight: 600"> Edit Test </v-col>
       <v-spacer></v-spacer>
-      <v-col cols="3">
-        <v-text-field
-          class="mt-2"
-          density="comfortable"
+      <v-col cols="2">
+        <v-btn
           rounded="xl"
-          variant="outlined"
-          placeholder="Search Patient"
-          prepend-inner-icon="mdi-magnify"
-        ></v-text-field>
+          class="text-none mx-auto"
+          color="black"
+          block
+          size="x-large"
+          variant="flat"
+          style="font-family: 'Inter', 'sans-serif'"
+          to="/dashboard/test"
+        >
+          <v-icon style="margin-right: 10px">mdi-close-circle-outline</v-icon
+          >Cancel
+        </v-btn>
+      </v-col>
+      <v-col cols="2">
+        <v-btn
+          rounded="xl"
+          class="text-none mx-auto"
+          color="#569AFF"
+          block
+          size="x-large"
+          variant="flat"
+          style="font-family: 'Inter', 'sans-serif'"
+          @click="createTest"
+        >
+          <v-icon>mdi-file-document-outline</v-icon>Create Test
+        </v-btn>
       </v-col>
     </v-row>
 
-    <v-sheet :elevation="1" :height="200" :width="200"> </v-sheet>
+    <!-- Test Detail Section -->
+    <v-card class="mx-auto" col="6" rounded="xl">
+      <v-list lines="two">
+        <v-list-subheader
+          style="font-family: 'Poppins', 'sans-serif'; border-bottom-width: 1px"
+        >
+          Test Detail
+        </v-list-subheader>
+        <v-divider inset></v-divider>
+
+        <!-- Test Name -->
+        <v-list-item>
+          <v-col cols="12" sm="6" md="4">
+            <label>Test Name</label> <label style="color: red">*</label>
+            <v-text-field
+              class="mt-2 mb-4"
+              variant="outlined"
+              rounded="lg"
+              v-model="item.item.testName"
+              :rules="testNameRules"
+              style="width: 245px; border-radius: 10px"
+            ></v-text-field>
+
+            <!-- Test Description -->
+            <label>Test Description</label>
+            <v-text-field
+              class="mt-2 mb-4"
+              variant="outlined"
+              rounded="lg"
+              style="border-radius: 10px"
+            ></v-text-field>
+          </v-col>
+        </v-list-item>
+
+        <v-divider inset></v-divider>
+        <!-- Question Section -->
+        <v-list-item
+          v-for="(question, questionIndex) in questions"
+          :key="questionIndex"
+        >
+          <label>
+            Question
+            <template v-if="questions.length > 1">
+              <v-icon color="red" icon @click="removeQuestion(questionIndex)"
+                >mdi-delete</v-icon
+              >
+            </template>
+          </label>
+          <v-col cols="12" sm="6" md="4">
+            <v-row cols="6">
+              <v-text-field
+                v-model="question.text"
+                class="mt-2 mb-4"
+                variant="outlined"
+                rounded="lg"
+                style="border-radius: 10px"
+              ></v-text-field>
+              <v-btn
+                style="background-color: #5686e1"
+                icon
+                @click="addQuestion(questionIndex)"
+              >
+                <v-icon color="white">mdi-plus</v-icon>
+              </v-btn>
+            </v-row>
+            <!-- Options for the question -->
+            <v-radio-group v-model="question.selectedOption">
+              <v-row
+                v-for="(option, optionIndex) in question.options"
+                :key="optionIndex"
+              >
+                <v-col cols="3">
+                  <label>option</label><v-radio :value="optionIndex"></v-radio>
+                </v-col>
+                <template v-if="question.options.length > 1">
+                  <v-icon
+                    color="red"
+                    @click="removeQuestionOption(questionIndex, optionIndex)"
+                    >mdi-delete</v-icon
+                  >
+                </template>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="question.options[optionIndex]"
+                    class="mt-2 mb-4"
+                    variant="outlined"
+                    rounded="lg"
+                    style="border-radius: 10px; width: 100%"
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="2">
+                  <v-btn
+                    icon
+                    @click="addQuestionOption(questionIndex, optionIndex)"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-radio-group>
+
+            <v-divider insert></v-divider>
+          </v-col>
+        </v-list-item>
+      </v-list>
+    </v-card>
   </v-col>
 </template>
 
-<script setup>
+<script>
 import { ref } from "vue";
-const page = ref(1);
-const itemsPerPage = ref(10);
 
-const headers = [
-  {
-    title: "No.",
-    align: "start",
-    sortable: false,
-    key: "id",
+export default {
+  props: {
+    // Define the prop names you expect to receive
+    item: {
+      type: Object,
+      required: true,
+    },
+    // ... Add more props as needed
   },
-  { title: "Patient ID", key: "patientId", sortable: false },
-  { title: "Patient Name", key: "patientName", sortable: false },
-  { title: "Age", key: "age", sortable: false },
-  { title: "Mood", key: "mood", sortable: false },
-  { title: "Action", key: "action", sortable: false },
-];
-const patients = [
-  {
-    id: "01",
-    patientId: "PID001",
-    patientName: 6,
-    age: 24,
-    mood: 4,
-    action: "1%",
+  data() {
+    return {
+      questions: [
+        {
+          text: "",
+          options: [""], // Initialize with an empty option for this question
+        },
+      ],
+      testName: "",
+      testNameRules: [
+        (value) => {
+          if (value) return true;
+          return "You must enter a test name.";
+        },
+      ],
+    };
   },
-  {
-    id: "02",
-    patientId: "PID002",
-    patientName: 9,
-    age: 37,
-    mood: 4.3,
-    action: "1%",
+  methods: {
+    addQuestionOption(questionIndex, index) {
+      // Push an empty string as a new option for the specified question
+      // this.questions.options.push("");
+
+      this.questions[questionIndex].options.splice(index + 1, 0, "");
+    },
+    removeQuestionOption(questionIndex, optionIndex) {
+      // Remove the option for the specified question index and option index
+      this.questions[questionIndex].options.splice(optionIndex, 1);
+    },
+    addQuestion(index) {
+      const newQuestion = { text: "", options: [""] }; // Create a new question with an empty option
+      this.questions.splice(index + 1, 0, newQuestion); // Add the new question to the list of questions
+    },
+    removeQuestion(index) {
+      // Remove the question and corresponding options at the specified index
+      this.questions.splice(index, 1);
+    },
+    createTest() {
+      console.log("Test Name:", this.testName);
+
+      for (let i = 0; i < this.questions.length; i++) {
+        const question = this.questions[i];
+        console.log(`Question ${i + 1} Text:`, question.text);
+        console.log(`Question ${i + 1} Options:`, question.options);
+      }
+
+      // Add additional logic for creating the test if needed
+
+      // Placeholder message for now
+      console.log("Test creation logic to be implemented.");
+      this.$router.push("/dashboard/test");
+    },
   },
-  {
-    id: "03",
-    patientId: "PID003",
-    patientName: 16,
-    age: 23,
-    mood: 6,
-    action: "7%",
-  },
-  {
-    id: "04",
-    patientId: "PID004",
-    patientName: 3.7,
-    age: 67,
-    mood: 4.3,
-    action: "8%",
-  },
-  {
-    id: "05",
-    patientId: "PID005",
-    patientName: 16,
-    age: 49,
-    mood: 3.9,
-    action: "16%",
-  },
-  {
-    id: "06",
-    patientId: "PID006",
-    patientName: 0,
-    age: 94,
-    mood: 0,
-    action: "0%",
-  },
-  {
-    id: "07",
-    patientId: "PID007",
-    patientName: 0.2,
-    age: 98,
-    mood: 600,
-    action: "2%",
-  },
-  {
-    id: "08",
-    patientId: "PID008",
-    patientName: 3.2,
-    age: 87,
-    mood: 400,
-    action: "45%",
-  },
-  {
-    id: "09",
-    patientId: "PID009",
-    patientName: 25,
-    age: 51,
-    mood: 200,
-    action: "22%",
-  },
-  {
-    id: "10",
-    patientId: "PID010",
-    patientName: 26,
-    age: 65,
-    mood: 7,
-    action: "6%",
-  },
-];
-function getColor(mood) {
-  if (mood > 400) return "red";
-  else if (mood > 200) return "orange";
-  else return "green";
-}
+};
 </script>
 
 <style scoped>
-:deep(.v-pagination__list) {
-  justify-content: end;
-}
+/* Add any custom styles you need */
 </style>
-```
