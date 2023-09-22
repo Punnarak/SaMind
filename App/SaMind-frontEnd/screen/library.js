@@ -15,19 +15,16 @@ import {
 } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import CarouselCardItem, { SLIDER_WIDTH, ITEM_WIDTH } from "../Clibrary";
-import data from "../dataL";
+import dataL from "../dataL";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios"
-
-
+// import axios from "./axios";
 
 export default function Login() {
   const navigation = useNavigation();
-
 
   // useEffect(() => {
   //   // โหลดและตั้งค่า fontFamily
@@ -43,50 +40,50 @@ export default function Login() {
 
   const [searchText, setSearchText] = useState("");
   const [filteredLinks, setFilteredLinks] = useState([]);
-  let [data,setData] = useState([])
-  useEffect(() => {
-    // Make a GET request to fetch data from "/question?type=test2"
-    axios
-      .get("/library")
-      .then((response) => {
-        // Set the fetched data in your state
-      this.links = setData(response.data);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
-  }, []);
-  let links = data
-  // const links = [
-  //   {
-  //     id: 1,
-  //     name: "10 ตุลาคมวันสุขภาพจิต",
-  //     url: "https://www.lovecarestation.com/10-ตุลาคม-วันสุขภาพจิตโลก",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "สุขภาพจิตไทย...วัดใจไปพร้อมกัน",
-  //     url: "https://www.thailandplus.tv/archives/403806",
-  //   },
-  //   { id: 3, name: "สุขภาพจิตวัยรุ่น", url: "https://www.hitap.net/166484" },
-  //   {
-  //     id: 4,
-  //     name: "How To บริหารสุขภาพจิตในช่วง\nวิกฤตCOVID-19",
-  //     url: "https://www.rama.mahidol.ac.th/ramachannel/infographic/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B9%83%E0%B8%99%E0%B8%8A%E0%B9%88%E0%B8%A7%E0%B8%87/",
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "7 วิธีดูแลสภาพจิตใจหลังเผชิญ\nความโศกเศร้า",
-  //     url: "https://www.camri.go.th/th/home/infographic/infographic-395",
-  //   },
-  //   {
-  //     id: 6,
-  //     name: "CheckList สุขภาพจิตแบบไหนถึง\nควรพบแพทย์",
-  //     url: "https://www.rama.mahidol.ac.th/ramachannel/infographic/check-list-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B9%84%E0%B8%AB%E0%B8%99%E0%B8%96%E0%B8%B6%E0%B8%87%E0%B8%84%E0%B8%A7%E0%B8%A3/",
-  //   },
-  //   // เพิ่มลิงก์อื่น ๆ ตามต้องการ
-  // ];
+  // let [data, setData] = useState([]);
+  // useEffect(() => {
+  //   // Make a GET request to fetch data from "/question?type=test2"
+  //   axios
+  //     .get("/library")
+  //     .then((response) => {
+  //       // Set the fetched data in your state
+  //     this.links = setData(response.data);
+  //     })
+  //     .catch((error) => {
+  //       // Handle any errors here
+  //       console.error("Axios error:", error);
+  //     });
+  // }, []);
+  // let links = data
+  const links = [
+    {
+      id: 1,
+      name: "10 ตุลาคมวันสุขภาพจิต",
+      url: "https://www.lovecarestation.com/10-ตุลาคม-วันสุขภาพจิตโลก",
+    },
+    {
+      id: 2,
+      name: "สุขภาพจิตไทย...วัดใจไปพร้อมกัน",
+      url: "https://www.thailandplus.tv/archives/403806",
+    },
+    { id: 3, name: "สุขภาพจิตวัยรุ่น", url: "https://www.hitap.net/166484" },
+    {
+      id: 4,
+      name: "How To บริหารสุขภาพจิตในช่วง\nวิกฤตCOVID-19",
+      url: "https://www.rama.mahidol.ac.th/ramachannel/infographic/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B9%83%E0%B8%99%E0%B8%8A%E0%B9%88%E0%B8%A7%E0%B8%87/",
+    },
+    {
+      id: 5,
+      name: "7 วิธีดูแลสภาพจิตใจหลังเผชิญ\nความโศกเศร้า",
+      url: "https://www.camri.go.th/th/home/infographic/infographic-395",
+    },
+    {
+      id: 6,
+      name: "CheckList สุขภาพจิตแบบไหนถึง\nควรพบแพทย์",
+      url: "https://www.rama.mahidol.ac.th/ramachannel/infographic/check-list-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B9%84%E0%B8%AB%E0%B8%99%E0%B8%96%E0%B8%B6%E0%B8%87%E0%B8%84%E0%B8%A7%E0%B8%A3/",
+    },
+    // เพิ่มลิงก์อื่น ๆ ตามต้องการ
+  ];
   const handleSearch = (text) => {
     setSearchText(text);
     if (text === "") {
@@ -194,7 +191,7 @@ export default function Login() {
       />
       <Carousel
         ref={isCarousel}
-        data={data}
+        data={dataL}
         renderItem={CarouselCardItem}
         sliderWidth={SLIDER_WIDTH}
         itemWidth={ITEM_WIDTH}
