@@ -8,9 +8,9 @@ router.use(express.json());
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: 'your_email_service',
+  service: 'Gmail',
   auth: {
-    user: 'your_email',
+    user: 'desmotest123@gmail.com',
     pass: 'your_email_password',
   },
 });
