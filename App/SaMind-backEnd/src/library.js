@@ -3,29 +3,36 @@ const express = require('express');
 const router = express.Router();
 
 // router.get('/library', (req, res) => {
-//     const style = req.query.style || ''; // Default value if parameter not provided
-//     const query = 'SELECT * FROM library WHERE style LIKE $1';
-  
-//     client.query(query, [`%${style}%`])
-//       .then(result => {
-//         res.json(result.rows);
-//       })
-//       .catch(err => {
-//         console.error('Error executing query:', err);
-//         res.status(500).json({ error: 'An error occurred' });
-//       });
+//   const id = req.query.id; // Get the type parameter from the query
+//   let query = 'SELECT * FROM library';
+
+//   // Check if the type parameter is provided
+//   if (id) {
+//     query += ' WHERE id LIKE $1';
+//   }
+
+//   const queryParams = id ? [`%${id}%`] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
 // });
 
 router.get('/library', (req, res) => {
-  const style = req.query.style; // Get the type parameter from the query
+  const id = req.query.id; // Get the id parameter from the query
   let query = 'SELECT * FROM library';
 
-  // Check if the type parameter is provided
-  if (style) {
-    query += ' WHERE style LIKE $1';
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE id = $1';
   }
 
-  const queryParams = style ? [`%${style}%`] : [];
+  const queryParams = id ? [id] : [];
 
   client.query(query, queryParams)
     .then(result => {
@@ -37,16 +44,17 @@ router.get('/library', (req, res) => {
     });
 });
 
-router.post('/libraryAdd', (req, res) => {
-  const { libraryid, title, linkpicture, linkweb, style } = req.body;
 
-  if (!libraryid || !title || !linkpicture || !linkweb || !style ) {
-    return res.status(400).json({ error: 'Both title, link-picture and link-web are required fields.' });
+router.post('/libraryAdd', (req, res) => {
+  const { id, name, url} = req.body;
+
+  if (!id || !name || !url) {
+    return res.status(400).json({ error: 'Both id, name, url are required fields.' });
   }
 
-  const insertQuery = 'INSERT INTO library (libraryid, title, linkpicture, linkweb, style) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+  const insertQuery = 'INSERT INTO library (id, name, url) VALUES ($1, $2, $3) RETURNING *';
 
-  client.query(insertQuery, [libraryid, title, linkpicture, linkweb, style])
+  client.query(insertQuery, [id, name, url])
     .then(result => {
       res.status(201).json(result.rows[0]);
     })
