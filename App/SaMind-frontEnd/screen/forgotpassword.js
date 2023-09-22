@@ -128,6 +128,7 @@ export default function Forgotpassword() {
               <Button
                 title="X"
                 color="black"
+                
                 style={styles.close}
                 onPress={close}
                 isVisible={send}
@@ -204,6 +205,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   close: {
+    
     zIndex: 5,
   },
   wel: {
@@ -246,7 +248,7 @@ const styles = StyleSheet.create({
   title4: {
     ...Platform.select({
       android: {
-        marginRight: horizontalScale(140),
+        marginRight: horizontalScale(160),
       },
       ios: {
         marginRight: horizontalScale(160.5),

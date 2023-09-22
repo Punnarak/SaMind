@@ -174,8 +174,19 @@ export default function Login({ route }) {
           style={[
             styles.hospitalInput,
             {
-              height: isPickerVisible ? "43.5%" : "10%",
+              ...Platform.select({
+      android: {
+        height: isPickerVisible ? "43.5%" : "10%",
+              paddingBottom: isPickerVisible ? 200 : 0,
+        
+      },
+      ios: {
+        // margin: "5%",
+        height: isPickerVisible ? "43.5%" : "10%",
               paddingBottom: isPickerVisible ? 150 : 0,
+      },
+    }),
+             
             },
           ]}
           placeholder="Choose time..."
@@ -188,7 +199,18 @@ export default function Login({ route }) {
             name="chevron-back-outline"
             style={{
               transform: [{ rotate: "270deg" }],
-              marginTop: isPickerVisible ? 2 : 2,
+              ...Platform.select({
+      android: {
+        marginTop: isPickerVisible ? -4 : -4,
+      
+        
+      },
+      ios: {
+        marginTop: isPickerVisible ? 2 : 2,
+     
+      },
+    }),
+             
             }}
             size={20}
             color="#3987FD"
@@ -230,7 +252,18 @@ export default function Login({ route }) {
             name="chevron-back-outline"
             style={{
               transform: [{ rotate: "270deg" }],
-              marginTop: isPickerVisible ? 1 : 1,
+              ...Platform.select({
+      android: {
+        marginTop: isPickerVisible ? -2 : -2,
+      
+        
+      },
+      ios: {
+        marginTop: isPickerVisible ? 1 : 1,
+     
+      },
+    }),
+             
             }}
             size={20}
             color="#3987FD"
@@ -393,9 +426,19 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   title1: {
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+        marginBottom: verticalScale(60),
+      },
+      ios: {
+        // margin: "5%",
+        marginBottom: verticalScale(50),
+      },
+    }),
     marginRight: "82.1%",
     // marginTop: "0%",
-    marginBottom: verticalScale(50),
+    
     // marginBottom: "1%",
     fontSize: moderateScale(19.6),
     // fontSize: 20,
@@ -404,9 +447,18 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   title2: {
+    ...Platform.select({
+      android: {
+        marginBottom: verticalScale(3),
+        
+      },
+      ios: {
+        marginBottom: verticalScale(3),
+      },
+    }),
     marginRight: "80.5%",
     // marginTop: "0%",
-    marginBottom: verticalScale(3),
+    
     // marginBottom: "1%",
     fontSize: moderateScale(19.6),
     // fontSize: 20,
@@ -415,9 +467,18 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   title3: {
+    ...Platform.select({
+      android: {
+        marginBottom: verticalScale(3),
+        
+      },
+      ios: {
+        marginBottom: verticalScale(3),
+      },
+    }),
     marginRight: "90.5%",
     // marginTop: "0%",
-    marginBottom: verticalScale(3),
+   
     // marginBottom: "1%",
     fontSize: moderateScale(19.6),
     // fontSize: 20,
@@ -426,9 +487,18 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   title4: {
+    ...Platform.select({
+      android: {
+        marginBottom: verticalScale(65),
+        
+      },
+      ios: {
+        marginBottom: verticalScale(55),
+      },
+    }),
     marginRight: "73.1%",
     // marginTop: "0%",
-    marginBottom: verticalScale(55),
+    
     // marginBottom: "1%",
     fontSize: moderateScale(19.6),
     // fontSize: 20,
@@ -437,12 +507,20 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   TextInput: {
+    ...Platform.select({
+      android: {
+        marginBottom: verticalScale(10),
+      },
+      ios: {
+        marginBottom: verticalScale(6),
+      },
+    }),
     marginTop: moderateScale(3.05),
     // marginTop: "1%",
     height: verticalScale(38.315),
     // height: 40,
     width: "100%",
-    marginBottom: verticalScale(6),
+    
     // marginBottom: "2%",
     borderWidth: 2,
     borderColor: "#569AFF",
@@ -506,21 +584,24 @@ const styles = StyleSheet.create({
     marginLeft: "3%",
     fontWeight: "bold",
   },
-
-  icon: {
-    width: 50,
-    height: 50,
-    alignItems: "center",
-    margin: "7%",
-    resizeMode: "contain",
-  },
   hospitalInput: {
     position: "absolute",
-
-    marginTop: verticalScale(58),
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+        marginTop: verticalScale(63),
+        
+      },
+      ios: {
+        // margin: "5%",
+        marginTop: verticalScale(58),
+        marginBottom: verticalScale(6.5),
+      },
+    }),
+    
     // height: verticalScale(38.35),
     width: "100%",
-    marginBottom: verticalScale(6.5),
+    
     borderColor: "#3987FD",
     borderWidth: 2,
     borderRadius: 10,
@@ -556,22 +637,47 @@ const styles = StyleSheet.create({
     // zIndex: 5,
   },
   list: {
+    ...Platform.select({
+      android: {
+ 
+        maxHeight: 210,
+    marginTop: "21%",
+    width: "98.49%",
+    borderRadius: 10,
+      },
+      ios: {
+        maxHeight: 190,
+        marginTop: "20%",
+        width: "99%",
+    borderRadius: 10,
+      },
+    }),
     backgroundColor: "white",
     position: "absolute",
-    width: "99%",
-    maxHeight: 190,
-    marginTop: "20%",
-    borderRadius: 10,
+    
     zIndex: 3,
   },
   Drinput: {
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+        marginTop: verticalScale(238),
+        marginBottom: verticalScale(6.5),
+      
+      },
+      ios: {
+        // margin: "5%",
+        marginTop: verticalScale(205),
+        marginBottom: verticalScale(6.5),
+      },
+    }),
     backgroundColor: "white",
     position: "absolute",
 
-    marginTop: verticalScale(205),
+    
     // height: verticalScale(38.35),
     width: "100%",
-    marginBottom: verticalScale(6.5),
+    
     borderColor: "#3987FD",
     borderWidth: 2,
     borderRadius: 10,
@@ -580,11 +686,22 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   listN: {
+    ...Platform.select({
+      android: {
+        width: "98.0%",
+        maxHeight: 190,
+        marginTop: "74%",
+        
+      },
+      ios: {
+        width: "98.0%",
+        maxHeight: 190,
+        marginTop: "67%",
+      },
+    }),
     backgroundColor: "white",
     position: "absolute",
-    width: "98.0%",
-    maxHeight: 190,
-    marginTop: "67%",
+    
     zIndex: 1,
   },
   Modal: {

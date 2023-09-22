@@ -306,8 +306,14 @@ const styles = StyleSheet.create({
   },
   hospitalInput: {
     position: "absolute",
-
-    marginTop: verticalScale(330),
+    ...Platform.select({
+      android: {
+        marginTop: verticalScale(338),
+      },
+      ios: {
+        marginTop: verticalScale(330),
+      },
+    }),
     // height: verticalScale(38.35),
     width: 265,
     marginBottom: verticalScale(6.5),
@@ -414,9 +420,17 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   list: {
+    ...Platform.select({
+      android: {
+        maxHeight: 120,
+      },
+      ios: {
+        maxHeight: 130,
+      },
+    }),
     position: "absolute",
     width: "77.5%",
-    maxHeight: 130,
+    
     marginTop: "112.5%",
     zIndex: 1,
   },

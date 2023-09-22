@@ -22,7 +22,7 @@ export default function Login() {
   const [disabled, setDisabled] = useState(false);
   const iconSize = Platform.select({
     ios: 57,
-    android: 37,
+    android: 48,
   });
 
   handleLogin = async () => {};
@@ -302,6 +302,15 @@ export default function Login() {
 const styles = StyleSheet.create({
   // blue background
   container1: {
+      ...Platform.select({
+      android: {
+      
+      },
+      ios: {
+     
+        },
+      }),
+    marginTop: -10,
     flex: 1,
     backgroundColor: "#C6E3FF",
     alignItems: "center",
@@ -470,12 +479,20 @@ const styles = StyleSheet.create({
   },
   // 6 Box of Feature
   button: {
+    ...Platform.select({
+      android: {
+         paddingVertical: verticalScale(20.5),
+      },
+      ios: {
+       paddingVertical: verticalScale(10.5),
+      },
+    }),
     marginTop: verticalScale(-19),
     // marginTop: "-6%",
     margin: "2%",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: verticalScale(10.5),
+    
     // paddingVertical: 11,
     paddingHorizontal: horizontalScale(28),
     // paddingHorizontal: 30,
@@ -525,24 +542,30 @@ const styles = StyleSheet.create({
   },
   // bottom bar
   undertag: {
-    // ...Platform.select({
-    //   android: {
-    //     height: 50.4,
-    //   },
-    //   ios: {
+    ...Platform.select({
+      android: {
+        // height: 50.4,
+        elevation: 10,
+        shadowColor: "black", // IOS
+        shadowOffset: { height: 1, width: 1 }, // IOS
+        shadowOpacity: 1, // IOS
+        shadowRadius: 1, //IOS
+      },
+      ios: {
     // height: 69.8,
-    //   },
-    // }),
+    shadowColor: "rgba(0,0,0, 0.3)", // IOS
+    shadowOffset: { height: 1, width: 1 }, // IOS
+    shadowOpacity: 1, // IOS
+    shadowRadius: 1, //IOS
+      },
+    }), 
     height: verticalScale(67.8),
     width: horizontalScale(380),
     // width: "120%",
     // height: 69.8,
     // marginTop: "2%",
     backgroundColor: "white",
-    shadowColor: "rgba(0,0,0, 0.3)", // IOS
-    shadowOffset: { height: 1, width: 1 }, // IOS
-    shadowOpacity: 1, // IOS
-    shadowRadius: 1, //IOS
+    
     flexDirection: "row",
     alignItems: "center",
     // marginTop: "7%",
