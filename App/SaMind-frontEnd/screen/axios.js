@@ -1,5 +1,5 @@
 import axios from "axios";
 const HTTP = axios.create({
-  baseURL: "http://192.168.137.1:4343",
+  baseURL: "https://7499-49-229-134-236.ngrok-free.app",
 });
 export default HTTP;

@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import RadioItem from "../RadioItem"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
+import axios from "./axios.js";
 
 export default function Notification() {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ export default function Notification() {
   const [level, setLevel] = useState("ท่านมีอาการซึมเศร้าระดับปานกลาง");
   const [color, setColor] = useState("black");
   const [suggestion, setSuggestion] = useState("ไม่จำเป็นต้องรักษา");
-  const questions = [
+  const [data, setData] = useState([
     {
       id: 1,
       question: "1. เบื่อ ทำอะไร ๆ ก็ไม่เพลิดเพลิน",
@@ -120,9 +121,31 @@ export default function Notification() {
         "มีเกือบทุกวัน",
       ],
     },
+  ]);
 
-    // Add more questions as needed
-  ];
+  let questions = [];
+  useEffect(() => {
+    // Make a GET request to fetch data from "/question?type=test2"
+    axios
+      .get("/question?type=PHQ9")
+      .then((response) => {
+        // Set the fetched data in your state
+        // response.data = [];
+        if (response.data.length != 0) {
+          console.log("in");
+          setData(response.data);
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
+  }, []);
+  questions = data;
+  // const questions =
+
   const toggleUnderstand = () => {
     setModal(!modal);
   };
