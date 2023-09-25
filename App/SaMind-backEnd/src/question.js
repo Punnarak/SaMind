@@ -94,5 +94,25 @@ router.get('/questiontype', (req, res) => {
     });
 });
 
+// ver use body
+router.delete('/questionsDel', (req, res) => {
+  const type = req.body.type; // Get the type from the request body
+
+  if (!type) {
+    return res.status(400).json({ error: 'Type parameter is required.' });
+  }
+
+  const deleteQuery = 'DELETE FROM questionnaire_new WHERE type = $1';
+
+  client.query(deleteQuery, [type])
+    .then(result => {
+      const deletedRowCount = result.rowCount;
+      res.json({ message: `Deleted ${deletedRowCount} questions with type ${type}.` });
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
 
 module.exports = router;
