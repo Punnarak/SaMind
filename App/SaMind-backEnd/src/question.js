@@ -80,7 +80,19 @@ router.post('/questionAdd', (req, res) => {
     });
 });
 
+router.get('/questiontype', (req, res) => {
+  let query = 'SELECT DISTINCT type FROM questionnaire_new';
 
+  client.query(query)
+    .then(result => {
+      const types = result.rows.map(row => row.type);
+      res.json(types);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
 
 
 module.exports = router;
