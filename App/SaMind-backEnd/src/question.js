@@ -2,26 +2,7 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 
-// router.get('/question', (req, res) => {
-//   const type = req.query.type; // Get the type parameter from the query
-//   let query = 'SELECT id, question, options FROM questionnaire';
-
-//   // Check if the type parameter is provided
-//   if (type) {
-//     query += ' WHERE type LIKE $1';
-//   }
-
-//   const queryParams = type ? [`%${type}%`] : [];
-
-//   client.query(query, queryParams)
-//     .then(result => {
-//       res.json(result.rows);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
+const { v4: uuidv4 } = require('uuid');
 
 router.get('/question', (req, res) => {
   const type = req.query.type; // Get the type parameter from the query
@@ -63,46 +44,42 @@ router.get('/question', (req, res) => {
     });
 });
 
-
-// router.post('/questionAdd', (req, res) => {
-//   const { id, question, options, type } = req.body;
-
-//   if (!id || !question || !options || !type ) {
-//     return res.status(400).json({ error: 'Both question and choice are required fields.' });
-//   }
-
-//   const insertQuery = 'INSERT INTO questionnaire (id, question, options, type) VALUES ($1, $2, $3, $4) RETURNING *';
-
-//   client.query(insertQuery, [id, question, options, type])
-//     .then(result => {
-//       res.status(201).json(result.rows[0]);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
 router.post('/questionAdd', (req, res) => {
-  const { id, question, options, type } = req.body;
+  const requestData = req.body; // Assuming req.body is an array of objects
 
-  if (!id || !question || !options || !type) {
-    return res.status(400).json({ error: 'Both question and choice are required fields.' });
+  if (!Array.isArray(requestData)) {
+    return res.status(400).json({ error: 'Request data should be an array of objects.' });
   }
 
-  const optionsString = JSON.stringify(options); // Convert options array to JSON string
+  // Iterate through each item in the array and insert it into the database with auto-generated IDs
+  const insertQueries = requestData.map(item => {
+    const { no, question, options, type } = item;
 
-  const insertQuery = 'INSERT INTO questionnaire (id, question, options, type) VALUES ($1, $2, $3, $4) RETURNING *';
+    if (!question || !options || !type || !no) {
+      return res.status(400).json({ error: 'Each item in the array must have question, options, and type fields.' });
+    }
 
-  client.query(insertQuery, [id, question, optionsString, type])
-    .then(result => {
-      res.status(201).json(result.rows[0]);
+    const id = uuidv4(); // Generate a new UUID for the question
+    const optionsString = JSON.stringify(options);
+
+    const insertQuery = 'INSERT INTO questionnaire_new (id, no, question, options, type) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+
+    return client.query(insertQuery, [id, no, question, optionsString, type]);
+  });
+
+  // Execute all insert queries concurrently
+  Promise.all(insertQueries)
+    .then(results => {
+      const insertedItems = results.map(result => result.rows[0]);
+      res.status(201).json(insertedItems);
     })
     .catch(err => {
-      console.error('Error executing query:', err);
+      console.error('Error executing queries:', err);
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+
 
 
 module.exports = router;
