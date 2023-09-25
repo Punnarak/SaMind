@@ -1,5 +1,5 @@
 import axios from "axios";
 const HTTP = axios.create({
-  baseURL: "http://192.168.137.1:4343",
+  baseURL: "http://10.226.165.79:4343",
 });
 export default HTTP;

@@ -6,14 +6,14 @@ const { v4: uuidv4 } = require('uuid');
 
 router.get('/question', (req, res) => {
   const type = req.query.type; // Get the type parameter from the query
-  let query = 'SELECT id, question, options FROM questionnaire';
+  let query = 'SELECT no, question, options, type FROM questionnaire_new';
 
   // Check if the type parameter is provided
   if (type) {
     query += ' WHERE type LIKE $1';
   }
 
-  const queryParams = type ? [`%${type}%`] : [];
+  const queryParams = type ? [type] : [];
 
   client.query(query, queryParams)
     .then(result => {
@@ -22,20 +22,21 @@ router.get('/question', (req, res) => {
 
         try {
           // Attempt to parse the options field as JSON
-          options = JSON.parse(row.options);
+          options = row.options;
         } catch (error) {
           // Handle any parsing errors, e.g., if the data is not valid JSON
           options = null; // Or handle the error in an appropriate way for your use case
         }
 
         return {
-          id: row.id,
+          no: row.no,
           question: row.question,
-          options: options
+          options: options,
+          type: row.type
         };
       });
 
-      formattedResults.sort((a, b) => a.id - b.id);
+      formattedResults.sort((a, b) => a.no - b.no);
       res.json(formattedResults);
     })
     .catch(err => {
