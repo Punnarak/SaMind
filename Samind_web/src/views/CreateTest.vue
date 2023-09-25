@@ -86,7 +86,7 @@
           <v-col cols="12" sm="6" md="4">
             <v-row cols="6">
               <v-text-field
-                v-model="question.text"
+                v-model="question.question"
                 class="mt-2 mb-4"
                 variant="outlined"
                 rounded="lg"
@@ -147,14 +147,17 @@
 
 <script>
 import { ref } from "vue";
+import axios from "../axios";
 
 export default {
   data() {
     return {
       questions: [
         {
-          text: "",
+          no: "",
+          question: "",
           options: [""], // Initialize with an empty option for this question
+          type: "",
         },
       ],
       testName: "",
@@ -178,7 +181,7 @@ export default {
       this.questions[questionIndex].options.splice(optionIndex, 1);
     },
     addQuestion(index) {
-      const newQuestion = { text: "", options: [""] }; // Create a new question with an empty option
+      const newQuestion = { question: "", options: [""] }; // Create a new question with an empty option
       this.questions.splice(index + 1, 0, newQuestion); // Add the new question to the list of questions
     },
     removeQuestion(index) {
@@ -186,19 +189,34 @@ export default {
       this.questions.splice(index, 1);
     },
     createTest() {
-      console.log("Test Name:", this.testName);
+      const testData = this.questions.map((question, index) => ({
+        no: index + 1, // Assuming a simple incrementing ID starting from 15
+        question: question.question,
+        options: question.options.map(
+          (option, optionIndex) => question.options[optionIndex]
+        ), // Map options to [1, 2, 3, ...]
+        type: this.testName, // Assuming a simple incrementing type starting from test5
+      }));
 
-      for (let i = 0; i < this.questions.length; i++) {
-        const question = this.questions[i];
-        console.log(`Question ${i + 1} Text:`, question.text);
-        console.log(`Question ${i + 1} Options:`, question.options);
-      }
+      // Convert testData to JSON string
+      const testDataJSON = JSON.stringify(testData, null, 2);
 
-      // Add additional logic for creating the test if needed
+      console.log("Test Data (JSON):", testDataJSON);
+
+      // Add additional logic for handling the created test data if needed
 
       // Placeholder message for now
       console.log("Test creation logic to be implemented.");
-      this.$router.push("/dashboard/test");
+
+      axios
+        .post("/questionAdd", testDataJSON)
+        .then((response) => {
+          console.log("Inserted questions:", response.data);
+          this.$router.push("/dashboard/test");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
   },
 };
