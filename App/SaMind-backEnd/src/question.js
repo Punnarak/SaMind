@@ -54,6 +54,7 @@ router.get('/question', (req, res) => {
         };
       });
 
+      formattedResults.sort((a, b) => a.id - b.id);
       res.json(formattedResults);
     })
     .catch(err => {
