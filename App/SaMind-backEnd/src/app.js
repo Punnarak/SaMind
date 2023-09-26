@@ -38,9 +38,10 @@ app.use(appoint);
 // Test 
 const dashboard = require('./dashboard.js');
 app.use(dashboard);
-// const appoint = require('./mailOTP.js');
-// app.use(send-otp);
-// app.use(verify-otp);
+
+const mailOTP = require('./mailOTP.js');
+app.use(mailOTP);
+
 
 
  
