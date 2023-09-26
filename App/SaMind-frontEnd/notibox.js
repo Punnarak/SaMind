@@ -13,8 +13,8 @@ const NotificationBox = ({ item, index }) => {
     >
       <View style={styles.container} key={index}>
         <Text style={[styles.header]}>{item.title}</Text>
-        <Text style={[styles.detail]}>Detail: {item.title}</Text>
-        <Text style={[styles.detail]}>Turn in Before: {item.title}</Text>
+        <Text style={[styles.detail]}>Detail: {item.detail}</Text>
+        <Text style={[styles.detail]}>Turn in Before: {item.turnin}</Text>
 
         <Ionicons
           name="chevron-back-outline"

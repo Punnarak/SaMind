@@ -46,7 +46,7 @@ export default function Notification() {
   const toggleConfirm = () => {
     setModal(!modal);
     setScore(0);
-    // navigation.navigate("Generaltestscreen");
+    navigation.navigate("Generaltestscreen");
   };
 
   const handleOptionSelect = (questionId, option) => {
@@ -119,7 +119,7 @@ export default function Notification() {
             onPress={() => navigation.goBack()}
           />
         </View>
-        <Text style={styles.header}>แบบประเมินโรคซึมเศร้า PHQ-9</Text>
+        <Text style={styles.header}>แบบประเมินโรคซึมเศร้า Q2</Text>
       </ImageBackground>
 
       <View style={styles.container3}>

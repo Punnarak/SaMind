@@ -11,6 +11,7 @@
           variant="outlined"
           placeholder="Search Test"
           prepend-inner-icon="mdi-magnify"
+          v-model="search"
         ></v-text-field> </v-col
       ><v-spacer></v-spacer>
       <v-col cols="2">
@@ -33,7 +34,7 @@
       rounded="xl"
       v-model:page="page"
       :headers="headers"
-      :items="patients"
+      :items="filteredTest"
       class="elevation-1"
       style="border-radius: 10px"
     >
@@ -42,15 +43,13 @@
           style="margin-right: 20px"
           @click="
             this.$router.push({
-              path: `edittest/${item.columns.id}`,
-              query: { item: JSON.stringify(item) },
+              path: `createtest`,
             })
           "
           >mdi-pencil</v-icon
         >
-        <v-icon>mdi-delete</v-icon>
+        <v-icon @click="Delete(item)">mdi-delete</v-icon>
         <v-icon style="margin-left: 20px">mdi-send</v-icon>
-        <!-- {{ item.columns.action }} -->
       </template>
 
       <template v-slot:bottom>
@@ -82,21 +81,27 @@
 <script setup>
 import { ref } from "vue";
 import axios from "../axios.js";
-import { onMounted } from "vue";
-
-// onMounted(async () => {
-//   try {
-//     let url = "/question";
-//     await axios
-//       .get(url)
-//       .then((response) => {
-//         console.log(response.data)
-//       })
-
-//   } catch (error) {
-//     console.error("Error fetching products:", error);
-//   }
-// });
+import { onMounted, computed } from "vue";
+let test = ref([]);
+onMounted(async () => {
+  try {
+    const response = await axios.get("/questiontype", {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    console.log("questions:", response.data);
+    const testmap = response.data.map((question, index) => ({
+      id: index + 1,
+      testName: question,
+    }));
+    console.log("testmap:", testmap);
+    test.value = testmap;
+    console.log("test:", test);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+});
 
 const page = ref(1);
 const itemsPerPage = ref(10);
@@ -108,65 +113,37 @@ const headers = [
     sortable: false,
     key: "id",
   },
-  { title: "Test Name", key: "testName", sortable: false, align: "center" },
+  { title: "Test Name", key: "testName", sortable: false, align: "center" }, // Update key to "testName"
   { title: "Action", key: "action", sortable: false, align: "center" },
 ];
-const patients = [
-  {
-    id: "01",
-    testName: "Somsak Test 1",
-    action: 6,
-  },
-  {
-    id: "02",
-    testName: "Somsak Test 2",
-    action: 9,
-  },
-  {
-    id: "03",
-    testName: "Somsak Test 3",
-    action: 16,
-  },
-  {
-    id: "04",
-    testName: "Somsak Test 4",
-    action: 3.7,
-  },
-  {
-    id: "05",
-    testName: "Somsak Test 5",
-    action: 16,
-  },
-  {
-    id: "06",
-    testName: "Somsak Test 6",
-    action: 0,
-  },
-  {
-    id: "07",
-    testName: "Somsak Test 7",
-    action: 0.2,
-  },
-  {
-    id: "08",
-    testName: "Somsak Test 8",
-    action: 3.2,
-  },
-  {
-    id: "09",
-    testName: "Somsak Test 9",
-    action: 25,
-  },
-  {
-    id: "10",
-    testName: "Somsak Test 10",
-    action: 26,
-  },
-];
-function getColor(mood) {
-  if (mood > 400) return "red";
-  else if (mood > 200) return "orange";
-  else return "green";
+
+let search = ref("");
+
+const filteredTest = computed(() => {
+  const searchTerm = search.value.toLowerCase();
+  return test.value.filter((item) =>
+    item.testName.toLowerCase().includes(searchTerm)
+  );
+});
+
+function Delete(question) {
+  const type = { type: question.columns.testName };
+  const typeJSON = JSON.stringify(type, null, 2);
+  console.log("test", typeJSON);
+  axios
+    .delete("/questionsDel", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: typeJSON, // Send the data directly in the request body
+    })
+    .then((response) => {
+      console.log("delete questions:", response);
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 }
 </script>
 

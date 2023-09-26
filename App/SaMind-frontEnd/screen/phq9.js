@@ -152,7 +152,7 @@ export default function Notification() {
   const toggleConfirm = () => {
     setModal(!modal);
     setScore(0);
-    // navigation.navigate("Generaltestscreen");
+    navigation.navigate("Generaltestscreen");
   };
 
   const handleOptionSelect = (questionId, option) => {

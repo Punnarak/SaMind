@@ -209,7 +209,12 @@ export default {
       console.log("Test creation logic to be implemented.");
 
       axios
-        .post("/questionAdd", testDataJSON)
+        .post("/questionAdd", testDataJSON, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
         .then((response) => {
           console.log("Inserted questions:", response.data);
           this.$router.push("/dashboard/test");

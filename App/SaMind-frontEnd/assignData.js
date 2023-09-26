@@ -1,7 +1,7 @@
 const data = [
   (daily = [
     {
-      title: "January Survey",
+      title: "October Survey",
       status: "no",
     },
     {
@@ -11,7 +11,7 @@ const data = [
   ]),
   (weekly = [
     {
-      title: "January Survey",
+      title: "October Survey",
       status: "no",
     },
     {
@@ -25,7 +25,7 @@ const data = [
   ]),
   (monthly = [
     {
-      title: "January Survey",
+      title: "October Survey",
       status: "no",
     },
     {

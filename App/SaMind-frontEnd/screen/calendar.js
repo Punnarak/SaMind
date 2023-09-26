@@ -13,7 +13,7 @@ export default function Calendar() {
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
-    const dateStrings = ["2023-08-01", "2023-08-05"];
+    const dateStrings = ["2023-10-27", "2023-10-30"];
     setHighlightedDatesFormat(dateStrings);
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>

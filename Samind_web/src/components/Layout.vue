@@ -117,7 +117,15 @@
         </v-list-item>
         <v-list-item @click="">
           <v-icon>mdi-logout-variant</v-icon>
-          <span class="pl-2">Sign out</span>
+          <span
+            class="pl-2"
+            @click="
+              this.$router.push({
+                path: `/`,
+              })
+            "
+            >Sign out</span
+          >
         </v-list-item>
       </v-list>
     </v-menu>

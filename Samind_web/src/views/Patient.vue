@@ -113,7 +113,7 @@ const patients = [
   {
     id: "01",
     patientId: "PID001",
-    patientName: 6,
+    patientName: "Somsak Test1",
     age: 24,
     mood: 4,
     action: "1%",
@@ -121,7 +121,7 @@ const patients = [
   {
     id: "02",
     patientId: "PID002",
-    patientName: 9,
+    patientName: "Somsee Test2",
     age: 37,
     mood: 4.3,
     action: "1%",
@@ -129,7 +129,7 @@ const patients = [
   {
     id: "03",
     patientId: "PID003",
-    patientName: 16,
+    patientName: "Somchai Test3",
     age: 23,
     mood: 6,
     action: "7%",
@@ -137,7 +137,7 @@ const patients = [
   {
     id: "04",
     patientId: "PID004",
-    patientName: 3.7,
+    patientName: "Somsom Test4",
     age: 67,
     mood: 4.3,
     action: "8%",
@@ -145,7 +145,7 @@ const patients = [
   {
     id: "05",
     patientId: "PID005",
-    patientName: 16,
+    patientName: "Somcheng Test5",
     age: 49,
     mood: 3.9,
     action: "16%",
@@ -153,7 +153,7 @@ const patients = [
   {
     id: "06",
     patientId: "PID006",
-    patientName: 0,
+    patientName: "Sompon Test6",
     age: 94,
     mood: 0,
     action: "0%",
@@ -161,7 +161,7 @@ const patients = [
   {
     id: "07",
     patientId: "PID007",
-    patientName: 0.2,
+    patientName: "Somporn Test7",
     age: 98,
     mood: 600,
     action: "2%",
@@ -169,7 +169,7 @@ const patients = [
   {
     id: "08",
     patientId: "PID008",
-    patientName: 3.2,
+    patientName: "Sommon Test8",
     age: 87,
     mood: 400,
     action: "45%",
@@ -177,7 +177,7 @@ const patients = [
   {
     id: "09",
     patientId: "PID009",
-    patientName: 25,
+    patientName: "Somrak Test9",
     age: 51,
     mood: 200,
     action: "22%",
@@ -185,7 +185,7 @@ const patients = [
   {
     id: "10",
     patientId: "PID010",
-    patientName: 26,
+    patientName: "Somjit Test10",
     age: 65,
     mood: 7,
     action: "6%",

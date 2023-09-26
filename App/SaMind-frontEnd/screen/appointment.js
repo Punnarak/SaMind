@@ -26,7 +26,7 @@ export default function Calendar({ route }) {
   const { date, month, year } = route.params || {};
 
   useEffect(() => {
-    const dateStrings = ["2023-08-01", "2023-08-05"];
+    const dateStrings = ["2023-10-27", "2023-10-30"];
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>
       moment(dateString, dateFormat).toDate()

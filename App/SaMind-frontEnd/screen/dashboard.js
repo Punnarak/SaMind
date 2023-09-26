@@ -123,7 +123,7 @@ export default function Login() {
             SaMind is also happy for you.
           </Text>
           <Text style={{ fontSize: 8, color: "#D0A449", marginTop: "12%" }}>
-            AVG between 2 Jan 2022 - 8 Jan 2022
+            AVG between 20 Sep 2023 - 26 Sep 2023
           </Text>
         </View>
       </View>
@@ -147,7 +147,7 @@ export default function Login() {
               }}
             >
               <Text style={styles.q}>แบบทดสอบ 2Q</Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ 2 Jan 2022</Text>
+              <Text style={styles.d}>ทดสอบเมื่อวันที่ 22 Sep 2023</Text>
             </View>
             <Text style={styles.r}>คุณมีความเสี่ยงที่จะเป็นโรคซึมเศร้า</Text>
           </View>
@@ -174,7 +174,7 @@ export default function Login() {
               }}
             >
               <Text style={styles.q}>แบบทดสอบ PHQ9 </Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ 2 jan 2022</Text>
+              <Text style={styles.d}>ทดสอบเมื่อวันที่ 26 Sep 2023</Text>
             </View>
             <Text style={styles.r2}>ท่านมีอาการซึมเศร้าระดับปานกลาง</Text>
           </View>
