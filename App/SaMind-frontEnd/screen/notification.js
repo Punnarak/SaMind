@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,37 +6,63 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
+
 import { Feather } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import NotiBox from "../notibox";
 
 export default function Notification() {
   const navigation = useNavigation();
-  const route = useRoute();
+  const data = [
+    {
+      title: "ทำแบบประเมินโรคซึมเศร้า PHQ-9",
+      detail: "แบบคัดกรองโรคซึมเศร้าแบบ 9 คำถาม",
+      turnin: "27 Sep 2023",
+      target: "Testscreen",
+    },
+    {
+      title: "ทำแบบประเมินโรคซึมเศร้า Q2",
+      detail: "แบบคัดกรองโรคซึมเศร้าแบบ 2 คำถาม",
+      turnin: "27 Sep 2023",
+      target: "Testscreen",
+    },
+  ];
 
   useEffect(() => {
     console.log("Notification Screen");
   }, []);
 
-  // Extract data from the route params
-  const { data } = route.params;
-
   return (
     <ImageBackground
       source={require("../assets/Game.png")}
-      style={{ alignItems: "center", flex: 1, position: "absolute" }}
+      style={{ alignItems: "center", flex: 1, postition: "absolute" }}
     >
-      <View style={{ flexDirection: "row", marginTop: "15%" }}>
+      <View
+        style={{
+          flexDirection: "row",
+
+          marginTop: "15%",
+        }}
+      >
         <Ionicons
           name="chevron-back-outline"
           size={30}
           color="#3987FD"
-          style={{ marginRight: "80%" }}
+          style={{
+            marginRight: "80%",
+          }}
           onPress={() => navigation.goBack()}
         />
       </View>
       <Text style={styles.header}>Notification</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      ></View>
+
       <View style={styles.container2}>
         <ScrollView style={{}}>
           {data.map((item, index) => (

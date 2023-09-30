@@ -15,7 +15,7 @@ import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { Ionicons } from "@expo/vector-icons";
-
+// import data from "../notiData";
 const isAndroid = Platform.OS === "android";
 
 export default function Login() {
@@ -23,7 +23,7 @@ export default function Login() {
   const [selectedMenu, setSelectedMenu] = useState();
   const [checkIn, setCheckIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
-
+  // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   useEffect(() => {
     console.log("Home Screen");
@@ -288,11 +288,13 @@ export default function Login() {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() =>
-              // Navigate to the Notification screen and pass the data as a param
-              navigation.navigate("Notification", {
-                data: require("../notiData"),
-              })
+            onPress={
+              () =>
+                // Navigate to the Notification screen and pass the data as a param
+                navigation.navigate("Notiscreen")
+              // navigation.navigate("Notiscreen", {
+              //   data: notiData,
+              // })
             }
           />
           <Feather

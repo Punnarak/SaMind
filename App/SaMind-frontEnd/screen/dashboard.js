@@ -111,7 +111,7 @@ export default function Login() {
         />
         <View
           style={{
-            flexDirection: "co;umn",
+            flexDirection: "column",
             marginTop: "-20%",
             marginLeft: "40%",
             zIndex: 7,
