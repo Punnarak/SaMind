@@ -69,7 +69,9 @@ export default function Login() {
     );
   };
 
-  console.log("SignUp Screen");
+  useEffect(() => {
+    console.log("SignUp Screen");
+  }, []);
   const animatedNodeTag = Platform.select({
     ios: "parent",
     android: 37631,
@@ -430,7 +432,7 @@ const styles = StyleSheet.create({
     }),
     position: "absolute",
     width: "77.5%",
-    
+
     marginTop: "112.5%",
     zIndex: 1,
   },

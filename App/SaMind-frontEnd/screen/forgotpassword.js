@@ -30,6 +30,10 @@ export default function Forgotpassword() {
   const [Conpassword, setConPassword] = useState("");
   const [send, setSend] = useState(false);
   const [check, setCheck] = useState(false);
+  useEffect(() => {
+    console.log("Forgot Password Screen");
+  }, []);
+
   const togglePopup = () => {
     setSend(!send);
   };
@@ -40,7 +44,6 @@ export default function Forgotpassword() {
   const toggleState = () => {
     setCheck(!check);
   };
-  console.log("Forgot Password Screen");
 
   return (
     <View style={styles.container1}>
@@ -128,7 +131,6 @@ export default function Forgotpassword() {
               <Button
                 title="X"
                 color="black"
-                
                 style={styles.close}
                 onPress={close}
                 isVisible={send}
@@ -205,7 +207,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1, //IOS
   },
   close: {
-    
     zIndex: 5,
   },
   wel: {

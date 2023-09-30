@@ -125,6 +125,7 @@ export default function Notification() {
 
   let questions = [];
   useEffect(() => {
+    console.log("PHQ9 Test Screen");
     // Make a GET request to fetch data from "/question?type=test2"
     axios
       .get("/question?type=PHQ9")
@@ -213,8 +214,6 @@ export default function Notification() {
 
     setModal(!modal);
   };
-
-  console.log("PHQ9 Test Screen");
 
   return (
     <View style={styles.container2}>

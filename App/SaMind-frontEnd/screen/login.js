@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   StyleSheet,
@@ -25,15 +25,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    // const response = await login(email, password);
-    // if (response.success) {
-    //   navigation.navigate("Home");
-    // } else {
-    //   Alert.alert("Login Failed", "Invalid email or password.");
-    // }
-  };
-  console.log("Login Screen");
+  useEffect(() => {
+    console.log("Login Screen");
+  }, []);
 
   return (
     <View style={styles.container1}>

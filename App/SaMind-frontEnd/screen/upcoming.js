@@ -18,12 +18,12 @@ import assignData from "../assignData";
 
 export default function Upcoming({ route }) {
   const navigation = useNavigation();
-  console.log("Upcoming Screen");
   const { date, month, year } = route.params || {};
   const [datas, setData] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState("a");
 
   useEffect(() => {
+    console.log("Upcoming Screen");
     const dateStrings = [year + "-" + month + "-" + date];
     console.log(dateStrings);
     const dateFormat = "YYYY-MM-DD";

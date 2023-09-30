@@ -15,8 +15,9 @@ export default function Notification() {
   const [disabled, setDisabled] = useState(true);
   const navigation = useNavigation();
 
-  handleLogin = async () => {};
-  console.log("Test Screen");
+  useEffect(() => {
+    console.log("Test Screen");
+  }, []);
 
   return (
     // <View style={styles.container1}>

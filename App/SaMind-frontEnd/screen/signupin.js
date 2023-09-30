@@ -5,7 +5,9 @@ import { useNavigation } from "@react-navigation/native";
 const SignUpIn = () => {
   const navigation = useNavigation();
 
-  console.log("Signup in screen");
+  useEffect(() => {
+    console.log("SignUpIn Screen");
+  }, []);
   return (
     <View style={styles.container}>
       <Image

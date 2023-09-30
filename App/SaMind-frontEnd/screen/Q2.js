@@ -88,7 +88,9 @@ export default function Notification() {
     setModal(!modal);
   };
 
-  console.log("2Q Test Screen");
+  useEffect(() => {
+    console.log("Q2 Test Screen");
+  }, []);
   return (
     <View style={styles.container2}>
       <ImageBackground

@@ -1,12 +1,16 @@
-import React from "react";
-import {
-  MainNavigation,
-  FeaturesNavigation,
-  ProfileNavigation,
-} from "./Navigation";
+import React, { useEffect } from "react";
+import { MainNavigation } from "./Navigation";
+import * as Device from "expo-device"; // Correct import for Device
 
 const App = () => {
-  // นำ Navigation ที่ต้องการมาใช้ในแอปพลิเคชัน
+  // Log the Device model name to the console
+  const newModel = Device.modelName;
+  console.log("New Model:", newModel);
+
+  useEffect(() => {
+    // Any additional logic you may want to add after component mounts
+  }, []);
+
   return (
     <>
       <MainNavigation />

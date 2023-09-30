@@ -7,7 +7,9 @@ import moment from "moment";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 export default function Calendar() {
-  console.log("Calendar Screen");
+  useEffect(() => {
+    console.log("Calendar Screen");
+  }, []);
 
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);

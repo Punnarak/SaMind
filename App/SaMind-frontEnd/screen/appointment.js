@@ -26,6 +26,7 @@ export default function Calendar({ route }) {
   const { date, month, year } = route.params || {};
 
   useEffect(() => {
+    console.log("Appointment Screen");
     const dateStrings = ["2023-10-27", "2023-10-30"];
     const dateFormat = "YYYY-MM-DD";
     const dates = dateStrings.map((dateString) =>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Device } from "expo-device";
+
 import {
   StyleSheet,
   Text,
@@ -15,29 +15,25 @@ import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { Ionicons } from "@expo/vector-icons";
-
-const isAndroid = Platform.OS === "android";
-
 export default function Login() {
   const navigation = useNavigation();
   const [selectedMenu, setSelectedMenu] = useState();
   const [checkIn, setCheckIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const iconSize = Platform.select({
+    ios: 57,
+    android: 48,
+  });
 
-  const iconSize = isAndroid ? 48 : 57;
-  useEffect(() => {
-    console.log("Home Screen");
-  }, []);
-
+  handleLogin = async () => {};
+  console.log("Home Screen");
   const handleMenuPress = (menu) => {
     setSelectedMenu(menu);
     console.log(menu);
   };
-
   const isMenuSelected = (menu) => {
     return menu === selectedMenu;
   };
-
   const handleCheckinPress = (selectedMenu) => {
     console.log("checkin --> ", selectedMenu);
     if (
@@ -288,12 +284,7 @@ export default function Login() {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() =>
-              // Navigate to the Notification screen and pass the data as a param
-              navigation.navigate("Notification", {
-                data: require("../notiData"),
-              })
-            }
+            onPress={() => navigation.navigate("Notiscreen")}
           />
           <Feather
             name="smile"
@@ -311,6 +302,10 @@ export default function Login() {
 const styles = StyleSheet.create({
   // blue background
   container1: {
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
     marginTop: -10,
     flex: 1,
     backgroundColor: "#C6E3FF",
@@ -480,15 +475,14 @@ const styles = StyleSheet.create({
   },
   // 6 Box of Feature
   button: {
-    // ...Platform.select({
-    //   android: {
-    //     ,
-    //   },
-    //   ios: {
-    //     paddingVertical: ,
-    //   },
-    // }),
-    paddingVertical: isAndroid ? verticalScale(20.5) : verticalScale(10.5),
+    ...Platform.select({
+      android: {
+        paddingVertical: verticalScale(20.5),
+      },
+      ios: {
+        paddingVertical: verticalScale(10.5),
+      },
+    }),
     marginTop: verticalScale(-19),
     // marginTop: "-6%",
     margin: "2%",
@@ -505,84 +499,73 @@ const styles = StyleSheet.create({
   },
   // Appointment icon
   picb: {
-    // ...Platform.select({
-    //   android: {
-    //     // margin: "4%",
-    //   },
-    //   ios: {
-    //     margin: "4%",
-    //   },
-    // }),
-    margin: isAndroid ? "0%" : "4%",
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "4%",
+      },
+    }),
     alignItems: "center",
     // margin: "4%",
   },
   // Test Game Calendar icon
   picb1: {
-    // ...Platform.select({
-    //   android: {
-    //     // margin: "4%",
-    //   },
-    //   ios: {
-    //     margin: "5%",
-    //   },
-    // }),
-    margin: isAndroid ? "0%" : "5%",
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "5%",
+      },
+    }),
     alignItems: "center",
     // margin: "5%",
   },
   // Library Dashboard icon
   picb2: {
-    // ...Platform.select({
-    //   android: {
-    //     // margin: "4%",
-    //   },
-    //   ios: {
-    //     margin: "5%",
-    //   },
-    // }),
-    margin: isAndroid ? "0%" : "5%",
+    ...Platform.select({
+      android: {
+        // margin: "4%",
+      },
+      ios: {
+        margin: "5%",
+      },
+    }),
     alignItems: "center",
     // margin: "5%",
   },
   // bottom bar
-  undertag: isAndroid
-    ? {
+  undertag: {
+    ...Platform.select({
+      android: {
+        // height: 50.4,
         elevation: 10,
         shadowColor: "black", // IOS
         shadowOffset: { height: 1, width: 1 }, // IOS
         shadowOpacity: 1, // IOS
         shadowRadius: 1, //IOS
-
-        height: verticalScale(67.8),
-        width: horizontalScale(380),
-        // width: "120%",
-        // height: 69.8,
-        // marginTop: "2%",
-        backgroundColor: "white",
-
-        flexDirection: "row",
-        alignItems: "center",
-        // marginTop: "7%",
-      }
-    : {
+      },
+      ios: {
         // height: 69.8,
         shadowColor: "rgba(0,0,0, 0.3)", // IOS
         shadowOffset: { height: 1, width: 1 }, // IOS
         shadowOpacity: 1, // IOS
         shadowRadius: 1, //IOS
-
-        height: verticalScale(67.8),
-        width: horizontalScale(380),
-        // width: "120%",
-        // height: 69.8,
-        // marginTop: "2%",
-        backgroundColor: "white",
-
-        flexDirection: "row",
-        alignItems: "center",
-        // marginTop: "7%",
       },
+    }),
+    height: verticalScale(67.8),
+    width: horizontalScale(380),
+    // width: "120%",
+    // height: 69.8,
+    // marginTop: "2%",
+    backgroundColor: "white",
+
+    flexDirection: "row",
+    alignItems: "center",
+    // marginTop: "7%",
+  },
   // Avatar icon
   picur: {
     marginLeft: horizontalScale(266.5),

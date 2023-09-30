@@ -31,7 +31,9 @@ export default function Login() {
     setIsChecked(!isChecked);
   };
   const handleLogin = async () => {};
-  console.log("Edit Profile Screen");
+  useEffect(() => {
+    console.log("Edit Profile Screen");
+  }, []);
 
   return (
     <View style={styles.container1}>

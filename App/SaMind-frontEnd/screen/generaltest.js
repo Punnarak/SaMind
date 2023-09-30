@@ -8,8 +8,9 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Notification() {
   const navigation = useNavigation();
 
-  handleLogin = async () => {};
-  console.log("General Test Screen");
+  useEffect(() => {
+    console.log("General Test Screen");
+  }, []);
 
   return (
     <ImageBackground

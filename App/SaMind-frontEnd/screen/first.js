@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import CarouselCardItem, {
@@ -13,6 +13,9 @@ const CarouselCards = () => {
   const navigation = useNavigation();
   const [index, setIndex] = React.useState(0);
   const isCarousel = React.useRef(null);
+  useEffect(() => {
+    console.log("First Screen");
+  }, []);
 
   return (
     <View style={styles.container}>

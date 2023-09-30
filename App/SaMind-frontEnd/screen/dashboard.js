@@ -9,7 +9,9 @@ export default function Login() {
   const navigation = useNavigation();
 
   handleLogin = async () => {};
-  console.log("Dashboard Screen");
+  useEffect(() => {
+    console.log("Dashboard Screen");
+  }, []);
 
   return (
     <ImageBackground

@@ -58,6 +58,7 @@ export default function Library() {
     // เพิ่มลิงก์อื่น ๆ ตามต้องการ
   ]);
   useEffect(() => {
+    console.log("Library Screen");
     // Make a GET request to fetch data from "/question?type=test2"
     axios
       .get("/library")
