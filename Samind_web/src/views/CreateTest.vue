@@ -208,6 +208,16 @@ export default {
       // Placeholder message for now
       console.log("Test creation logic to be implemented.");
 
+      // axios
+      //   .post("/questionAdd", testDataJSON)
+      //   .then((response) => {
+      //     console.log("Inserted questions:", response.data);
+      //     this.$router.push("/dashboard/test");
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
+
       axios
         .post("/questionAdd", testDataJSON, {
           headers: {
