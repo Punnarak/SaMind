@@ -9,12 +9,12 @@ import {
   Platform,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import { Ionicons } from "@expo/vector-icons";
+
 // import data from "../notiData";
 const isAndroid = Platform.OS === "android";
 
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     //     marginTop: "4%",
     //   },
     //   ios: {
-    marginTop: "10%",
+    // marginTop: "10%",
     //   },
     // }),
     marginTop: 40,

@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Svg, Path } from "react-native-svg";
 import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+
 export default function Login() {
   const navigation = useNavigation();
 
-  handleLogin = async () => {};
   useEffect(() => {
     console.log("Dashboard Screen");
   }, []);
