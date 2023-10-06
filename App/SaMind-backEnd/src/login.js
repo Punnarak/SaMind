@@ -17,6 +17,20 @@ const saltRounds = 10
 const jwt = require('jsonwebtoken');
 const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
 
+// const { Auth, LoginCredentials } = require("two-step-auth");
+
+// async function login(emailId) {
+//   try {
+//     const res = await Auth(emailId, "SaMind_OTP");
+//     console.log(res);
+//     console.log(res.mail);
+//     console.log(res.OTP);
+//     console.log(res.success);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 // app.use(cors())
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}));

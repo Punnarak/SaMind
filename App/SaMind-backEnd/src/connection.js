@@ -8,20 +8,20 @@ const client = new Client({
     database: "sumDB"
 })
 
-const avatar = new Client({
-    host: "localhost",
-    user: "postgres",
-    port: 5432,
-    password: "0936340845",
-    database: "avatarDB"
-})
+// const avatar = new Client({
+//     host: "localhost",
+//     user: "postgres",
+//     port: 5432,
+//     password: "0936340845",
+//     database: "avatarDB"
+// })
 
-const game = new Client({
-    host: "localhost",
-    user: "postgres",
-    port: 5432,
-    password: "0936340845",
-    database: "gameDB"
-})
+// const game = new Client({
+//     host: "localhost",
+//     user: "postgres",
+//     port: 5432,
+//     password: "0936340845",
+//     database: "gameDB"
+// })
 
-module.exports = client,avatar,game
+module.exports = client //,avatar,game

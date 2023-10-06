@@ -1,5 +1,5 @@
 const client = require('./connection.js');
-// const avatar = require('./connection.js');
+const avatar = require('./connection.js');
 // const { client, avatar, game } = require('./connection.js');
 
 const express = require('express');
@@ -56,28 +56,28 @@ router.get('/dashTest', (req, res) => {
 });
 
 
-// router.get('/dash_mood_detection', (req, res) => {
-//   const id = req.query.id; // Get the id parameter from the query
-//   let query = 'SELECT * FROM mood_detection';
+router.get('/dash_mood_detection', (req, res) => {
+  const id = req.query.id; // Get the id parameter from the query
+  let query = 'SELECT * FROM mood_detection';
 
-//   // Check if the id parameter is provided
-//   if (id) {
-//     query += ' WHERE id = $1';
-//   }
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE id = $1';
+  }
 
-//   // Add an "ORDER BY" clause to sort the result by the "id" column
-//   query += ' ORDER BY id';
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY id';
 
-//   const queryParams = id ? [id] : [];
+  const queryParams = id ? [id] : [];
 
-//   avatar.query(query, queryParams)
-//     .then(result => {
-//       res.json(result.rows);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
+  avatar.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
   
 module.exports = router;
