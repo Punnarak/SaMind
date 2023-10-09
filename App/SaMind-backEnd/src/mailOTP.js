@@ -6,15 +6,6 @@ const router = express.Router();
 
 router.use(express.json());
 
-// Nodemailer configuration
-// const transporter = nodemailer.createTransport({
-//   service: 'Gmail',
-//   auth: {
-//     user: 'desmotest123@gmail.com',
-//     pass: 'jarejare123',
-//   },
-// });
-
 const transporter = nodemailer.createTransport({
   // requireTLS: true,
   host: "smtp.gmail.com.",
@@ -105,10 +96,11 @@ router.post('/forgot-password', async (req, res) => {
 
     // Send OTP through email
     await transporter.sendMail({
-      from: 'your_email',
+      from: 'desmotest123@gmail.com',
       to: email,
-      subject: 'Forgot Password OTP',
-      text: `Your OTP for password reset is: ${otp}`,
+      subject: 'Your OTP Code',
+      text: `Your OTP code is: ${otp}`,
+      html: `<b>Your OTP code is: ${otp}</b>`,
     });
 
     res.status(200).json({ message: 'OTP sent successfully' });
