@@ -1,15 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { MainNavigation } from "./Navigation";
-import * as Device from "expo-device"; // Correct import for Device
+import * as Device from "expo-device";
+// import { AppRegistry } from "react-native";
+// import First from "./screen/First"; // เปลี่ยนเป็นชื่อของ component ที่ต้องการที่จะเป็นหน้าหลัก
 
-const App = () => {
-  // Log the Device model name to the console
+const SaMind = () => {
   const newModel = Device.modelName;
   console.log("New Model:", newModel);
-
-  useEffect(() => {
-    // Any additional logic you may want to add after component mounts
-  }, []);
 
   return (
     <>
@@ -18,4 +15,7 @@ const App = () => {
   );
 };
 
-export default App;
+// ลงทะเบียนชื่อ "SaMind" และใช้ component "First" เป็นหน้าหลัก
+// AppRegistry.registerComponent("SaMind", () => First);
+
+export default SaMind; // แก้ให้ export SaMind ไม่ใช่ MyApp

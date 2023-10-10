@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Device } from "expo-device";
+// import { Device } from "expo-device";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
@@ -16,6 +15,14 @@ import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 // import data from "../notiData";
+// const getDeviceModel = () => {
+//   const modelName = Device.modelName;
+//   // Check if the model name indicates an Android device
+//   return modelName.toLowerCase().includes("android");
+// };
+
+// const isAndroid = getDeviceModel();
+
 const isAndroid = Platform.OS === "android";
 
 export default function Login() {

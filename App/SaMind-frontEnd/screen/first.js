@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import data from "../data";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
-const CarouselCards = () => {
+const First = () => {
   const navigation = useNavigation();
   const [index, setIndex] = React.useState(0);
   const isCarousel = React.useRef(null);
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CarouselCards;
+export default First;
