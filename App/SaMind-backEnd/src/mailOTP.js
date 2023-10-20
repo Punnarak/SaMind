@@ -56,7 +56,7 @@ function isValidEmail(email) {
 }
 
 
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp1', async (req, res) => {
     const { email, otp } = req.body;
   
     try {
