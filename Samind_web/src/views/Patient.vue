@@ -11,6 +11,7 @@
           variant="outlined"
           placeholder="Search Patient"
           prepend-inner-icon="mdi-magnify"
+          v-model="search"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -19,7 +20,7 @@
       rounded="xl"
       v-model:page="page"
       :headers="headers"
-      :items="patients"
+      :items="filteredPatients"
       class="elevation-1"
       style="border-radius: 10px"
     >
@@ -75,9 +76,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
-import { onMounted } from "vue";
 
 // onMounted(async () => {
 //   try {
@@ -92,6 +92,15 @@ import { onMounted } from "vue";
 //     console.error("Error fetching products:", error);
 //   }
 // });
+
+let search = ref("");
+
+const filteredPatients = computed(() => {
+  const searchTerm = search.value.toLowerCase();
+  return patients.filter((item) =>
+    item.patientName.toLowerCase().includes(searchTerm)
+  );
+});
 
 const page = ref(1);
 const itemsPerPage = ref(10);
