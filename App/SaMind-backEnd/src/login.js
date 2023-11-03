@@ -17,6 +17,23 @@ const saltRounds = 10
 const jwt = require('jsonwebtoken');
 const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
 
+const nodemailer = require('nodemailer');
+const randomstring = require('randomstring');
+
+// const { Auth, LoginCredentials } = require("two-step-auth");
+
+// async function login(emailId) {
+//   try {
+//     const res = await Auth(emailId, "SaMind_OTP");
+//     console.log(res);
+//     console.log(res.mail);
+//     console.log(res.OTP);
+//     console.log(res.success);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 // app.use(cors())
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}));
@@ -47,68 +64,285 @@ client.connect();
 //     client.end;
 // })
 
-router.post('/register', jsonParser, function (req, res, next) {
-  const id = req.body.id;
-  const email = req.body.email;
-  const password = req.body.password;
-  const fname = req.body.fname;
-  const lname = req.body.lname;
-
-  const emailCheckQuery = {
-    text: 'SELECT * FROM users WHERE email = $1',
-    values: [email]
-  };
-
-  client.query(emailCheckQuery, function(err, emailCheckResult) {
-    if (err) {
-      res.json({ status: 'error', message: err });
-      return;
-    }
-
-    if (emailCheckResult.rows.length > 0) {
-      res.status(409).json({ status: 'error', message: 'Email already exists.' });
-      return;
-    }
-
-    const idCheckQuery = {
-      text: 'SELECT * FROM users WHERE id = $1',
-      values: [id]
-    };
-
-    client.query(idCheckQuery, function(err, idCheckResult) {
-      if (err) {
-        res.json({ status: 'error', message: err });
-        return;
-      }
-
-      if (idCheckResult.rows.length > 0) {
-        res.status(409).json({ status: 'error', message: 'ID already exists.' });
-        return;
-      }
-
-
-      bcrypt.hash(password, saltRounds, function(err, hash) {
-        if (err) {
-          res.json({ status: 'error', message: err });
-          return;
-        }
-
-        const query = {
-          text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-          values: [id, email, hash, fname, lname]
-        };
-
-        client.query(query, function(err, results) {
-          if (err) {
-            res.json({ status: 'error', message: err });
-            return;
-          }
-          res.json({ status: 'success' });
-        });
-      });
-    });
-  });
+const transporter = nodemailer.createTransport({
+  // requireTLS: true,
+  host: "smtp.gmail.com.",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "desmotest123@gmail.com",
+    pass: "uovg pqyt utur dvyz",
+  },
 });
+
+// Register a user and send OTP
+// router.post('/register-with-otp', jsonParser, async (req, res) => {
+//   try {
+//     const { id, email, password, fname, lname } = req.body;
+
+//     // Validate the email address
+//     if (!isValidEmail(email)) {
+//       return res.status(400).json({ message: 'Invalid email address' });
+//     }
+
+//     // Generate a random OTP
+//     const otp = randomstring.generate({ length: 6, charset: 'numeric' });
+
+//     // Hash the user's password
+//     bcrypt.hash(password, saltRounds, async (err, hash) => {
+//       if (err) {
+//         return res.status(500).json({ message: 'Error hashing password' });
+//       }
+
+//       // Save OTP and user details in the database
+//       try {
+//         const registrationQuery = {
+//           text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+//           values: [id, email, hash, fname, lname],
+//         };
+
+//         await client.query(registrationQuery);
+//         await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
+
+//         // Send OTP through email
+//         await transporter.sendMail({
+//           from: 'your_email@gmail.com',
+//           to: email,
+//           subject: 'Your OTP Code',
+//           text: `Your OTP code is: ${otp}`,
+//           html: `<b>Your OTP code is: ${otp}</b>`,
+//         });
+
+//         res.status(200).json({ message: 'Registration and OTP sent successfully' });
+//       } catch (error) {
+//         console.error('Error registering user and sending OTP:', error);
+//         res.status(500).json({ message: 'An error occurred' });
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Error during registration:', error);
+//     res.status(500).json({ message: 'An error occurred' });
+//   }
+// });
+
+// Register a user and send OTP
+// router.post('/register-with-otp', jsonParser, async (req, res) => {
+//   try {
+//     const { id, email, password, fname, lname } = req.body;
+
+//     // Validate the email address
+//     if (!isValidEmail(email)) {
+//       return res.status(400).json({ message: 'Invalid email address' });
+//     }
+
+//     // Generate a random OTP
+//     const otp = randomstring.generate({ length: 6, charset: 'numeric' });
+
+//     // Hash the user's password
+//     const hash = await bcrypt.hash(password, saltRounds);
+
+//     // Start a database transaction
+//     // const client = await client.connect();
+//     try {
+//       // Save OTP and user details in the database within a transaction
+//       await client.query('BEGIN');
+
+//       const registrationQuery = {
+//         text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+//         values: [id, email, hash, fname, lname],
+//       };
+//       await client.query(registrationQuery);
+
+//       await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
+
+//       // Commit the transaction
+//       await client.query('COMMIT');
+
+//       // Send OTP through email
+//       await transporter.sendMail({
+//         from: 'your_email@gmail.com',
+//         to: email,
+//         subject: 'Your OTP Code',
+//         text: `Your OTP code is: ${otp}`,
+//         html: `<b>Your OTP code is: ${otp}</b>`,
+//       });
+
+//       res.status(200).json({ message: 'Registration and OTP sent successfully' });
+//     } catch (error) {
+//       // Rollback the transaction in case of an error
+//       await client.query('ROLLBACK');
+//       console.error('Error registering user and sending OTP:', error);
+//       res.status(500).json({ message: 'An error occurred' });
+//     } finally {
+//       // Release the database connection
+//       client.release();
+//     }
+//   } catch (error) {
+//     console.error('Error during registration:', error);
+//     res.status(500).json({ message: 'An error occurred' });
+//   }
+// });
+
+// Function to validate email address
+
+// Register a user and send OTP
+
+router.post('/register-with-otp', jsonParser, async (req, res) => {
+  try {
+    const { id, email, password, fname, lname } = req.body;
+
+    // Validate the email address
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    // Generate a random OTP
+    const otp = randomstring.generate({ length: 6, charset: 'numeric' });
+
+    // Hash the user's password
+    const hash = await bcrypt.hash(password, saltRounds);
+
+    // Start a database transaction
+    // const client = await pool.connect();
+    try {
+      // Save user details in the database within a transaction
+      await client.query('BEGIN');
+
+      const registrationQuery = {
+        text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+        values: [id, email, hash, fname, lname],
+      };
+      await client.query(registrationQuery);
+
+      await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
+
+      // Commit the transaction
+      await client.query('COMMIT');
+
+      // Send OTP through email
+      await transporter.sendMail({
+        from: 'desmotest123@gmail.com',
+        to: email,
+        subject: 'Your OTP Code',
+        text: `Your OTP code is: ${otp}`,
+        html: `<b>Your OTP code is: ${otp}</b>`,
+      });
+
+      res.status(200).json({ message: 'Registration initiated. Please verify OTP to complete registration.' });
+    } catch (error) {
+      // Rollback the transaction in case of an error
+      await client.query('ROLLBACK');
+      console.error('Error initiating registration and sending OTP:', error);
+      res.status(500).json({ message: 'An error occurred' });
+    } finally {
+      // Release the database connection
+      client.release();
+    }
+  } catch (error) {
+    console.error('Error during registration initiation:', error);
+    res.status(500).json({ message: 'An error occurred' });
+  }
+});
+
+// Verify OTP and complete registration
+router.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    // const client = await pool.connect();
+
+    // Check if the OTP matches the one in the database
+    const result = await client.query('SELECT * FROM otp_data WHERE email = $1 AND otp = $2', [email, otp]);
+
+    if (result.rows.length === 0) {
+      client.release();
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    // Delete the OTP entry from the database after successful verification
+    await client.query('DELETE FROM otp_data WHERE email = $1', [email]);
+
+    // Update the user's registration status as "verified"
+    await client.query('UPDATE users SET status = $1 WHERE email = $2', ['verified', email]);
+
+    client.release();
+
+    res.status(200).json({ message: 'OTP verified and registration completed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred' });
+  }
+});
+
+function isValidEmail(email) {
+  // Use a regular expression for basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+//this api "/register" remake from "Pee"
+// router.post('/register', jsonParser, function (req, res, next) {
+//   const id = req.body.id;
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   const fname = req.body.fname;
+//   const lname = req.body.lname;
+
+//   const emailCheckQuery = {
+//     text: 'SELECT * FROM users WHERE email = $1',
+//     values: [email]
+//   };
+
+//   client.query(emailCheckQuery, function(err, emailCheckResult) {
+//     if (err) {
+//       res.json({ status: 'error', message: err });
+//       return;
+//     }
+
+//     if (emailCheckResult.rows.length > 0) {
+//       res.status(409).json({ status: 'error', message: 'Email already exists.' });
+//       return;
+//     }
+
+//     const idCheckQuery = {
+//       text: 'SELECT * FROM users WHERE id = $1',
+//       values: [id]
+//     };
+
+//     client.query(idCheckQuery, function(err, idCheckResult) {
+//       if (err) {
+//         res.json({ status: 'error', message: err });
+//         return;
+//       }
+
+//       if (idCheckResult.rows.length > 0) {
+//         res.status(409).json({ status: 'error', message: 'ID already exists.' });
+//         return;
+//       }
+
+
+//       bcrypt.hash(password, saltRounds, function(err, hash) {
+//         if (err) {
+//           res.json({ status: 'error', message: err });
+//           return;
+//         }
+
+//         const query = {
+//           text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
+//           values: [id, email, hash, fname, lname]
+//         };
+
+//         client.query(query, function(err, results) {
+//           if (err) {
+//             res.json({ status: 'error', message: err });
+//             return;
+//           }
+//           res.json({ status: 'success' });
+//         });
+//       });
+//     });
+//   });
+// });
 
 function authenticate(req, res, next) {
     // ตรวจสอบการยืนยันตัวตนที่นี่

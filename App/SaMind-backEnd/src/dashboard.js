@@ -58,6 +58,7 @@ router.get('/dashTest', (req, res) => {
 
 // router.get('/dash_mood_detection', (req, res) => {
 //   const id = req.query.id; // Get the id parameter from the query
+//   client.query("SET search_path TO 'avatarDB';");
 //   let query = 'SELECT * FROM mood_detection';
 
 //   // Check if the id parameter is provided
@@ -70,7 +71,7 @@ router.get('/dashTest', (req, res) => {
 
 //   const queryParams = id ? [id] : [];
 
-//   avatar.query(query, queryParams)
+//   client.query(query, queryParams)
 //     .then(result => {
 //       res.json(result.rows);
 //     })
@@ -79,5 +80,38 @@ router.get('/dashTest', (req, res) => {
 //       res.status(500).json({ error: 'An error occurred' });
 //     });
 // });
+
+router.get('/dash_mood_detection', (req, res) => {
+  const id = req.query.id; // Get the id parameter from the query
+  const schemaName = 'avatar_db'; // Specify the schema name
+
+  // Set the search_path to the desired schema
+  const setSchemaQuery = `SET search_path TO ${schemaName}, public;`;
+
+  // Build the query to select data from the table
+  let query = `SELECT * FROM ${schemaName}.mood_detection`;
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY id';
+
+  const queryParams = id ? [id] : [];
+
+  // Run the queries
+  client.query(setSchemaQuery) // Set the search_path
+    .then(() => client.query(query, queryParams)) // Execute the main query
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
   
 module.exports = router;

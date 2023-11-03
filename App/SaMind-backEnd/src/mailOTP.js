@@ -6,39 +6,16 @@ const router = express.Router();
 
 router.use(express.json());
 
-// Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  // requireTLS: true,
+  host: "smtp.gmail.com.",
+  port: 465,
+  secure: true,
   auth: {
-    user: 'desmotest123@gmail.com',
-    pass: 'jarejare123',
+    user: "desmotest123@gmail.com",
+    pass: "uovg pqyt utur dvyz",
   },
 });
-
-// router.post('/send-otp', async (req, res) => {
-//   const { email } = req.body;
-
-//   // Generate a random OTP
-//   const otp = randomstring.generate({ length: 6, charset: 'numeric' });
-
-//   try {
-//     // Save OTP in the database
-//     await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
-
-//     // Send OTP through email
-//     await transporter.sendMail({
-//       from: 'desmotest123@gmail.com',
-//       to: email,
-//       subject: 'Your OTP Code',
-//       text: `Your OTP code is: ${otp}`,
-//     });
-
-//     res.status(200).json({ message: 'OTP sent successfully' });
-//   } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: 'An error occurred' });
-//   }
-// });
 
 router.post('/send-otp', async (req, res) => {
   try {
@@ -61,6 +38,7 @@ router.post('/send-otp', async (req, res) => {
       to: email,
       subject: 'Your OTP Code',
       text: `Your OTP code is: ${otp}`,
+      html: `<b>Your OTP code is: ${otp}</b>`,
     });
 
     res.status(200).json({ message: 'OTP sent successfully' });
@@ -78,7 +56,7 @@ function isValidEmail(email) {
 }
 
 
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp1', async (req, res) => {
     const { email, otp } = req.body;
   
     try {
@@ -118,10 +96,11 @@ router.post('/forgot-password', async (req, res) => {
 
     // Send OTP through email
     await transporter.sendMail({
-      from: 'your_email',
+      from: 'desmotest123@gmail.com',
       to: email,
-      subject: 'Forgot Password OTP',
-      text: `Your OTP for password reset is: ${otp}`,
+      subject: 'Your OTP Code',
+      text: `Your OTP code is: ${otp}`,
+      html: `<b>Your OTP code is: ${otp}</b>`,
     });
 
     res.status(200).json({ message: 'OTP sent successfully' });
