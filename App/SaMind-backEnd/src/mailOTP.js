@@ -56,7 +56,7 @@ function isValidEmail(email) {
 }
 
 
-router.post('/verify-otp1', async (req, res) => {
+router.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
   
     try {
@@ -130,6 +130,5 @@ router.post('/reset-password', async (req, res) => {
       res.status(500).json({ message: 'An error occurred' });
   }
 });
-
 
 module.exports = router;

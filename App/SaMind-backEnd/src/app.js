@@ -42,8 +42,8 @@ app.use(dashboard);
 const mailOTP = require('./mailOTP.js');
 app.use(mailOTP);
 
-const updateUser = require('./updateUser.js');
-app.use(updateUser);
+// const updateUser = require('./updateUser.js');
+// app.use(updateUser);
 
 
 
