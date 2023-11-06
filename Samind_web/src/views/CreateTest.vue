@@ -39,6 +39,7 @@
     <v-card class="mx-auto" col="6" rounded="xl">
       <v-list lines="two">
         <v-list-subheader
+          class="ml-3"
           style="font-family: 'Poppins', 'sans-serif'; border-bottom-width: 1px"
         >
           Test Detail
@@ -47,8 +48,9 @@
 
         <!-- Test Name -->
         <v-list-item>
-          <v-col cols="12" sm="6" md="4">
-            <label>Test Name</label> <label style="color: red">*</label>
+          <v-col cols="12" sm="6" md="4" style="height: 350px">
+            <label style="font-weight: bold">Test Name</label>
+            <label style="color: red">*</label>
             <v-text-field
               class="mt-2 mb-4"
               variant="outlined"
@@ -59,12 +61,12 @@
             ></v-text-field>
 
             <!-- Test Description -->
-            <label>Test Description</label>
+            <label style="font-weight: bold">Test Description</label>
             <v-text-field
-              class="mt-2 mb-4"
+              class="mt-2"
               variant="outlined"
               rounded="lg"
-              style="border-radius: 10px"
+              style="border-radius: 10px; height: 300px"
             ></v-text-field>
           </v-col>
         </v-list-item>
@@ -72,10 +74,11 @@
         <v-divider inset></v-divider>
         <!-- Question Section -->
         <v-list-item
+          class="ml-4"
           v-for="(question, questionIndex) in questions"
           :key="questionIndex"
         >
-          <label>
+          <label style="font-weight: bold">
             Question
             <template v-if="questions.length > 1">
               <v-icon color="red" icon @click="removeQuestion(questionIndex)"
@@ -93,6 +96,7 @@
                 style="border-radius: 10px"
               ></v-text-field>
               <v-btn
+                class="ml-4 mt-2"
                 style="background-color: #5686e1"
                 icon
                 @click="addQuestion(questionIndex)"
@@ -107,7 +111,8 @@
                 :key="optionIndex"
               >
                 <v-col cols="3">
-                  <label>option</label><v-radio :value="optionIndex"></v-radio>
+                  <label style="font-weight: bold">option</label
+                  ><v-radio :value="optionIndex"></v-radio>
                 </v-col>
                 <template v-if="question.options.length > 1">
                   <v-icon
