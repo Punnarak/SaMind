@@ -44,7 +44,18 @@
           icon="mdi-magnify"
           color="blue"
           size="30px"
-          @click="this.$router.push('/patientinfo')"
+          @click="
+            this.$router.push({
+              path: 'patientdashboard',
+              query: {
+                patientId: item.columns.patientId,
+                name: item.columns.patientName,
+                age: item.columns.age,
+                gender: item.columns.gender,
+                mood: item.columns.mood,
+              },
+            })
+          "
         />
         <!-- {{ item.columns.action }} -->
       </template>
@@ -78,7 +89,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
-
 // onMounted(async () => {
 //   try {
 //     let url = "/question";
@@ -114,6 +124,7 @@ const headers = [
   },
   { title: "Patient ID", key: "patientId", sortable: false },
   { title: "Patient Name", key: "patientName", sortable: false },
+  { title: "Gender", key: "gender", sortable: false },
   { title: "Age", key: "age", sortable: false },
   { title: "Mood", key: "mood", sortable: false },
   { title: "Action", key: "action", sortable: false },
@@ -124,6 +135,7 @@ const patients = [
     patientId: "PID001",
     patientName: "Somsak Test1",
     age: 24,
+    gender: "male",
     mood: 4,
     action: "1%",
   },
@@ -132,6 +144,7 @@ const patients = [
     patientId: "PID002",
     patientName: "Somsee Test2",
     age: 37,
+    gender: "female",
     mood: 4.3,
     action: "1%",
   },
@@ -140,6 +153,7 @@ const patients = [
     patientId: "PID003",
     patientName: "Somchai Test3",
     age: 23,
+    gender: "male",
     mood: 6,
     action: "7%",
   },
@@ -148,6 +162,7 @@ const patients = [
     patientId: "PID004",
     patientName: "Somsom Test4",
     age: 67,
+    gender: "male",
     mood: 4.3,
     action: "8%",
   },
@@ -156,6 +171,7 @@ const patients = [
     patientId: "PID005",
     patientName: "Somcheng Test5",
     age: 49,
+    gender: "female",
     mood: 3.9,
     action: "16%",
   },
@@ -164,6 +180,7 @@ const patients = [
     patientId: "PID006",
     patientName: "Sompon Test6",
     age: 94,
+    gender: "female",
     mood: 0,
     action: "0%",
   },
@@ -172,6 +189,7 @@ const patients = [
     patientId: "PID007",
     patientName: "Somporn Test7",
     age: 98,
+    gender: "male",
     mood: 600,
     action: "2%",
   },
@@ -180,6 +198,7 @@ const patients = [
     patientId: "PID008",
     patientName: "Sommon Test8",
     age: 87,
+    gender: "female",
     mood: 400,
     action: "45%",
   },
@@ -188,6 +207,7 @@ const patients = [
     patientId: "PID009",
     patientName: "Somrak Test9",
     age: 51,
+    gender: "male",
     mood: 200,
     action: "22%",
   },
@@ -196,6 +216,7 @@ const patients = [
     patientId: "PID010",
     patientName: "Somjit Test10",
     age: 65,
+    gender: "female",
     mood: 7,
     action: "6%",
   },

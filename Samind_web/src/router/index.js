@@ -38,6 +38,16 @@ const router = createRouter({
           path: "calendar",
           component: () => import("../views/Calendar.vue"),
         },
+        {
+          path: "booking",
+          component: () => import("../views/Booking.vue"),
+          props: true,
+        },
+        {
+          path: "patientdashboard",
+          component: () => import("../views/PatientDashboard.vue"),
+          props: true,
+        },
       ],
     },
   ],

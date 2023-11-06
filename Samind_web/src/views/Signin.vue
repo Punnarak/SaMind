@@ -29,6 +29,8 @@
                   placeholder="Enter your email"
                   density="comfortable"
                   rounded="lg"
+                  v-model="email"
+                  :rules="emailRules"
                 ></v-text-field>
                 <label>Password</label>
                 <v-text-field
@@ -38,6 +40,8 @@
                   placeholder="Enter your password"
                   density="comfortable"
                   rounded="lg"
+                  v-model="password"
+                  :rules="passwordRules"
                 ></v-text-field>
 
                 <v-btn
@@ -61,8 +65,36 @@
   </v-main>
 </template>
 
-<script setup>
-// Your script content
+<script>
+export default {
+  data() {
+    return {
+      email: "",
+      emailRules: [
+        (value) => {
+          if (!value) {
+            return "You must enter an email address.";
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return "Invalid email address. Please enter a valid email.";
+          } else {
+            return true;
+          }
+        },
+      ],
+      password: "",
+      passwordRules: [
+        (value) => {
+          if (!value) {
+            return "You must enter a password.";
+          } else {
+            return true;
+          }
+        },
+      ],
+    };
+  },
+  methods: {},
+};
 </script>
 
 <style scoped>
