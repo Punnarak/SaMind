@@ -1,7 +1,16 @@
 <template>
   <v-col class="px-10">
     <v-row align="center" class="calendar" justify="center">
-      <v-col class="calendar-header" cols="4">
+      <v-col class="calendar-header" v-if="selectedViewType === 'day'" cols="4">
+        <button @click="prevDay"><v-icon>mdi-chevron-left</v-icon></button>
+        <h2>{{ currentDay }}</h2>
+        <button @click="nextDay"><v-icon>mdi-chevron-right</v-icon></button>
+      </v-col>
+      <v-col
+        class="calendar-header"
+        v-if="selectedViewType === 'month'"
+        cols="4"
+      >
         <button @click="prevMonth"><v-icon>mdi-chevron-left</v-icon></button>
         <h2>{{ currentMonth }}</h2>
         <button @click="nextMonth"><v-icon>mdi-chevron-right</v-icon></button>
@@ -15,21 +24,9 @@
         <!-- Empty space on the right -->
       </v-col>
       <div class="calendar-day" v-if="selectedViewType === 'day'">
-        <h1>{{ currentDate.toDateString() }}</h1>
         <div class="time-slots">
           <div class="time-slot" v-for="hour in hours" :key="hour">
             {{ hour }}
-          </div>
-        </div>
-        <div class="events">
-          <div
-            class="event"
-            v-for="event in events"
-            :key="event.id"
-            :style="getEventStyle(event)"
-            @click="editEvent(event)"
-          >
-            {{ event.title }}
           </div>
         </div>
       </div>
@@ -53,12 +50,9 @@
             class="icon-viewcontainer"
             @mouseover="handleIconHover"
             @mouseout="handleIconHover"
+            @click.stop="viewClicked(cell.day, currentDate)"
           >
-            <v-icon
-              class="icon view-icon"
-              @click.stop="viewClicked(cell.day, currentDate)"
-              >mdi-eye</v-icon
-            >
+            <v-icon class="icon view-icon">mdi-eye</v-icon>
             <span class="icon view-text">View</span>
           </div>
           <!-- Booking icon for booking -->
@@ -66,11 +60,9 @@
             class="icon-bookcontainer"
             @mouseover="handleIconHover"
             @mouseout="handleIconHover"
+            @click.stop="bookClicked(cell.day, currentDate)"
           >
-            <v-icon
-              class="icon book-icon"
-              @click.stop="bookClicked(cell.day, currentDate)"
-              >mdi-account-plus</v-icon
+            <v-icon class="icon book-icon">mdi-account-plus</v-icon
             ><span class="icon book-text">Booking</span>
           </div>
         </div>
@@ -84,6 +76,7 @@ export default {
   data() {
     return {
       selectedViewType: "month", // Initially, show the grid view
+      selectedDate: new Date(),
       currentMonth: "",
       calendarGrid: [],
       currentDate: new Date(),
@@ -136,7 +129,42 @@ export default {
       dayLabels: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
     };
   },
+  computed: {
+    currentDay() {
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      return days[this.currentDate.getDay()] + " " + this.currentDate.getDate();
+    },
+  },
   methods: {
+    nextDay() {
+      const nextDay = new Date(this.selectedDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      this.selectedDate = nextDay;
+      this.currentDate = nextDay;
+      console.log("currentDay", this.currentDate);
+    },
+
+    // Update the current day to the previous day
+    prevDay() {
+      const prevDay = new Date(this.selectedDate);
+      prevDay.setDate(prevDay.getDate() - 1);
+      this.selectedDate = prevDay;
+      this.currentDate = prevDay;
+
+      console.log("currentDay", this.currentDate);
+    },
+    getScheduleLineStyle() {
+      const top = (this.currentTimeMinutes * 100) / 1440 + "%";
+      return { top };
+    },
     getEventStyle(event) {
       // Calculate the position and height of the event based on its start and end times
       const startHour = parseInt(event.start.split(":")[0]);
@@ -250,14 +278,23 @@ export default {
       console.log(
         `View clicked: Day ${day}, Month ${currentDate.getMonth()}, Year ${currentDate.getFullYear()}`
       );
+      this.selectedViewType = "day";
     },
     bookClicked(day, currentDate) {
       console.log(
         `Book clicked: Day ${day}, Month ${currentDate.getMonth()}, Year ${currentDate.getFullYear()}`
       );
+
+      this.$router.push({
+        path: `booking`,
+        query: {
+          bookday: `${day}/${currentDate.getMonth()}/${currentDate.getFullYear()}`,
+        },
+      });
     },
   },
   created() {
+    this.selectedDate = new Date();
     this.currentDate = new Date();
     this.currentYear = this.currentDate.getFullYear();
     this.updateCalendar();
@@ -277,7 +314,16 @@ body {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
+.day-schedule-line {
+  position: absolute;
+  top: 0;
+  left: 50%; /* Adjust the left position to align the line in the middle of the day column */
+  transform: translateX(-50%);
+  width: 2px; /* Adjust the width of the line */
+  height: 100%;
+  background-color: red; /* Adjust the color of the line */
+  z-index: 2; /* Ensure the line is above other elements */
+}
 .time-slots {
   display: flex;
   flex-direction: column;
