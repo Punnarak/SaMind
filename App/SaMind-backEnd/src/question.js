@@ -1,8 +1,20 @@
 const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
+const nodemailer = require('nodemailer');
 
 const { v4: uuidv4 } = require('uuid');
+
+const transporter = nodemailer.createTransport({
+  // requireTLS: true,
+  host: "smtp.gmail.com.",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "desmotest123@gmail.com",
+    pass: "uovg pqyt utur dvyz",
+  },
+});
 
 router.get('/question', (req, res) => {
   const type = req.query.type; // Get the type parameter from the query
@@ -47,6 +59,7 @@ router.get('/question', (req, res) => {
 
 router.post('/questionAdd', (req, res) => {
   const requestData = req.body; // Assuming req.body is an array of objects
+  // const email = req.body;
 
   if (!Array.isArray(requestData)) {
     return res.status(400).json({ error: 'Request data should be an array of objects.' });
@@ -72,6 +85,23 @@ router.post('/questionAdd', (req, res) => {
   Promise.all(insertQueries)
     .then(results => {
       const insertedItems = results.map(result => result.rows[0]);
+      // Send an email notification
+      const mailOptions = {
+        from: 'desmotest123@gmail.com',
+        to: 'psho300@gmail.com', //fix this email for next update
+        subject: 'New Question',
+        text: `Test_text Question`,
+        html: `<b>Test_html Question</b>`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error sending email:', error);
+        } else {
+          console.log('Email notification sent:', info.response);
+        }
+      });
+
       res.status(201).json(insertedItems);
     })
     .catch(err => {

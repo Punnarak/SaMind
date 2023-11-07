@@ -244,35 +244,38 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
   }
 });
 
-// Verify OTP and complete registration
-router.post('/verify-otp', async (req, res) => {
-  const { email, otp } = req.body;
 
+router.post('/update_user_profile', async (req, res) => {
   try {
-    // const client = await pool.connect();
+    const { id, email, password, fname, lname } = req.body;
 
-    // Check if the OTP matches the one in the database
-    const result = await client.query('SELECT * FROM otp_data WHERE email = $1 AND otp = $2', [email, otp]);
-
-    if (result.rows.length === 0) {
-      client.release();
-      return res.status(400).json({ message: 'Invalid OTP' });
+    // Validate the email address
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    // Delete the OTP entry from the database after successful verification
-    await client.query('DELETE FROM otp_data WHERE email = $1', [email]);
+    // Hash the new password
+    const hash = await bcrypt.hash(password, saltRounds);
 
-    // Update the user's registration status as "verified"
-    await client.query('UPDATE users SET status = $1 WHERE email = $2', ['verified', email]);
-
-    client.release();
-
-    res.status(200).json({ message: 'OTP verified and registration completed successfully' });
+    // Update user profile in the database with the hashed password
+    client.query(
+      'UPDATE users SET email=$2, password=$3, fname=$4, lname=$5 WHERE id=$1',
+      [id, email, hash, fname, lname], // Use the hashed password
+      (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).json({ error: 'An error occurred while updating the user profile' });
+        } else {
+          res.json({ message: 'User profile updated successfully' });
+        }
+      }
+    );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'An error occurred' });
+    res.status(500).json({ error: 'An error occurred' });
   }
 });
+
 
 function isValidEmail(email) {
   // Use a regular expression for basic email validation
