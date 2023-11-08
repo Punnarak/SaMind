@@ -51,7 +51,7 @@
                 patientId: item.columns.patientId,
                 name: item.columns.patientName,
                 age: item.columns.age,
-                gender: item.columns.gender,
+                // gender: item.columns.gender,
                 mood: item.columns.mood,
               },
             })
@@ -118,16 +118,15 @@ const itemsPerPage = ref(10);
 const headers = [
   {
     title: "No.",
-    align: "start",
+    align: "center",
     sortable: false,
     key: "id",
   },
-  { title: "Patient ID", key: "patientId", sortable: false },
+  { title: "Patient ID", key: "patientId", align: "start", sortable: false },
   { title: "Patient Name", key: "patientName", sortable: false },
-  { title: "Gender", key: "gender", sortable: false },
-  { title: "Age", key: "age", sortable: false },
-  { title: "Mood", key: "mood", sortable: false },
-  { title: "Action", key: "action", sortable: false },
+  { title: "Age", key: "age", align: "center", sortable: false },
+  { title: "Mood", key: "mood", align: "center", sortable: false },
+  { title: "Action", key: "action", align: "center", sortable: false },
 ];
 const patients = [
   {
