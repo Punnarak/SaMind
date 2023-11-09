@@ -2,27 +2,6 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 
-// router.get('/library', (req, res) => {
-//   const id = req.query.id; // Get the type parameter from the query
-//   let query = 'SELECT * FROM library';
-
-//   // Check if the type parameter is provided
-//   if (id) {
-//     query += ' WHERE id LIKE $1';
-//   }
-
-//   const queryParams = id ? [`%${id}%`] : [];
-
-//   client.query(query, queryParams)
-//     .then(result => {
-//       res.json(result.rows);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
 router.get('/library', (req, res) => {
   const id = req.query.id; // Get the id parameter from the query
   let query = 'SELECT * FROM library';

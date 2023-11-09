@@ -5,6 +5,25 @@ const client = require('./connection.js');
 const express = require('express');
 const router = express.Router();
 
+router.post('/mood_tracker', (req, res) => {
+  const { id, patient_id, date_time, score } = req.body;
+
+  if (!id || !patient_id || !date_time || !score) {
+    return res.status(400).json({ error: 'Both id, patient_id, score, date_time are required fields.' });
+  }
+
+  const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
+
+  client.query(insertQuery, [id, patient_id, score, date_time])
+    .then(result => {
+      res.status(201).json(result.rows[0]);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
 
 router.get('/dash_AVG_mood', (req, res) => {
   const id = req.query.id; // Get the id parameter from the query
@@ -112,6 +131,8 @@ router.get('/dash_mood_detection', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+
 
   
 module.exports = router;

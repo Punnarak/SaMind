@@ -2,25 +2,46 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 
-router.post('/appoint', function (req, res, next) {
-    const therapistID = req.body.therapistID;
-    const date = req.body.date;
-    const time = req.body.time;
+router.post('/appoint_post', (req, res) => {
+  const { appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint, update_date } = req.body;
 
-    const query = {
-      text: 'SELECT * FROM appointment WHERE therapistID = $1, date = $2, time = $3',
-      values: [therapistID, date, time]
-    };
-  
-    client.query(query, function(err, appointment, fields) {
-      if (err) {
-        res.json({ status: 'error', message: err });
-        return;
-      }
-      if (appointment.rows.length == 0) {
-        res.json({ status: 'error', message: 'NO user found' });
-        return;
-      }
+  if (!appointment_id || !therapist_id || !patient_id || !date || !time || !location) {
+    return res.status(400).json({ error: 'Both appointment_id, therapist_id, patient_id, date, time, location are required fields.' });
+  }
+
+  const insertQuery = 'INSERT INTO appointment (appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint, update_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
+
+  client.query(insertQuery, [appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint, update_date])
+    .then(result => {
+      res.status(201).json(result.rows[0]);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.get('/appoint_get', (req, res) => {
+  const appointment_id = req.query.appointment_id; // Get the id parameter from the query
+  let query = 'SELECT * FROM appointment';
+
+  // Check if the id parameter is provided
+  if (appointment_id) {
+    query += ' WHERE appointment_id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY appointment_id';
+
+  const queryParams = appointment_id ? [appointment_id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
     });
 });
 

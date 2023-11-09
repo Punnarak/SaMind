@@ -24,4 +24,4 @@ const client = new Client({
 //     database: "gameDB"
 // })
 
-module.exports = client //,avatar,game
+module.exports = client //,avatar ,game

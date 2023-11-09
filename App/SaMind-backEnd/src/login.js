@@ -189,7 +189,7 @@ const transporter = nodemailer.createTransport({
 
 router.post('/register-with-otp', jsonParser, async (req, res) => {
   try {
-    const { id, email, password, fname, lname } = req.body;
+    const { id, email, password, patient_id } = req.body;
 
     // Validate the email address
     if (!isValidEmail(email)) {
@@ -209,8 +209,8 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
       await client.query('BEGIN');
 
       const registrationQuery = {
-        text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-        values: [id, email, hash, fname, lname],
+        text: 'INSERT INTO users (id, email, password, patient_id) VALUES ($1, $2, $3, $4)',
+        values: [id, email, hash, patient_id],
       };
       await client.query(registrationQuery);
 
@@ -245,9 +245,9 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
 });
 
 
-router.post('/update_user_profile', async (req, res) => {
+router.post('/reset_password', async (req, res) => {
   try {
-    const { id, email, password, fname, lname } = req.body;
+    const { id, email, password, patient_id } = req.body;
 
     // Validate the email address
     if (!isValidEmail(email)) {
@@ -259,14 +259,14 @@ router.post('/update_user_profile', async (req, res) => {
 
     // Update user profile in the database with the hashed password
     client.query(
-      'UPDATE users SET email=$2, password=$3, fname=$4, lname=$5 WHERE id=$1',
-      [id, email, hash, fname, lname], // Use the hashed password
+      'UPDATE users SET email=$2, password=$3, patient_id=$4 WHERE id=$1',
+      [id, email, hash, patient_id], // Use the hashed password
       (error, results) => {
         if (error) {
           console.error(error);
-          res.status(500).json({ error: 'An error occurred while updating the user profile' });
+          res.status(500).json({ error: 'An error occurred while reset password' });
         } else {
-          res.json({ message: 'User profile updated successfully' });
+          res.json({ message: 'Reset password successfully' });
         }
       }
     );
@@ -397,6 +397,7 @@ router.post('/authen',jsonParser, function (req, res, next) {
     client.end;
 })
 
+//phone OTP
 router.post('/sendotp', (req,res) => {
   var phoneNo = _.get(req, ["body", "phoneNo"]);
   console.log(phoneNo)
