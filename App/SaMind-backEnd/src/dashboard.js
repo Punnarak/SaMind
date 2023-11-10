@@ -5,25 +5,80 @@ const client = require('./connection.js');
 const express = require('express');
 const router = express.Router();
 
-router.post('/mood_tracker', (req, res) => {
+router.post('/mood_tracker_post', async (req, res) => {
   const { id, patient_id, date_time, score } = req.body;
 
   if (!id || !patient_id || !date_time || !score) {
     return res.status(400).json({ error: 'Both id, patient_id, score, date_time are required fields.' });
   }
 
+  // Check the number of entries for the patient
+  const countQuery = 'SELECT COUNT(*) FROM mood_tracker WHERE patient_id = $1';
+  const countResult = await client.query(countQuery, [patient_id]);
+
+  const entryCount = parseInt(countResult.rows[0].count, 10);
+
+  // If the patient already has 7 entries, delete the oldest one
+  if (entryCount >= 7) {
+    const deleteQuery = `
+      DELETE FROM mood_tracker
+      WHERE ctid IN (
+        SELECT ctid
+        FROM mood_tracker
+        WHERE patient_id = $1
+        ORDER BY date_time ASC
+        LIMIT 1
+      )
+      RETURNING *
+    `;
+  
+    try {
+      const deleteResult = await client.query(deleteQuery, [patient_id]);
+      console.log('Deleted oldest entry:', deleteResult.rows[0]);
+    } catch (deleteErr) {
+      console.error('Error deleting oldest entry:', deleteErr);
+      return res.status(500).json({ error: 'An error occurred while deleting the oldest entry' });
+    }
+  }
+
+  // Insert the new entry
   const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
 
-  client.query(insertQuery, [id, patient_id, score, date_time])
-    .then(result => {
-      res.status(201).json(result.rows[0]);
-    })
-    .catch(err => {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'An error occurred' });
-    });
+  try {
+    const insertResult = await client.query(insertQuery, [id, patient_id, score, date_time]);
+    res.status(201).json(insertResult.rows[0]);
+  } catch (insertErr) {
+    console.error('Error executing query:', insertErr);
+    res.status(500).json({ error: 'An error occurred while inserting the new entry' });
+  }
 });
 
+router.get('/average_scores', async (req, res) => {
+  const { patient_id } = req.query;
+
+  // Check if patient_id is provided
+  if (!patient_id) {
+    return res.status(400).json({ error: 'Patient ID is required as a query parameter.' });
+  }
+
+  const avgScoreQuery = `
+    SELECT patient_id, AVG(score)::numeric(10, 2) AS average_score
+    FROM mood_tracker
+    WHERE patient_id = $1
+    GROUP BY patient_id;
+  `;
+
+  try {
+    const result = await client.query(avgScoreQuery, [patient_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Patient not found or has no mood tracker entries.' });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred while fetching average scores' });
+  }
+});
 
 router.get('/dash_AVG_mood', (req, res) => {
   const id = req.query.id; // Get the id parameter from the query

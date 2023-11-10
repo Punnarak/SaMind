@@ -21,19 +21,43 @@ router.post('/appoint_post', (req, res) => {
     });
 });
 
-router.get('/appoint_get', (req, res) => {
-  const appointment_id = req.query.appointment_id; // Get the id parameter from the query
+router.get('/appoint_patient_get', (req, res) => {
+  const id = req.query.patient_id; // Get the id parameter from the query
   let query = 'SELECT * FROM appointment';
 
   // Check if the id parameter is provided
-  if (appointment_id) {
-    query += ' WHERE appointment_id = $1';
+  if (id) {
+    query += ' WHERE patient_id = $1';
   }
 
   // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY appointment_id';
+  query += ' ORDER BY patient_id';
 
-  const queryParams = appointment_id ? [appointment_id] : [];
+  const queryParams = id ? [id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.get('/appoint_therapist_get', (req, res) => {
+  const id = req.query.therapist_id; // Get the id parameter from the query
+  let query = 'SELECT * FROM appointment';
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE therapist_id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY therapist_id';
+
+  const queryParams = id ? [id] : [];
 
   client.query(query, queryParams)
     .then(result => {
