@@ -12,8 +12,8 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import RadioItem from "../RadioItem"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
-import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import RadioItem from "../RadioItem.js"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics.js";
 import Modal from "react-native-modal";
 import axios from "./axios.js";
 

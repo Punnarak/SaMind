@@ -2,8 +2,14 @@
   <v-main style="display: flex">
     <div>
       <img
-        src="../assets/signin/white mood bg.svg"
-        style="position: absolute; top: 0px; left: -120px; z-index: 0"
+        src="../assets/signin/whitemood.png"
+        style="
+          position: absolute;
+          top: 0px;
+          left: -120px;
+          z-index: 0;
+          height: 170%;
+        "
       />
       <div class="d-none d-md-block">
         <img

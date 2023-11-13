@@ -134,9 +134,22 @@
                 "
               >
                 <v-row>
-                  <v-icon left size="10px" class="ml-10 mr-5"
-                    >mdi-circle</v-icon
-                  >
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/hicon.png"
+                    style="
+                      position: absolute;
+                      width: 50px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/ybg.png"
+                    style="width: 55px"
+                  />
                 </v-row>
                 <v-col>
                   <label
@@ -198,9 +211,22 @@
                 "
               >
                 <v-row>
-                  <v-icon left size="10px" class="ml-10 mr-5"
-                    >mdi-circle</v-icon
-                  >
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/hicon.png"
+                    style="
+                      position: absolute;
+                      width: 50px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/ybg.png"
+                    style="width: 55px"
+                  />
                 </v-row>
                 <v-col>
                   <label

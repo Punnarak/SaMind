@@ -160,6 +160,10 @@ export default {
       // Simulate an asynchronous operation
       return new Promise((resolve) => {
         setTimeout(resolve, 2000); // Simulate a 2-second delay
+        this.$router.push({
+          path: "/dashboard/calendar",
+          query: {},
+        });
       });
     },
   },
