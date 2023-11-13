@@ -16,7 +16,7 @@ import Testscreen from "./screen/Test";
 import Avatarscreen from "./screen/Avatar";
 import Upcomingscreen from "./screen/Upcoming";
 import Appointmentscreen from "./screen/Appointment";
-import Forgotscreen from "./screen/Forgotpassword";
+import Forgotscreen from "./screen/ForgotPassword";
 import Selectappointmentscreen from "./screen/SelectAppointment";
 import Signupinscreen from "./screen/SignupIn";
 import Generaltestscreen from "./screen/GeneralTest";
