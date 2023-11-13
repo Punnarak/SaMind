@@ -45,6 +45,9 @@ app.use(mailOTP);
 // const updateUser = require('./updateUser.js');
 // app.use(updateUser);
 
+const info_users = require('./info_users.js');
+app.use(info_users);
+
 
 
  

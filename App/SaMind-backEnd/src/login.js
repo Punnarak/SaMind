@@ -2,8 +2,6 @@ const client = require('./connection.js')
 const validateForm = require('./function.js')
 
 const express = require('express')
-// const cors = require('cors')
-// const app = express()
 const router = express.Router();
 
 const _ = require('lodash')
@@ -20,49 +18,7 @@ const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by b
 const nodemailer = require('nodemailer');
 const randomstring = require('randomstring');
 
-// const { Auth, LoginCredentials } = require("two-step-auth");
-
-// async function login(emailId) {
-//   try {
-//     const res = await Auth(emailId, "SaMind_OTP");
-//     console.log(res);
-//     console.log(res.mail);
-//     console.log(res.OTP);
-//     console.log(res.success);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// app.use(cors())
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({extended: true}));
-
 client.connect();
-
-// router.post('/register',jsonParser, function (req, res, next) {
-//     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-//     const id = req.body.id;
-//     const email = req.body.email;
-//     const password = req.body.password;
-//     const fname = req.body.fname;
-//     const lname = req.body.lname;
-
-//     const query = {
-//         text: 'INSERT INTO users (id,email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-//         values: [id,email, hash, fname, lname]
-//     };
-
-//     client.query(query, function(err, results) {
-//             if (err) {
-//                 res.json({ status: 'error', message: err });
-//                 return;
-//             }
-//             res.json({ status: 'ok' });
-//         });
-//     });
-//     client.end;
-// })
 
 const transporter = nodemailer.createTransport({
   // requireTLS: true,
@@ -75,125 +31,25 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Register a user and send OTP
-// router.post('/register-with-otp', jsonParser, async (req, res) => {
-//   try {
-//     const { id, email, password, fname, lname } = req.body;
-
-//     // Validate the email address
-//     if (!isValidEmail(email)) {
-//       return res.status(400).json({ message: 'Invalid email address' });
-//     }
-
-//     // Generate a random OTP
-//     const otp = randomstring.generate({ length: 6, charset: 'numeric' });
-
-//     // Hash the user's password
-//     bcrypt.hash(password, saltRounds, async (err, hash) => {
-//       if (err) {
-//         return res.status(500).json({ message: 'Error hashing password' });
-//       }
-
-//       // Save OTP and user details in the database
-//       try {
-//         const registrationQuery = {
-//           text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-//           values: [id, email, hash, fname, lname],
-//         };
-
-//         await client.query(registrationQuery);
-//         await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
-
-//         // Send OTP through email
-//         await transporter.sendMail({
-//           from: 'your_email@gmail.com',
-//           to: email,
-//           subject: 'Your OTP Code',
-//           text: `Your OTP code is: ${otp}`,
-//           html: `<b>Your OTP code is: ${otp}</b>`,
-//         });
-
-//         res.status(200).json({ message: 'Registration and OTP sent successfully' });
-//       } catch (error) {
-//         console.error('Error registering user and sending OTP:', error);
-//         res.status(500).json({ message: 'An error occurred' });
-//       }
-//     });
-//   } catch (error) {
-//     console.error('Error during registration:', error);
-//     res.status(500).json({ message: 'An error occurred' });
-//   }
-// });
-
-// Register a user and send OTP
-// router.post('/register-with-otp', jsonParser, async (req, res) => {
-//   try {
-//     const { id, email, password, fname, lname } = req.body;
-
-//     // Validate the email address
-//     if (!isValidEmail(email)) {
-//       return res.status(400).json({ message: 'Invalid email address' });
-//     }
-
-//     // Generate a random OTP
-//     const otp = randomstring.generate({ length: 6, charset: 'numeric' });
-
-//     // Hash the user's password
-//     const hash = await bcrypt.hash(password, saltRounds);
-
-//     // Start a database transaction
-//     // const client = await client.connect();
-//     try {
-//       // Save OTP and user details in the database within a transaction
-//       await client.query('BEGIN');
-
-//       const registrationQuery = {
-//         text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-//         values: [id, email, hash, fname, lname],
-//       };
-//       await client.query(registrationQuery);
-
-//       await client.query('INSERT INTO otp_data (email, otp) VALUES ($1, $2)', [email, otp]);
-
-//       // Commit the transaction
-//       await client.query('COMMIT');
-
-//       // Send OTP through email
-//       await transporter.sendMail({
-//         from: 'your_email@gmail.com',
-//         to: email,
-//         subject: 'Your OTP Code',
-//         text: `Your OTP code is: ${otp}`,
-//         html: `<b>Your OTP code is: ${otp}</b>`,
-//       });
-
-//       res.status(200).json({ message: 'Registration and OTP sent successfully' });
-//     } catch (error) {
-//       // Rollback the transaction in case of an error
-//       await client.query('ROLLBACK');
-//       console.error('Error registering user and sending OTP:', error);
-//       res.status(500).json({ message: 'An error occurred' });
-//     } finally {
-//       // Release the database connection
-//       client.release();
-//     }
-//   } catch (error) {
-//     console.error('Error during registration:', error);
-//     res.status(500).json({ message: 'An error occurred' });
-//   }
-// });
-
-// Function to validate email address
-
-// Register a user and send OTP
-
 router.post('/register-with-otp', jsonParser, async (req, res) => {
   try {
-    const { id, email, password, fname, lname } = req.body;
+    const { id, email, password, patient_id } = req.body;
 
     // Validate the email address
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    // Check if the email already exists in the database
+    const emailCheckQuery = {
+      text: 'SELECT * FROM users WHERE email = $1',
+      values: [email],
+    };
+
+    const emailCheckResult = await client.query(emailCheckQuery);
+
+    if (emailCheckResult.rows.length > 0) {
+      return res.status(400).json({ message: 'Email already in use' });
     }
 
     // Generate a random OTP
@@ -203,14 +59,14 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
     const hash = await bcrypt.hash(password, saltRounds);
 
     // Start a database transaction
-    // const client = await pool.connect();
+    // const client = await client.connect();
     try {
       // Save user details in the database within a transaction
       await client.query('BEGIN');
 
       const registrationQuery = {
-        text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-        values: [id, email, hash, fname, lname],
+        text: 'INSERT INTO users (id, email, password, patient_id) VALUES ($1, $2, $3, $4)',
+        values: [id, email, hash, patient_id],
       };
       await client.query(registrationQuery);
 
@@ -236,7 +92,7 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
       res.status(500).json({ message: 'An error occurred' });
     } finally {
       // Release the database connection
-      client.release();
+      // client.release();
     }
   } catch (error) {
     console.error('Error during registration initiation:', error);
@@ -244,10 +100,9 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
   }
 });
 
-
-router.post('/update_user_profile', async (req, res) => {
+router.post('/reset_password', async (req, res) => {
   try {
-    const { id, email, password, fname, lname } = req.body;
+    const { id, email, password, patient_id } = req.body;
 
     // Validate the email address
     if (!isValidEmail(email)) {
@@ -259,14 +114,14 @@ router.post('/update_user_profile', async (req, res) => {
 
     // Update user profile in the database with the hashed password
     client.query(
-      'UPDATE users SET email=$2, password=$3, fname=$4, lname=$5 WHERE id=$1',
-      [id, email, hash, fname, lname], // Use the hashed password
+      'UPDATE users SET email=$2, password=$3, patient_id=$4 WHERE id=$1',
+      [id, email, hash, patient_id], // Use the hashed password
       (error, results) => {
         if (error) {
           console.error(error);
-          res.status(500).json({ error: 'An error occurred while updating the user profile' });
+          res.status(500).json({ error: 'An error occurred while reset password' });
         } else {
-          res.json({ message: 'User profile updated successfully' });
+          res.json({ message: 'Reset password successfully' });
         }
       }
     );
@@ -276,76 +131,11 @@ router.post('/update_user_profile', async (req, res) => {
   }
 });
 
-
 function isValidEmail(email) {
   // Use a regular expression for basic email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-
-//this api "/register" remake from "Pee"
-// router.post('/register', jsonParser, function (req, res, next) {
-//   const id = req.body.id;
-//   const email = req.body.email;
-//   const password = req.body.password;
-//   const fname = req.body.fname;
-//   const lname = req.body.lname;
-
-//   const emailCheckQuery = {
-//     text: 'SELECT * FROM users WHERE email = $1',
-//     values: [email]
-//   };
-
-//   client.query(emailCheckQuery, function(err, emailCheckResult) {
-//     if (err) {
-//       res.json({ status: 'error', message: err });
-//       return;
-//     }
-
-//     if (emailCheckResult.rows.length > 0) {
-//       res.status(409).json({ status: 'error', message: 'Email already exists.' });
-//       return;
-//     }
-
-//     const idCheckQuery = {
-//       text: 'SELECT * FROM users WHERE id = $1',
-//       values: [id]
-//     };
-
-//     client.query(idCheckQuery, function(err, idCheckResult) {
-//       if (err) {
-//         res.json({ status: 'error', message: err });
-//         return;
-//       }
-
-//       if (idCheckResult.rows.length > 0) {
-//         res.status(409).json({ status: 'error', message: 'ID already exists.' });
-//         return;
-//       }
-
-
-//       bcrypt.hash(password, saltRounds, function(err, hash) {
-//         if (err) {
-//           res.json({ status: 'error', message: err });
-//           return;
-//         }
-
-//         const query = {
-//           text: 'INSERT INTO users (id, email, password, fname, lname) VALUES ($1, $2, $3, $4, $5)',
-//           values: [id, email, hash, fname, lname]
-//         };
-
-//         client.query(query, function(err, results) {
-//           if (err) {
-//             res.json({ status: 'error', message: err });
-//             return;
-//           }
-//           res.json({ status: 'success' });
-//         });
-//       });
-//     });
-//   });
-// });
 
 function authenticate(req, res, next) {
     // ตรวจสอบการยืนยันตัวตนที่นี่
@@ -397,6 +187,7 @@ router.post('/authen',jsonParser, function (req, res, next) {
     client.end;
 })
 
+//phone OTP
 router.post('/sendotp', (req,res) => {
   var phoneNo = _.get(req, ["body", "phoneNo"]);
   console.log(phoneNo)
