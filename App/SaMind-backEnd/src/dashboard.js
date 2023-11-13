@@ -129,11 +129,15 @@ router.get('/dashTest', (req, res) => {
     });
 });
 
-
 // router.get('/dash_mood_detection', (req, res) => {
 //   const id = req.query.id; // Get the id parameter from the query
-//   client.query("SET search_path TO 'avatarDB';");
-//   let query = 'SELECT * FROM mood_detection';
+//   // client.query("SET search_path TO 'avatarDB';");
+//   // let query = 'SELECT * FROM mood_detection';
+
+//   let query = `
+//   SET search_path TO 'avatarDB';
+//   SELECT * FROM mood_detection;
+// `;
 
 //   // Check if the id parameter is provided
 //   if (id) {
@@ -157,37 +161,62 @@ router.get('/dashTest', (req, res) => {
 
 router.get('/dash_mood_detection', (req, res) => {
   const id = req.query.id; // Get the id parameter from the query
-  const schemaName = 'avatar_db'; // Specify the schema name
-
-  // Set the search_path to the desired schema
-  const setSchemaQuery = `SET search_path TO ${schemaName}, public;`;
-
-  // Build the query to select data from the table
-  let query = `SELECT * FROM ${schemaName}.mood_detection`;
+  // let query = 'SET search_path TO \'avatarDB\'; SELECT * FROM mood_detection';
+  // const query = id ? 'SELECT * FROM avatarDB.mood_detection WHERE id = $1 ORDER BY id' : 'SELECT * FROM avatarDB.mood_detection ORDER BY id';
+  let query = 'SELECT * FROM avatarDB.mood_detection WHERE id = $1 ORDER BY id';
 
   // Check if the id parameter is provided
   if (id) {
-    query += ' WHERE id = $1';
+    query += ' LIMIT 1';
+    client.query(query, [id])
+      .then(result => {
+        res.json(result.rows);
+      })
+      .catch(err => {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'An error occurred' });
+      });
+  } else {
+    query += ' ORDER BY id';
+    client.query(query)
+      .then(result => {
+        res.json(result.rows);
+      })
+      .catch(err => {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'An error occurred' });
+      });
   }
-
-  // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY id';
-
-  const queryParams = id ? [id] : [];
-
-  // Run the queries
-  client.query(setSchemaQuery) // Set the search_path
-    .then(() => client.query(query, queryParams)) // Execute the main query
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'An error occurred' });
-    });
 });
 
+// router.get('/dash_mood_detection', (req, res) => {
+//   const id = req.query.id; // Get the id parameter from the query
+//   let query = 'SELECT * FROM avatarDB.mood_detection';
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE id = $1 ORDER BY id LIMIT 1';
+//     client.query(query, [id])
+//       .then(result => {
+//         res.json(result.rows);
+//       })
+//       .catch(err => {
+//         console.error('Error executing query:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//       });
+//   } else {
+//     query += ' ORDER BY id';
+//     client.query(query)
+//       .then(result => {
+//         res.json(result.rows);
+//       })
+//       .catch(err => {
+//         console.error('Error executing query:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//       });
+//   }
+// });
 
 
-  
+
 module.exports = router;
