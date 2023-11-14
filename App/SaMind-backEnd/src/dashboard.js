@@ -6,10 +6,10 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/mood_tracker_post', async (req, res) => {
-  const { id, patient_id, date_time, score } = req.body;
+  const { id, patient_id, score } = req.body;
 
-  if (!id || !patient_id || !date_time || !score) {
-    return res.status(400).json({ error: 'Both id, patient_id, score, date_time are required fields.' });
+  if (!id || !patient_id || !score) {
+    return res.status(400).json({ error: 'Both id, patient_id, score are required fields.' });
   }
 
   // Check the number of entries for the patient
@@ -44,8 +44,19 @@ router.post('/mood_tracker_post', async (req, res) => {
   // Insert the new entry
   const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
 
+  var currentDate = new Date();
+
+  var day = currentDate.getDate();
+  var month = currentDate.getMonth() + 1; // เพื่อให้เดือนเริ่มต้นที่ 1
+  var year = currentDate.getFullYear();
+  var hours = currentDate.getHours();
+  var minutes = currentDate.getMinutes();
+  var seconds = currentDate.getSeconds();
+
+  var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
   try {
-    const insertResult = await client.query(insertQuery, [id, patient_id, score, date_time]);
+    const insertResult = await client.query(insertQuery, [id, patient_id, score, formattedDate]);
     res.status(201).json(insertResult.rows[0]);
   } catch (insertErr) {
     console.error('Error executing query:', insertErr);

@@ -5,7 +5,7 @@ const client = new Client({
     user: "postgres",
     port: 5432,
     password: "0936340845",
-    database: "sumDB"
+    database: "sum_db"
 })
 
 // const avatar = new Client({
