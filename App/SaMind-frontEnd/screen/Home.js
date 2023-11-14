@@ -244,7 +244,7 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Loginscreen")}
+              onPress={() => navigation.navigate("Gamescreen")}
             >
               <Text style={styles.Textb}>GAME</Text>
               <I
