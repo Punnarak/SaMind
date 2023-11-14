@@ -45,4 +45,47 @@ router.get('/info_patient_get', (req, res) => {
       });
 });
 
+router.post('/info_therapist_post', (req, res) => {
+  const { therapist_id, fname, lname, phone, email, hospital_name } = req.body;
+
+  if (!therapist_id || !fname || !lname || !phone || !email || !hospital_name) {
+    return res.status(400).json({ error: 'Both therapist_id, fname, lname, phone, email, hospital_name are required fields.' });
+  }
+
+  const insertQuery = 'INSERT INTO therapist (therapist_id, fname, lname, phone, email, hospital_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+
+  client.query(insertQuery, [therapist_id, fname, lname, phone, email, hospital_name])
+    .then(result => {
+      res.status(201).json(result.rows[0]);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.get('/info_therapist_get', (req, res) => {
+  const id = req.query.therapist_id; // Get the id parameter from the query
+  let query = 'SELECT * FROM therapist';
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE therapist_id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY therapist_id';
+
+  const queryParams = id ? [id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
 module.exports = router;

@@ -116,17 +116,17 @@ router.get('/dash_AVG_mood', (req, res) => {
     });
 });
 
-router.get('/dashTest', (req, res) => {
-  const id = req.query.id; // Get the id parameter from the query
+router.get('/score_question_get', (req, res) => {
+  const id = req.query.patient_id; // Get the id parameter from the query
   let query = 'SELECT * FROM test_score';
 
   // Check if the id parameter is provided
   if (id) {
-    query += ' WHERE id = $1';
+    query += ' WHERE patient_id = $1';
   }
 
   // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY id';
+  query += ' ORDER BY patient_id';
 
   const queryParams = id ? [id] : [];
 
