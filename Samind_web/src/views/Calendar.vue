@@ -1,81 +1,282 @@
 <template>
-  <v-col class="px-10">
-    <v-row align="center" class="calendar" justify="center">
-      <v-col class="calendar-header" v-if="selectedViewType === 'day'" cols="4">
-        <button @click="prevDay"><v-icon>mdi-chevron-left</v-icon></button>
-        <h2>{{ currentDay }}</h2>
-        <button @click="nextDay"><v-icon>mdi-chevron-right</v-icon></button>
-      </v-col>
-      <v-col
-        class="calendar-header"
-        v-if="selectedViewType === 'month'"
-        cols="4"
-      >
-        <button @click="prevMonth"><v-icon>mdi-chevron-left</v-icon></button>
-        <h2>{{ currentMonth }}</h2>
-        <button @click="nextMonth"><v-icon>mdi-chevron-right</v-icon></button>
-      </v-col>
-      <v-col class="calendar-type" cols="4" align="center">
-        <button @click="selectDay">DAY</button>
-        <button @click="selectWeek">WEEK</button>
-        <button @click="selectMonth">MONTH</button>
-      </v-col>
-      <v-col cols="4">
-        <!-- Empty space on the right -->
-      </v-col>
-      <div class="calendar-day" v-if="selectedViewType === 'day'">
-        <div class="time-slots">
-          <div class="time-slot" v-for="hour in hours" :key="hour">
-            {{ hour }}
-          </div>
-        </div>
-      </div>
-      <div class="calendar-week" v-if="selectedViewType === 'week'">
-        <!-- ... Your existing grid view code ... -->
-      </div>
-      <div class="calendar-grid" v-if="selectedViewType === 'month'">
-        <!-- Add day labels and numbers within the v-for loop -->
-        <div
-          v-for="(cell, index) in calendarGrid"
-          :key="cell.key"
-          :class="['calendar-box', cell.class]"
-        >
-          <!-- Display day labels for the first row of the calendar grid -->
-          <div v-if="index < 7" class="day-label">{{ dayLabels[index] }}</div>
-          <div v-if="index < 7" class="day-number-1fr">{{ cell.day }}</div>
-          <div v-if="index >= 7" class="day-number">{{ cell.day }}</div>
-          <br />
-          <!-- Eye icon for viewing -->
-          <div
-            class="icon-viewcontainer"
-            @mouseover="handleIconHover"
-            @mouseout="handleIconHover"
-            @click.stop="viewClicked(cell.day, currentDate)"
+  <v-row>
+    <v-app
+      style="z-index: 9999; background-color: transparent; position: fixed"
+    >
+      <v-container fluid>
+        <v-col v-if="requestBarOpen" class="request-bar" col="4">
+          <v-navigation-drawer
+            color="white"
+            location="right"
+            app
+            right
+            style="width: auto"
           >
-            <v-icon class="icon view-icon">mdi-eye</v-icon>
-            <span class="icon view-text">View</span>
-          </div>
-          <!-- Booking icon for booking -->
-          <div
-            class="icon-bookcontainer"
-            @mouseover="handleIconHover"
-            @mouseout="handleIconHover"
-            @click.stop="bookClicked(cell.day, currentDate)"
-          >
-            <v-icon class="icon book-icon">mdi-account-plus</v-icon
-            ><span class="icon book-text">Booking</span>
-          </div>
-        </div>
-      </div>
-    </v-row>
-  </v-col>
-</template>
+            <row>
+              <label class="title ml-5"> POSTPONE MEETING REQUEST </label>
+              <v-btn icon variant="text" @click="toggleRequestBar">
+                <v-icon>mdi-close</v-icon>
+              </v-btn></row
+            >
+            <v-list align="center" dense>
+              <v-list-item
+                v-for="(patient, patientIndex) in patients"
+                :key="patientIndex"
+                class="custom-chip mb-5"
+              >
+                <div style="margin-top: -10px">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      margin-top: -30px;
+                      position: absolute;
+                    "
+                  >
+                    <img
+                      class="mr-2"
+                      src="../assets/dashboard/ybg.png"
+                      style="width: 30px"
+                    />
+                    <label class="nametext">{{ patient.patientName }}</label>
+                  </div>
+                  <br />
+                  <div>
+                    <div class="circle-container">
+                      <div
+                        class="circle"
+                        style="background-color: rgba(0, 191, 99, 1)"
+                      ></div>
+                      <div class="line"></div>
+                      <div
+                        class="circle"
+                        style="background-color: rgba(217, 217, 217, 1)"
+                      ></div>
+                    </div>
 
+                    <div
+                      style="
+                        display: flex;
+                        position: absolute;
+                        margin-top: -74px;
+                        margin-left: 70px;
+                      "
+                    >
+                      <label
+                        class="text mr-8"
+                        style="color: rgba(0, 191, 99, 1); font-size: 13px;
+'"
+                        >To</label
+                      >
+                      <label
+                        class="text"
+                        style="
+                          color: rgba(0, 191, 99, 1);
+                          font-weight: 500;
+                          font-size: 13px;
+                          text-align: start;
+                        "
+                        >{{ patient.toDate }}<br />{{ patient.toTime }}
+                      </label>
+                    </div>
+
+                    <div
+                      style="
+                        display: flex;
+                        position: absolute;
+                        margin-top: -20px;
+                        margin-left: 70px;
+                      "
+                    >
+                      <label
+                        class="text mr-4"
+                        style="color: rgba(157, 157, 157, 1); font-size: 13px"
+                        >From</label
+                      ><label
+                        class="text"
+                        style="
+                          color: rgba(157, 157, 157, 1);
+                          font-weight: 500;
+                          font-size: 13px;
+                          text-align: start;
+                        "
+                        >{{ patient.fromDate }}<br />{{ patient.fromTime }}
+                      </label>
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        margin-top: 30px;
+                        margin-left: 5px;
+                        position: absolute;
+                      "
+                    >
+                      <v-btn
+                        class="requestbtn mr-2"
+                        style="
+                          color: rgba(0, 191, 99, 1);
+                          border: 1px solid #00bf63;
+                          border-color: rgba(0, 191, 99, 1);
+                          box-shadow: 0px 0px 2px 0px #00bf63;
+                        "
+                        >confirm</v-btn
+                      >
+                      <v-btn
+                        class="requestbtn"
+                        style="
+                          color: rgba(242, 86, 86, 1);
+                          border: 1px solid rgba(242, 86, 86, 1);
+                          border-color: rgba(242, 86, 86, 1);
+                          box-shadow: 0px 0px 2px 0px rgba(242, 86, 86, 1);
+                        "
+                        >cancel</v-btn
+                      >
+                    </div>
+                  </div>
+                </div>
+              </v-list-item>
+            </v-list>
+          </v-navigation-drawer>
+        </v-col>
+      </v-container>
+    </v-app>
+
+    <!-- Calendar Content -->
+    <v-col class="px-10 mt-3" col="8">
+      <v-row align="center" class="calendar" justify="center">
+        <v-col
+          class="calendar-header"
+          v-if="selectedViewType === 'day'"
+          cols="4"
+        >
+          <button @click="prevDay"><v-icon>mdi-chevron-left</v-icon></button>
+          <h2>{{ currentDay }}</h2>
+          <button @click="nextDay"><v-icon>mdi-chevron-right</v-icon></button>
+        </v-col>
+        <v-col
+          class="calendar-header"
+          v-if="selectedViewType === 'month'"
+          cols="4"
+        >
+          <button @click="prevMonth"><v-icon>mdi-chevron-left</v-icon></button>
+          <h2>{{ currentMonth }}</h2>
+          <button @click="nextMonth"><v-icon>mdi-chevron-right</v-icon></button>
+        </v-col>
+        <v-col class="calendar-type" cols="4" align="center">
+          <button @click="selectDay">DAY</button>
+          <button @click="selectWeek">WEEK</button>
+          <button @click="selectMonth">MONTH</button>
+        </v-col>
+        <v-col cols="2"> </v-col>
+
+        <v-col class="mb-3" cols="2">
+          <v-btn
+            rounded="xl"
+            class="text-none mx-auto"
+            color="#569AFF"
+            block
+            size="x-large"
+            variant="flat"
+            @click="request !== 0 ? toggleRequestBar() : null"
+          >
+            {{ request !== 0 ? `${request} requests` : "No request" }}
+          </v-btn>
+        </v-col>
+
+        <div class="calendar-day" v-if="selectedViewType === 'day'">
+          <div class="time-slots">
+            <div class="time-slot" v-for="hour in hours" :key="hour">
+              {{ hour }}
+            </div>
+          </div>
+        </div>
+        <div class="calendar-week" v-if="selectedViewType === 'week'">
+          <!-- ... Your existing grid view code ... -->
+        </div>
+        <div class="calendar-grid" v-if="selectedViewType === 'month'">
+          <!-- Add day labels and numbers within the v-for loop -->
+          <div
+            v-for="(cell, index) in calendarGrid"
+            :key="cell.key"
+            :class="['calendar-box', cell.class]"
+          >
+            <!-- Display day labels for the first row of the calendar grid -->
+            <div v-if="index < 7" class="day-label">{{ dayLabels[index] }}</div>
+            <div v-if="index < 7" class="day-number-1fr">{{ cell.day }}</div>
+            <div v-if="index >= 7" class="day-number">{{ cell.day }}</div>
+            <br />
+            <!-- Eye icon for viewing -->
+            <div
+              class="icon-viewcontainer"
+              @mouseover="handleIconHover"
+              @mouseout="handleIconHover"
+              @click.stop="viewClicked(cell.day, currentDate)"
+            >
+              <v-icon class="icon view-icon">mdi-eye</v-icon>
+              <span class="icon view-text">View</span>
+            </div>
+            <!-- Booking icon for booking -->
+            <div
+              class="icon-bookcontainer"
+              @mouseover="handleIconHover"
+              @mouseout="handleIconHover"
+              @click.stop="bookClicked(cell.day, currentDate)"
+            >
+              <v-icon class="icon book-icon">mdi-account-plus</v-icon
+              ><span class="icon book-text">Booking</span>
+            </div>
+          </div>
+        </div>
+      </v-row>
+    </v-col>
+  </v-row>
+</template>
+<script setup>
+const patients = [
+  {
+    id: "01",
+    patientId: "PID001",
+    patientName: "Somsak Test1",
+    toDate: "Tue, 19 Sep 2023",
+    toTime: "10.00",
+    fromDate: "Tue, 12 Sep 2023",
+    fromTime: "10.00",
+  },
+  {
+    id: "02",
+    patientId: "PID002",
+    patientName: "Somsee Test2",
+    toDate: "Tue, 19 Sep 2023",
+    toTime: "10.00",
+    fromDate: "Tue, 12 Sep 2023",
+    fromTime: "10.00",
+  },
+  {
+    id: "03",
+    patientId: "PID003",
+    patientName: "Somchai Test3",
+    toDate: "Tue, 19 Sep 2023",
+    toTime: "10.00",
+    fromDate: "Tue, 12 Sep 2023",
+    fromTime: "10.00",
+  },
+  {
+    id: "04",
+    patientId: "PID004",
+    patientName: "Somsom Test4",
+    toDate: "Tue, 19 Sep 2023",
+    toTime: "10.00",
+    fromDate: "Tue, 12 Sep 2023",
+    fromTime: "10.00",
+  },
+];
+</script>
 <script>
 export default {
   data() {
     return {
-      selectedViewType: "month", // Initially, show the grid view
+      request: 1,
+      selectedViewType: "month",
       selectedDate: new Date(),
       currentMonth: "",
       calendarGrid: [],
@@ -127,6 +328,7 @@ export default {
         "December",
       ],
       dayLabels: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
+      requestBarOpen: false,
     };
   },
   computed: {
@@ -151,14 +353,11 @@ export default {
       this.currentDate = nextDay;
       console.log("currentDay", this.currentDate);
     },
-
-    // Update the current day to the previous day
     prevDay() {
       const prevDay = new Date(this.selectedDate);
       prevDay.setDate(prevDay.getDate() - 1);
       this.selectedDate = prevDay;
       this.currentDate = prevDay;
-
       console.log("currentDay", this.currentDate);
     },
     getScheduleLineStyle() {
@@ -166,7 +365,6 @@ export default {
       return { top };
     },
     getEventStyle(event) {
-      // Calculate the position and height of the event based on its start and end times
       const startHour = parseInt(event.start.split(":")[0]);
       const startMinute = parseInt(event.start.split(":")[1]);
       const endHour = parseInt(event.end.split(":")[0]);
@@ -179,7 +377,6 @@ export default {
       return { top, height };
     },
     editEvent(event) {
-      // Implement event editing logic
       console.log("Edit event: " + event.title);
     },
     updateCalendar() {
@@ -187,10 +384,8 @@ export default {
         this.currentYear
       }`;
 
-      // Clear the existing calendar grid
       this.calendarGrid = [];
 
-      // Calculate the number of days in the current month
       const firstDay = new Date(
         this.currentYear,
         this.currentDate.getMonth(),
@@ -203,21 +398,18 @@ export default {
       );
       const numDays = lastDay.getDate();
 
-      // Calculate the previous month's last day correctly
       const prevMonthLastDay = new Date(
         this.currentYear,
         this.currentDate.getMonth(),
         0
       );
 
-      // Calculate the next month's first day
       const nextMonthFirstDay = new Date(
         this.currentYear,
         this.currentDate.getMonth() + 1,
         1
       );
 
-      // Add cells for the days of the previous month in gray
       for (let i = 0; i < firstDay.getDay(); i++) {
         const day = prevMonthLastDay.getDate() - firstDay.getDay() + i + 1;
         this.calendarGrid.push({
@@ -227,12 +419,10 @@ export default {
         });
       }
 
-      // Add the days of the current month
       for (let day = 1; day <= numDays; day++) {
         this.calendarGrid.push({ key: `day-${day}`, day, class: "day" });
       }
 
-      // Add cells for the days of the next month
       for (let i = 0; i < 6 - lastDay.getDay(); i++) {
         const day = i + 1;
         this.calendarGrid.push({
@@ -242,7 +432,6 @@ export default {
         });
       }
     },
-
     prevMonth() {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1);
       if (this.currentDate.getMonth() < 0) {
@@ -260,17 +449,14 @@ export default {
       this.updateCalendar();
     },
     selectDay() {
-      // Handle the click on the "DAY" button
       console.log("Selected DAY");
       this.selectedViewType = "day";
     },
     selectWeek() {
-      // Handle the click on the "WEEK" button
       console.log("Selected WEEK");
       this.selectedViewType = "week";
     },
     selectMonth() {
-      // Handle the click on the "MONTH" button
       console.log("Selected MONTH");
       this.selectedViewType = "month";
     },
@@ -292,6 +478,10 @@ export default {
         },
       });
     },
+    toggleRequestBar() {
+      console.log("opennnn");
+      this.requestBarOpen = !this.requestBarOpen;
+    },
   },
   created() {
     this.selectedDate = new Date();
@@ -303,6 +493,90 @@ export default {
 </script>
 
 <style scoped>
+.requestbtn {
+  display: flex;
+  width: 113px;
+  height: 20px;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 0.1px;
+}
+.text {
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 0.16px;
+}
+.circle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -10px;
+  margin-right: 150px;
+}
+
+.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.line {
+  width: 2px;
+  height: 40px; /* Adjust the height of the line as needed */
+  background-color: #000; /* You can set your preferred color */
+}
+.custom-chip {
+  width: 277px;
+  height: 194px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid #569aff;
+  box-shadow: 0px 0px 2px 0px #569aff;
+  position: relative;
+  overflow: hidden;
+}
+.nametext {
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.13px;
+}
+.title {
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.16px;
+}
+.request-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  z-index: 9999;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.v-navigation-drawer {
+  z-index: 9999; /* Set a higher z-index value for the navigation drawer */
+}
 body {
   font-family: Arial, sans-serif;
 }
@@ -447,7 +721,7 @@ h2 {
 }
 
 .calendar-box {
-  width: 150px;
+  width: 155px;
   height: 100px;
   border: 2px solid #eaeaea;
   background-color: white;

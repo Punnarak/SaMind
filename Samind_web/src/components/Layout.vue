@@ -1,4 +1,4 @@
-<template>
+<template class="layout">
   <!-- lg screen -->
   <v-navigation-drawer color="#5686E1">
     <v-row>
@@ -91,7 +91,7 @@
   </v-navigation-drawer>
 
   <!-- Navbar -->
-  <v-app-bar>
+  <v-app-bar class="nav">
     <div class="d-lg-none">
       <v-btn icon @click.stop="drawer = !drawer">
         <v-icon color="">mdi-menu</v-icon>
@@ -142,6 +142,11 @@ const drawer = ref(null);
 </script>
 
 <style scoped>
+.layout,
+.nav {
+  z-index: 998;
+}
+
 .dash {
   opacity: 0.5;
   stroke: white;
@@ -159,7 +164,6 @@ const drawer = ref(null);
   font-family: "Nunito", sans-serif;
   letter-spacing: 1.5px;
 }
-
 .title {
   font-size: 20px;
   font-weight: 600;
