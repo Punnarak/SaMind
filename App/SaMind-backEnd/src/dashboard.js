@@ -91,54 +91,46 @@ router.get('/average_scores', async (req, res) => {
   }
 });
 
-router.get('/dash_AVG_mood', (req, res) => {
-  const id = req.query.id; // Get the id parameter from the query
-  let query = 'SELECT * FROM mood_tracker';
-
-  // Check if the id parameter is provided
-  if (id) {
-    query += ' WHERE id = $1';
-  }
-
-  // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY id';
-
-  const queryParams = id ? [id] : [];
-  
-
-  client.query(query, queryParams)
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'An error occurred' });
-    });
-});
-
-router.get('/score_question_get', (req, res) => {
+router.get('/check_mood_per_day_get', (req, res) => {
   const id = req.query.patient_id; // Get the id parameter from the query
-  let query = 'SELECT * FROM test_score';
+
+  // Get the current date and time
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+
+  // Build the SQL query
+  let query = 'SELECT * FROM mood_tracker';
+  const queryParams = [];
 
   // Check if the id parameter is provided
   if (id) {
     query += ' WHERE patient_id = $1';
+    queryParams.push(id);
   }
+
+  // Add a condition to check if the date_time column matches the current date
+  query += ' AND date_time::date = $2';
+  queryParams.push(formattedDate.slice(0, 10));
 
   // Add an "ORDER BY" clause to sort the result by the "id" column
   query += ' ORDER BY patient_id';
 
-  const queryParams = id ? [id] : [];
-
+  // Execute the query
   client.query(query, queryParams)
     .then(result => {
-      res.json(result.rows);
+      // Check if there are rows in the result
+      const hasRows = result.rows.length > 0;
+
+      // Return true or false based on whether there are rows
+      res.json(hasRows);
     })
     .catch(err => {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+
 
 // router.get('/dash_mood_detection', (req, res) => {
 //   const id = req.query.id; // Get the id parameter from the query
@@ -170,11 +162,11 @@ router.get('/score_question_get', (req, res) => {
 //     });
 // });
 
-router.get('/dash_mood_detection', (req, res) => {
+router.get('/dash_mood_detection1', (req, res) => {
   const id = req.query.id; // Get the id parameter from the query
   // let query = 'SET search_path TO \'avatarDB\'; SELECT * FROM mood_detection';
   // const query = id ? 'SELECT * FROM avatarDB.mood_detection WHERE id = $1 ORDER BY id' : 'SELECT * FROM avatarDB.mood_detection ORDER BY id';
-  let query = 'SELECT * FROM avatarDB.mood_detection WHERE id = $1 ORDER BY id';
+  let query = 'SELECT * FROM avatar_db.mood_detection';
 
   // Check if the id parameter is provided
   if (id) {
@@ -198,6 +190,30 @@ router.get('/dash_mood_detection', (req, res) => {
         res.status(500).json({ error: 'An error occurred' });
       });
   }
+});
+
+router.get('/dash_mood_detection', (req, res) => {
+  const id = req.query.id; // Get the id parameter from the query
+  let query = 'SELECT * FROM avatar_db.mood_detection';
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY id';
+
+  const queryParams = id ? [id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
 });
 
 // router.get('/dash_mood_detection', (req, res) => {

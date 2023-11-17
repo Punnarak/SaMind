@@ -145,4 +145,113 @@ router.delete('/questionsDel', (req, res) => {
     });
 });
 
+
+router.post('/score_question_post', async (req, res) => {
+  const { score_id, score, type, patient_id } = req.body;
+
+  if (!score_id || !score || !type || !patient_id) {
+    return res.status(400).json({ error: 'Both score_id, score, type, patient_id are required fields.' });
+  }
+
+  // Insert the new entry
+  const insertQuery = 'INSERT INTO test_score (score_id, score, type, date_time, patient_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+
+  var currentDate = new Date();
+
+  var day = currentDate.getDate();
+  var month = currentDate.getMonth() + 1; // เพื่อให้เดือนเริ่มต้นที่ 1
+  var year = currentDate.getFullYear();
+  var hours = currentDate.getHours();
+  var minutes = currentDate.getMinutes();
+  var seconds = currentDate.getSeconds();
+
+  var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+  try {
+    const insertResult = await client.query(insertQuery, [score_id, score, type, formattedDate, patient_id]);
+    res.status(201).json(insertResult.rows[0]);
+  } catch (insertErr) {
+    console.error('Error executing query:', insertErr);
+    res.status(500).json({ error: 'An error occurred while inserting the new entry' });
+  }
+});
+
+router.get('/score_question_get', (req, res) => {
+  const id = req.query.patient_id; // Get the id parameter from the query
+  let query = 'SELECT * FROM test_score';
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE patient_id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "id" column
+  query += ' ORDER BY patient_id';
+
+  const queryParams = id ? [id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+// router.get('/finish_two_latest_question_get', (req, res) => {
+//   const id = req.query.patient_id; // Get the id parameter from the query
+//   const date = req.query.date_time;
+//   let query = 'SELECT * FROM test_score';
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   // Add an "ORDER BY" clause to sort the result by the "id" column
+//   query += ' ORDER BY patient_id';
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.get('/finish_two_latest_question_get', (req, res) => {
+  const id = req.query.patient_id; // Get the id parameter from the query
+  let query = 'SELECT * FROM test_score';
+
+  // Check if the id parameter is provided
+  if (id) {
+    query += ' WHERE patient_id = $1';
+  }
+
+  // Add an "ORDER BY" clause to sort the result by the "date_time" column in descending order
+  query += ' ORDER BY date_time DESC';
+
+  // Add a "LIMIT" clause to get only the top 2 rows
+  query += ' LIMIT 2';
+
+  const queryParams = id ? [id] : [];
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+
+
 module.exports = router;
