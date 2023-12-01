@@ -566,9 +566,9 @@ export default {
           borderBottom: "1px solid #ccc",
           position: "absolute",
           top: `${positionTop}px`,
-          left: "530px",
+          left: "435px",
           right: "0",
-          width: "760px",
+          width: "950px",
         };
       }
 
@@ -1067,7 +1067,7 @@ h2 {
 }
 
 .calendar-day-size {
-  width: 800px;
+  width: 1000px;
   margin: 0 auto;
 }
 
