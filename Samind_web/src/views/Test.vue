@@ -51,15 +51,17 @@
         <v-icon @click="(deletePopup = true), (selectTest = item)"
           >mdi-delete</v-icon
         >
+
         <v-icon
           style="margin-left: 20px"
           @click="(sendPopup = true), (selectTest = item)"
           >mdi-send</v-icon
         >
-        <Transition name="modal">
+
+        <Transition name="delete-modal">
           <div v-if="deletePopup" class="modal-mask">
             <div class="modal-wrapper">
-              <div class="modal-container">
+              <div class="modal-container delete">
                 <div class="modal-header" align="start">
                   <slot class="popupheader" name="header">Confirm delete</slot>
                 </div>
@@ -98,20 +100,21 @@
           </div>
         </Transition>
 
-        <Transition name="modal">
+        <Transition name="send-modal">
           <div v-if="sendPopup" class="modal-mask">
             <div class="modal-wrapper">
-              <div class="modal-container">
-                <div class="modal-header" align="start">
+              <div class="modal-container send">
+                <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
                     >Send “{{ item.columns.testName }}”
                   </slot>
+                  <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
 
                 <div class="modal-body" align="start">
                   <slot name="body"
                     ><v-text-field
-                      class="mt-2"
+                      class="mt-2 mb-3"
                       density="comfortable"
                       variant="Solo"
                       style="
@@ -123,48 +126,141 @@
                       placeholder="Search Patient"
                       v-model="searchPatient"
                     ></v-text-field>
-                    <vue-custom-scrollbar
-                      class="scroll-area"
-                      :settings="settings"
-                      @ps-scroll-y="scrollHanle"
-                    ></vue-custom-scrollbar>
-                    <div
-                      class="mt-3 ml-4"
-                      v-for="(patient, Index) in patients"
-                      :key="Index"
-                    >
-                      <input
-                        type="checkbox"
-                        id="Index"
-                        value="patient"
-                        style="width: 17px; height: 17px; flex-shrink: 0"
-                        color="
-                      rgba(60, 155, 242, 1)"
-                        v-model="checkedNames"
-                      />
-                      <label class="ml-4">{{ patient.patientName }}</label>
-                      <v-divider class="mt-3 mb-3" insert></v-divider></div
+                    <div class="scroll" style="height: 250px; overflow-y: auto">
+                      <div
+                        class="mt-3 ml-4"
+                        v-for="(patient, Index) in filteredPatients"
+                        :key="Index"
+                      >
+                        <input
+                          type="checkbox"
+                          :id="'checkbox_' + Index"
+                          :value="patient.patientId"
+                          style="
+                            width: 17px;
+                            height: 17px;
+                            flex-shrink: 0;
+                            color: rgba(60, 155, 242, 1);
+                          "
+                          v-model="checkedNames"
+                          @change="handleCheckboxChange(patient.patientId)"
+                        />
+                        <label class="ml-4">{{ patient.patientName }}</label>
+                        <v-divider class="mt-3 mb-3" insert></v-divider>
+                      </div></div
                   ></slot>
                 </div>
 
-                <div class="modal-footer">
+                <div
+                  class="modal-footer"
+                  style="display: flex; justify-content: flex-end"
+                >
                   <slot name="footer">
-                    <button
-                      class="modal-default-button"
-                      style="color: red"
-                      @click="Delete(item, selectTest), (sendPopup = false)"
-                    >
-                      Send
-                    </button>
-                    <button
-                      class="modal-default-button mr-5"
-                      style="color: #00bf63"
-                      @click="Delete(item, selectTest), (sendPopup = false)"
-                    >
-                      Cancel
-                    </button>
+                    <v-col cols="5">
+                      <v-btn
+                        rounded="xl"
+                        class="text-none mx-auto"
+                        color="#569AFF"
+                        block
+                        size="x-large"
+                        variant="flat"
+                        style="
+                          color: #fff;
+                          font-size: 15px;
+                          font-style: normal;
+                          font-weight: 500;
+                          line-height: normal;
+                          letter-spacing: 0.13px;
+                          margin-top: -10px;
+                        "
+                        @click="
+                          (sendPopup = false),
+                            (sendingPopup = true),
+                            handleSendTestClick()
+                        "
+                      >
+                        Send Test</v-btn
+                      >
+                    </v-col>
                   </slot>
                 </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+
+        <Transition name="sending-modal">
+          <div v-if="sendingPopup" class="modal-mask">
+            <div class="modal-wrapper">
+              <div
+                class="modal-container send"
+                style="
+                  margin-top: 6px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <label
+                  class="popupheader"
+                  style="font-size: 25px; margin-top: 150px"
+                  >Sending Test</label
+                >
+                <div
+                  ref="animationContainer"
+                  style="width: 700px; height: 700px; margin-top: -140px"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+
+        <Transition name="done-modal">
+          <div v-if="donePopup" class="modal-mask">
+            <div class="modal-wrapper">
+              <div
+                class="modal-container send"
+                style="
+                  margin-top: 6px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <label
+                  class="popupheader"
+                  style="font-size: 25px; margin-top: 140px"
+                  >Test has been sent</label
+                >
+                <div
+                  ref="animationContainer2"
+                  style="width: 300px; height: 300px"
+                ></div>
+                <v-col cols="5">
+                  <v-btn
+                    rounded="xl"
+                    class="text-none mx-auto"
+                    color="#569AFF"
+                    block
+                    size="x-large"
+                    variant="flat"
+                    style="
+                      color: #fff;
+                      font-size: 15px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: normal;
+                      letter-spacing: 0.13px;
+                      margin-top: -10px;
+                      border-radius: 20px;
+                    "
+                    @click="donePopup = false"
+                  >
+                    Close</v-btn
+                  >
+                </v-col>
               </div>
             </div>
           </div>
@@ -206,14 +302,74 @@ export default {
   data() {
     return {
       selectTest: [],
+      sendingPopup: false,
+      donePopup: false,
+      checkedNames: [],
     };
+  },
+  methods: {
+    handleCheckboxChange(patientId) {
+      const index = this.checkedNames.indexOf(patientId);
+
+      if (index === -1) {
+        // If the patientId is not in the array, add it
+        this.checkedNames.push(patientId);
+      } else {
+        // If the patientId is already in the array, remove it
+        this.checkedNames.splice(index, 1);
+      }
+    },
+
+    handleSendTestClick() {
+      console.log("Selected Patients IDs:", this.checkedNames);
+      this.loadSendingAnimation();
+    },
+
+    loadSendingAnimation() {
+      this.$nextTick(() => {
+        const animationContainer = this.$refs.animationContainer;
+        console.log("Animation Container:", animationContainer);
+
+        lottie.loadAnimation({
+          container: animationContainer,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData: animationpath,
+        });
+
+        setTimeout(() => {
+          this.sendingPopup = false;
+          this.donePopup = true;
+          this.loadSendingAnimation2();
+        }, 3000);
+      });
+    },
+    loadSendingAnimation2() {
+      this.$nextTick(() => {
+        const animationContainer2 = this.$refs.animationContainer2;
+        console.log("Animation Container2:", animationContainer2);
+
+        lottie.loadAnimation({
+          container: animationContainer2,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData: animationpath2,
+        });
+      });
+    },
   },
 };
 </script>
 <script setup>
 import { ref } from "vue";
-import axios from "../axios.js";
+// import axios from "../axios.js";
 import { onMounted, computed } from "vue";
+import lottie from "lottie-web";
+import animationpath from "../assets/sending.json";
+import animationpath2 from "../assets/senddone.json";
+
 // let test = ref([]);
 let test = ref([
   {
@@ -222,6 +378,14 @@ let test = ref([
     action: "1",
   },
 ]);
+let checkedNames = ref([]);
+let searchPatient = ref("");
+const filteredPatients = computed(() => {
+  const searchTerm = searchPatient.value.toLowerCase();
+  return patients.filter((item) =>
+    item.patientName.toLowerCase().includes(searchTerm)
+  );
+});
 
 const patients = [
   {
@@ -315,25 +479,25 @@ const patients = [
     action: "6%",
   },
 ];
-onMounted(async () => {
-  try {
-    const response = await axios.get("/questiontype", {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    });
-    console.log("questions:", response.data);
-    const testmap = response.data.map((question, index) => ({
-      id: index + 1,
-      testName: question,
-    }));
-    console.log("testmap:", testmap);
-    test.value = testmap;
-    console.log("test:", test);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-});
+// onMounted(async () => {
+//   try {
+//     const response = await axios.get("/questiontype", {
+//       headers: {
+//         "ngrok-skip-browser-warning": "true",
+//       },
+//     });
+//     console.log("questions:", response.data);
+//     const testmap = response.data.map((question, index) => ({
+//       id: index + 1,
+//       testName: question,
+//     }));
+//     console.log("testmap:", testmap);
+//     test.value = testmap;
+//     console.log("test:", test);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// });
 
 const page = ref(1);
 const itemsPerPage = ref(10);
@@ -363,31 +527,49 @@ function Delete(question, selectTest) {
   const type = { type: question.columns.testName };
   const typeJSON = JSON.stringify(type, null, 2);
   console.log("test", typeJSON);
-  axios
-    .delete("/questionsDel", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: typeJSON, // Send the data directly in the request body
-    })
-    .then((response) => {
-      console.log("delete questions:", response);
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+  // axios
+  //   .delete("/questionsDel", {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     data: typeJSON, // Send the data directly in the request body
+  //   })
+  //   .then((response) => {
+  //     console.log("delete questions:", response);
+  //     window.location.reload();
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error:", error);
+  //   });
 }
 </script>
 
 <style scoped>
+.send-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text {
+  font-family: "Poppins", sans-serif;
+}
+/* WebKit */
+.scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3c9bf2;
+  border-radius: 4px;
+}
+
 :deep(.v-pagination__list) {
   justify-content: end;
 }
 
 .popupheader {
   color: #000;
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 20px;
   font-style: normal;
   font-weight: 500;
@@ -413,7 +595,7 @@ function Delete(question, selectTest) {
 
 .modal-container {
   width: 452px;
-  height: 463px;
+  height: 150px;
   flex-shrink: 0;
   border-radius: 15px;
   background: #fff;
@@ -423,6 +605,13 @@ function Delete(question, selectTest) {
   transition: all 0.3s ease;
 }
 
+.delete {
+  height: 150px;
+}
+
+.send {
+  height: 463px;
+}
 .modal-header h3 {
   margin-top: 0;
   color: #42b983;
@@ -459,4 +648,3 @@ function Delete(question, selectTest) {
   transform: scale(1.1);
 }
 </style>
-```

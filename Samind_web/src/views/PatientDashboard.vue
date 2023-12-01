@@ -228,7 +228,7 @@
                     style="width: 55px"
                   />
                 </v-row>
-                <v-col>
+                <v-row>
                   <label
                     class="moodresult ml-8"
                     style="font-weight: bold; font-size: 24px"
@@ -236,7 +236,7 @@
                   >
                   <br />
                   <label class="testdate ml-7">{{ detectDate }}</label>
-                </v-col></v-chip
+                </v-row></v-chip
               ></v-col
             ></v-row
           >
