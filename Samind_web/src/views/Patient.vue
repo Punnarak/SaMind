@@ -219,6 +219,15 @@ const patients = [
     mood: 7,
     action: "6%",
   },
+  {
+    id: "11",
+    patientId: "PID011",
+    patientName: "Somjit Test11",
+    age: 65,
+    gender: "female",
+    mood: 7,
+    action: "6%",
+  },
 ];
 function getColor(mood) {
   if (mood > 400) return "red";
