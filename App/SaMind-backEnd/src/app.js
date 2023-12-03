@@ -1,16 +1,13 @@
-const express = require('express')
-const cors = require('cors')
-const app = express()
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
-const _ = require('lodash')
-const axios = require('axios');
-
-const bodyParser = require('body-parser')
-const jsonParser = bodyParser.json()
-
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Import API file
 const login = require('./login.js');
@@ -22,7 +19,6 @@ const question = require('./question.js');
 const library = require('./library.js');
 const appoint = require('./appoint.js');
 
-
 // Use the API file
 app.use(login);
 app.use(register);
@@ -33,26 +29,33 @@ app.use(question);
 app.use(library);
 app.use(appoint);
 
-
-
-// Test 
+// Test
 const dashboard = require('./dashboard.js');
 app.use(dashboard);
 
 const mailOTP = require('./mailOTP.js');
 app.use(mailOTP);
 
-// const updateUser = require('./updateUser.js');
-// app.use(updateUser);
-
 const info_users = require('./info_users.js');
 app.use(info_users);
 
+// Swagger setup
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'SaMind API Documentation',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./login.js', './question.js', './library.js', './appoint.js', './dashboard.js', './mailOTP.js', './info_users.js'],
+};
 
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
- 
 app.listen(4343, function () {
-    console.log('CORS-enabled web server listening on port 4343')
-  })
+  console.log('CORS-enabled web server listening on port 4343');
+});
 
 exports.module = app;

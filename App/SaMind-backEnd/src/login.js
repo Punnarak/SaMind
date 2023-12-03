@@ -31,6 +31,48 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * @swagger
+ * /register-with-otp:
+ *   post:
+ *     summary: Register a user with OTP verification
+ *     tags:
+ *       - Registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               patient_id:
+ *                 type: integer
+ *     responses:
+ *       '200':
+ *         description: Registration initiated. Please verify OTP to complete registration.
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Registration initiated. Please verify OTP to complete registration.
+ *       '400':
+ *         description: Invalid email address or email already in use
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid email address or email already in use
+ *       '500':
+ *         description: An error occurred during registration initiation
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: An error occurred during registration initiation
+ */
 router.post('/register-with-otp', jsonParser, async (req, res) => {
   try {
     const { id, email, password, patient_id } = req.body;
@@ -100,6 +142,48 @@ router.post('/register-with-otp', jsonParser, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /reset_password:
+ *   post:
+ *     summary: Reset user password
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               patient_id:
+ *                 type: integer
+ *     responses:
+ *       '200':
+ *         description: Reset password successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Reset password successfully
+ *       '400':
+ *         description: Invalid email address
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid email address
+ *       '500':
+ *         description: An error occurred while resetting the password
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: An error occurred while resetting the password
+ */
 router.post('/reset_password', async (req, res) => {
   try {
     const { id, email, password, patient_id } = req.body;
@@ -144,7 +228,64 @@ function authenticate(req, res, next) {
     // หากผ่านการยืนยันตัวตน
     next();
 }
-  
+ 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Authenticate user and get a token
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully logged in
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: ok
+ *               message: login success
+ *               token: <JWT_TOKEN>
+ *               fname: John
+ *       '400':
+ *         description: Bad request, missing or invalid parameters
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: error
+ *               message: Bad request, missing or invalid parameters
+ *       '401':
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: error
+ *               message: Invalid credentials
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: error
+ *               message: User not found
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: error
+ *               message: Internal server error
+ */
 router.post('/login', authenticate, jsonParser, function (req, res, next) {
     const email = req.body.email;
     const query = {
@@ -186,6 +327,14 @@ router.post('/authen',jsonParser, function (req, res, next) {
     }
     client.end;
 })
+
+
+
+
+
+
+
+
 
 //phone OTP
 router.post('/sendotp', (req,res) => {

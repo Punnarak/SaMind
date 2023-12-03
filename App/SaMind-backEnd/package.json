@@ -13,6 +13,8 @@
     "pg": "^8.11.3",
     "pg-promise": "^11.5.4",
     "randomstring": "^1.3.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "two-step-auth": "^1.1.2",
     "uuid": "^9.0.1"
   },
