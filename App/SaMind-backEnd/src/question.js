@@ -145,33 +145,40 @@ router.delete('/questionsDel', (req, res) => {
     });
 });
 
-
 router.post('/score_question_post', async (req, res) => {
-  const { score_id, score, type, patient_id } = req.body;
+  const { score, type, patient_id } = req.body;
 
-  if (!score_id || !score || !type || !patient_id) {
-    return res.status(400).json({ error: 'Both score_id, score, type, patient_id are required fields.' });
+  if (!score || !type || !patient_id) {
+    return res.status(400).json({ error: 'score, type, and patient_id are required fields.' });
   }
+
+  // Use a sequence to generate the score_id
+  const generateScoreIdQuery = 'SELECT NEXTVAL(\'score_id_seq\') AS score_id';
 
   // Insert the new entry
   const insertQuery = 'INSERT INTO test_score (score_id, score, type, date_time, patient_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
 
   var currentDate = new Date();
-
   var day = currentDate.getDate();
-  var month = currentDate.getMonth() + 1; // เพื่อให้เดือนเริ่มต้นที่ 1
+  var month = currentDate.getMonth() + 1; // To start the month from 1
   var year = currentDate.getFullYear();
   var hours = currentDate.getHours();
   var minutes = currentDate.getMinutes();
   var seconds = currentDate.getSeconds();
-
   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
   try {
-    const insertResult = await client.query(insertQuery, [score_id, score, type, formattedDate, patient_id]);
+    // Execute the query to generate the score_id
+    const scoreIdResult = await client.query(generateScoreIdQuery);
+
+    // Extract the generated score_id from the result
+    const generatedScoreId = scoreIdResult.rows[0].score_id;
+
+    // Insert the new entry with the generated score_id
+    const insertResult = await client.query(insertQuery, [generatedScoreId, score, type, formattedDate, patient_id]);
     res.status(201).json(insertResult.rows[0]);
-  } catch (insertErr) {
-    console.error('Error executing query:', insertErr);
+  } catch (error) {
+    console.error('Error executing query:', error);
     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
   }
 });

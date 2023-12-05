@@ -4,18 +4,18 @@ const router = express.Router();
 
 
 router.get('/calendar_get', (req, res) => {
-  const appointment_id = req.query.appointment_id; // Get the id parameter from the query
-  let query = 'SELECT * FROM appointment';
+  const patient_id = req.query.patient_id;
+  let query = 'SELECT * FROM appointment_new';
 
   // Check if the id parameter is provided
-  if (appointment_id) {
-    query += ' WHERE appointment_id = $1';
+  if (patient_id) {
+    query += ' WHERE patient_id = $1';
   }
 
   // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY appointment_id';
+  // query += ' ORDER BY date';
 
-  const queryParams = appointment_id ? [appointment_id] : [];
+  const queryParams = patient_id ? [patient_id] : [];
 
   client.query(query, queryParams)
     .then(result => {

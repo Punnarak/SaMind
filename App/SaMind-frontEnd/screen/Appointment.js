@@ -13,6 +13,7 @@ import moment from "moment";
 import Modal from "react-native-modal";
 import "moment-timezone";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import axios from "./axios.js";
 
 export default function Calendar({ route }) {
   console.log("Calendar Screen");
@@ -27,15 +28,29 @@ export default function Calendar({ route }) {
 
   useEffect(() => {
     console.log("Appointment Screen");
-    const dateStrings = ["2023-10-27", "2023-10-30"];
-    const dateFormat = "YYYY-MM-DD";
-    const dates = dateStrings.map((dateString) =>
-      moment(dateString, dateFormat).toDate()
-    );
-    setHighlightedDates(dates);
+    let dateStrings;
+    axios
+      .get("/appoint_patient_get")
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          dateStrings = response.data;
+          const dateFormat = "YYYY-MM-DD";
+          const dates = dateStrings.map((dateString) =>
+            moment(dateString, dateFormat).toDate()
+          );
+          setHighlightedDates(dates);
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   }, []);
 
-  const handleDateSelected = (date, month, year) => {
+  const handleDateSelected = (date, month, year, textColor) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
     const dateString = year + "-" + (month + 1) + "-" + date;
     const dateFormat = "YYYY-MM-DD";
@@ -63,7 +78,7 @@ export default function Calendar({ route }) {
           date = date + "rd";
         }
       }
-    } else if (!isDateInHighlightedDates) {
+    } else if (!isDateInHighlightedDates && textColor !== "#f00") {
       navigation.navigate("Selectappointmentscreen", { date, month, year });
     }
 

@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import axios from "./axios.js";
 
 export default function Calendar() {
   useEffect(() => {
@@ -15,13 +16,28 @@ export default function Calendar() {
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
-    const dateStrings = ["2023-10-27", "2023-10-30"];
-    setHighlightedDatesFormat(dateStrings);
-    const dateFormat = "YYYY-MM-DD";
-    const dates = dateStrings.map((dateString) =>
-      moment(dateString, dateFormat).toDate()
-    );
-    setHighlightedDates(dates);
+    // const dateStrings = ["2023-10-27", "2023-10-30"];
+    let dateStrings;
+    axios
+      .get("/appoint_patient_get")
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          dateStrings = response.data;
+          setHighlightedDatesFormat(dateStrings);
+          const dateFormat = "YYYY-MM-DD";
+          const dates = dateStrings.map((dateString) =>
+            moment(dateString, dateFormat).toDate()
+          );
+          setHighlightedDates(dates);
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   }, []);
 
   const handleDateSelected = (date, month, year) => {
