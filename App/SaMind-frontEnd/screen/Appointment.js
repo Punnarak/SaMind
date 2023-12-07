@@ -28,9 +28,12 @@ export default function Calendar({ route }) {
 
   useEffect(() => {
     console.log("Appointment Screen");
+    const param = {
+      "patient_id": 123
+    };
     let dateStrings;
     axios
-      .get("/appoint_patient_get")
+      .post("/appoint_patient_post", param)
       .then((response) => {
         if (response.data.length != 0) {
           console.log("in");

@@ -5,11 +5,70 @@ const client = require('./connection.js');
 const express = require('express');
 const router = express.Router();
 
-router.post('/mood_tracker_post', async (req, res) => {
-  const { id, patient_id, score } = req.body;
+// router.post('/mood_tracker_post', async (req, res) => {
+//   const { mood_tracker_id, patient_id, score } = req.body;
 
-  if (!id || !patient_id || !score) {
-    return res.status(400).json({ error: 'Both id, patient_id, score are required fields.' });
+//   if (!mood_tracker_id || !patient_id || !score) {
+//     return res.status(400).json({ error: 'Both mood_tracker_id, patient_id, score are required fields.' });
+//   }
+
+//   // Check the number of entries for the patient
+//   const countQuery = 'SELECT COUNT(*) FROM mood_tracker WHERE patient_id = $1';
+//   const countResult = await client.query(countQuery, [patient_id]);
+
+//   const entryCount = parseInt(countResult.rows[0].count, 10);
+
+//   // If the patient already has 7 entries, delete the oldest one
+//   if (entryCount >= 7) {
+//     const deleteQuery = `
+//       DELETE FROM mood_tracker
+//       WHERE ctid IN (
+//         SELECT ctid
+//         FROM mood_tracker
+//         WHERE patient_id = $1
+//         ORDER BY date_time ASC
+//         LIMIT 1
+//       )
+//       RETURNING *
+//     `;
+  
+//     try {
+//       const deleteResult = await client.query(deleteQuery, [patient_id]);
+//       console.log('Deleted oldest entry:', deleteResult.rows[0]);
+//     } catch (deleteErr) {
+//       console.error('Error deleting oldest entry:', deleteErr);
+//       return res.status(500).json({ error: 'An error occurred while deleting the oldest entry' });
+//     }
+//   }
+
+//   // Insert the new entry
+//   const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
+
+//   var currentDate = new Date();
+
+//   var day = currentDate.getDate();
+//   var month = currentDate.getMonth() + 1; // เพื่อให้เดือนเริ่มต้นที่ 1
+//   var year = currentDate.getFullYear();
+//   var hours = currentDate.getHours();
+//   var minutes = currentDate.getMinutes();
+//   var seconds = currentDate.getSeconds();
+
+//   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+//   try {
+//     const insertResult = await client.query(insertQuery, [id, patient_id, score, formattedDate]);
+//     res.status(201).json(insertResult.rows[0]);
+//   } catch (insertErr) {
+//     console.error('Error executing query:', insertErr);
+//     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
+//   }
+// });
+
+router.post('/mood_tracker_post', async (req, res) => {
+  const { patient_id, score } = req.body;
+
+  if (!patient_id || !score) {
+    return res.status(400).json({ error: 'Both patient_id and score are required fields.' });
   }
 
   // Check the number of entries for the patient
@@ -41,9 +100,7 @@ router.post('/mood_tracker_post', async (req, res) => {
     }
   }
 
-  // Insert the new entry
-  const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
-
+  // Format the date in the desired format
   var currentDate = new Date();
 
   var day = currentDate.getDate();
@@ -55,14 +112,20 @@ router.post('/mood_tracker_post', async (req, res) => {
 
   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
+  // Insert the new entry
+  const insertQuery = 'INSERT INTO mood_tracker (mood_tracker_id, patient_id, score, date_time) VALUES (nextval(\'mood_tracker_id_seq\'), $1, $2, $3::timestamp) RETURNING *';
+
   try {
-    const insertResult = await client.query(insertQuery, [id, patient_id, score, formattedDate]);
+    const insertResult = await client.query(insertQuery, [patient_id, score, formattedDate]);
     res.status(201).json(insertResult.rows[0]);
   } catch (insertErr) {
     console.error('Error executing query:', insertErr);
     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
   }
 });
+
+
+
 
 router.get('/average_scores', async (req, res) => {
   const { patient_id } = req.query;
