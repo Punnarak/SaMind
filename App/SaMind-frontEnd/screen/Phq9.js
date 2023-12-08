@@ -164,12 +164,12 @@ export default function Notification() {
   };
 
   const handleFormSubmit = () => {
+    let result = 0;
     console.log("Selected options:", selectedOptions);
     if (Object.keys(selectedOptions).length != 9) {
       setCheck(false);
     } else if (Object.keys(selectedOptions).length == 9) {
       setCheck(true);
-      let result = 0;
       for (const value of Object.values(selectedOptions)) {
         if (value == "ไม่เลย") {
           console.log("value", value);
@@ -211,7 +211,20 @@ export default function Notification() {
       console.log(result);
       setScore(result);
     }
-
+    const param = {
+      "score": result,
+      "type": "PHQ9",
+      "patient_id": 123
+  };
+    axios
+      .post("/score_question_post", param)
+      .then((response) => {
+        console.log("submit success", response.data);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
     setModal(!modal);
   };
 
