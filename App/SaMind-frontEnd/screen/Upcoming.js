@@ -11,19 +11,21 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
-import data from "../upcomingData";
+// import data from "../upcomingData";
 import UpcomingBox from "../upcomingbox";
 import AssignmentBox from "../AssigmentBox";
 import assignData from "../assignData";
+import axios from "./axios.js";
 
 export default function Upcoming({ route }) {
   const navigation = useNavigation();
-  const { date, month, year } = route.params || {};
+  const { data, date, month, year } = route.params || {};
   const [datas, setData] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState("a");
 
   useEffect(() => {
     console.log("Upcoming Screen");
+    console.log("testttt", data)
     const dateStrings = [year + "-" + month + "-" + date];
     console.log(dateStrings);
     const dateFormat = "YYYY-MM-DD";

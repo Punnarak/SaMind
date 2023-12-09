@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import axios from "./axios.js";
 
 export default function Calendar() {
   useEffect(() => {
@@ -15,16 +16,34 @@ export default function Calendar() {
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
-    const dateStrings = ["2023-10-27", "2023-10-30"];
-    setHighlightedDatesFormat(dateStrings);
-    const dateFormat = "YYYY-MM-DD";
-    const dates = dateStrings.map((dateString) =>
-      moment(dateString, dateFormat).toDate()
-    );
-    setHighlightedDates(dates);
+    // const dateStrings = ["2023-10-27", "2023-10-30"];
+    let dateStrings;
+    const param = {
+      "patient_id": 124
+    };
+    axios
+      .post("/appoint_patient_post", param)
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          dateStrings = response.data;
+          setHighlightedDatesFormat(dateStrings);
+          const dateFormat = "YYYY-MM-DD";
+          const dates = dateStrings.map((dateString) =>
+            moment(dateString, dateFormat).toDate()
+          );
+          setHighlightedDates(dates);
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   }, []);
 
-  const handleDateSelected = (date, month, year) => {
+  const handleDateSelected = async (date, month, year) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
     month = (month + 1).toString().padStart(2, "0");
     date = date.toString().padStart(2, "0");
@@ -33,8 +52,24 @@ export default function Calendar() {
     console.log("Selected date:", selectedDate);
 
     if (highlightedDatesFormat.includes(selectedDate)) {
-      navigation.navigate("Upcomingscreen", { date, month, year });
-    }
+      let data = [];
+      const param = {
+        "patient_id": 124,
+        "date": selectedDate
+      };
+
+      try {
+        const response = await axios.post("/upcoming_date_post", param);
+  
+        if (response.data.length !== 0) {
+          console.log("OUT");
+          data = response.data;
+        }
+        navigation.navigate("Upcomingscreen", { data, date, month, year });
+      } catch (error) {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      }}
   };
 
   return (

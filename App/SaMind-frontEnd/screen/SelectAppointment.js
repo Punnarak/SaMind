@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
 import moment from "moment";
+import axios from "./axios.js";
 
 export default function Login({ route }) {
   const navigation = useNavigation();
@@ -119,6 +120,22 @@ export default function Login({ route }) {
       datestring + " " + Days[day] + " " + months[month] + " " + year
     );
     setSubmit(!submit);
+    const param = {
+      "therapist_id": 9999,
+      "patient_id": 124,
+      "date": dateString,
+      "time": selectedValue
+    }
+    console.log(param)
+    axios
+      .post("/appoint_post", param)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   };
 
   const togglePicker = () => {

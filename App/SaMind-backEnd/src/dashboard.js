@@ -1,15 +1,71 @@
 const client = require('./connection.js');
-// const avatar = require('./connection.js');
-// const { client, avatar, game } = require('./connection.js');
-
 const express = require('express');
 const router = express.Router();
 
-router.post('/mood_tracker_post', async (req, res) => {
-  const { id, patient_id, score } = req.body;
+// router.post('/mood_tracker_post', async (req, res) => {
+//   const { mood_tracker_id, patient_id, score } = req.body;
 
-  if (!id || !patient_id || !score) {
-    return res.status(400).json({ error: 'Both id, patient_id, score are required fields.' });
+//   if (!mood_tracker_id || !patient_id || !score) {
+//     return res.status(400).json({ error: 'Both mood_tracker_id, patient_id, score are required fields.' });
+//   }
+
+//   // Check the number of entries for the patient
+//   const countQuery = 'SELECT COUNT(*) FROM mood_tracker WHERE patient_id = $1';
+//   const countResult = await client.query(countQuery, [patient_id]);
+
+//   const entryCount = parseInt(countResult.rows[0].count, 10);
+
+//   // If the patient already has 7 entries, delete the oldest one
+//   if (entryCount >= 7) {
+//     const deleteQuery = `
+//       DELETE FROM mood_tracker
+//       WHERE ctid IN (
+//         SELECT ctid
+//         FROM mood_tracker
+//         WHERE patient_id = $1
+//         ORDER BY date_time ASC
+//         LIMIT 1
+//       )
+//       RETURNING *
+//     `;
+  
+//     try {
+//       const deleteResult = await client.query(deleteQuery, [patient_id]);
+//       console.log('Deleted oldest entry:', deleteResult.rows[0]);
+//     } catch (deleteErr) {
+//       console.error('Error deleting oldest entry:', deleteErr);
+//       return res.status(500).json({ error: 'An error occurred while deleting the oldest entry' });
+//     }
+//   }
+
+//   // Insert the new entry
+//   const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
+
+//   var currentDate = new Date();
+
+//   var day = currentDate.getDate();
+//   var month = currentDate.getMonth() + 1; // เพื่อให้เดือนเริ่มต้นที่ 1
+//   var year = currentDate.getFullYear();
+//   var hours = currentDate.getHours();
+//   var minutes = currentDate.getMinutes();
+//   var seconds = currentDate.getSeconds();
+
+//   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+//   try {
+//     const insertResult = await client.query(insertQuery, [id, patient_id, score, formattedDate]);
+//     res.status(201).json(insertResult.rows[0]);
+//   } catch (insertErr) {
+//     console.error('Error executing query:', insertErr);
+//     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
+//   }
+// });
+
+router.post('/mood_tracker_post', async (req, res) => {
+  const { patient_id, score } = req.body;
+
+  if (!patient_id || !score) {
+    return res.status(400).json({ error: 'Both patient_id and score are required fields.' });
   }
 
   // Check the number of entries for the patient
@@ -41,9 +97,7 @@ router.post('/mood_tracker_post', async (req, res) => {
     }
   }
 
-  // Insert the new entry
-  const insertQuery = 'INSERT INTO mood_tracker (id, patient_id, score, date_time) VALUES ($1, $2, $3, $4) RETURNING *';
-
+  // Format the date in the desired format
   var currentDate = new Date();
 
   var day = currentDate.getDate();
@@ -55,14 +109,20 @@ router.post('/mood_tracker_post', async (req, res) => {
 
   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
+  // Insert the new entry
+  const insertQuery = 'INSERT INTO mood_tracker (mood_tracker_id, patient_id, score, date_time) VALUES (nextval(\'mood_tracker_id_seq\'), $1, $2, $3::timestamp) RETURNING *';
+
   try {
-    const insertResult = await client.query(insertQuery, [id, patient_id, score, formattedDate]);
+    const insertResult = await client.query(insertQuery, [patient_id, score, formattedDate]);
     res.status(201).json(insertResult.rows[0]);
   } catch (insertErr) {
     console.error('Error executing query:', insertErr);
     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
   }
 });
+
+
+
 
 router.get('/average_scores', async (req, res) => {
   const { patient_id } = req.query;
@@ -91,29 +151,70 @@ router.get('/average_scores', async (req, res) => {
   }
 });
 
-router.get('/check_mood_per_day_get', (req, res) => {
-  const id = req.query.patient_id; // Get the id parameter from the query
+// router.get('/check_mood_per_day_get', (req, res) => {
+//   const id = req.query.patient_id; // Get the id parameter from the query
+
+//   // Get the current date and time
+//   const currentDate = new Date();
+//   const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+
+//   // Build the SQL query
+//   let query = 'SELECT * FROM mood_tracker';
+//   const queryParams = [];
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE patient_id = $1';
+//     queryParams.push(id);
+//   }
+
+//   // Add a condition to check if the date_time column matches the current date
+//   query += ' AND date_time::date = $2';
+//   queryParams.push(formattedDate.slice(0, 10));
+
+//   // Add an "ORDER BY" clause to sort the result by the "id" column
+//   query += ' ORDER BY patient_id';
+
+//   // Execute the query
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Check if there are rows in the result
+//       const hasRows = result.rows.length > 0;
+
+//       // Return true or false based on whether there are rows
+//       res.json(hasRows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/check_mood_per_day_get', (req, res) => {
+  const id = req.body.patient_id; // Get the patient_id from the request body
 
   // Get the current date and time
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
 
-  // Build the SQL query
-  let query = 'SELECT * FROM mood_tracker';
+  // Build the SQL query with a left join on the patient table
+  let query = 'SELECT mood_tracker.*, patient.fname FROM mood_tracker';
+  query += ' LEFT JOIN patient ON mood_tracker.patient_id = patient.patient_id';
+
   const queryParams = [];
 
   // Check if the id parameter is provided
   if (id) {
-    query += ' WHERE patient_id = $1';
+    query += ' WHERE mood_tracker.patient_id = $1::integer'; // Explicitly cast to integer
     queryParams.push(id);
   }
 
   // Add a condition to check if the date_time column matches the current date
-  query += ' AND date_time::date = $2';
+  query += ' AND mood_tracker.date_time::date = $2';
   queryParams.push(formattedDate.slice(0, 10));
 
-  // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY patient_id';
+  // Add an "ORDER BY" clause to sort the result by the mood_tracker id column
+  query += ' ORDER BY mood_tracker_id';
 
   // Execute the query
   client.query(query, queryParams)
@@ -121,14 +222,26 @@ router.get('/check_mood_per_day_get', (req, res) => {
       // Check if there are rows in the result
       const hasRows = result.rows.length > 0;
 
-      // Return true or false based on whether there are rows
-      res.json(hasRows);
+      // Construct the response object
+      const responseObject = {
+        fname: hasRows ? result.rows[0].fname : null,
+        checkin: hasRows,
+        moodscore: hasRows ? result.rows[0].score : null,
+      };
+
+      // Return the JSON object
+      res.json(responseObject);
     })
     .catch(err => {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+
+
+
+
 
 
 
