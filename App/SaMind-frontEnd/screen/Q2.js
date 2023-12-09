@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import RadioItem from "../RadioItem"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
+import axios from "./axios.js";
 
 export default function Notification() {
   const navigation = useNavigation();
@@ -57,12 +58,12 @@ export default function Notification() {
   };
 
   const handleFormSubmit = () => {
+    let result = 0;
     console.log("Selected options:", selectedOptions);
     if (Object.keys(selectedOptions).length != 2) {
       setCheck(false);
     } else if (Object.keys(selectedOptions).length == 2) {
       setCheck(true);
-      let result = 0;
       for (const value of Object.values(selectedOptions)) {
         if (value == "ไม่เลย") {
           console.log("value", value);
@@ -85,6 +86,20 @@ export default function Notification() {
       console.log(result);
       setScore(result);
     }
+    const param = {
+      "score": result,
+      "type": "2Q",
+      "patient_id": 123
+  };
+    axios
+      .post("/score_question_post", param)
+      .then((response) => {
+        console.log("submit success", response.data);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
     setModal(!modal);
   };
 

@@ -57,7 +57,7 @@
       </v-col>
     </v-row>
 
-    <v-card class="mx-auto" col="6" rounded="xl" style="height: 560px">
+    <v-card class="mx-auto" cols="12" rounded="xl" style="height: 560px">
       <v-list lines="two">
         <v-list-subheader
           class="ml-3"
@@ -69,12 +69,12 @@
         >
           Appointment Detail
         </v-list-subheader>
-        <v-divider inset></v-divider>
-        <v-col class="ml-4" cols="12" sm="6" md="4">
+        <v-divider insert></v-divider>
+        <v-col class="ml-4" cols="12" sm="6" md="8">
           <label style="font-weight: bold">Patient</label>
           <label style="color: red">*</label>
           <v-select
-            class="mt-2 mb-10"
+            class="mt-2 mb-5"
             variant="outlined"
             rounded="lg"
             style="width: 245px; height: 50px; border-radius: 10px"
@@ -86,7 +86,7 @@
 
           <label style="font-weight: bold">Date</label>
           <v-text-field
-            class="mt-2 mb-10"
+            class="mt-2 mb-5"
             variant="outlined"
             rounded="lg"
             style="
@@ -100,6 +100,44 @@
             :disabled="true"
             v-model="bookday"
           ></v-text-field>
+          <v-row align="center">
+            <v-col cols="4">
+              <!-- Start Time -->
+              <label style="font-weight: bold">Start Time</label>
+              <label style="color: red">*</label>
+              <v-select
+                class="mt-2 mb-5"
+                variant="outlined"
+                rounded="lg"
+                style="width: 245px; height: 50px; border-radius: 10px"
+                v-model="selectedStartTime"
+                :items="timeOption"
+                placeholder="Select Time"
+                :rules="selectStartTimetRules"
+              ></v-select>
+            </v-col>
+
+            <!-- Arrow Icon -->
+            <v-col class="text-center mt-4" cols="2">
+              <v-icon>mdi-arrow-right</v-icon>
+            </v-col>
+
+            <v-col cols="4">
+              <!-- End Time -->
+              <label style="font-weight: bold">End Time</label>
+              <label style="color: red">*</label>
+              <v-select
+                class="mt-2 mb-5"
+                variant="outlined"
+                rounded="lg"
+                style="width: 245px; height: 50px; border-radius: 10px"
+                v-model="selectedEndTime"
+                :items="timeOption"
+                placeholder="Select Time"
+                :rules="selectEndTimeRules"
+              ></v-select>
+            </v-col>
+          </v-row>
 
           <label style="font-weight: bold"> Note </label>
           <label>(optional) </label>
@@ -108,7 +146,7 @@
             class="mt-4"
             variant="outlined"
             rounded="lg"
-            style="border-radius: 10px; width: 400px; height: 320px"
+            style="border-radius: 10px; width: 400px; height: 220px"
           ></v-text-field>
         </v-col>
       </v-list>
@@ -127,6 +165,35 @@ export default {
         (value) => {
           if (value) return true;
           return "You must enter a patient.";
+        },
+      ],
+      selectedStartTime: null,
+      selectedEndTime: null,
+      timeOption: [
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+        "13:00",
+        "13:30",
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
+      ],
+      selectStartTimetRules: [
+        (value) => {
+          if (value) return true;
+          return "You must start time.";
+        },
+      ],
+      selectEndTimeRules: [
+        (value) => {
+          if (value) return true;
+          return "You must select end time.";
         },
       ],
       addingAppointment: false,
@@ -170,4 +237,10 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.line {
+  width: 40px;
+  height: 2px; /* Adjust the height of the line as needed */
+  background-color: #000; /* You can set your preferred color */
+}
+</style>

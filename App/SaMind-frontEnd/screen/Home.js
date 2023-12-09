@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import axios from "./axios.js";
 
 // import data from "../notiData";
 // const getDeviceModel = () => {
@@ -30,10 +31,35 @@ export default function Login() {
   const [selectedMenu, setSelectedMenu] = useState();
   const [checkIn, setCheckIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [fName, setFName] = useState("");
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   useEffect(() => {
     console.log("Home Screen");
+    const param = {
+      "patient_id": 123,
+    };
+    axios
+      .post("/check_mood_per_day_get", param)
+      .then((response) => {
+        if(response.data.checkin === true){
+          setCheckIn(true)
+          setDisabled(true)
+        } else {
+          setCheckIn(false)
+          setDisabled(false)
+        }
+        if(response.data.fname){
+          setFName(response.data.fname)
+        }
+        setSelectedMenu(response.data.moodscore)
+        
+        console.log("checkin", response.data.checkin);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   }, []);
 
   const handleMenuPress = (menu) => {
@@ -48,15 +74,28 @@ export default function Login() {
   const handleCheckinPress = (selectedMenu) => {
     console.log("checkin --> ", selectedMenu);
     if (
-      selectedMenu == "a" ||
-      selectedMenu == "b" ||
-      selectedMenu == "c" ||
-      selectedMenu == "d" ||
-      selectedMenu == "e"
+      selectedMenu == "5" ||
+      selectedMenu == "4" ||
+      selectedMenu == "3" ||
+      selectedMenu == "2" ||
+      selectedMenu == "1"
     ) {
       setDisabled(true);
       setCheckIn(true);
-      console.log("checkin complete");
+      const param = {
+        "patient_id": 123,
+        "score" : selectedMenu
+      };
+      axios
+        .post("/mood_tracker_post", param)
+        .then((response) => {
+          console.log("checkin complete", response.data);
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
+
     } else {
       setDisabled(false);
       setCheckIn(false);
@@ -88,7 +127,7 @@ export default function Login() {
       </View>
       <Text style={styles.n}>
         Hi{"  "}
-        <Text style={styles.name}>Punya</Text>
+        <Text style={styles.name}>{fName !== "" ? fName : "Punya"}</Text>
       </Text>
       <Text style={styles.n1}>How are you feeling today?</Text>
       <View
@@ -110,23 +149,23 @@ export default function Login() {
           disabled={disabled}
           style={[
             styles.menuItem,
-            isMenuSelected("a") && styles.selectedMenuItem,
+            isMenuSelected("5") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("a")}
+          onPress={() => handleMenuPress("5")}
         >
           <Image
             source={require("../assets/m1.png")}
             style={[styles.icon]}
-            onPress={() => handleMenuPress("a")}
+            onPress={() => handleMenuPress("5")}
           />
         </TouchableOpacity>
         <TouchableOpacity
           disabled={disabled}
           style={[
             styles.menuItem,
-            isMenuSelected("b") && styles.selectedMenuItem,
+            isMenuSelected("4") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("b")}
+          onPress={() => handleMenuPress("4")}
         >
           <Image source={require("../assets/m2.png")} style={[styles.icon]} />
         </TouchableOpacity>
@@ -134,9 +173,9 @@ export default function Login() {
           disabled={disabled}
           style={[
             styles.menuItem,
-            isMenuSelected("c") && styles.selectedMenuItem,
+            isMenuSelected("3") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("c")}
+          onPress={() => handleMenuPress("3")}
         >
           <Image source={require("../assets/m3.png")} style={[styles.icon]} />
         </TouchableOpacity>
@@ -144,9 +183,9 @@ export default function Login() {
           disabled={disabled}
           style={[
             styles.menuItem,
-            isMenuSelected("d") && styles.selectedMenuItem,
+            isMenuSelected("2") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("d")}
+          onPress={() => handleMenuPress("2")}
         >
           <Image source={require("../assets/m4.png")} style={[styles.icon]} />
         </TouchableOpacity>
@@ -154,9 +193,9 @@ export default function Login() {
           disabled={disabled}
           style={[
             styles.menuItem,
-            isMenuSelected("e") && styles.selectedMenuItem,
+            isMenuSelected("1") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("e")}
+          onPress={() => handleMenuPress("1")}
         >
           <Image source={require("../assets/m5.png")} style={[styles.icon]} />
         </TouchableOpacity>
@@ -420,6 +459,7 @@ const styles = StyleSheet.create({
     marginTop: "1%",
     marginLeft: "55%",
     fontWeight: "bold",
+  
   },
   // checkin button
   checkinb: {
@@ -452,6 +492,15 @@ const styles = StyleSheet.create({
   },
   // Hi
   n: {
+    ...Platform.select({
+      android: {
+        left: 30,
+        width: horizontalScale(150),
+      },
+      ios: {
+        
+      },
+    }),
     fontSize: moderateScale(23),
     // fontSize: 23,
     color: "#6AA6FF",
@@ -459,6 +508,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     // marginRight: "62%",
     marginRight: horizontalScale(233.5),
+  
   },
   // How are you feeling today?
   n1: {

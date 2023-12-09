@@ -23,9 +23,12 @@
                 <v-list-item
                   v-for="(patient, patientIndex) in patients"
                   :key="patientIndex"
+                  :class="{
+                    'hidden-details': patientDetailsVisible[patientIndex],
+                  }"
                   class="custom-chip mb-5"
                 >
-                  <div style="margin-top: -10px">
+                  <div style="margin-top: -10px" v-if="patient.value == ''">
                     <div
                       style="
                         display: flex;
@@ -34,11 +37,17 @@
                         position: absolute;
                       "
                     >
-                      <img
-                        class="mr-2"
-                        src="../assets/dashboard/ybg.png"
-                        style="width: 30px"
-                      />
+                      <div
+                        class="circle mr-2"
+                        style="
+                          background-color: rgba(86, 154, 255, 1);
+                          width: 30px;
+                          height: 30px;
+                        "
+                      >
+                        <v-icon style="color: white">mdi-account</v-icon>
+                      </div>
+
                       <label class="nametext">{{ patient.patientName }}</label>
                     </div>
                     <br />
@@ -65,8 +74,7 @@
                       >
                         <label
                           class="text mr-8"
-                          style="color: rgba(0, 191, 99, 1); font-size: 13px;
-'"
+                          style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
                           >To</label
                         >
                         <label
@@ -120,6 +128,7 @@
                             border-color: rgba(0, 191, 99, 1);
                             box-shadow: 0px 0px 2px 0px #00bf63;
                           "
+                          @click="toggleDetails(patientIndex)"
                           >confirm</v-btn
                         >
                         <v-btn
@@ -130,6 +139,7 @@
                             border-color: rgba(242, 86, 86, 1);
                             box-shadow: 0px 0px 2px 0px rgba(242, 86, 86, 1);
                           "
+                          @click="toggleDetails(patientIndex)"
                           >cancel</v-btn
                         >
                       </div>
@@ -206,22 +216,45 @@
               </div>
             </div>
             <div class="day-day">
-              <div class="event-container-day">
-                <div
-                  v-for="time in timesDay"
-                  :key="time"
-                  class="event-day"
-                  :style="getEventStyle(time)"
-                >
-                  <div v-if="eventsDay[time]" class="event-details-day">
-                    <span class="title-day">{{ eventsDay[time].title }}</span>
-                    <span class="description-day">{{
-                      eventsDay[time].description
-                    }}</span>
-                    <span class="color-day">{{ eventsDay[time].color }}</span>
+              <v-menu class="event-container-day">
+                <template v-slot:activator="{ props }">
+                  <div
+                    v-bind="props"
+                    v-for="time in timesDayUse"
+                    :key="time"
+                    class="event-day"
+                    :style="getEventStyle(time)"
+                  >
+                    <div v-if="eventsDay[time]" class="event-details-day">
+                      <span class="title-day">{{
+                        eventsDay[time].patientName
+                      }}</span>
+                      <span class="description-day"
+                        >{{ eventsDay[time].timeA }}-{{
+                          eventsDay[time].timeB
+                        }}</span
+                      >
+                    </div>
                   </div>
-                </div>
-              </div>
+                </template>
+                <v-list>
+                  <v-list-item @click="">
+                    <span class="pl-2">{{ eventsDay }}</span>
+                  </v-list-item>
+                  <v-list-item @click="">
+                    <v-icon>mdi-logout-variant</v-icon>
+                    <span
+                      class="pl-2"
+                      @click="
+                        this.$router.push({
+                          path: `/`,
+                        })
+                      "
+                      >Sign out</span
+                    >
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </div>
           </div>
         </div>
@@ -326,11 +359,11 @@
             </div>
 
             <label
+              class="moreevent mt-2"
               v-if="hasMultipleEvents(cell.day, cell, currentDate)"
-              @click="seeMoreEvents(cell.day, cell, currentDate)"
-              style="font-size: 10px; margin-left: 10px"
+              style="font-size: 10px; margin-left: 10px; position: absolute"
             >
-              See More Events
+              + more events
             </label>
           </div>
         </div>
@@ -349,6 +382,7 @@ const patients = [
     toTime: "10.00",
     fromDate: "Tue, 12 Sep 2023",
     fromTime: "10.00",
+    value: "",
   },
   {
     id: "02",
@@ -358,6 +392,7 @@ const patients = [
     toTime: "10.00",
     fromDate: "Tue, 12 Sep 2023",
     fromTime: "10.00",
+    value: "",
   },
   {
     id: "03",
@@ -367,6 +402,7 @@ const patients = [
     toTime: "10.00",
     fromDate: "Tue, 12 Sep 2023",
     fromTime: "10.00",
+    value: "",
   },
   {
     id: "04",
@@ -376,6 +412,7 @@ const patients = [
     toTime: "10.00",
     fromDate: "Tue, 12 Sep 2023",
     fromTime: "10.00",
+    value: "",
   },
 ];
 </script>
@@ -385,6 +422,7 @@ export default {
   data() {
     return {
       request: 1,
+
       selectedViewType: "month",
       selectedDate: new Date(),
       currentMonth: "",
@@ -392,6 +430,7 @@ export default {
       currentDate: new Date(),
       currentYear: "",
       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      selectedEvent: {},
       timesDay: [
         "00:00",
         "01:00",
@@ -417,18 +456,76 @@ export default {
         "21:00",
         "22:00",
         "23:00",
+        "24:00",
+      ],
+      timesDayUse: [
+        "00:00",
+        "00:30",
+        "01:00",
+        "01:30",
+        "02:00",
+        "02:30",
+        "03:00",
+        "03:30",
+        "04:00",
+        "04:30",
+        "05:00",
+        "05:30",
+        "06:00",
+        "06:30",
+        "07:00",
+        "07:30",
+        "08:00",
+        "08:30",
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+        "13:00",
+        "13:30",
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
+        "17:00",
+        "17:30",
+        "18:00",
+        "18:30",
+        "19:00",
+        "19:30",
+        "20:00",
+        "20:30",
+        "21:00",
+        "21:30",
+        "22:00",
+        "22:30",
+        "23:00",
+        "23:30",
+        "24:00",
+        "24:30",
       ],
       eventsDay: {
         //เปลี่ยนวันแล้วให้ยิง api ไปดึงข้อมูลมาในแต่ละรอบ
-        "08:00": {
-          title: "Meeting",
-          description: "Team meeting",
-          color: "red",
+        "10:00": {
+          patientName: "John Smith’s session",
+          timeA: "10:00 ",
+          timeB: "11:00",
+        },
+        "13:30": {
+          patientName: "Jane Kim’s session",
+          timeA: "13:30",
+          timeB: "14:30",
         },
         "12:00": {
-          title: "Lunch",
-          description: "Lunch with colleagues",
-          color: "green",
+          patientName: "Jane Kim’s session",
+          timeA: "12:00",
+          timeB: "13:00",
         },
       },
       times: [
@@ -556,19 +653,19 @@ export default {
       const event = this.eventsDay[time];
 
       if (event) {
-        const index = this.timesDay.indexOf(time);
-        const positionTop = (index + 2.9) * 60;
+        const index = this.timesDayUse.indexOf(time);
+        const positionTop = (index + 5.7) * 30.1;
 
         return {
           height: "60px",
-          backgroundColor: event.color || "lightblue",
-          opacity: 0.5,
+          backgroundColor: "#3C9BF2",
           borderBottom: "1px solid #ccc",
           position: "absolute",
           top: `${positionTop}px`,
           left: "435px",
           right: "0",
           width: "950px",
+          borderRadius: "15px",
         };
       }
 
@@ -902,6 +999,13 @@ export default {
       console.log("opennnn");
       this.requestBarOpen = !this.requestBarOpen;
     },
+    toggleDetails(index) {
+      this.$set(
+        this.patientDetailsVisible,
+        index,
+        !this.patientDetailsVisible[index]
+      );
+    },
   },
   created() {
     this.selectedDate = new Date();
@@ -937,6 +1041,9 @@ h2 {
 
 <!-- Request Bar -->
 <style scoped>
+.hidden-details {
+  display: none;
+}
 .nametext {
   color: #000;
   font-family: "Poppins", sans-serif;
@@ -1012,7 +1119,16 @@ h2 {
   box-shadow: 0px 0px 2px 0px #569aff;
   position: relative;
 }
-
+.custom-chip-value {
+  width: 277px;
+  height: 194px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid #569aff;
+  box-shadow: 0px 0px 2px 0px #569aff;
+  background-color: #569aff;
+  position: relative;
+}
 .title {
   color: #000;
   font-family: "Poppins", sans-serif;
@@ -1089,7 +1205,7 @@ h2 {
 }
 
 .linee-day {
-  width: 94%;
+  width: 100%;
   height: 1px;
   background-color: #ccc;
   margin-left: auto;
@@ -1113,10 +1229,10 @@ h2 {
 
 .event-details-day {
   position: absolute;
-  top: 0; /* Set top to 0 to align events within the time slots */
-  left: 50%;
+  top: 0;
+  left: 10%;
   transform: translateX(-50%);
-  text-align: center;
+  text-align: left;
   z-index: 1;
   color: #fff;
 }
@@ -1126,9 +1242,9 @@ h2 {
   margin-bottom: 5px;
 }
 
-.event-day:hover .event-details-day {
-  display: flex; /* Show details on hover */
-}
+/* .event-day:hover .event-details-day {
+  display: flex; 
+} */
 
 .event-day:hover {
   background-color: #f0f0f0;
@@ -1223,10 +1339,10 @@ h2 {
 .event-box-pink {
   margin-top: 10px;
   position: absolute;
-  background-color: rgba(255, 192, 203, 0.5);
+  background-color: rgba(112, 229, 255, 0.33);
   width: 100%;
   height: 50px;
-
+  user-select: none;
   z-index: 0;
 }
 .event-info-time {
@@ -1238,6 +1354,7 @@ h2 {
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  user-select: none;
 }
 
 .event-info-name {
@@ -1256,6 +1373,7 @@ h2 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  user-select: none;
 }
 
 .day,
@@ -1278,6 +1396,7 @@ h2 {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  user-select: none;
   /* Increase cell spacing */
   /* gap: 10px; */
 }
@@ -1335,6 +1454,7 @@ h2 {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
+  z-index: 1;
 }
 .icon-bookcontainer:hover .icon {
   color: #f27456;
@@ -1348,6 +1468,7 @@ h2 {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
+  z-index: 1;
 }
 .icon-viewcontainer:hover .icon {
   color: #3c9bf2;
@@ -1361,5 +1482,10 @@ h2 {
 .icon-bookcontainer {
   text-align: left;
   margin-left: 20px;
+}
+
+.calendar-box:hover .event-box-pink,
+.calendar-box:hover .moreevent {
+  opacity: 0;
 }
 </style>
