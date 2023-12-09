@@ -128,7 +128,7 @@ router.post('/appoint_post', (req, res) => {
   if (!therapist_id || !patient_id || !date || !time) {
     return res.status(400).json({ error: 'therapist_id, patient_id, date, and time are required fields.' });
   }
-
+ 
   // If appointment_id is not provided, generate a unique identifier (assuming you are using PostgreSQL)
   if (!appointment_id) {
     const generateAppointmentIdQuery = 'SELECT NEXTVAL(\'appointment_id_seq\') AS appointment_id';
