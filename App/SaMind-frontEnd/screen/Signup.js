@@ -10,6 +10,7 @@ import {
   Platform,
   FlatList,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
@@ -25,12 +26,20 @@ export default function Login() {
   const { passwordVisibility1, togglePasswordVisibility1 } =
     usePasswordVisibility1();
   const [email, setEmail] = useState("");
-  const [fullname, setFullname] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [Conpassword, setConPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [isPickerVisible, setIsPickerVisible] = useState(false);
+  //validate
+  const [firstNameError, setFirstNameError] = useState(" ");
+  const [lastNameError, setLastNameError] = useState(" ");
+  const [emailError, setEmailError] = useState(" ");
+  const [passwordError, setPasswordError] = useState(" ");
+  const [conPasswordError, setConPasswordError] = useState(" ");
+  const [hospitalError, setHospitalError] = useState(" ");
   const items = [
     { id: 1, name: "โรงพยาบาลศิริราช", value: "โรงพยาบาลศิริราช" },
     {
@@ -44,6 +53,60 @@ export default function Login() {
     { id: 6, name: "Hospital 6", value: "hospital6" },
   ];
 
+  const handleSignupPress = () => {
+    // Reset previous error messages
+    setFirstNameError(" ");
+    setLastNameError(" ");
+    setEmailError(" ");
+    setPasswordError(" ");
+    setConPasswordError(" ");
+    setHospitalError(" ");
+
+    // Perform basic validation
+    if (!firstName) {
+      setFirstNameError("First name is required");
+    }
+    if (!lastName) {
+      setLastNameError("Last name is required");
+    }
+    if (!email) {
+      setEmailError("Email is required");
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+    }
+    if (!Conpassword) {
+      setConPasswordError("Confirm Password is required");
+    }
+    if (!selectedValue) {
+      setHospitalError("Please select a hospital");
+    }
+    if (
+      firstName &&
+      lastName &&
+      email &&
+      password &&
+      Conpassword &&
+      selectedValue &&
+      !isChecked
+    ) {
+      Alert.alert("Validation Error", "Please agree to Terms & Conditions");
+    }
+
+    if (
+      firstNameError === " " &&
+      lastNameError === " " &&
+      emailError === " " &&
+      passwordError === " " &&
+      conPasswordError === " " &&
+      hospitalError === " " &&
+      isChecked
+    ) {
+      console.log("in");
+      navigation.navigate("Signupinscreen", { animatedNodeTag });
+    }
+  };
+
   const handleCheckboxToggle = () => {
     setIsChecked(!isChecked);
   };
@@ -53,12 +116,8 @@ export default function Login() {
 
   const handleItemPress = (itemValue) => {
     console.log("Hospital --> ", itemValue);
-    // if (tapCount === 1) {
     setSelectedValue(itemValue.name);
     setIsPickerVisible(false);
-    // } else {
-    //   setTapCount(1);
-    // }
   };
 
   const renderLink = ({ item }) => {
@@ -86,27 +145,54 @@ export default function Login() {
       <View style={styles.container2}>
         <Text style={styles.wel}>Let's get started</Text>
         <TextInput
-          placeholder="Fullname"
+          placeholder="Firstname"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
-          value={fullname}
-          onChangeText={setFullname}
+          value={firstName}
+          onChangeText={(text) => {
+            setFirstName(text);
+            setFirstNameError(
+              text.trim() === "" ? "First name is required" : " "
+            );
+          }}
         />
+        <Text style={styles.errorText}>{firstNameError}</Text>
+        <TextInput
+          placeholder="Lastname"
+          placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
+          style={styles.TextInput}
+          value={lastName}
+          onChangeText={(text) => {
+            setLastName(text);
+            setLastNameError(
+              text.trim() === "" ? "Last name is required" : " "
+            );
+          }}
+        />
+        <Text style={styles.errorText}>{lastNameError}</Text>
         <TextInput
           placeholder="Email"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setEmailError(text.trim() === "" ? "Email is required" : " ");
+          }}
         />
+        <Text style={styles.errorText}>{emailError}</Text>
         <TextInput
           placeholder="Password"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           secureTextEntry={passwordVisibility}
           style={styles.TextInput}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            setPasswordError(text.trim() === "" ? "Password is required" : " ");
+          }}
         />
+        <Text style={styles.errorText}>{passwordError}</Text>
         <TouchableOpacity
           style={styles.eyeI}
           onPress={togglePasswordVisibility}
@@ -123,8 +209,14 @@ export default function Login() {
           secureTextEntry={passwordVisibility1}
           style={styles.TextInput2}
           value={Conpassword}
-          onChangeText={setConPassword}
+          onChangeText={(text) => {
+            setConPassword(text);
+            setConPasswordError(
+              text.trim() === "" ? "Confirm Password is required" : " "
+            );
+          }}
         />
+        <Text style={styles.errorText}>{conPasswordError}</Text>
         <TouchableOpacity
           style={styles.eyeI}
           onPress={togglePasswordVisibility1}
@@ -149,6 +241,7 @@ export default function Login() {
           editable={false}
           value={selectedValue ? selectedValue : ""}
         />
+
         <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker}>
           <Ionicons
             name="chevron-back-outline"
@@ -169,7 +262,7 @@ export default function Login() {
             style={styles.list}
           />
         ) : null}
-
+        <Text style={styles.errorText2}>{hospitalError}</Text>
         <View
           style={{
             flexDirection: "row",
@@ -186,7 +279,7 @@ export default function Login() {
             />
           </TouchableOpacity>
           <Text style={styles.n}>
-            I agree to {"  "}
+            I agree to{" "}
             <Text
               style={styles.hyper}
               onPress={() => navigation.navigate("Signupscreen")}
@@ -197,13 +290,11 @@ export default function Login() {
         </View>
         <TouchableOpacity
           style={styles.loginb}
-          onPress={() =>
-            navigation.navigate("Signupinscreen", { animatedNodeTag })
-          }
+          onPress={() => handleSignupPress()}
         >
           <Text style={styles.text}>Sign up</Text>
         </TouchableOpacity>
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -237,7 +328,7 @@ export default function Login() {
             source={require("../assets/facebook.png")}
             style={styles.icon}
           />
-        </View>
+        </View> */}
       </View>
       {/* </View> */}
     </ImageBackground>
@@ -289,7 +380,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // height: "4.75%",
     // width: "80%",
-    width: 265,
+    width: 250,
     // marginBottom: "2%",
     marginBottom: verticalScale(6.5),
     // marginBottom: 6.7,
@@ -302,7 +393,7 @@ const styles = StyleSheet.create({
   },
   hospital: {
     textAlign: "left",
-    marginRight: "63%",
+    marginRight: "59%",
     marginTop: 25,
     color: "rgba(86, 154, 255, 0.52)",
   },
@@ -313,11 +404,11 @@ const styles = StyleSheet.create({
         marginTop: verticalScale(338),
       },
       ios: {
-        marginTop: verticalScale(330),
+        marginTop: verticalScale(376),
       },
     }),
     // height: verticalScale(38.35),
-    width: 265,
+    width: 250,
     marginBottom: verticalScale(6.5),
     borderColor: "#3987FD",
     borderWidth: 1,
@@ -345,7 +436,7 @@ const styles = StyleSheet.create({
     // height: "4.75%",
     // width: "80%",
     // width: horizontalScale(255),
-    width: 265,
+    width: 250,
     // marginBottom: "2%",
     marginBottom: verticalScale(6.6),
     // marginBottom: 6.7,
@@ -359,7 +450,7 @@ const styles = StyleSheet.create({
   eyeI: {
     // position: "absolute",
     // marginLeft: "70%",
-    marginLeft: 232,
+    marginLeft: 220,
     // marginTop: "-12%",
     // marginTop: verticalScale(-38.5),
     marginTop: -36,
@@ -431,9 +522,43 @@ const styles = StyleSheet.create({
       },
     }),
     position: "absolute",
-    width: "77.5%",
+    width: "70.5%",
 
-    marginTop: "112.5%",
+    marginTop: "128.5%",
+    zIndex: 1,
+  },
+  errorText: {
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
+    fontSize: 10,
+    // position: "absolute",
+    // marginTop: "44%",
+    marginTop: "-1%",
+    marginBottom: "-2.8%",
+    textAlign: "left",
+    alignSelf: "flex-start",
+    // left: 70,
+    left: 40,
+    color: "red",
+    zIndex: 1,
+  },
+  errorText2: {
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
+    fontSize: 10,
+    // position: "absolute",
+    // marginTop: "44%",
+    marginTop: "3.9%",
+    marginBottom: "-3.5%",
+    textAlign: "left",
+    alignSelf: "flex-start",
+    // left: 70,
+    left: 40,
+    color: "red",
     zIndex: 1,
   },
 });
