@@ -5,11 +5,12 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function Notification() {
+export default function Notification({ route }) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log("General Test Screen");
+    console.log("General Test Screen", patientId);
   }, []);
 
   return (
@@ -78,7 +79,9 @@ export default function Notification() {
                   marginLeft: "80%",
                   transform: [{ rotate: "180deg" }],
                 }}
-                onPress={() => navigation.navigate("Phq9testscreen")}
+                onPress={() =>
+                  navigation.navigate("Phq9testscreen", { patientId })
+                }
               />
             </View>
           </View>
@@ -123,7 +126,9 @@ export default function Notification() {
                   marginLeft: "80%",
                   transform: [{ rotate: "180deg" }],
                 }}
-                onPress={() => navigation.navigate("Q2testscreen")}
+                onPress={() =>
+                  navigation.navigate("Q2testscreen", { patientId })
+                }
               />
             </View>
           </View>

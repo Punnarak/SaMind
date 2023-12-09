@@ -25,7 +25,7 @@ export default function Upcoming({ route }) {
 
   useEffect(() => {
     console.log("Upcoming Screen");
-    console.log("testttt", data)
+    console.log("testttt", data);
     const dateStrings = [year + "-" + month + "-" + date];
     console.log(dateStrings);
     const dateFormat = "YYYY-MM-DD";

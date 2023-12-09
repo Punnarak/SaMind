@@ -24,11 +24,50 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [patientId, setPatientId] = useState(123);
+  //validate
+  const [checkEmail, setCheckEmail] = useState(false);
+  const [emailError, setEmailError] = useState(" ");
+  const [passwordError, setPasswordError] = useState(" ");
 
   useEffect(() => {
     console.log("Login Screen");
   }, []);
 
+  useEffect(() => {
+    if (email != "") {
+      validateEmail();
+    }
+  }, [email]);
+
+  const handleLoginPress = () => {
+    setEmailError(" ");
+    setPasswordError(" ");
+
+    validateEmail();
+    if (!email) {
+      setEmailError("Email is required");
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+    }
+    if (email && password && checkEmail === true) {
+      console.log("Login Complete");
+      // setPatientId("123");
+      navigation.navigate("Homescreen", { patientId });
+    }
+  };
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      setCheckEmail(false);
+      setEmailError("Invalid email address. Please enter a valid email.");
+    } else {
+      setCheckEmail(true);
+      setEmailError(" ");
+    }
+  };
   return (
     <View style={styles.container1}>
       <ImageBackground
@@ -43,17 +82,27 @@ export default function Login() {
             placeholderTextColor={"#rgba(86, 154, 255, 0.52)"}
             style={styles.TextInput}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+
+              setEmailError(text.trim() === "" ? "Email is required" : " ");
+            }}
           />
+          <Text style={styles.errorText}>{emailError}</Text>
           <TextInput
             placeholder="Password"
             placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
             secureTextEntry={passwordVisibility}
             style={styles.TextInput}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              setPasswordError(
+                text.trim() === "" ? "Password is required" : " "
+              );
+            }}
           />
-
+          <Text style={styles.errorText}>{passwordError}</Text>
           <TouchableOpacity
             style={styles.eyeI}
             onPress={togglePasswordVisibility}
@@ -79,7 +128,7 @@ export default function Login() {
 
           <TouchableOpacity
             style={styles.loginb}
-            onPress={() => navigation.navigate("Homescreen")}
+            onPress={() => handleLoginPress()}
           >
             <Text style={styles.text}>Sign in</Text>
           </TouchableOpacity>
@@ -93,7 +142,7 @@ export default function Login() {
               Sign up
             </Text>
           </Text>
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -141,7 +190,7 @@ export default function Login() {
                 style={styles.icon}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </ImageBackground>
     </View>
@@ -246,5 +295,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: "7%",
     resizeMode: "contain",
+  },
+  errorText: {
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
+    fontSize: 10,
+    marginTop: "-3%",
+    marginBottom: "-2.8%",
+    textAlign: "left",
+    alignSelf: "flex-start",
+    left: 35,
+    color: "red",
+    zIndex: 1,
   },
 });
