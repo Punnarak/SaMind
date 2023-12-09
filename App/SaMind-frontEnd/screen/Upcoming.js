@@ -14,18 +14,18 @@ import moment from "moment";
 // import data from "../upcomingData";
 import UpcomingBox from "../upcomingbox";
 import AssignmentBox from "../AssigmentBox";
-import assignData from "../assignData";
+// import assignData from "../assignData";
 import axios from "./axios.js";
 
 export default function Upcoming({ route }) {
   const navigation = useNavigation();
-  const { data, date, month, year } = route.params || {};
+  const { patientId, data, date, month, year } = route.params || {};
   const [datas, setData] = useState([]);
-  const [selectedMenu, setSelectedMenu] = useState("a");
+  const [selectedMenu, setSelectedMenu] = useState("daily");
+  const [assignData, setAssignData] = useState([]);
 
   useEffect(() => {
-    console.log("Upcoming Screen");
-    console.log("testttt", data);
+    console.log("Upcoming Screen", patientId);
     const dateStrings = [year + "-" + month + "-" + date];
     console.log(dateStrings);
     const dateFormat = "YYYY-MM-DD";
@@ -33,11 +33,47 @@ export default function Upcoming({ route }) {
       moment(dateString, dateFormat).toDate()
     );
     setData(dates);
+    const param = {
+      patient_id: patientId,
+      type: selectedMenu,
+    };
+    axios
+      .post("/assignmentInfo_post", param)
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          setAssignData(response.data)
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   }, []);
 
   console.log("date--> " + date);
   const handleMenuPress = (menu) => {
     setSelectedMenu(menu);
+    const param = {
+      patient_id: patientId,
+      type: menu,
+    };
+    axios
+      .post("/assignmentInfo_post", param)
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          setAssignData(response.data)
+        }
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   };
 
   const isMenuSelected = (menu) => {
@@ -92,14 +128,14 @@ export default function Upcoming({ route }) {
         <TouchableOpacity
           style={[
             styles.menuItem,
-            isMenuSelected("a") && styles.selectedMenuItem,
+            isMenuSelected("daily") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("a")}
+          onPress={() => handleMenuPress("daily")}
         >
           <Text
             style={[
               styles.menuText,
-              isMenuSelected("a") && styles.selectedMenuText,
+              isMenuSelected("daily") && styles.selectedMenuText,
             ]}
           >
             Daily
@@ -108,14 +144,14 @@ export default function Upcoming({ route }) {
         <TouchableOpacity
           style={[
             styles.menuItem,
-            isMenuSelected("b") && styles.selectedMenuItem,
+            isMenuSelected("weekly") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("b")}
+          onPress={() => handleMenuPress("weekly")}
         >
           <Text
             style={[
               styles.menuText,
-              isMenuSelected("b") && styles.selectedMenuText,
+              isMenuSelected("weekly") && styles.selectedMenuText,
             ]}
           >
             Weekly
@@ -124,14 +160,14 @@ export default function Upcoming({ route }) {
         <TouchableOpacity
           style={[
             styles.menuItem,
-            isMenuSelected("c") && styles.selectedMenuItem,
+            isMenuSelected("monthly") && styles.selectedMenuItem,
           ]}
-          onPress={() => handleMenuPress("c")}
+          onPress={() => handleMenuPress("monthly")}
         >
           <Text
             style={[
               styles.menuText,
-              isMenuSelected("c") && styles.selectedMenuText,
+              isMenuSelected("monthly") && styles.selectedMenuText,
             ]}
           >
             Monthly
@@ -147,23 +183,23 @@ export default function Upcoming({ route }) {
           flex: 1,
         }}
       >
-        {selectedMenu == "a" && (
+        {selectedMenu == "daily" && (
           <ScrollView style={{}}>
-            {assignData[0].map((item, index) => (
+            {assignData.map((item, index) => (
               <AssignmentBox item={item} index={index} key={index} />
             ))}
           </ScrollView>
         )}
-        {selectedMenu == "b" && (
+        {selectedMenu == "weekly" && (
           <ScrollView style={{}}>
-            {assignData[1].map((item, index) => (
+            {assignData.map((item, index) => (
               <AssignmentBox item={item} index={index} key={index} />
             ))}
           </ScrollView>
         )}
-        {selectedMenu == "c" && (
+        {selectedMenu == "monthly" && (
           <ScrollView style={{}}>
-            {assignData[2].map((item, index) => (
+            {assignData.map((item, index) => (
               <AssignmentBox item={item} index={index} key={index} />
             ))}
           </ScrollView>

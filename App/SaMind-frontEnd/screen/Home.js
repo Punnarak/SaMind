@@ -51,10 +51,11 @@ export default function Home({ route }) {
           setDisabled(false);
         }
         if (response.data.fname) {
+          console.log("DDDDDD", response.data.fname);
           setFName(response.data.fname);
         }
         setSelectedMenu(response.data.moodscore);
-        console.log("checkin", response.data.checkin);
+        console.log("checkin", response.data.checkin, response.data.fname);
       })
       .catch((error) => {
         console.error("Axios error:", error);

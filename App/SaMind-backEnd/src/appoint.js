@@ -6,25 +6,25 @@ const client = require('./connection.js');
 // Use bodyParser middleware to parse JSON in the request body
 router.use(bodyParser.json());
 
-// router.post('/appoint_post', (req, res) => {
-//   const { appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint } = req.body;
+router.post('/appoint_post_byAdmin', (req, res) => {
+  const { appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint } = req.body;
 
-//   if (!appointment_id || !therapist_id || !patient_id || !date || !time || !location) {
-//     return res.status(400).json({ error: 'Both appointment_id, therapist_id, patient_id, date, time, location are required fields.' });
-//   }
+  if (!appointment_id || !therapist_id || !patient_id || !date || !time || !location) {
+    return res.status(400).json({ error: 'Both appointment_id, therapist_id, patient_id, date, time, location are required fields.' });
+  }
 
-//   // Use CURRENT_TIMESTAMP for the update_date column
-//   const insertQuery = 'INSERT INTO appointment (appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint, update_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP) RETURNING *';
+  // Use CURRENT_TIMESTAMP for the update_date column
+  const insertQuery = 'INSERT INTO appointment (appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint, update_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP) RETURNING *';
 
-//   client.query(insertQuery, [appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint])
-//     .then(result => {
-//       res.status(201).json(result.rows[0]);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
+  client.query(insertQuery, [appointment_id, therapist_id, patient_id, date, time, location, create_by, confirm, type_appoint])
+    .then(result => {
+      res.status(201).json(result.rows[0]);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
 
 // router.post('/appoint_post', (req, res) => {
 //   const { appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
