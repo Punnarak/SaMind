@@ -132,7 +132,7 @@ router.post('/appoint_post', (req, res) => {
   // If appointment_id is not provided, generate a unique identifier (assuming you are using PostgreSQL)
   if (!appointment_id) {
     const generateAppointmentIdQuery = 'SELECT NEXTVAL(\'appointment_id_seq\') AS appointment_id';
-
+ 
     client.query(generateAppointmentIdQuery)
       .then(result => {
         appointment_id = result.rows[0].appointment_id;
