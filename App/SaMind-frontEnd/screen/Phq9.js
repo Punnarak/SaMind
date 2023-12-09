@@ -17,7 +17,8 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics.js";
 import Modal from "react-native-modal";
 import axios from "./axios.js";
 
-export default function Notification() {
+export default function Notification({ route }) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
 
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -212,10 +213,10 @@ export default function Notification() {
       setScore(result);
     }
     const param = {
-      "score": result,
-      "type": "PHQ9",
-      "patient_id": 123
-  };
+      score: result,
+      type: "PHQ9",
+      patient_id: patientId,
+    };
     axios
       .post("/score_question_post", param)
       .then((response) => {

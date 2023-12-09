@@ -26,38 +26,37 @@ import axios from "./axios.js";
 
 const isAndroid = Platform.OS === "android";
 
-export default function Login() {
+export default function Home({ route }) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [selectedMenu, setSelectedMenu] = useState();
   const [checkIn, setCheckIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
-  const [fName, setFName] = useState("");
+  const [fName, setFName] = useState("Punya");
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   useEffect(() => {
-    console.log("Home Screen");
+    console.log("Home Screen", patientId);
     const param = {
-      "patient_id": 123,
+      patient_id: patientId,
     };
     axios
       .post("/check_mood_per_day_get", param)
       .then((response) => {
-        if(response.data.checkin === true){
-          setCheckIn(true)
-          setDisabled(true)
+        if (response.data.checkin === true) {
+          setCheckIn(true);
+          setDisabled(true);
         } else {
-          setCheckIn(false)
-          setDisabled(false)
+          setCheckIn(false);
+          setDisabled(false);
         }
-        if(response.data.fname){
-          setFName(response.data.fname)
+        if (response.data.fname) {
+          setFName(response.data.fname);
         }
-        setSelectedMenu(response.data.moodscore)
-        
+        setSelectedMenu(response.data.moodscore);
         console.log("checkin", response.data.checkin);
       })
       .catch((error) => {
-        // Handle any errors here
         console.error("Axios error:", error);
       });
   }, []);
@@ -83,8 +82,8 @@ export default function Login() {
       setDisabled(true);
       setCheckIn(true);
       const param = {
-        "patient_id": 123,
-        "score" : selectedMenu
+        patient_id: patientId,
+        score: selectedMenu,
       };
       axios
         .post("/mood_tracker_post", param)
@@ -92,10 +91,8 @@ export default function Login() {
           console.log("checkin complete", response.data);
         })
         .catch((error) => {
-          // Handle any errors here
           console.error("Axios error:", error);
         });
-
     } else {
       setDisabled(false);
       setCheckIn(false);
@@ -127,7 +124,7 @@ export default function Login() {
       </View>
       <Text style={styles.n}>
         Hi{"  "}
-        <Text style={styles.name}>{fName !== "" ? fName : "Punya"}</Text>
+        <Text style={styles.name}>{fName}</Text>
       </Text>
       <Text style={styles.n1}>How are you feeling today?</Text>
       <View
@@ -237,7 +234,9 @@ export default function Login() {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Appointmentscreen")}
+              onPress={() =>
+                navigation.navigate("Appointmentscreen", { patientId })
+              }
             >
               <Text style={styles.Textb}>APPOINTMENT</Text>
               <Icon
@@ -250,7 +249,9 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Calendarscreen")}
+              onPress={() =>
+                navigation.navigate("Calendarscreen", { patientId })
+              }
             >
               <Text style={styles.Textb}>CALENDAR</Text>
               <I
@@ -316,7 +317,7 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Testscreen")}
+              onPress={() => navigation.navigate("Testscreen", { patientId })}
             >
               <Text style={styles.Textb}>TEST</Text>
               <I
@@ -459,7 +460,6 @@ const styles = StyleSheet.create({
     marginTop: "1%",
     marginLeft: "55%",
     fontWeight: "bold",
-  
   },
   // checkin button
   checkinb: {
@@ -497,9 +497,7 @@ const styles = StyleSheet.create({
         left: 30,
         width: horizontalScale(150),
       },
-      ios: {
-        
-      },
+      ios: {},
     }),
     fontSize: moderateScale(23),
     // fontSize: 23,
@@ -508,7 +506,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     // marginRight: "62%",
     marginRight: horizontalScale(233.5),
-  
   },
   // How are you feeling today?
   n1: {

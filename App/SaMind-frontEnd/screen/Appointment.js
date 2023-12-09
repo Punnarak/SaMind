@@ -24,12 +24,12 @@ export default function Calendar({ route }) {
   const [confirm, setConfirm] = useState(false);
   const [showdate, setshowdate] = useState([]);
   //   const [isCalendarVisible, setCalendarVisible] = useState(true);
-  const { date, month, year } = route.params || {};
+  const { patientId } = route.params || {};
 
   useEffect(() => {
-    console.log("Appointment Screen");
+    console.log("Appointment Screen", patientId);
     const param = {
-      "patient_id": 123
+      patient_id: patientId,
     };
     let dateStrings;
     axios

@@ -7,19 +7,20 @@ import moment from "moment";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import axios from "./axios.js";
 
-export default function Calendar() {
-  useEffect(() => {
-    console.log("Calendar Screen");
-  }, []);
-
+export default function Calendar({ route }) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
+    console.log("Calendar Screen", patientId);
+  }, []);
+
+  useEffect(() => {
     // const dateStrings = ["2023-10-27", "2023-10-30"];
     let dateStrings;
     const param = {
-      "patient_id": 124
+      patient_id: patientId,
     };
     axios
       .post("/appoint_patient_post", param)
@@ -54,13 +55,13 @@ export default function Calendar() {
     if (highlightedDatesFormat.includes(selectedDate)) {
       let data = [];
       const param = {
-        "patient_id": 124,
-        "date": selectedDate
+        patient_id: patientId,
+        date: selectedDate,
       };
 
       try {
         const response = await axios.post("/upcoming_date_post", param);
-  
+
         if (response.data.length !== 0) {
           console.log("OUT");
           data = response.data;
@@ -69,7 +70,8 @@ export default function Calendar() {
       } catch (error) {
         // Handle any errors here
         console.error("Axios error:", error);
-      }}
+      }
+    }
   };
 
   return (

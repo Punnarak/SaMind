@@ -11,12 +11,13 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function Notification() {
+export default function Notification({ route }) {
+  const { patientId } = route.params || {};
   const [disabled, setDisabled] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log("Test Screen");
+    console.log("Test Screen", patientId);
   }, []);
 
   return (
@@ -61,7 +62,9 @@ export default function Notification() {
         <View style={styles.container3}>
           <TouchableOpacity
             style={styles.box}
-            onPress={() => navigation.navigate("Generaltestscreen")}
+            onPress={() =>
+              navigation.navigate("Generaltestscreen", { patientId })
+            }
           >
             <Text
               style={{
