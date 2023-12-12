@@ -57,6 +57,8 @@ router.get('/question', (req, res) => {
     });
 });
 
+
+
 router.post('/questionAdd', (req, res) => {
   const requestData = req.body; // Assuming req.body is an array of objects
   // const email = req.body;
@@ -110,13 +112,55 @@ router.post('/questionAdd', (req, res) => {
     });
 });
 
-router.get('/questiontype', (req, res) => {
-  let query = 'SELECT DISTINCT type FROM questionnaire_new';
+// router.get('/questiontype', (req, res) => {
+//   let query = 'SELECT DISTINCT type FROM questionnaire_new';
 
-  client.query(query)
+//   client.query(query)
+//     .then(result => {
+//       const types = result.rows.map(row => row.type);
+//       res.json(types);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/assignment_status_wait', (req, res) => {
+  const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
+
+  // Use $1 as a placeholder for the parameter in the query
+  let query = 'SELECT test_name FROM assignment WHERE patient_id = $1 AND status = $2';
+
+  // Pass an array of parameter values as the second argument to the query function
+  client.query(query, [patientId, 'WAIT'])
     .then(result => {
-      const types = result.rows.map(row => row.type);
-      res.json(types);
+      const testNames = result.rows.map(row => row.test_name);
+      res.json(testNames);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.post('/individual_test_post', (req, res) => {
+  const patientId = req.body.patient_id;
+  const testName = req.body.test_name;
+
+  // Use $1 and $2 as placeholders for the parameters in the query
+  let query = `
+    SELECT assignment.*, questionnaire_new2.question, questionnaire_new2.options
+    FROM assignment
+    LEFT JOIN questionnaire_new2 ON questionnaire_new2.test_name = assignment.test_name
+    WHERE assignment.patient_id = $1 AND assignment.test_name = $2 AND assignment.status = 'WAIT'
+  `;
+
+  // Pass an array of parameter values as the second argument to the query function
+  client.query(query, [patientId, testName])
+    .then(result => {
+      const testData = result.rows;
+      res.json(testData);
     })
     .catch(err => {
       console.error('Error executing query:', err);
