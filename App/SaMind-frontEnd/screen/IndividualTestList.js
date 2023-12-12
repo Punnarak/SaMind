@@ -91,9 +91,19 @@ export default function IndividualTestList({ route }) {
                         fontSize: 10,
                         color: "#569AFF",
                         fontStyle: "italic",
+                        marginTop: 8,
                       }}
                     >
                       detail: {item.detail}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: "#569AFF",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Turn in before: {item.turnInBefore}
                     </Text>
                   </View>
                   <Ionicons
@@ -154,7 +164,7 @@ const styles = StyleSheet.create({
   container3: {
     backgroundColor: "white",
     alignItems: "center",
-    width: "650%",
+    width: "790%",
     height: "77%",
     paddingTop: 10,
     flex: 1,
@@ -167,7 +177,7 @@ const styles = StyleSheet.create({
     marginTop: "5%",
     width: "100%",
     paddingHorizontal: "3%",
-    paddingVertical: "10%",
+    paddingVertical: "6%",
   },
   header: {
     fontSize: 16,
