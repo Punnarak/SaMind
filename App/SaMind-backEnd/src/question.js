@@ -126,17 +126,41 @@ router.post('/questionAdd', (req, res) => {
 //     });
 // });
 
+// router.post('/assignment_status_wait', (req, res) => {
+//   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
+
+//   // Use $1 as a placeholder for the parameter in the query
+//   let query = 'SELECT test_name FROM assignment WHERE patient_id = $1 AND status = $2';
+
+//   // Pass an array of parameter values as the second argument to the query function
+//   client.query(query, [patientId, 'WAIT'])
+//     .then(result => {
+//       const testNames = result.rows.map(row => row.test_name);
+//       res.json(testNames);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/assignment_status_wait', (req, res) => {
   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
 
   // Use $1 as a placeholder for the parameter in the query
-  let query = 'SELECT test_name FROM assignment WHERE patient_id = $1 AND status = $2';
+  let query = 'SELECT test_name, detail, turn_in_before FROM assignment WHERE patient_id = $1 AND status = $2';
 
   // Pass an array of parameter values as the second argument to the query function
   client.query(query, [patientId, 'WAIT'])
     .then(result => {
-      const testNames = result.rows.map(row => row.test_name);
-      res.json(testNames);
+      // Assuming your result.rows has the columns test_name, detail, turn_in_before
+      const assignments = result.rows.map(row => ({
+        test_name: row.test_name,
+        detail: row.detail,
+        turn_in_before: row.turn_in_before
+      }));
+
+      res.json(assignments);
     })
     .catch(err => {
       console.error('Error executing query:', err);

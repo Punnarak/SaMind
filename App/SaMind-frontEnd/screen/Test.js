@@ -14,7 +14,7 @@ import axios from "./axios.js";
 
 export default function Notification({ route }) {
   const { patientId } = route.params || {};
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
