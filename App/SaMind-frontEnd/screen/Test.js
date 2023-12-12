@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function Notification({ route }) {
   const { patientId } = route.params || {};
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -80,7 +80,9 @@ export default function Notification({ route }) {
           <TouchableOpacity
             style={disabled ? styles.disabledindibox : styles.indibox}
             disabled={disabled}
-            onPress={() => navigation.navigate("Homescreen")}
+            onPress={() =>
+              navigation.navigate("IndividualTestListScreen", { patientId })
+            }
           >
             <Text
               style={
@@ -109,14 +111,14 @@ export default function Notification({ route }) {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("NotiScreen")}
           />
           <Feather
             name="smile"
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Loginscreen")}
+            onPress={() => navigation.navigate("Avatarscreen")}
           />
         </View>
       </View>

@@ -22,6 +22,8 @@ import Signupinscreen from "./screen/SignupIn";
 import Generaltestscreen from "./screen/GeneralTest";
 import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
+import IndividualTestListScreen from "./screen/IndividualTestList";
+import IndividualTestScreen from "./screen/IndividualTest";
 
 const Stack = createStackNavigator();
 
@@ -106,6 +108,16 @@ const MainStack = () => {
       <Stack.Screen
         name="Q2testscreen"
         component={Q2testscreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestListScreen"
+        component={IndividualTestListScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestScreen"
+        component={IndividualTestScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
