@@ -84,7 +84,8 @@ export default function IndividualTestList({ route }) {
                         fontStyle: "italic",
                       }}
                     >
-                      {item.title}
+                      {item.createBy}{" "}
+                      {item.testName}
                     </Text>
                     <Text
                       style={{

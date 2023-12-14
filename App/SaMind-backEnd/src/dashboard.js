@@ -121,9 +121,6 @@ router.post('/mood_tracker_post', async (req, res) => {
   }
 });
 
-
-
-
 router.get('/average_scores', async (req, res) => {
   const { patient_id } = req.query;
 
@@ -237,12 +234,6 @@ router.post('/check_mood_per_day_get', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
-
-
-
-
-
-
 
 
 // router.get('/dash_mood_detection', (req, res) => {

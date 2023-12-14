@@ -63,7 +63,7 @@ export default function Upcoming({ route }) {
     axios
       .post("/assignmentInfo_post", param)
       .then((response) => {
-        if (response.data.length != 0) {
+        if (response.data.length != null) {
           console.log("in");
           setAssignData(response.data)
         }
@@ -186,7 +186,7 @@ export default function Upcoming({ route }) {
         {selectedMenu == "daily" && (
           <ScrollView style={{}}>
             {assignData.map((item, index) => (
-              <AssignmentBox item={item} index={index} key={index} />
+              <AssignmentBox item={item} index={index} key={index} /> 
             ))}
           </ScrollView>
         )}
