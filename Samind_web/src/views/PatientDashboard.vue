@@ -165,6 +165,22 @@
               <label class="title mr-16" style="font-weight: bold"
                 >Score Test
               </label>
+              <span class="mr-16 ml-16"></span>
+
+              <label
+                class="hyper mr-16"
+                style="font-weight: bold"
+                @click="
+                  this.$router.push({
+                    path: 'patienttesthistory',
+                    query: {
+                      patientName: patientName,
+                    },
+                  })
+                "
+                >See All
+              </label>
+
               <v-chip
                 class="mt-5 ml-5"
                 style="
@@ -307,6 +323,21 @@ export default {
   font-style: normal;
   font-weight: 600;
   /* line-height: normal; */
+}
+
+.hyper {
+  color: #3c9bf2;
+  text-align: right;
+  font-family: "Montserrat", sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.hyper:hover {
+  cursor: pointer;
+  text-shadow: 2px 2px 4px rgba(84, 147, 248, 0.5);
 }
 
 .moodresult {

@@ -48,6 +48,16 @@ const router = createRouter({
           component: () => import("../views/PatientDashboard.vue"),
           props: true,
         },
+        {
+          path: "patienttesthistory",
+          component: () => import("../views/TestHistory.vue"),
+          props: true,
+        },
+        {
+          path: "referral",
+          component: () => import("../views/Referral.vue"),
+          props: true,
+        },
       ],
     },
   ],

@@ -4,7 +4,7 @@
       style="z-index: 9999; background-color: transparent; position: fixed"
     >
       <v-container fluid>
-        <v-col v-if="requestBarOpen" class="request-bar" col="4">
+        <v-col v-if="requestBarOpen === true" class="request-bar" col="4">
           <v-navigation-drawer
             color="white"
             location="right"
@@ -23,9 +23,6 @@
                 <v-list-item
                   v-for="(patient, patientIndex) in patients"
                   :key="patientIndex"
-                  :class="{
-                    'hidden-details': patientDetailsVisible[patientIndex],
-                  }"
                   class="custom-chip mb-5"
                 >
                   <div style="margin-top: -10px" v-if="patient.value == ''">
@@ -170,9 +167,9 @@
           v-if="selectedViewType === 'week'"
           cols="4"
         >
-          <button @click="prevMonth"><v-icon>mdi-chevron-left</v-icon></button>
-          <h2 style="width: 200px">{{ currentMonth }}</h2>
-          <button @click="nextMonth"><v-icon>mdi-chevron-right</v-icon></button>
+          <button @click="prevWeek"><v-icon>mdi-chevron-left</v-icon></button>
+          <h2 style="width: 200px">{{ currentWeekRange() }}</h2>
+          <button @click="nextWeek"><v-icon>mdi-chevron-right</v-icon></button>
         </v-col>
         <v-col
           class="calendar-header"
@@ -417,15 +414,16 @@ const patients = [
 ];
 </script>
 <script>
+import { startOfWeek, endOfWeek, format } from "date-fns";
 export default {
   components: {},
   data() {
     return {
       request: 1,
-
       selectedViewType: "month",
       selectedDate: new Date(),
       currentMonth: "",
+      currentWeek: "",
       calendarGrid: [],
       currentDate: new Date(),
       currentYear: "",
@@ -528,17 +526,6 @@ export default {
           timeB: "13:00",
         },
       },
-      times: [
-        "8:00 AM",
-        "9:00 AM",
-        "10:00 AM",
-        "11:00 AM",
-        "12:00 PM",
-        "1:00 PM",
-        "2:00 PM",
-        "3:00 PM",
-        "4:00 PM",
-      ],
       events: [
         {
           id: 1,
@@ -564,7 +551,6 @@ export default {
           date: "2-12-2023",
           time: "10:00",
         },
-        // ... เพิ่มเหตุการณ์อื่น ๆ ตามต้องการ
       ],
       months: [
         "January",
@@ -613,13 +599,13 @@ export default {
     //Calendar Day
     currentDay() {
       const days = [
+        "Sunday",
         "Monday",
         "Tuesday",
         "Wednesday",
         "Thursday",
         "Friday",
         "Saturday",
-        "Sunday",
       ];
       return (
         days[
@@ -637,7 +623,6 @@ export default {
       this.selectedDate = nextDay;
       this.currentDate = nextDay;
       console.log("currentDay", this.currentDate);
-
       this.updateCalendar();
     },
     prevDay() {
@@ -646,16 +631,13 @@ export default {
       this.selectedDate = prevDay;
       this.currentDate = prevDay;
       console.log("currentDay", this.currentDate);
-
       this.updateCalendar();
     },
     getEventStyle(time) {
       const event = this.eventsDay[time];
-
       if (event) {
         const index = this.timesDayUse.indexOf(time);
         const positionTop = (index + 5.7) * 30.1;
-
         return {
           height: "60px",
           backgroundColor: "#3C9BF2",
@@ -668,7 +650,6 @@ export default {
           borderRadius: "15px",
         };
       }
-
       return {
         height: "60px",
         backgroundColor: "transparent",
@@ -676,6 +657,32 @@ export default {
       };
     },
     //Calendar Week
+    currentWeekRange() {
+      const start = startOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const end = endOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const startFormat = format(start, "d MMM");
+      const endFormat = format(end, "d MMM");
+
+      return `${startFormat} - ${endFormat}`;
+    },
+    prevWeek() {
+      const prevWeekStart = startOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const prevWeekEnd = endOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const prevWeekEndDate = new Date(prevWeekStart);
+      prevWeekEndDate.setDate(prevWeekEndDate.getDate() - 1);
+
+      this.currentDate = prevWeekEndDate;
+      this.updateCalendar();
+    },
+    nextWeek() {
+      const nextWeekStart = startOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const nextWeekEnd = endOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const nextWeekStartDate = new Date(nextWeekEnd);
+      nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 1);
+
+      this.currentDate = nextWeekStartDate;
+      this.updateCalendar();
+    },
     isCurrentDay(dayIndex) {
       const currentDate = new Date(this.currentDate);
       currentDate.setDate(
@@ -757,7 +764,6 @@ export default {
       } else if (cell.class === "next-month-day") {
         if (tempMonth + 1 >= 12) {
           tempMonth = 0;
-
           month = tempMonth + 1;
           year = tempYear + 1;
         } else {
@@ -766,11 +772,6 @@ export default {
         }
       }
       // ดึงข้อมูลเหตุการณ์ทั้งหมดในวันที่กำหนด
-      console.log(
-        this.events.filter(
-          (event) => event.date === day + "-" + month + "-" + year
-        )
-      );
       return this.events.filter(
         (event) => event.date === day + "-" + month + "-" + year
       );
@@ -780,7 +781,6 @@ export default {
       return events.sort((a, b) => {
         const timeA = a.time.split(":").map(Number);
         const timeB = b.time.split(":").map(Number);
-
         if (timeA[0] !== timeB[0]) {
           return timeA[0] - timeB[0];
         } else {
@@ -792,7 +792,6 @@ export default {
       return this.getEvents(day, cell, currentDate).length > 1;
     },
     seeMoreEvents(day, cell, currentDate) {
-      // Implement the logic to show more events or navigate to a separate page
       console.log(
         `See more events for Day ${day}, Month ${
           currentDate.getMonth() + 1
@@ -804,9 +803,7 @@ export default {
       this.currentMonth = `${
         this.months[this.currentDate.getMonth()]
       }, ${this.currentDate.getFullYear()}`;
-
       this.calendarGrid = [];
-
       const firstDay = new Date(
         this.currentYear,
         this.currentDate.getMonth(),
@@ -818,19 +815,16 @@ export default {
         0
       );
       const numDays = lastDay.getDate();
-
       const prevMonthLastDay = new Date(
         this.currentYear,
         this.currentDate.getMonth(),
         0
       );
-
       const nextMonthFirstDay = new Date(
         this.currentYear,
         this.currentDate.getMonth() + 1,
         1
       );
-
       for (let i = 0; i < firstDay.getDay(); i++) {
         const day = prevMonthLastDay.getDate() - firstDay.getDay() + i + 1;
         this.calendarGrid.push({
@@ -839,11 +833,9 @@ export default {
           class: "prev-month-day",
         });
       }
-
       for (let day = 1; day <= numDays; day++) {
         this.calendarGrid.push({ key: `day-${day}`, day, class: "day" });
       }
-
       for (let i = 0; i < 6 - lastDay.getDay(); i++) {
         const day = i + 1;
         this.calendarGrid.push({
@@ -905,20 +897,12 @@ export default {
           );
         }
       }
-
       this.selectedViewType = "day";
       this.currentDate = currentDate;
       this.updateCalendar();
     },
-
     bookClicked(day, currentDate, cell) {
       if (cell.class === "day") {
-        console.log(
-          `Book clicked: Day ${day}, Month ${
-            currentDate.getMonth() + 1
-          }, Year ${currentDate.getFullYear()}`
-        );
-
         this.$router.push({
           path: `booking`,
           query: {
@@ -930,12 +914,6 @@ export default {
       } else if (cell.class === "prev-month-day") {
         if (currentDate.getMonth() + 1 <= 1) {
           currentDate.setMonth(11);
-          console.log(
-            `Book clicked: Day ${day}, Month ${currentDate.getMonth()}, Year ${
-              currentDate.getFullYear() - 1
-            }`
-          );
-
           this.$router.push({
             path: `booking`,
             query: {
@@ -945,10 +923,6 @@ export default {
             },
           });
         } else {
-          console.log(
-            `Book clicked: Day ${day}, Month ${currentDate.getMonth()}, Year ${currentDate.getFullYear()}`
-          );
-
           this.$router.push({
             path: `booking`,
             query: {
@@ -959,12 +933,6 @@ export default {
       } else if (cell.class === "next-month-day") {
         if (currentDate.getMonth() + 1 >= 12) {
           currentDate.setMonth(0);
-          console.log(
-            `Book clicked: Day ${day}, Month ${
-              currentDate.getMonth() + 1
-            }, Year ${currentDate.getFullYear() + 1}`
-          );
-
           this.$router.push({
             path: `booking`,
             query: {
@@ -974,12 +942,6 @@ export default {
             },
           });
         } else {
-          console.log(
-            `Book clicked: Day ${day}, Month ${
-              currentDate.getMonth() + 2
-            }, Year ${currentDate.getFullYear()}`
-          );
-
           this.$router.push({
             path: `booking`,
             query: {
@@ -990,14 +952,14 @@ export default {
           });
         }
       }
-
       this.currentDate = currentDate;
       this.updateCalendar();
     },
     //Request Bar
     toggleRequestBar() {
-      console.log("opennnn");
       this.requestBarOpen = !this.requestBarOpen;
+
+      console.log("open", this.requestBarOpen);
     },
     toggleDetails(index) {
       this.$set(

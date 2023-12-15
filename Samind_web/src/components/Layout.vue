@@ -26,6 +26,12 @@
             title="Calendar"
             to="/dashboard/calendar"
           ></v-list-item>
+          <v-list-item
+            class="mt-2"
+            prepend-icon="mdi-account-settings"
+            title="Referral"
+            to="/dashboard/referral"
+          ></v-list-item>
         </v-list>
       </v-col>
     </v-row>
@@ -73,6 +79,12 @@
             prepend-icon="mdi-calendar"
             title="Calendar"
             to="/dashboard/calendar"
+          ></v-list-item>
+          <v-list-item
+            class="mt-2"
+            prepend-icon="mdi-account-settings"
+            title="Referral"
+            to="/dashboard/referral"
           ></v-list-item>
         </v-list>
       </v-col>
@@ -138,9 +150,20 @@
 
 <script setup>
 import { ref } from "vue";
+
 const drawer = ref(null);
 </script>
 
+<script>
+import Account from "../assets/accountminus.svg";
+
+export default {
+  components: {
+    Account,
+  },
+  // Other component options...
+};
+</script>
 <style scoped>
 .layout,
 .nav {
