@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Svg, Path } from "react-native-svg";
+import { Svg, Circle, Path } from "react-native-svg";
 import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -10,7 +10,7 @@ export default function Login({route}) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
-
+  const [moodCard, setMoodCard] = useState("");
   useEffect(() => {
     console.log("Dashboard Screen", patientId);
     const param = {
@@ -31,6 +31,19 @@ export default function Login({route}) {
       });
   }, []);
 
+  const setMood = (mood) => {
+    if (mood >= 0 && mood <= 1) {
+      setMoodCard("terrible");
+    } else if (mood >= 2 && mood < 3) {
+      setMoodCard("bad");
+    } else if (mood >= 3 && mood < 4) {
+      setMoodCard("soso");
+    } else if (mood >= 4 && mood < 5) {
+      setMoodCard("happy");
+    } else if (mood > 4 && mood <= 5) {
+      setMoodCard("cheerful");
+    }
+  };
   return (
     <ImageBackground
       source={require("../assets/Game.png")}
@@ -64,89 +77,446 @@ export default function Login({route}) {
         <Text style={styles.con1}>Average Mood</Text>
         <Text style={styles.con2}>from mood tracker</Text>
       </View>
-
-      <View style={styles.mbox}>
-        <Image
-          source={require("../assets/cl.png")}
-          style={{
-            position: "absolute",
-            width: 60,
-            height: 50,
-            zIndex: 5,
-            resizeMode: "contain",
-            marginTop: "-2%",
-            marginLeft: "13%",
-          }}
-        />
-        <Image
-          source={require("../assets/cl.png")}
-          style={{
-            position: "absolute",
-            width: 15,
-            height: 1,
-            zIndex: 6,
-            resizeMode: "contain",
-            marginTop: "21%",
-            marginLeft: "23%",
-          }}
-        />
-        <Image
-          source={require("../assets/cl.png")}
-          style={{
-            position: "absolute",
-            width: 70,
-            height: 70,
-            zIndex: 4,
-            resizeMode: "contain",
-            marginTop: "9%",
-            marginLeft: "0%",
-          }}
-        />
-        <Image
-          source={require("../assets/cl.png")}
-          style={{
-            position: "absolute",
-            width: 30,
-            height: 30,
-            zIndex: 4,
-            resizeMode: "contain",
-            marginTop: "27.4%",
-            marginLeft: "17%",
-          }}
-        />
-        <Image
-          source={require("../assets/m2.png")}
-          style={{
-            width: 50,
-            height: 50,
-            zIndex: 5,
-            backgroundColor: "#F6D35A",
-            tintColor: "#000000",
-            borderRadius: 30,
-            marginTop: "15%",
-            marginLeft: "13%",
-          }}
-        />
-        <View
-          style={{
-            flexDirection: "column",
-            marginTop: "-20%",
-            marginLeft: "40%",
-            zIndex: 7,
-          }}
-        >
-          <Text style={{ fontSize: 14, color: "#D0A449", fontWeight: "bold" }}>
-            Happy
-          </Text>
-          <Text style={{ fontSize: 10, color: "#D0A449", marginTop: "5%" }}>
-            Be happy for this moment.{"\n"}This moment is your life, and {"\n"}
-            SaMind is also happy for you.
-          </Text>
-          <Text style={{ fontSize: 8, color: "#D0A449", marginTop: "12%" }}>
-            AVG between 20 Sep 2023 - 26 Sep 2023
-          </Text>
+      {moodCard == "cheerful" && (
+        <View style={styles.cheerfulbox}>
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 60,
+              height: 50,
+              zIndex: 5,
+              resizeMode: "contain",
+              marginTop: "-2%",
+              marginLeft: "13%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 15,
+              height: 1,
+              zIndex: 6,
+              resizeMode: "contain",
+              marginTop: "21%",
+              marginLeft: "23%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 70,
+              height: 70,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "9%",
+              marginLeft: "0%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 30,
+              height: 30,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "27.4%",
+              marginLeft: "17%",
+            }}
+          />
+          <Image
+            source={require("../assets/m2.png")}
+            style={{
+              width: 50,
+              height: 50,
+              zIndex: 5,
+              backgroundColor: "#FFD700",
+              tintColor: "#000000",
+              borderRadius: 30,
+              marginTop: "15%",
+              marginLeft: "13%",
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "-20%",
+              marginLeft: "40%",
+              zIndex: 7,
+            }}
+          >
+            <Text
+              style={{ fontSize: 14, color: "#FBC02D", fontWeight: "bold" }}
+            >
+              Cheerful
+            </Text>
+            <Text style={{ fontSize: 10, color: "#FBC02D", marginTop: "5%" }}>
+              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+              {"\n"}
+              SaMind is also happy for you.
+            </Text>
+            <Text style={{ fontSize: 8, color: "#FBC02D", marginTop: "12%" }}>
+              AVG between 20 Sep 2023 - 26 Sep 2023
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
+
+      {moodCard == "happy" && (
+        <View style={styles.happybox}>
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 60,
+              height: 50,
+              zIndex: 5,
+              resizeMode: "contain",
+              marginTop: "-2%",
+              marginLeft: "13%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 15,
+              height: 1,
+              zIndex: 6,
+              resizeMode: "contain",
+              marginTop: "21%",
+              marginLeft: "23%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 70,
+              height: 70,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "9%",
+              marginLeft: "0%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 30,
+              height: 30,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "27.4%",
+              marginLeft: "17%",
+            }}
+          />
+          <Image
+            source={require("../assets/m2.png")}
+            style={{
+              width: 50,
+              height: 50,
+              zIndex: 5,
+              backgroundColor: "#FFB06A",
+              tintColor: "#000000",
+              borderRadius: 30,
+              marginTop: "15%",
+              marginLeft: "13%",
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "-20%",
+              marginLeft: "40%",
+              zIndex: 7,
+            }}
+          >
+            <Text
+              style={{ fontSize: 14, color: "#E9967A", fontWeight: "bold" }}
+            >
+              Happy
+            </Text>
+            <Text style={{ fontSize: 10, color: "#E9967A", marginTop: "5%" }}>
+              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+              {"\n"}
+              SaMind is also happy for you.
+            </Text>
+            <Text style={{ fontSize: 8, color: "#E9967A", marginTop: "12%" }}>
+              AVG between 20 Sep 2023 - 26 Sep 2023
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {moodCard == "soso" && (
+        <View style={styles.sosobox}>
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 60,
+              height: 50,
+              zIndex: 5,
+              resizeMode: "contain",
+              marginTop: "-2%",
+              marginLeft: "13%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 15,
+              height: 1,
+              zIndex: 6,
+              resizeMode: "contain",
+              marginTop: "21%",
+              marginLeft: "23%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 70,
+              height: 70,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "9%",
+              marginLeft: "0%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 30,
+              height: 30,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "27.4%",
+              marginLeft: "17%",
+            }}
+          />
+          <Image
+            source={require("../assets/m2.png")}
+            style={{
+              width: 50,
+              height: 50,
+              zIndex: 5,
+              backgroundColor: "#C1EAC1",
+              tintColor: "#000000",
+              borderRadius: 30,
+              marginTop: "15%",
+              marginLeft: "13%",
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "-20%",
+              marginLeft: "40%",
+              zIndex: 7,
+            }}
+          >
+            <Text
+              style={{ fontSize: 14, color: "#808000", fontWeight: "bold" }}
+            >
+              So so
+            </Text>
+            <Text style={{ fontSize: 10, color: "#808000", marginTop: "5%" }}>
+              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+              {"\n"}
+              SaMind is also happy for you.
+            </Text>
+            <Text style={{ fontSize: 8, color: "#808000", marginTop: "12%" }}>
+              AVG between 20 Sep 2023 - 26 Sep 2023
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {moodCard == "bad" && (
+        <View style={styles.badbox}>
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 60,
+              height: 50,
+              zIndex: 5,
+              resizeMode: "contain",
+              marginTop: "-2%",
+              marginLeft: "13%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 15,
+              height: 1,
+              zIndex: 6,
+              resizeMode: "contain",
+              marginTop: "21%",
+              marginLeft: "23%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 70,
+              height: 70,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "9%",
+              marginLeft: "0%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 30,
+              height: 30,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "27.4%",
+              marginLeft: "17%",
+            }}
+          />
+          <Image
+            source={require("../assets/m2.png")}
+            style={{
+              width: 50,
+              height: 50,
+              zIndex: 5,
+              backgroundColor: "#e8e8e8",
+              tintColor: "#000000",
+              borderRadius: 30,
+              marginTop: "15%",
+              marginLeft: "13%",
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "-20%",
+              marginLeft: "40%",
+              zIndex: 7,
+            }}
+          >
+            <Text
+              style={{ fontSize: 14, color: "#696969", fontWeight: "bold" }}
+            >
+              Bad
+            </Text>
+            <Text style={{ fontSize: 10, color: "#696969", marginTop: "5%" }}>
+              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+              {"\n"}
+              SaMind is also happy for you.
+            </Text>
+            <Text style={{ fontSize: 8, color: "#696969", marginTop: "12%" }}>
+              AVG between 20 Sep 2023 - 26 Sep 2023
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {moodCard == "terrible" && (
+        <View style={styles.terriblebox}>
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 60,
+              height: 50,
+              zIndex: 5,
+              resizeMode: "contain",
+              marginTop: "-2%",
+              marginLeft: "13%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 15,
+              height: 1,
+              zIndex: 6,
+              resizeMode: "contain",
+              marginTop: "21%",
+              marginLeft: "23%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 70,
+              height: 70,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "9%",
+              marginLeft: "0%",
+            }}
+          />
+          <Image
+            source={require("../assets/cl.png")}
+            style={{
+              position: "absolute",
+              width: 30,
+              height: 30,
+              zIndex: 4,
+              resizeMode: "contain",
+              marginTop: "27.4%",
+              marginLeft: "17%",
+            }}
+          />
+          <Image
+            source={require("../assets/m2.png")}
+            style={{
+              width: 50,
+              height: 50,
+              zIndex: 5,
+              backgroundColor: "#FFC0CB",
+              tintColor: "#000000",
+              borderRadius: 30,
+              marginTop: "15%",
+              marginLeft: "13%",
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "-20%",
+              marginLeft: "40%",
+              zIndex: 7,
+            }}
+          >
+            <Text
+              style={{ fontSize: 14, color: "#800020", fontWeight: "bold" }}
+            >
+              Terrible
+            </Text>
+            <Text style={{ fontSize: 10, color: "#800020", marginTop: "5%" }}>
+              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+              {"\n"}
+              SaMind is also happy for you.
+            </Text>
+            <Text style={{ fontSize: 8, color: "#800020", marginTop: "12%" }}>
+              AVG between 20 Sep 2023 - 26 Sep 2023
+            </Text>
+          </View>
+        </View>
+      )}
+
       <View style={styles.container2}>
         <View style={styles.qbox}>
           <View style={styles.box}>
@@ -235,7 +605,7 @@ export default function Login({route}) {
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#F7D35A",
+                  backgroundColor: "#99D9A4",
                   borderRadius: 30,
                   resizeMode: "cover",
                 }}
@@ -249,7 +619,7 @@ export default function Login({route}) {
                 }}
               >
                 <View style={styles.perbox}>
-                  <Text style={styles.moodN}>Happy</Text>
+                  <Text style={styles.moodN}>Positive</Text>
                   <Text style={styles.moodper}>40%</Text>
                 </View>
               </View>
@@ -261,7 +631,7 @@ export default function Login({route}) {
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#C24BFF",
+                  backgroundColor: "#D3D3D3",
                   borderRadius: 30,
                   resizeMode: "cover",
                 }}
@@ -276,7 +646,7 @@ export default function Login({route}) {
                 }}
               >
                 <View style={styles.perbox}>
-                  <Text style={styles.moodN}>Sad</Text>
+                  <Text style={styles.moodN}>Neutral</Text>
                   <Text style={styles.moodper}>40%</Text>
                 </View>
               </View>
@@ -292,19 +662,35 @@ export default function Login({route}) {
                     height: 50,
                     resizeMode: "cover",
                     zIndex: 2,
+                    borderRadius: 30,
                   }}
                 />
               </View>
-              <Image
-                source={require("../assets/cr.png")}
+
+              <Svg
                 style={{
                   position: "absolute",
                   width: 50,
                   height: 50,
                   resizeMode: "cover",
                   zIndex: 1,
+                  left: 0,
+                  top: 0,
                 }}
-              />
+                width="50"
+                height="50"
+                viewBox="0 0 46 46"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Circle
+                  id="Ellipse 101"
+                  cx="23"
+                  cy="23"
+                  r="23"
+                  fill="#C0C0C0"
+                />
+              </Svg>
               <View style={styles.angry}></View>
               <View
                 style={{
@@ -316,7 +702,7 @@ export default function Login({route}) {
                 }}
               >
                 <View style={styles.perboxa}>
-                  <Text style={styles.moodNa}>Angry</Text>
+                  <Text style={styles.moodNa}>Negative</Text>
                   <Text style={styles.moodpera}>40%</Text>
                 </View>
               </View>
@@ -379,14 +765,62 @@ const styles = StyleSheet.create({
     marginTop: 39,
     marginLeft: "15%",
   },
-  mbox: {
+  cheerfulbox: {
     width: "80%",
     // width: 312,
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#FFF4DD",
-    borderColor: "#FFF4DD",
+    backgroundColor: "#FFFF99",
+    borderColor: "#FFFF99",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
+  },
+  happybox: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "#FFDAB9",
+    borderColor: "#ADD8E6",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
+  },
+  sosobox: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "#C1D7C5",
+    borderColor: "#C1D7C5",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
+  },
+  badbox: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "#D3D3D3",
+    borderColor: "#D3D3D3",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
+  },
+  terriblebox: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "#FFB6C1",
+    borderColor: "#FFB6C1",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",

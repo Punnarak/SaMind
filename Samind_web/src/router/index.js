@@ -26,14 +26,16 @@ const router = createRouter({
         },
         {
           path: "createtest",
+          name: "createtest",
           component: () => import("../views/CreateTest.vue"),
         },
+        // In your router configuration
         {
-          path: "edittest/:id",
+          path: "edittest",
           name: "edittest",
-          component: () => import("../views/EditTest.vue"),
-          props: true,
+          component: import("../views/EditTest.vue"),
         },
+
         {
           path: "calendar",
           component: () => import("../views/Calendar.vue"),
@@ -46,6 +48,16 @@ const router = createRouter({
         {
           path: "patientdashboard",
           component: () => import("../views/PatientDashboard.vue"),
+          props: true,
+        },
+        {
+          path: "patienttesthistory",
+          component: () => import("../views/TestHistory.vue"),
+          props: true,
+        },
+        {
+          path: "referral",
+          component: () => import("../views/Referral.vue"),
           props: true,
         },
       ],
