@@ -23,7 +23,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          to="createtest"
+          @click="createWithPopup = true"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Test</v-btn
         >
@@ -41,11 +41,7 @@
       <template v-slot:item.action="{ item }">
         <v-icon
           style="margin-right: 20px"
-          @click="
-            this.$router.push({
-              path: `createtest`,
-            })
-          "
+          @click="handleEditTest(item.columns.testName)"
           >mdi-pencil</v-icon
         >
         <v-icon @click="(deletePopup = true), (selectTest = item)"
@@ -57,6 +53,105 @@
           @click="(sendPopup = true), (selectTest = item)"
           >mdi-send</v-icon
         >
+
+        <v-icon
+          style="margin-left: 20px"
+          @click="handleCopyTest(item.columns.testName)"
+          >mdi-content-copy</v-icon
+        >
+        <Transition name="createwith-modal">
+          <div v-if="createWithPopup" class="modal-mask">
+            <div class="modal-wrapper">
+              <div class="modal-container createwith">
+                <div class="modal-header mt-5" align="center">
+                  <slot class="popupcreateheader" name="header"
+                    ><label
+                      style="
+                        color: #000;
+                        text-align: center;
+                        font-size: 24px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: normal;
+                      "
+                      >Create Test</label
+                    ></slot
+                  >
+                </div>
+
+                <div class="modal-body mt-10" style="margin-top: 6px">
+                  <slot name="body">
+                    <v-row>
+                      <v-col>
+                        <v-btn
+                          rounded="xl"
+                          class="text-none mx-auto"
+                          color="#569AFF"
+                          block
+                          size="x-large"
+                          variant="flat"
+                          style="width: 100px; height: 70px"
+                          @click="createWithPopup = false"
+                          to="createtest"
+                        >
+                          <v-icon class="mr-2" style="font-size: 27px"
+                            >mdi-file-document-outline</v-icon
+                          >New Test</v-btn
+                        > </v-col
+                      ><v-col>
+                        <v-btn
+                          rounded="xl"
+                          class="text-none mx-auto"
+                          color="rgba(0, 191, 99, 1)"
+                          block
+                          size="x-large"
+                          variant="flat"
+                          style="width: 100px; height: 70px"
+                          @click="
+                            (createWithPopup = false), (duplicatePopup = true)
+                          "
+                        >
+                          <v-row align="center">
+                            <v-icon class="mr-2" style="font-size: 27px"
+                              >mdi-file-document-outline</v-icon
+                            >
+                            <div align="start">
+                              <label style="font-size: 13px; display: block">
+                                Duplicate from
+                              </label>
+                              <label style="font-size: 13px; display: block">
+                                Other Test</label
+                              >
+                            </div></v-row
+                          >
+                        </v-btn></v-col
+                      ></v-row
+                    >
+                  </slot>
+                </div>
+
+                <div class="modal-footer">
+                  <slot name="footer">
+                    <button
+                      class="modal-default-button-duplicate text mt-5"
+                      style="
+                        color: #858585;
+                        text-align: center;
+                        font-size: 17px;
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: 24px; /* 160% */
+                      "
+                      @click="createWithPopup = false"
+                    >
+                      Cancel
+                    </button>
+                  </slot>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
 
         <Transition name="delete-modal">
           <div v-if="deletePopup" class="modal-mask">
@@ -126,7 +221,7 @@
                       placeholder="Search Patient"
                       v-model="searchPatient"
                     ></v-text-field>
-                    <div class="scroll" style="height: 250px; overflow-y: auto">
+                    <div class="scroll" style="height: 190px; overflow-y: auto">
                       <div
                         class="mt-3 ml-4"
                         v-for="(patient, Index) in filteredPatients"
@@ -147,8 +242,16 @@
                         />
                         <label class="ml-4">{{ patient.patientName }}</label>
                         <v-divider class="mt-3 mb-3" insert></v-divider>
-                      </div></div
-                  ></slot>
+                      </div>
+                    </div>
+
+                    <label class="text">Due date</label>
+                    <b-form-datepicker
+                      id="example-datepicker"
+                      v-model="value"
+                      class="mb-2"
+                    ></b-form-datepicker>
+                  </slot>
                 </div>
 
                 <div
@@ -265,6 +368,88 @@
             </div>
           </div>
         </Transition>
+
+        <Transition name="duplicate-modal">
+          <div v-if="duplicatePopup" class="modal-mask-duplicate">
+            <div class="modal-wrapper">
+              <div class="modal-container createwith">
+                <div class="modal-header mt-5" align="start">
+                  <slot class="popupcreateheader" name="header"
+                    ><label
+                      class="ml-5"
+                      style="
+                        color: #000;
+                        text-align: center;
+                        font-size: 24px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: normal;
+                      "
+                      >Duplicate Test</label
+                    ></slot
+                  >
+                </div>
+
+                <div class="modal-body mt-5" style="margin-top: 6px">
+                  <slot name="body">
+                    <v-select
+                      class="dropdown-list mt-4 ml-5"
+                      variant="outlined"
+                      rounded="lg"
+                      style="
+                        width: 330px;
+                        height: 50px;
+                        border-radius: 10px;
+                        z-index: 9999;
+                        position: relative;
+                      "
+                      v-model="selectedDuplicateTest"
+                      :items="testDuplicate"
+                      placeholder="Select Test"
+                    ></v-select
+                  ></slot>
+                </div>
+
+                <div class="modal-footer" align="center">
+                  <slot name="footer">
+                    <button
+                      class="modal-default-button-duplicate text mt-10 mr-16"
+                      style="
+                        color: rgba(60, 155, 242, 1);
+                        text-align: center;
+                        font-size: 17px;
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: 24px; /* 160% */
+                      "
+                      @click="
+                        (duplicatePopup = false),
+                          handleDuplicateTest(selectedDuplicateTest)
+                      "
+                    >
+                      Next
+                    </button>
+
+                    <button
+                      class="modal-default-button-duplicate text mt-5 ml-16"
+                      style="
+                        color: #858585;
+                        text-align: center;
+                        font-size: 17px;
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: 24px; /* 160% */
+                      "
+                      @click="duplicatePopup = false"
+                    >
+                      Cancel
+                    </button>
+                  </slot>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
       </template>
 
       <template v-slot:bottom>
@@ -296,18 +481,73 @@
 <script>
 export default {
   props: {
+    createWithPopup: Boolean,
+    duplicatePopup: Boolean,
     deletePopup: Boolean,
     sendPopup: Boolean,
   },
+  components: {
+    Datepicker,
+  },
   data() {
     return {
+      selectedDuplicateTest: null,
       selectTest: [],
       sendingPopup: false,
+      selectedDate: null,
       donePopup: false,
       checkedNames: [],
     };
   },
   methods: {
+    handleDuplicateTest(testName) {
+      console.log("testName in testlist page", testName);
+      this.$router.push({
+        name: "createtest", // Use the route name instead of path
+        query: {
+          testName: "mocktestduplicate",
+        },
+      });
+    },
+    Delete(question, selectTest) {
+      console.log("selectTest", selectTest);
+      const type = { type: question.columns.testName };
+      const typeJSON = JSON.stringify(type, null, 2);
+      console.log("test", typeJSON);
+
+      // axios
+      //   .delete("/questionsDel", {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     data: typeJSON, // Send the data directly in the request body
+      //   })
+      //   .then((response) => {
+      //     console.log("delete questions:", response);
+      //     window.location.reload();
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });\
+    },
+    handleEditTest(testName) {
+      console.log("testName in testlist page", testName);
+      this.$router.push({
+        name: "edittest", // Use the route name instead of path
+        query: {
+          testName: "mocktestedit",
+        },
+      });
+    },
+    handleCopyTest(testName) {
+      console.log("testName in testlist page", testName);
+      this.$router.push({
+        name: "createtest",
+        query: {
+          testName: testName,
+        },
+      });
+    },
     handleCheckboxChange(patientId) {
       const index = this.checkedNames.indexOf(patientId);
 
@@ -319,7 +559,10 @@ export default {
         this.checkedNames.splice(index, 1);
       }
     },
-
+    handleDueDateChange(date) {
+      // Handle the change in the due date
+      console.log("Due date selected:", date);
+    },
     handleSendTestClick() {
       console.log("Selected Patients IDs:", this.checkedNames);
       this.loadSendingAnimation();
@@ -386,6 +629,8 @@ const filteredPatients = computed(() => {
     item.patientName.toLowerCase().includes(searchTerm)
   );
 });
+
+let testDuplicate = ["Test1", "Test2", "Test3"];
 
 const patients = [
   {
@@ -521,29 +766,7 @@ const filteredTest = computed(() => {
     item.testName.toLowerCase().includes(searchTerm)
   );
 });
-
-function Delete(question, selectTest) {
-  console.log("selectTest", selectTest);
-  const type = { type: question.columns.testName };
-  const typeJSON = JSON.stringify(type, null, 2);
-  console.log("test", typeJSON);
-  // axios
-  //   .delete("/questionsDel", {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     data: typeJSON, // Send the data directly in the request body
-  //   })
-  //   .then((response) => {
-  //     console.log("delete questions:", response);
-  //     window.location.reload();
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error:", error);
-  //   });
-}
 </script>
-
 <style scoped>
 .send-popup-header {
   display: flex;
@@ -566,6 +789,15 @@ function Delete(question, selectTest) {
 :deep(.v-pagination__list) {
   justify-content: end;
 }
+.popupcreateheader {
+  color: #000;
+  text-align: center;
+  font-family: "Inter";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
 
 .popupheader {
   color: #000;
@@ -576,9 +808,22 @@ function Delete(question, selectTest) {
   line-height: normal;
   letter-spacing: 0.2px;
 }
+
+.modal-mask-duplicate {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  /* margin-top: -280px; */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity 0.3s ease;
+}
 .modal-mask {
   position: fixed;
-  z-index: 9998;
+  z-index: 999;
   top: 0;
   left: 0;
   width: 100%;
@@ -604,6 +849,15 @@ function Delete(question, selectTest) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
 }
+.createwith {
+  height: 280px;
+  border: 2px solid #3c9bf2;
+}
+
+.dropdown-list {
+  position: fixed;
+  z-index: 9999;
+}
 
 .delete {
   height: 150px;
@@ -621,6 +875,9 @@ function Delete(question, selectTest) {
   margin: 20px 0;
 }
 
+.modal-default-button-duplicate {
+  float: center;
+}
 .modal-default-button {
   float: right;
 }

@@ -127,11 +127,12 @@
               <label style="font-weight: bold">End Time</label>
               <label style="color: red">*</label>
               <v-select
+                :disabled="true"
                 class="mt-2 mb-5"
                 variant="outlined"
                 rounded="lg"
                 style="width: 245px; height: 50px; border-radius: 10px"
-                v-model="selectedEndTime"
+                v-model="calculatedEndTime"
                 :items="timeOption"
                 placeholder="Select Time"
                 :rules="selectEndTimeRules"
@@ -204,6 +205,20 @@ export default {
     this.bookday = this.$route.query.bookday; // Set it to an empty string if not provided
     console.log("this.bookday", this.bookday);
   },
+  computed: {
+    calculatedEndTime() {
+      if (this.selectedStartTime) {
+        // Assuming timeOption is in the format "HH:mm"
+        const startTime = this.selectedStartTime.split(":");
+        const endHour = parseInt(startTime[0]) + 1;
+        const endTime =
+          endHour.toString().padStart(2, "0") + ":" + startTime[1];
+        return endTime;
+      }
+      return null;
+    },
+  },
+
   methods: {
     async addAppointment() {
       // Set the loading state

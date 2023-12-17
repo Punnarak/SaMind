@@ -13,7 +13,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          to="test"
+          to="/dashboard/test"
         >
           <v-icon style="margin-right: 10px">mdi-close-circle-outline</v-icon
           >Cancel
@@ -105,14 +105,15 @@
               </v-btn>
             </v-row>
             <!-- Options for the question -->
-            <v-radio-group v-model="question.selectedOption">
+            <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
                 :key="optionIndex"
               >
                 <v-col cols="3">
-                  <label style="font-weight: bold">option</label
-                  ><v-radio :value="optionIndex"></v-radio>
+                  <label style="font-weight: bold">option</label>
+                  <!-- Use a unique v-model for each radio button -->
+                  <v-radio :value="option" v-model="question.answer"></v-radio>
                 </v-col>
                 <template v-if="question.options.length > 1">
                   <v-icon
@@ -130,7 +131,6 @@
                     style="border-radius: 10px; width: 100%"
                   ></v-text-field>
                 </v-col>
-
                 <v-col cols="2">
                   <v-btn
                     icon
@@ -153,8 +153,8 @@
 <script>
 import { ref } from "vue";
 import axios from "../axios";
-
 export default {
+  props: ["testNameCreate", "questionsCreate"],
   data() {
     return {
       questions: [
@@ -163,6 +163,7 @@ export default {
           question: "",
           options: [""], // Initialize with an empty option for this question
           type: "",
+          answer: "",
         },
       ],
       testName: "",
@@ -174,7 +175,40 @@ export default {
       ],
     };
   },
+  created() {
+    // console.log("query param", this.$router.query.testName);
+  },
+  mounted() {
+    this.mockTestData();
+  },
+
   methods: {
+    mockTestData() {
+      console.log("query param", this.$route.query);
+      if (this.$route.query.testName != null) {
+        this.testName = this.$route.query.testName;
+        console.log("copytest: ", this.testName);
+
+        let questionsapi = [
+          {
+            no: 1,
+            question: "What is your favorite color?",
+            options: ["Red", "Green", "Blue"],
+            type: "Mock Type",
+            answer: "Red", // Index of the correct answer in the options array
+          },
+          {
+            no: 2,
+            question: "How many fingers do you have?",
+            options: ["Four", "Five", "Six"],
+            type: "Mock Type",
+            answer: "Five", // Index of the correct answer in the options array
+          },
+        ];
+        this.questions = questionsapi;
+        console.log("Questions:", this.questions);
+      }
+    },
     addQuestionOption(questionIndex, index) {
       // Push an empty string as a new option for the specified question
       // this.questions.options.push("");
@@ -197,9 +231,8 @@ export default {
       const testData = this.questions.map((question, index) => ({
         no: index + 1, // Assuming a simple incrementing ID starting from 15
         question: question.question,
-        options: question.options.map(
-          (option, optionIndex) => question.options[optionIndex]
-        ), // Map options to [1, 2, 3, ...]
+        options: question.options,
+        answer: question.answer,
         type: this.testName, // Assuming a simple incrementing type starting from test5
       }));
 
