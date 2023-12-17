@@ -593,69 +593,130 @@ router.post('/get_answer_for_map', (req, res) => {
 //   }
 // });
 
-router.post('/get_question_and_answer_for_map', async (req, res) => {
-  const testType = req.body.type;
-  const patientId = req.body.patientId;
+// router.post('/get_question_and_answer_for_map', async (req, res) => {
+//   const testType = req.body.type;
+//   const patientId = req.body.patientId;
 
-  // Query to fetch questions
-  let questionQuery = 'SELECT no, question, options, test_name FROM questionnaire_new2 WHERE test_name = $1';
-  const questionParams = [testType];
+//   // Query to fetch questions
+//   let questionQuery = 'SELECT no, question, options, test_name FROM questionnaire_new2 WHERE test_name = $1';
+//   const questionParams = [testType];
 
-  try {
-    const questionResult = await client.query(questionQuery, questionParams);
-    const questions = questionResult.rows;
+//   try {
+//     const questionResult = await client.query(questionQuery, questionParams);
+//     const questions = questionResult.rows;
 
-    // Query to fetch answers
-    let answerQuery = 'SELECT patient_id, type, answer FROM test_score WHERE';
-    const answerParams = [];
+//     // Query to fetch answers
+//     let answerQuery = 'SELECT patient_id, type, answer FROM test_score WHERE';
+//     const answerParams = [];
 
-    // Check if either patientId or type is provided
-    if (patientId) {
-      answerQuery += ' patient_id = $1';
-      answerParams.push(patientId);
-    }
+//     // Check if either patientId or type is provided
+//     if (patientId) {
+//       answerQuery += ' patient_id = $1';
+//       answerParams.push(patientId);
+//     }
 
-    if (type) {
-      if (patientId) {
-        answerQuery += ' AND';
-      }
-      answerQuery += ' type = $2';
-      answerParams.push(type);
-    }
+//     if (type) {
+//       if (patientId) {
+//         answerQuery += ' AND';
+//       }
+//       answerQuery += ' type = $2';
+//       answerParams.push(type);
+//     }
 
-    const answerResult = await client.query(answerQuery, answerParams);
-    const answers = answerResult.rows;
+//     const answerResult = await client.query(answerQuery, answerParams);
+//     const answers = answerResult.rows;
 
-    // Merge questions and answers
-    const mergedResult = questions.map((question, index) => {
-      // Check if answers[index] exists before accessing its properties
-      const answer = answers[index] && answers[index].answer;
+//     // Merge questions and answers
+//     const mergedResult = questions.map((question, index) => {
+//       // Check if answers[index] exists before accessing its properties
+//       const answer = answers[index] && answers[index].answer;
 
-      // Parse the JSON string into an object
-      const parsedAnswer = answer ? JSON.parse(answer) : null;
+//       // Parse the JSON string into an object
+//       const parsedAnswer = answer ? JSON.parse(answer) : null;
 
-      // Check if parsedAnswer is defined and has keys before accessing its properties
-      const answerKey = parsedAnswer ? Object.keys(parsedAnswer)[0] : null;
+//       // Check if parsedAnswer is defined and has keys before accessing its properties
+//       const answerKey = parsedAnswer ? Object.keys(parsedAnswer)[0] : null;
 
-      return {
-        no: question.no,
-        question: question.question,
-        options: question.options,
-        answer: answerKey ? parsedAnswer[answerKey] : null,
-        type: question.test_name,
-      };
-    });
+//       return {
+//         no: question.no,
+//         question: question.question,
+//         options: question.options,
+//         answer: answerKey ? parsedAnswer[answerKey] : null,
+//         type: question.test_name,
+//       };
+//     });
 
-    res.json(mergedResult);
-  } catch (err) {
-    console.error('Error executing query:', err);
-    res.status(500).json({ error: 'An error occurred' });
-  }
-});
+//     res.json(mergedResult);
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
 
-router.post('/merge_apis', async (req, res) => {
+// router.post('/merge_apis', async (req, res) => {
+//   const type = req.body.type;
+//   const patientId = req.body.patientId;
+
+//   // Fetch data from the first API
+//   const questionQuery = 'SELECT no, question, options, test_name FROM questionnaire_new2 WHERE test_name = $1';
+//   const questionResult = await client.query(questionQuery, [type]);
+
+//   // Fetch data from the second API
+//   const answerQuery = 'SELECT patient_id, type, answer FROM test_score WHERE patient_id = $1 AND type = $2';
+//   const answerResult = await client.query(answerQuery, [patientId, type]);
+
+//   // Merge the results
+//   const mergedResults = questionResult.rows.map(questionRow => {
+//     const matchingAnswer = answerResult.rows.find(answerRow => answerRow.answer[questionRow.no.toString()] !== undefined);
+//     const mergedResult = {
+//       no: questionRow.no,
+//       question: questionRow.question,
+//       options: questionRow.options,
+//       answer: matchingAnswer ? matchingAnswer.answer[questionRow.no.toString()] : null,
+//       type: type,
+//     };
+//     return mergedResult;
+//   });
+
+//   res.json(mergedResults);
+// });
+
+// router.post('/answer_map_question_from_user', async (req, res) => {
+//   const type = req.body.type;
+//   const patientId = req.body.patient_id;
+
+//   // Fetch data from the first API
+//   const questionQuery = 'SELECT no, question, options, test_name FROM questionnaire_new2 WHERE test_name = $1';
+//   const questionResult = await client.query(questionQuery, [type]);
+
+//   // Fetch data from the second API
+//   const answerQuery = 'SELECT patient_id, type, answer FROM test_score WHERE patient_id = $1 AND type = $2';
+//   const answerResult = await client.query(answerQuery, [patientId, type]);
+
+//   // Merge the results
+//   const mergedResults = questionResult.rows.map(questionRow => {
+//     const matchingAnswer = answerResult.rows.find(answerRow => {
+//       const answerData = answerRow.answer; // No need for JSON.parse here
+//       return answerData[questionRow.no.toString()] !== undefined;
+//     });
+
+//     const mergedResult = {
+//       no: questionRow.no,
+//       question: questionRow.question,
+//       options: questionRow.options,
+//       answer: matchingAnswer ? matchingAnswer.answer[questionRow.no.toString()] : null,
+//       type: type,
+//     };
+
+//     return mergedResult;
+//   });
+
+//   res.json(mergedResults);
+// });
+
+router.post('/answer_map_question_from_user', async (req, res) => {
   const type = req.body.type;
-  const patientId = req.body.patientId;
+  const patientId = req.body.patient_id;
 
   // Fetch data from the first API
   const questionQuery = 'SELECT no, question, options, test_name FROM questionnaire_new2 WHERE test_name = $1';
@@ -667,7 +728,11 @@ router.post('/merge_apis', async (req, res) => {
 
   // Merge the results
   const mergedResults = questionResult.rows.map(questionRow => {
-    const matchingAnswer = answerResult.rows.find(answerRow => answerRow.answer[questionRow.no.toString()] !== undefined);
+    const matchingAnswer = answerResult.rows.find(answerRow => {
+      const answerData = answerRow.answer; // No need for JSON.parse here
+      return answerData[questionRow.no.toString()] !== undefined;
+    });
+
     const mergedResult = {
       no: questionRow.no,
       question: questionRow.question,
@@ -675,12 +740,15 @@ router.post('/merge_apis', async (req, res) => {
       answer: matchingAnswer ? matchingAnswer.answer[questionRow.no.toString()] : null,
       type: type,
     };
+
     return mergedResult;
   });
 
+  // Sort the mergedResults array by the "no" property
+  mergedResults.sort((a, b) => a.no - b.no);
+
   res.json(mergedResults);
 });
-
 
 
 // ver use body

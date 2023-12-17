@@ -121,32 +121,433 @@ router.post('/mood_tracker_post', async (req, res) => {
   }
 });
 
-router.get('/average_scores', async (req, res) => {
-  const { patient_id } = req.query;
 
-  // Check if patient_id is provided
-  if (!patient_id) {
-    return res.status(400).json({ error: 'Patient ID is required as a query parameter.' });
-  }
+//least fix 17/12/2023
+// router.post('/average_scores', async (req, res) => {
+//   const { patient_id } = req.body;
 
+//   // Check if patient_id is provided in the request body
+//   if (!patient_id) {
+//     return res.status(400).json({ error: 'Patient ID is required in the request body.' });
+//   }
+
+//   const avgScoreQuery = `
+//     SELECT AVG(score)::numeric(10, 2) AS average_score
+//     FROM mood_tracker
+//     WHERE patient_id = $1
+//       AND date_time >= CURRENT_DATE - INTERVAL '6 days'
+//       AND date_time < CURRENT_DATE + INTERVAL '1 day';
+//   `;
+
+//   try {
+//     const result = await client.query(avgScoreQuery, [patient_id]);
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: 'Patient not found or has no mood tracker entries.' });
+//     }
+
+//     const average_score = result.rows[0].average_score;
+
+//     const startDate = new Date();
+//     startDate.setDate(startDate.getDate() - 6);
+
+//     const endDate = new Date();
+
+//     const formattedStartDate = `${startDate.getDate()} ${getMonthName(startDate.getMonth())} ${startDate.getFullYear()}`;
+//     const formattedEndDate = `${endDate.getDate()} ${getMonthName(endDate.getMonth())} ${endDate.getFullYear()}`;
+
+//     const dateBetween = `${formattedStartDate} - ${formattedEndDate}`;
+
+//     res.status(200).json({ average_score, dateBetween });
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     res.status(500).json({ error: 'An error occurred while fetching average scores' });
+//   }
+// });
+
+//function getAverageScores
+async function getAverageScores(patientId) {
   const avgScoreQuery = `
-    SELECT patient_id, AVG(score)::numeric(10, 2) AS average_score
+    SELECT AVG(score)::numeric(10, 2) AS average_score
     FROM mood_tracker
     WHERE patient_id = $1
-    GROUP BY patient_id;
+      AND date_time >= CURRENT_DATE - INTERVAL '6 days'
+      AND date_time < CURRENT_DATE + INTERVAL '1 day';
   `;
 
   try {
-    const result = await client.query(avgScoreQuery, [patient_id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found or has no mood tracker entries.' });
+    const result = await client.query(avgScoreQuery, [patientId]);
+
+    if (result.rows.length === 0 || result.rows[0].average_score === null || result.rows[0].average_score === undefined) {
+      return { error: 'Patient not found or has no mood tracker entries.' };
     }
-    res.status(200).json(result.rows[0]);
+
+    const average_score = Number(result.rows[0].average_score); // Ensure it's a number
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 6);
+
+    const endDate = new Date();
+
+    const formattedStartDate = `${startDate.getDate()} ${getMonthName(startDate.getMonth())} ${startDate.getFullYear()}`;
+    const formattedEndDate = `${endDate.getDate()} ${getMonthName(endDate.getMonth())} ${endDate.getFullYear()}`;
+
+    const dateBetween = `${formattedStartDate} - ${formattedEndDate}`;
+
+    return {
+      avgMood: average_score.toFixed(2),
+      dateBetween,
+    };
   } catch (err) {
     console.error('Error executing query:', err);
-    res.status(500).json({ error: 'An error occurred while fetching average scores' });
+    return { error: 'An error occurred while fetching average scores' };
+  }
+}
+
+
+function getMonthName(month) {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return months[month];
+}
+
+
+//least fix 17/12/2023
+// router.post('/two_latest_question', (req, res) => {
+//   const id = req.query.patient_id; // Get the id parameter from the query
+//   let query = 'SELECT score, type, date_time FROM test_score'; // Include the date_time column in the query
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   // Move the condition to check if the "answer" column is null inside the WHERE clause
+//   if (id) {
+//     query += ' AND (answer IS NULL)';
+//   } else {
+//     query += ' WHERE (answer IS NULL)';
+//   }
+
+//   // Add an "ORDER BY" clause to sort the result by the "date_time" column in descending order
+//   query += ' ORDER BY date_time DESC';
+
+//   // Add a "LIMIT" clause to get only the top 2 rows
+//   query += ' LIMIT 2';
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const modifiedResult = {};
+
+//       result.rows.forEach((row, index) => {
+//         const { type, date_time } = row;
+//         let resultText = '';
+
+//         // Check the condition based on the "type"
+//         if (type === 'PHQ9') {
+//           const resultValue = parseInt(row.score, 10);
+//           if (resultValue < 7) {
+//             resultText = 'ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก';
+//           } else if (resultValue >= 7 && resultValue <= 12) {
+//             resultText = 'ท่านมีอาการซึมเศร้าในระดับน้อย';
+//           } else if (resultValue >= 13 && resultValue <= 18) {
+//             resultText = 'ท่านมีอาการซึมเศร้าในระดับปานกลาง';
+//           } else if (resultValue >= 19) {
+//             resultText = 'ท่านมีอาการซึมเศร้าในระดับรุนแรง';
+//           }
+//         } else if (type === '2Q') {
+//           const resultValue = parseInt(row.score, 10);
+//           if (resultValue != 0) {
+//             resultText = 'ท่านมีแนวโน้มเป็นโรคซึมเศร้า';
+//           } else {
+//             resultText = 'ท่านไม่มีแนวโน้มเป็นโรคซึมเศร้า';
+//           }
+//         }
+
+//         // Use the getMonthName function to format the date
+//         const formattedDate = `${date_time.getDate()} ${getMonthName(date_time.getMonth())} ${date_time.getFullYear()}`;
+
+//         // Add date to the modified result
+//         modifiedResult[`type${index + 1}`] = type;
+//         modifiedResult[`result${index + 1}`] = resultText;
+//         modifiedResult[`date${index + 1}`] = formattedDate;
+//       });
+
+//       res.json({ historyTest: modifiedResult });
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+
+//function getHistoryTest
+async function getHistoryTest(patientId) {
+  const query = `
+    SELECT score, type, date_time
+    FROM test_score
+    WHERE answer IS NULL
+    ORDER BY date_time DESC
+    LIMIT 2
+  `;
+  const queryParams = [];
+
+  try {
+    const result = await client.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+      return { error: 'No history test data found.' };
+    }
+
+    const modifiedResult = {
+      historyTest: {},
+    };
+
+    result.rows.forEach((row, index) => {
+      const { type, date_time } = row;
+      let resultText = '';
+
+      if (type === 'PHQ9') {
+        const resultValue = parseInt(row.score, 10);
+        if (resultValue < 7) {
+          resultText = 'ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก';
+        } else if (resultValue >= 7 && resultValue <= 12) {
+          resultText = 'ท่านมีอาการซึมเศร้าในระดับน้อย';
+        } else if (resultValue >= 13 && resultValue <= 18) {
+          resultText = 'ท่านมีอาการซึมเศร้าในระดับปานกลาง';
+        } else if (resultValue >= 19) {
+          resultText = 'ท่านมีอาการซึมเศร้าในระดับรุนแรง';
+        }
+      } else if (type === '2Q') {
+        const resultValue = parseInt(row.score, 10);
+        resultText = resultValue !== 0 ? 'ท่านมีแนวโน้มเป็นโรคซึมเศร้า' : 'ท่านไม่มีแนวโน้มเป็นโรคซึมเศร้า';
+      }
+
+      const formattedDate = `${date_time.getDate()} ${getMonthName(date_time.getMonth())} ${date_time.getFullYear()}`;
+
+      modifiedResult.historyTest[`type${index + 1}`] = type;
+      modifiedResult.historyTest[`result${index + 1}`] = resultText;
+      modifiedResult.historyTest[`date${index + 1}`] = formattedDate;
+    });
+
+    // Include dateAvatar information
+    if (result.rows.length > 0) {
+      const dateAvatar = result.rows[0].date_time;
+      modifiedResult.dateAvatar = `${dateAvatar.getDate()} ${getMonthName(dateAvatar.getMonth())} ${dateAvatar.getFullYear()} at ${dateAvatar.getHours()}:${dateAvatar.getMinutes()}:${dateAvatar.getSeconds()}`;
+    }
+
+    return modifiedResult;
+  } catch (err) {
+    console.error('Error executing query:', err);
+    return { error: 'An error occurred while fetching history test data.' };
+  }
+}
+
+
+//least fix 12/17/2023
+// router.post('/dash_mood_detection', (req, res) => {
+//   const patientId = req.body.patient_id; // Get the patient_id from the JSON body
+//   let query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection';
+
+//   // Check if the patient_id is provided in the JSON body
+//   if (patientId !== undefined) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   // Add an "ORDER BY" clause to sort the result by the "mood_detection_id" column
+//   query += ' ORDER BY mood_detection_id';
+
+//   const queryParams = patientId !== undefined ? [patientId] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Transform the response format
+//       const transformedResult = result.rows.map(row => ({
+//         date: formatDate(row.date),
+//         avatarMoodDetec: {
+//           positive: row.positive,
+//           negative: row.negative,
+//           neutral: row.neutral
+//         }
+//       }))[0]; // Get the first item in the array
+
+//       res.json(transformedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+//function getMood
+async function getAvatarMoodDetection(patientId) {
+  const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection';
+  const queryParams = patientId !== undefined ? [patientId] : [];;
+
+  try {
+    // const result = await client.query(query, queryParams);
+    const result = await client.query(query);
+
+    if (result.rows.length === 0) {
+      return { error: 'No avatar mood detection data found.' };
+    }
+
+    const transformedResult = result.rows.map(row => ({
+      date: formatDate(row.date),
+      avatarMoodDetec: {
+        positive: row.positive,
+        negative: row.negative,
+        neutral: row.neutral
+      }
+    }))[0];
+
+    return transformedResult;
+  } catch (err) {
+    console.error('Error executing query:', err);
+    return { error: 'An error occurred while fetching avatar mood detection data.' };
+  }
+}
+
+
+// Function to format date as "2 December 2023 at 23:37:57"
+function formatDate(timestamp) {
+  const dateObj = new Date(timestamp);
+  const day = dateObj.getDate();
+  const month = getMonthName(dateObj.getMonth());
+  const year = dateObj.getFullYear();
+  const hours = dateObj.getHours();
+  const minutes = dateObj.getMinutes();
+  const seconds = dateObj.getSeconds();
+
+  return `${day} ${month} ${year} at ${hours}:${minutes}:${seconds}`;
+}
+
+
+//merge api
+// router.post('/dashboard_api', async (req, res) => {
+//   const { patient_id } = req.body;
+
+//   // Check if patient_id is provided in the request body
+//   if (!patient_id) {
+//     return res.status(400).json({ error: 'Patient ID is required in the request body.' });
+//   }
+
+//   try {
+//     // API 1: Get average score
+//     const avgScoreQuery = `
+//       SELECT patient_id, AVG(score)::numeric(10, 2) AS average_score
+//       FROM mood_tracker
+//       WHERE patient_id = $1
+//       GROUP BY patient_id;
+//     `;
+
+//     const avgScoreResult = await client.query(avgScoreQuery, [patient_id]);
+
+//     let avgMood = null; // Default value for avgMood
+
+//     if (avgScoreResult.rows.length > 0) {
+//       // If there's a mood tracker entry, calculate and set avgMood
+//       const { average_score } = avgScoreResult.rows[0];
+//       avgMood = avgMood = average_score;
+//     }
+
+//     // API 2: Get two latest questions
+//     const twoLatestQuery = `
+//       SELECT score, type FROM test_score
+//       WHERE patient_id = $1 AND (answer IS NULL)
+//       ORDER BY date_time DESC
+//       LIMIT 2;
+//     `;
+//     const twoLatestResult = await client.query(twoLatestQuery, [patient_id]);
+
+//     const historyTest = {};
+//     twoLatestResult.rows.forEach((row, index) => {
+//       const { type, score } = row;
+//       let resultText = '';
+
+//       if (type === 'PHQ9') {
+//         const resultValue = parseInt(score, 10);
+//         if (resultValue < 7) {
+//           resultText = 'ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก';
+//         } else if (resultValue >= 7 && resultValue <= 12) {
+//           resultText = 'ท่านมีอาการซึมเศร้าในระดับน้อย';
+//         } else if (resultValue >= 13 && resultValue <= 18) {
+//           resultText = 'ท่านมีอาการซึมเศร้าในระดับปานกลาง';
+//         } else if (resultValue >= 19) {
+//           resultText = 'ท่านมีอาการซึมเศร้าในระดับรุนแรง';
+//         }
+//       } else if (type === '2Q') {
+//         const resultValue = parseInt(score, 10);
+//         resultText = resultValue !== 0 ? 'ท่านมีแนวโน้มเป็นโรคซึมเศร้า' : 'ท่านไม่มีแนวโน้มเป็นโรคซึมเศร้า';
+//       }
+
+//       historyTest[`type${index + 1}`] = type;
+//       historyTest[`result${index + 1}`] = resultText;
+//     });
+
+//     // API 3: Get mood detection
+//     const moodDetectionQuery = `
+//       SELECT * FROM avatar_mood_detection
+//       WHERE patient_id = $1
+//       ORDER BY mood_detection_id;
+//     `;
+//     const moodDetectionResult = await client.query(moodDetectionQuery, [patient_id]);
+
+//     if (moodDetectionResult.rows.length === 0) {
+//       return res.status(404).json({ error: 'Patient not found or has no mood detection entries.' });
+//     }
+
+//     const avatarMoodDetec = {
+//       positive: moodDetectionResult.rows[0].positive,
+//       negative: moodDetectionResult.rows[0].negative,
+//       neutral: moodDetectionResult.rows[0].neutral
+//     };
+
+//     // Combine results into the desired format
+//     const combinedResult = {
+//       avgMood,
+//       historyTest,
+//       avatarMoodDetec
+//     };
+
+//     res.status(200).json(combinedResult);
+
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     res.status(500).json({ error: 'An error occurred while fetching data.' });
+//   }
+// });
+
+router.post('/dashboard_api', async (req, res) => {
+  const { patient_id } = req.body;
+
+  try {
+    // Call the three APIs sequentially
+    const avgMoodResult = await getAverageScores(patient_id);
+    const historyTestResult = await getHistoryTest(patient_id);
+    const avatarMoodDetectionResult = await getAvatarMoodDetection(patient_id);
+
+    // Combine the results into the desired format
+    const mergedResult = {
+      avgMood: avgMoodResult.avgMood,
+      dateBetween: avgMoodResult.dateBetween,
+      historyTest: historyTestResult.historyTest,
+      dateAvatar: avatarMoodDetectionResult.date,
+      avatarMoodDetec: avatarMoodDetectionResult.avatarMoodDetec,
+    };
+
+    res.json(mergedResult);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
+
 
 // router.get('/check_mood_per_day_get', (req, res) => {
 //   const id = req.query.patient_id; // Get the id parameter from the query
@@ -235,118 +636,6 @@ router.post('/check_mood_per_day_get', (req, res) => {
     });
 });
 
-
-// router.get('/dash_mood_detection', (req, res) => {
-//   const id = req.query.id; // Get the id parameter from the query
-//   // client.query("SET search_path TO 'avatarDB';");
-//   // let query = 'SELECT * FROM mood_detection';
-
-//   let query = `
-//   SET search_path TO 'avatarDB';
-//   SELECT * FROM mood_detection;
-// `;
-
-//   // Check if the id parameter is provided
-//   if (id) {
-//     query += ' WHERE id = $1';
-//   }
-
-//   // Add an "ORDER BY" clause to sort the result by the "id" column
-//   query += ' ORDER BY id';
-
-//   const queryParams = id ? [id] : [];
-
-//   client.query(query, queryParams)
-//     .then(result => {
-//       res.json(result.rows);
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-router.get('/dash_mood_detection1', (req, res) => {
-  const id = req.query.id; // Get the id parameter from the query
-  // let query = 'SET search_path TO \'avatarDB\'; SELECT * FROM mood_detection';
-  // const query = id ? 'SELECT * FROM avatarDB.mood_detection WHERE id = $1 ORDER BY id' : 'SELECT * FROM avatarDB.mood_detection ORDER BY id';
-  let query = 'SELECT * FROM avatar_db.mood_detection';
-
-  // Check if the id parameter is provided
-  if (id) {
-    query += ' LIMIT 1';
-    client.query(query, [id])
-      .then(result => {
-        res.json(result.rows);
-      })
-      .catch(err => {
-        console.error('Error executing query:', err);
-        res.status(500).json({ error: 'An error occurred' });
-      });
-  } else {
-    query += ' ORDER BY id';
-    client.query(query)
-      .then(result => {
-        res.json(result.rows);
-      })
-      .catch(err => {
-        console.error('Error executing query:', err);
-        res.status(500).json({ error: 'An error occurred' });
-      });
-  }
-});
-
-router.get('/dash_mood_detection', (req, res) => {
-  const id = req.query.id; // Get the id parameter from the query
-  let query = 'SELECT * FROM avatar_db.mood_detection';
-
-  // Check if the id parameter is provided
-  if (id) {
-    query += ' WHERE id = $1';
-  }
-
-  // Add an "ORDER BY" clause to sort the result by the "id" column
-  query += ' ORDER BY id';
-
-  const queryParams = id ? [id] : [];
-
-  client.query(query, queryParams)
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'An error occurred' });
-    });
-});
-
-// router.get('/dash_mood_detection', (req, res) => {
-//   const id = req.query.id; // Get the id parameter from the query
-//   let query = 'SELECT * FROM avatarDB.mood_detection';
-
-//   // Check if the id parameter is provided
-//   if (id) {
-//     query += ' WHERE id = $1 ORDER BY id LIMIT 1';
-//     client.query(query, [id])
-//       .then(result => {
-//         res.json(result.rows);
-//       })
-//       .catch(err => {
-//         console.error('Error executing query:', err);
-//         res.status(500).json({ error: 'An error occurred' });
-//       });
-//   } else {
-//     query += ' ORDER BY id';
-//     client.query(query)
-//       .then(result => {
-//         res.json(result.rows);
-//       })
-//       .catch(err => {
-//         console.error('Error executing query:', err);
-//         res.status(500).json({ error: 'An error occurred' });
-//       });
-//   }
-// });
 
 // router.get('/assignmentInfo_get', (req, res) => {
 //   const id = req.query.assign_id; // Get the id parameter from the query

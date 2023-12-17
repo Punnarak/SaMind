@@ -1,15 +1,34 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Svg, Path } from "react-native-svg";
 import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import axios from "./axios.js";
 
-export default function Login() {
+export default function Login({route}) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
+  const [data, setData] = useState("");
 
   useEffect(() => {
-    console.log("Dashboard Screen");
+    console.log("Dashboard Screen", patientId);
+    const param = {
+      patient_id: patientId,
+    };
+    axios
+      .post("/dashboard_api", param)
+      .then((response) => {
+        
+          console.log("in");
+          setData(response.data);
+          console.log ("data:", response.data)
+
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
   }, []);
 
   return (
@@ -147,7 +166,7 @@ export default function Login() {
                 marginTop: "1%",
               }}
             >
-              <Text style={styles.q}>แบบทดสอบ 2Q</Text>
+              <Text style={styles.q}>{data.historyTest && data.historyTest.type1 !== null ? data.historyTest.type1 : "แบบทดสอบ 2Q"}</Text>
               <Text style={styles.d}>ทดสอบเมื่อวันที่ 22 Sep 2023</Text>
             </View>
             <Text style={styles.r}>คุณมีความเสี่ยงที่จะเป็นโรคซึมเศร้า</Text>

@@ -273,7 +273,7 @@ export default function Home({ route }) {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Dashboardscreen")}
+              onPress={() => navigation.navigate("Dashboardscreen", {patientId})}
             >
               <Text style={styles.Textb}>DASHBOARD</Text>
               <I
