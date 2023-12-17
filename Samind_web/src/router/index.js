@@ -26,14 +26,16 @@ const router = createRouter({
         },
         {
           path: "createtest",
+          name: "createtest",
           component: () => import("../views/CreateTest.vue"),
         },
+        // In your router configuration
         {
-          path: "edittest/:id",
+          path: "edittest",
           name: "edittest",
-          component: () => import("../views/EditTest.vue"),
-          props: true,
+          component: import("../views/EditTest.vue"),
         },
+
         {
           path: "calendar",
           component: () => import("../views/Calendar.vue"),

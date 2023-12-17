@@ -13,7 +13,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          to="test"
+          to="/dashboard/test"
         >
           <v-icon style="margin-right: 10px">mdi-close-circle-outline</v-icon
           >Cancel
@@ -105,7 +105,6 @@
               </v-btn>
             </v-row>
             <!-- Options for the question -->
-            <!-- Options for the question -->
             <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
@@ -154,8 +153,8 @@
 <script>
 import { ref } from "vue";
 import axios from "../axios";
-
 export default {
+  props: ["testNameCreate", "questionsCreate"],
   data() {
     return {
       questions: [
@@ -176,30 +175,39 @@ export default {
       ],
     };
   },
+  created() {
+    // console.log("query param", this.$router.query.testName);
+  },
   mounted() {
-    // Call the mockTestData method when the component is mounted
     this.mockTestData();
   },
+
   methods: {
     mockTestData() {
-      this.testName = "Mock Test";
-      this.questions = [
-        {
-          no: 1,
-          question: "What is your favorite color?",
-          options: ["Red", "Green", "Blue"],
-          type: "Mock Type",
-          answer: "Red", // Index of the correct answer in the options array
-        },
-        {
-          no: 2,
-          question: "How many fingers do you have?",
-          options: ["Four", "Five", "Six"],
-          type: "Mock Type",
-          answer: "Five", // Index of the correct answer in the options array
-        },
-        // Add more questions as needed...
-      ];
+      console.log("query param", this.$route.query);
+      if (this.$route.query.testName != null) {
+        this.testName = this.$route.query.testName;
+        console.log("copytest: ", this.testName);
+
+        let questionsapi = [
+          {
+            no: 1,
+            question: "What is your favorite color?",
+            options: ["Red", "Green", "Blue"],
+            type: "Mock Type",
+            answer: "Red", // Index of the correct answer in the options array
+          },
+          {
+            no: 2,
+            question: "How many fingers do you have?",
+            options: ["Four", "Five", "Six"],
+            type: "Mock Type",
+            answer: "Five", // Index of the correct answer in the options array
+          },
+        ];
+        this.questions = questionsapi;
+        console.log("Questions:", this.questions);
+      }
     },
     addQuestionOption(questionIndex, index) {
       // Push an empty string as a new option for the specified question

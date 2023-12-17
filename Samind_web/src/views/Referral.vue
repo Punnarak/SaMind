@@ -67,7 +67,7 @@
           class="send text-none"
           size="x-large"
           variant="flat"
-          to="test"
+          to="patient"
         >
           Send Referral<v-icon class="ml-5">mdi-share-outline</v-icon>
         </v-btn>

@@ -2,7 +2,7 @@
   <v-col class="px-10">
     <!-- Header and buttons -->
     <v-row align="center">
-      <v-col cols="6" style="font-weight: 600"> Edit Test </v-col>
+      <v-col cols="6" style="font-weight: 600"> Create Test </v-col>
       <v-spacer></v-spacer>
       <v-col cols="2">
         <v-btn
@@ -39,43 +39,46 @@
     <v-card class="mx-auto" col="6" rounded="xl">
       <v-list lines="two">
         <v-list-subheader
+          class="ml-3"
           style="font-family: 'Poppins', 'sans-serif'; border-bottom-width: 1px"
         >
           Test Detail
         </v-list-subheader>
-        <v-divider inset></v-divider>
+        <v-divider insert></v-divider>
 
         <!-- Test Name -->
         <v-list-item>
-          <v-col cols="12" sm="6" md="4">
-            <label>Test Name</label> <label style="color: red">*</label>
+          <v-col cols="12" sm="6" md="4" style="height: 350px">
+            <label style="font-weight: bold">Test Name</label>
+            <label style="color: red">*</label>
             <v-text-field
               class="mt-2 mb-4"
               variant="outlined"
               rounded="lg"
-              v-model="item.item.testName"
+              v-model="testName"
               :rules="testNameRules"
               style="width: 245px; border-radius: 10px"
             ></v-text-field>
 
             <!-- Test Description -->
-            <label>Test Description</label>
+            <label style="font-weight: bold">Test Description</label>
             <v-text-field
-              class="mt-2 mb-4"
+              class="mt-2"
               variant="outlined"
               rounded="lg"
-              style="border-radius: 10px"
+              style="border-radius: 10px; height: 300px"
             ></v-text-field>
           </v-col>
         </v-list-item>
 
-        <v-divider inset></v-divider>
+        <v-divider insert></v-divider>
         <!-- Question Section -->
         <v-list-item
+          class="ml-4"
           v-for="(question, questionIndex) in questions"
           :key="questionIndex"
         >
-          <label>
+          <label style="font-weight: bold">
             Question
             <template v-if="questions.length > 1">
               <v-icon color="red" icon @click="removeQuestion(questionIndex)"
@@ -86,13 +89,14 @@
           <v-col cols="12" sm="6" md="4">
             <v-row cols="6">
               <v-text-field
-                v-model="question.text"
+                v-model="question.question"
                 class="mt-2 mb-4"
                 variant="outlined"
                 rounded="lg"
                 style="border-radius: 10px"
               ></v-text-field>
               <v-btn
+                class="ml-4 mt-2"
                 style="background-color: #5686e1"
                 icon
                 @click="addQuestion(questionIndex)"
@@ -101,13 +105,16 @@
               </v-btn>
             </v-row>
             <!-- Options for the question -->
-            <v-radio-group v-model="question.selectedOption">
+            <!-- Options for the question -->
+            <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
                 :key="optionIndex"
               >
                 <v-col cols="3">
-                  <label>option</label><v-radio :value="optionIndex"></v-radio>
+                  <label style="font-weight: bold">option</label>
+                  <!-- Use a unique v-model for each radio button -->
+                  <v-radio :value="option" v-model="question.answer"></v-radio>
                 </v-col>
                 <template v-if="question.options.length > 1">
                   <v-icon
@@ -125,7 +132,6 @@
                     style="border-radius: 10px; width: 100%"
                   ></v-text-field>
                 </v-col>
-
                 <v-col cols="2">
                   <v-btn
                     icon
@@ -136,9 +142,8 @@
                 </v-col>
               </v-row>
             </v-radio-group>
-
-            <v-divider insert></v-divider>
           </v-col>
+          <v-divider insert></v-divider>
         </v-list-item>
       </v-list>
     </v-card>
@@ -149,14 +154,6 @@
 import { ref } from "vue";
 
 export default {
-  props: {
-    // Define the prop names you expect to receive
-    item: {
-      type: Object,
-      required: true,
-    },
-    // ... Add more props as needed
-  },
   data() {
     return {
       questions: [
@@ -174,7 +171,37 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.mockTestData();
+  },
+
   methods: {
+    mockTestData() {
+      console.log("query param", this.$route.query);
+      if (this.$route.query != null) {
+        this.testName = this.$route.query.testName;
+        console.log("copytest: ", this.testName);
+
+        let questionsapi = [
+          {
+            no: 1,
+            question: "What is your favorite color?",
+            options: ["Red", "Green", "Blue"],
+            type: "Mock Type",
+            answer: "Red", // Index of the correct answer in the options array
+          },
+          {
+            no: 2,
+            question: "How many fingers do you have?",
+            options: ["Four", "Five", "Six"],
+            type: "Mock Type",
+            answer: "Five", // Index of the correct answer in the options array
+          },
+        ];
+        this.questions = questionsapi;
+        console.log("Questions:", this.questions);
+      }
+    },
     addQuestionOption(questionIndex, index) {
       // Push an empty string as a new option for the specified question
       // this.questions.options.push("");
@@ -186,7 +213,7 @@ export default {
       this.questions[questionIndex].options.splice(optionIndex, 1);
     },
     addQuestion(index) {
-      const newQuestion = { text: "", options: [""] }; // Create a new question with an empty option
+      const newQuestion = { question: "", options: [""] }; // Create a new question with an empty option
       this.questions.splice(index + 1, 0, newQuestion); // Add the new question to the list of questions
     },
     removeQuestion(index) {
@@ -194,19 +221,48 @@ export default {
       this.questions.splice(index, 1);
     },
     createTest() {
-      console.log("Test Name:", this.testName);
+      const testData = this.questions.map((question, index) => ({
+        no: index + 1, // Assuming a simple incrementing ID starting from 15
+        question: question.question,
+        options: question.options,
+        answer: question.answer,
+        type: this.testName, // Assuming a simple incrementing type starting from test5
+      }));
 
-      for (let i = 0; i < this.questions.length; i++) {
-        const question = this.questions[i];
-        console.log(`Question ${i + 1} Text:`, question.text);
-        console.log(`Question ${i + 1} Options:`, question.options);
-      }
+      // Convert testData to JSON string
+      const testDataJSON = JSON.stringify(testData, null, 2);
 
-      // Add additional logic for creating the test if needed
+      console.log("Test Data (JSON):", testDataJSON);
+
+      // Add additional logic for handling the created test data if needed
 
       // Placeholder message for now
       console.log("Test creation logic to be implemented.");
-      this.$router.push("/dashboard/test");
+
+      // axios
+      //   .post("/questionAdd", testDataJSON)
+      //   .then((response) => {
+      //     console.log("Inserted questions:", response.data);
+      //     this.$router.push("/dashboard/test");
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
+
+      axios
+        .post("/questionAdd", testDataJSON, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("Inserted questions:", response.data);
+          this.$router.push("/dashboard/test");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
   },
 };
