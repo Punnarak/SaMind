@@ -24,6 +24,7 @@ import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
 import IndividualTestListScreen from "./screen/IndividualTestList";
 import IndividualTestScreen from "./screen/IndividualTest";
+import Gamescreen from "./screen/Game";
 
 const Stack = createStackNavigator();
 
@@ -138,6 +139,11 @@ const MainStack = () => {
       <Stack.Screen
         name="Editscreen"
         component={Editscreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Gamescreen"
+        component={Gamescreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
