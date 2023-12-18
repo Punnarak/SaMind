@@ -244,13 +244,23 @@
                         <v-divider class="mt-3 mb-3" insert></v-divider>
                       </div>
                     </div>
-
-                    <label class="text">Due date</label>
-                    <b-form-datepicker
-                      id="example-datepicker"
-                      v-model="value"
-                      class="mb-2"
-                    ></b-form-datepicker>
+                    <div class="duedate">
+                      <label class="text">Due date</label>
+                      <v-col style="margin-top: -10px; margin-left: -10px">
+                        <v-text-field
+                          class="custom-placeholder mt-2"
+                          density="comfortable"
+                          rounded="lg"
+                          variant="outlined"
+                          placeholder="Enter Date (DD/MM/YYYY)"
+                          prepend-inner-icon="mdi-calendar"
+                          style="width: 208px; height: 45px; flex-shrink: 0"
+                          v-model="dueDate"
+                          :rules="[dateValidation]"
+                        >
+                        </v-text-field>
+                      </v-col>
+                    </div>
                   </slot>
                 </div>
 
@@ -265,7 +275,7 @@
                         class="text-none mx-auto"
                         color="#569AFF"
                         block
-                        size="x-large"
+                        size="large"
                         variant="flat"
                         style="
                           color: #fff;
@@ -274,13 +284,9 @@
                           font-weight: 500;
                           line-height: normal;
                           letter-spacing: 0.13px;
-                          margin-top: -10px;
+                          margin-top: -40px;
                         "
-                        @click="
-                          (sendPopup = false),
-                            (sendingPopup = true),
-                            handleSendTestClick()
-                        "
+                        @click="handleSendTestClick()"
                       >
                         Send Test</v-btn
                       >
@@ -486,17 +492,15 @@ export default {
     deletePopup: Boolean,
     sendPopup: Boolean,
   },
-  components: {
-    Datepicker,
-  },
   data() {
     return {
       selectedDuplicateTest: null,
       selectTest: [],
       sendingPopup: false,
-      selectedDate: null,
+      dueDate: null,
       donePopup: false,
       checkedNames: [],
+      dateValidate: false,
     };
   },
   methods: {
@@ -559,13 +563,58 @@ export default {
         this.checkedNames.splice(index, 1);
       }
     },
-    handleDueDateChange(date) {
-      // Handle the change in the due date
-      console.log("Due date selected:", date);
+    dateValidation(value) {
+      const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
+
+      if (!value) {
+        return "Please enter a date";
+      }
+
+      if (!dateRegex.test(value)) {
+        this.dateValidate = false;
+        return "Date must be in the format DD/MM/YYYY";
+      } else {
+        this.dateValidate = true;
+      }
+
+      // Additional check for valid date
+      const parts = value.split("/");
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      if (isNaN(day) || isNaN(month) || isNaN(year)) {
+        this.dateValidate = false;
+        return "Invalid date";
+      } else {
+        this.dateValidate = true;
+      }
+
+      const inputDate = new Date(year, month - 1, day);
+      const currentDate = new Date();
+
+      if (
+        inputDate.getDate() !== day ||
+        inputDate.getMonth() !== month - 1 ||
+        inputDate.getFullYear() !== year ||
+        inputDate < currentDate
+      ) {
+        this.dateValidate = false;
+        return "Invalid date or past date";
+      } else {
+        this.dateValidate = true;
+      }
+
+      return true;
     },
     handleSendTestClick() {
-      console.log("Selected Patients IDs:", this.checkedNames);
-      this.loadSendingAnimation();
+      if (!this.dateValidate) {
+      } else {
+        this.sendPopup = false;
+        this.sendingPopup = true;
+        console.log("Selected Patients IDs:", this.checkedNames);
+        this.loadSendingAnimation();
+      }
     },
 
     loadSendingAnimation() {
@@ -612,7 +661,6 @@ import { onMounted, computed } from "vue";
 import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
-
 // let test = ref([]);
 let test = ref([
   {
@@ -768,6 +816,9 @@ const filteredTest = computed(() => {
 });
 </script>
 <style scoped>
+.custom-placeholder ::placeholder {
+  font-size: 11.8px;
+}
 .send-popup-header {
   display: flex;
   justify-content: space-between;
