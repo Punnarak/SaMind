@@ -121,6 +121,77 @@ router.post('/mood_tracker_post', async (req, res) => {
   }
 });
 
+// router.post('/get_name_user', (req, res) => {
+//   const id = req.query.id; // Get the id parameter from the query
+//   let query = 'SELECT * FROM patient';
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+//latest change 17/12/2566
+// router.post('/get_name_user', (req, res) => {
+//   const requestBody = req.body;
+//   const idFromBody = requestBody.patient_id;
+
+//   // Check if the patient_id is provided in the JSON body
+//   if (!idFromBody) {
+//     return res.status(400).json({ error: 'patient_id is required in the request body' });
+//   }
+
+//   const query = 'SELECT fname FROM patient WHERE patient_id = $1';
+//   const queryParams = [idFromBody];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Check if there are any rows in the result
+//       if (result.rows.length > 0) {
+//         // Modify the key from "fname" to "name"
+//         const modifiedResult = { name: result.rows[0].fname };
+//         res.json(modifiedResult);
+//       } else {
+//         // If no rows found, return an empty object or any desired response
+//         res.json({});
+//       }
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+//function getNameUser
+async function getNameUser(patientId) {
+  const query = 'SELECT fname FROM patient WHERE patient_id = $1';
+  const queryParams = [patientId];
+
+  try {
+    const result = await client.query(query, queryParams);
+
+    if (result.rows.length > 0) {
+      return { name: result.rows[0].fname };
+    } else {
+      return {};
+    }
+  } catch (err) {
+    console.error('Error executing query:', err);
+    return { error: 'An error occurred while fetching user name.' };
+  }
+}
+
 
 //least fix 17/12/2023
 // router.post('/average_scores', async (req, res) => {
@@ -522,17 +593,44 @@ function formatDate(timestamp) {
 //   }
 // });
 
+// router.post('/dashboard_api', async (req, res) => {
+//   const { patient_id } = req.body;
+
+//   try {
+//     // Call the three APIs sequentially
+//     const avgMoodResult = await getAverageScores(patient_id);
+//     const historyTestResult = await getHistoryTest(patient_id);
+//     const avatarMoodDetectionResult = await getAvatarMoodDetection(patient_id);
+
+//     // Combine the results into the desired format
+//     const mergedResult = {
+//       avgMood: avgMoodResult.avgMood,
+//       dateBetween: avgMoodResult.dateBetween,
+//       historyTest: historyTestResult.historyTest,
+//       dateAvatar: avatarMoodDetectionResult.date,
+//       avatarMoodDetec: avatarMoodDetectionResult.avatarMoodDetec,
+//     };
+
+//     res.json(mergedResult);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'An error occurred while fetching data.' });
+//   }
+// });
+
 router.post('/dashboard_api', async (req, res) => {
   const { patient_id } = req.body;
 
   try {
-    // Call the three APIs sequentially
+    // Call the two APIs sequentially
+    const nameResult = await getNameUser(patient_id);
     const avgMoodResult = await getAverageScores(patient_id);
     const historyTestResult = await getHistoryTest(patient_id);
     const avatarMoodDetectionResult = await getAvatarMoodDetection(patient_id);
 
     // Combine the results into the desired format
     const mergedResult = {
+      name: nameResult.name,
       avgMood: avgMoodResult.avgMood,
       dateBetween: avgMoodResult.dateBetween,
       historyTest: historyTestResult.historyTest,
@@ -588,8 +686,87 @@ router.post('/dashboard_api', async (req, res) => {
 //     });
 // });
 
+
+// router.post('/get_name_user', (req, res) => {
+//   const requestBody = req.body;
+//   const idFromBody = requestBody.patient_id;
+
+//   // Check if the patient_id is provided in the JSON body
+//   if (!idFromBody) {
+//     return res.status(400).json({ error: 'patient_id is required in the request body' });
+//   }
+
+//   const query = 'SELECT fname FROM patient WHERE patient_id = $1';
+//   const queryParams = [idFromBody];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Check if there are any rows in the result
+//       if (result.rows.length > 0) {
+//         // Modify the key from "fname" to "name"
+//         const modifiedResult = { name: result.rows[0].fname };
+//         res.json(modifiedResult);
+//       } else {
+//         // If no rows found, return an empty object or any desired response
+//         res.json({});
+//       }
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/check_mood_per_day_get', (req, res) => {
+//   const id = req.body.patient_id; // Get the patient_id from the request body
+
+//   // Get the current date and time
+//   const currentDate = new Date();
+//   const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+
+//   // Build the SQL query with a left join on the patient table
+//   let query = 'SELECT mood_tracker.*, patient.fname FROM mood_tracker';
+//   query += ' LEFT JOIN patient ON mood_tracker.patient_id = patient.patient_id';
+
+//   const queryParams = [];
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE mood_tracker.patient_id = $1::integer'; // Explicitly cast to integer
+//     queryParams.push(id);
+//   }
+
+//   // Add a condition to check if the date_time column matches the current date
+//   query += ' AND mood_tracker.date_time::date = $2';
+//   queryParams.push(formattedDate.slice(0, 10));
+
+//   // Add an "ORDER BY" clause to sort the result by the mood_tracker id column
+//   query += ' ORDER BY mood_tracker_id';
+
+//   // Execute the query
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Check if there are rows in the result
+//       const hasRows = result.rows.length > 0;
+
+//       // Construct the response object
+//       const responseObject = {
+//         fname: hasRows ? result.rows[0].fname : null,
+//         checkin: hasRows,
+//         moodscore: hasRows ? result.rows[0].score : null,
+//       };
+
+//       // Return the JSON object
+//       res.json(responseObject);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/check_mood_per_day_get', (req, res) => {
-  const id = req.body.patient_id; // Get the patient_id from the request body
+  const id = req.body.patient_id;
 
   // Get the current date and time
   const currentDate = new Date();
@@ -614,27 +791,47 @@ router.post('/check_mood_per_day_get', (req, res) => {
   // Add an "ORDER BY" clause to sort the result by the mood_tracker id column
   query += ' ORDER BY mood_tracker_id';
 
-  // Execute the query
+  // Execute the query to get the mood data
   client.query(query, queryParams)
-    .then(result => {
-      // Check if there are rows in the result
-      const hasRows = result.rows.length > 0;
+    .then(moodResult => {
+      // Check if there are rows in the mood result
+      const hasMoodRows = moodResult.rows.length > 0;
 
-      // Construct the response object
-      const responseObject = {
-        fname: hasRows ? result.rows[0].fname : null,
-        checkin: hasRows,
-        moodscore: hasRows ? result.rows[0].score : null,
+      let responseObject = {
+        fname: hasMoodRows ? moodResult.rows[0].fname : null,
+        checkin: hasMoodRows,
+        moodscore: hasMoodRows ? moodResult.rows[0].score : null,
       };
 
-      // Return the JSON object
-      res.json(responseObject);
+      // If patient_id is provided, fetch the name directly within the API
+      if (id) {
+        const nameQuery = 'SELECT fname FROM patient WHERE patient_id = $1';
+        const nameQueryParams = [id];
+
+        client.query(nameQuery, nameQueryParams)
+          .then(nameResult => {
+            // If the name is found, update the responseObject
+            if (nameResult.rows.length > 0) {
+              responseObject.fname = nameResult.rows[0].fname; // Update key to "fname"
+            }
+            // Return the JSON object
+            res.json(responseObject);
+          })
+          .catch(err => {
+            console.error('Error executing name query:', err);
+            res.json(responseObject); // Return the mood data even if there's an error fetching the name
+          });
+      } else {
+        // Return the JSON object without fetching the name
+        res.json(responseObject);
+      }
     })
     .catch(err => {
-      console.error('Error executing query:', err);
+      console.error('Error executing mood query:', err);
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 
 // router.get('/assignmentInfo_get', (req, res) => {

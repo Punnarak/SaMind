@@ -19,23 +19,24 @@ export default function Notification({ route }) {
 
   useEffect(() => {
     console.log("Test Screen", patientId);
-    const param = {
-      patient_id: patientId,
-    };
-    axios
-      .post("/assignment_status_wait", param)
-      .then((response) => {
-        if (response.data.length != 0) {
-          console.log("in");
-          setDisabled(false)
-        }
-        console.log(response.data, response.data.length);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
   }, []);
-
+  const param = {
+    patient_id: patientId,
+  };
+  axios
+    .post("/assignment_status_wait", param)
+    .then((response) => {
+      if (response.data.length != 0) {
+        console.log("in");
+        setDisabled(false)
+      } else {
+        setDisabled(true)
+      }
+      console.log(response.data, response.data.length);
+    })
+    .catch((error) => {
+      console.error("Axios error:", error);
+    });
   return (
     // <View style={styles.container1}>
     <ImageBackground

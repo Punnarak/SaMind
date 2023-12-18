@@ -11,7 +11,7 @@ export default function Login({route}) {
   const navigation = useNavigation();
   const [data, setData] = useState("");
   const [moodCard, setMoodCard] = useState("");
-  useEffect(() => {
+   useEffect(() => {
     console.log("Dashboard Screen", patientId);
     const param = {
       patient_id: patientId,
@@ -23,8 +23,8 @@ export default function Login({route}) {
           console.log("in");
           setData(response.data);
           console.log ("data:", response.data)
+          setMood(response.data.avgMood)
 
-        console.log(response.data, response.data.length);
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -159,7 +159,7 @@ export default function Login({route}) {
               SaMind is also happy for you.
             </Text>
             <Text style={{ fontSize: 8, color: "#FBC02D", marginTop: "12%" }}>
-              AVG between 20 Sep 2023 - 26 Sep 2023
+              AVG between {data.dateBetween}
             </Text>
           </View>
         </View>
@@ -247,7 +247,7 @@ export default function Login({route}) {
               SaMind is also happy for you.
             </Text>
             <Text style={{ fontSize: 8, color: "#E9967A", marginTop: "12%" }}>
-              AVG between 20 Sep 2023 - 26 Sep 2023
+              AVG between {data.dateBetween}
             </Text>
           </View>
         </View>
@@ -335,7 +335,7 @@ export default function Login({route}) {
               SaMind is also happy for you.
             </Text>
             <Text style={{ fontSize: 8, color: "#808000", marginTop: "12%" }}>
-              AVG between 20 Sep 2023 - 26 Sep 2023
+              AVG between {data.dateBetween}
             </Text>
           </View>
         </View>
@@ -423,7 +423,7 @@ export default function Login({route}) {
               SaMind is also happy for you.
             </Text>
             <Text style={{ fontSize: 8, color: "#696969", marginTop: "12%" }}>
-              AVG between 20 Sep 2023 - 26 Sep 2023
+              AVG between {data.dateBetween}
             </Text>
           </View>
         </View>
@@ -511,7 +511,7 @@ export default function Login({route}) {
               SaMind is also happy for you.
             </Text>
             <Text style={{ fontSize: 8, color: "#800020", marginTop: "12%" }}>
-              AVG between 20 Sep 2023 - 26 Sep 2023
+              AVG between {data.dateBetween}
             </Text>
           </View>
         </View>
@@ -536,10 +536,10 @@ export default function Login({route}) {
                 marginTop: "1%",
               }}
             >
-              <Text style={styles.q}>{data.historyTest && data.historyTest.type1 !== null ? data.historyTest.type1 : "แบบทดสอบ 2Q"}</Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ 22 Sep 2023</Text>
+              <Text style={styles.q}>{data.historyTest && data.historyTest.type1 !== null ? data.historyTest.type1 : null }</Text>
+              <Text style={styles.d}>ทดสอบเมื่อวันที่ {data.historyTest && data.historyTest.date1 !== null ? data.historyTest.date1 : null }</Text>
             </View>
-            <Text style={styles.r}>คุณมีความเสี่ยงที่จะเป็นโรคซึมเศร้า</Text>
+            <Text style={styles.r}>{data.historyTest && data.historyTest.result1 !== null ? data.historyTest.result1 : null }</Text>
           </View>
           <View
             style={{
@@ -563,13 +563,13 @@ export default function Login({route}) {
                 marginTop: "1%",
               }}
             >
-              <Text style={styles.q}>แบบทดสอบ PHQ9 </Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ 26 Sep 2023</Text>
+              <Text style={styles.q}>{data.historyTest && data.historyTest.type2 !== null ? data.historyTest.type2 : null }</Text>
+              <Text style={styles.d}>ทดสอบเมื่อวันที่ {data.historyTest && data.historyTest.date2 !== null ? data.historyTest.date2 : null }</Text>
             </View>
-            <Text style={styles.r2}>ท่านมีอาการซึมเศร้าระดับปานกลาง</Text>
+            <Text style={styles.r2}>{data.historyTest && data.historyTest.result2 !== null ? data.historyTest.result2 : null }</Text>
           </View>
         </View>
-        <Text style={styles.title}>อารมณ์ของ Punya จากบทสนทนากับ SaMind</Text>
+        <Text style={styles.title}>อารมณ์ของ {data.name} จากบทสนทนากับ SaMind</Text>
 
         <View style={styles.moodavgbox}>
           <View
@@ -620,7 +620,7 @@ export default function Login({route}) {
               >
                 <View style={styles.perbox}>
                   <Text style={styles.moodN}>Positive</Text>
-                  <Text style={styles.moodper}>40%</Text>
+                  <Text style={styles.moodper}>{data.avatarMoodDetec && data.avatarMoodDetec.positive !== null ? data.avatarMoodDetec.positive : "0%"}</Text>
                 </View>
               </View>
             </View>
@@ -647,7 +647,7 @@ export default function Login({route}) {
               >
                 <View style={styles.perbox}>
                   <Text style={styles.moodN}>Neutral</Text>
-                  <Text style={styles.moodper}>40%</Text>
+                  <Text style={styles.moodper}>{data.avatarMoodDetec && data.avatarMoodDetec.neutral !== null ? data.avatarMoodDetec.neutral : "0%"}</Text>
                 </View>
               </View>
             </View>
@@ -703,10 +703,11 @@ export default function Login({route}) {
               >
                 <View style={styles.perboxa}>
                   <Text style={styles.moodNa}>Negative</Text>
-                  <Text style={styles.moodpera}>40%</Text>
+                  <Text style={styles.moodpera}>{data.avatarMoodDetec && data.avatarMoodDetec.negative !== null ? data.avatarMoodDetec.negative : "0%"}</Text>
                 </View>
               </View>
             </View>
+            <Text style={styles.moodNa}>Last talk:{data.dateAvatar !== null ? data.dateAvatar : "No last talk"}</Text>
           </View>
         </View>
 

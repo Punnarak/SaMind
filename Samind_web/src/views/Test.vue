@@ -613,14 +613,38 @@ import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
-// let test = ref([]);
-let test = ref([
-  {
-    id: 1,
-    testName: "Test1",
-    action: "1",
-  },
-]);
+let test = ref([]);
+onMounted(async () => {
+  const param = {
+    therapist_id: 5555,
+  };
+  await axios
+    .post("/allTest", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      test.value = response.data.map((patient, index) => ({
+        no: patient.no,
+        testname: patient.testname,
+
+        // action: patient.action, // Add this line if "action" property is present
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+});
+// let test = ref([
+//   {
+//     id: 1,
+//     testName: "Test1",
+//     action: "1",
+//   },
+// ]);
 let checkedNames = ref([]);
 let searchPatient = ref("");
 const filteredPatients = computed(() => {
@@ -752,9 +776,9 @@ const headers = [
     title: "No.",
     align: "center",
     sortable: false,
-    key: "id",
+    key: "no",
   },
-  { title: "Test Name", key: "testName", sortable: false, align: "center" }, // Update key to "testName"
+  { title: "Test Name", key: "testname", sortable: false, align: "center" }, // Update key to "testName"
   { title: "Action", key: "action", sortable: false, align: "center" },
 ];
 

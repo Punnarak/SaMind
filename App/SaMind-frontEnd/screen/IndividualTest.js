@@ -54,7 +54,7 @@ export default function Notification({ route }) {
   };
   const toggleConfirm = () => {
     setModal(!modal);
-    navigation.navigate("IndividualTestListScreen", { patientId });
+    navigation.navigate("Testscreen", { patientId });
   };
 
   const handleOptionSelect = (questionId, option) => {
