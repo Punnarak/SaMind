@@ -29,11 +29,10 @@ const router = createRouter({
           name: "createtest",
           component: () => import("../views/CreateTest.vue"),
         },
-        // In your router configuration
         {
           path: "edittest",
           name: "edittest",
-          component: import("../views/EditTest.vue"),
+          component: () => import("../views/EditTest.vue"),
         },
 
         {
