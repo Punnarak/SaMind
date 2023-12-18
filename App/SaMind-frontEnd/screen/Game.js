@@ -1,114 +1,213 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import GestureRecognizer, { swipeDirections } from "react-native-swipe-gestures";
+import { useNavigation } from "@react-navigation/native";
 
-const Gamescreen = () => {
-  const [targetWord, setTargetWord] = useState("");
-  const [guess, setGuess] = useState("");
-  const [attempts, setAttempts] = useState(0);
-  const [enteredWords, setEnteredWords] = useState([]);
 
-  const generateRandomWord = () => {
-    const words = ["apple", "้hippo", "lucky", "phone", "mango"];
-    const randomIndex = Math.floor(Math.random() * words.length);
-    return words[randomIndex];
-  };
+const BoardSize = 4;
+
+const Game2048 = () => {
+  const navigation = useNavigation();
+  const [board, setBoard] = useState([]);
+  const [score, setScore] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState(null);
 
   useEffect(() => {
-    setTargetWord(generateRandomWord());
+    initializeGame();
   }, []);
 
-  const handleGuess = () => {
-    const lowerCaseGuess = guess.toLowerCase();
-    const lowerCaseTargetWord = targetWord.toLowerCase();
-  
-    if (guess.length !== 5) {
-      alert("Please enter a word with exactly 5 letters.");
-      setGuess("");
-      return;
-    }
-  
-    let correctPositionCount = 0;
-    let correctLetterWrongPositionCount = 0;
-    let incorrectCount = 0;
-    let correctLetterIndices = [];
-  
-    const highlightedGuess = guess.split("").map((char, index) => {
-      const isInCorrectPosition = char.toLowerCase() === lowerCaseTargetWord[index];
-      const isCorrectLetter = lowerCaseTargetWord.includes(char.toLowerCase());
-  
-      if (isInCorrectPosition) {
-        correctPositionCount++;
-        correctLetterIndices.push(index);
-      } else if (isCorrectLetter && !correctLetterIndices.includes(index)) {
-        correctLetterWrongPositionCount++;
-      } else {
-        incorrectCount++;
-      }
-  
-      let color = "black";
-  
-      if (isInCorrectPosition) {
-        color = "green";
-      } else if (isCorrectLetter && !isInCorrectPosition) {
-        color = "yellow";
-      }
-  
-      return (
-        <Text key={index} style={{ color }}>
-          {char}
-        </Text>
-      );
-    });
-  
-    if (lowerCaseGuess === lowerCaseTargetWord) {
-      alert(`Congratulations! You guessed the word in ${attempts + 1} attempts.`);
-      setTargetWord(generateRandomWord());
-      setAttempts(0);
-      setEnteredWords([]);
-    } else {
-      const formattedEnteredWord = (
-        <View key={enteredWords.length} style={styles.highlightedWord}>
-          {highlightedGuess}
-        </View>
-      );
-      setEnteredWords([...enteredWords, formattedEnteredWord]);
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-  
-      if (newAttempts === 5) {
-        alert(`Game Over! The correct answer was: ${targetWord}`);
-        setTargetWord(generateRandomWord());
-        setAttempts(0);
-        setEnteredWords([]);
-      }
-  
-      // Display counts in the UI
-      alert(`Correct Position: ${correctPositionCount}, Correct Letter (Wrong Position): ${correctLetterWrongPositionCount}, Incorrect: ${incorrectCount}`);
-    }
-  
-    setGuess("");
+  const initializeGame = () => {
+    const initialBoard = Array.from({ length: BoardSize }, () =>
+      Array(BoardSize).fill(0)
+    );
+    placeRandomTile(initialBoard);
+    placeRandomTile(initialBoard);
+    setBoard(initialBoard);
+    setScore(0);
   };
+
+  const placeRandomTile = (currentBoard) => {
+    const emptyTiles = [];
+    currentBoard.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        if (cell === 0) {
+          emptyTiles.push({ row: rowIndex, col: columnIndex });
+        }
+      });
+    });
+
+    if (emptyTiles.length > 0) {
+      const randomIndex = Math.floor(Math.random() * emptyTiles.length);
+      const { row, col } = emptyTiles[randomIndex];
+      currentBoard[row][col] = Math.random() < 0.9 ? 2 : 4;
+    }
+  };
+
+  const handleSwipe = (direction) => {
+    const newBoard = [...board];
+    let moved = false;
+
+    switch (direction) {
+      case "UP":
+        moved = moveTiles(newBoard, -1, 0);
+        break;
+      case "DOWN":
+        moved = moveTiles(newBoard, 1, 0);
+        break;
+      case "LEFT":
+        moved = moveTiles(newBoard, 0, -1);
+        break;
+      case "RIGHT":
+        moved = moveTiles(newBoard, 0, 1);
+        break;
+      default:
+        break;
+    }
+
+    if (moved) {
+      placeRandomTile(newBoard);
+      setBoard(newBoard);
+    }
+  };
+
+  const moveTiles = (currentBoard, rowDirection, colDirection) => {
+    let moved = false;
+
+    for (
+      let row = rowDirection === 1 ? BoardSize - 1 : 0;
+      rowDirection === 1 ? row >= 0 : row < BoardSize;
+      rowDirection === 1 ? row-- : row++
+    ) {
+      for (
+        let col = colDirection === 1 ? BoardSize - 1 : 0;
+        colDirection === 1 ? col >= 0 : col < BoardSize;
+        colDirection === 1 ? col-- : col++
+      ) {
+        const tileValue = currentBoard[row][col];
+
+        if (tileValue !== 0) {
+          let newRow = row;
+          let newCol = col;
+
+          while (
+            newRow + rowDirection >= 0 &&
+            newRow + rowDirection < BoardSize &&
+            newCol + colDirection >= 0 &&
+            newCol + colDirection < BoardSize &&
+            currentBoard[newRow + rowDirection][newCol + colDirection] === 0
+          ) {
+            currentBoard[newRow + rowDirection][
+              newCol + colDirection
+            ] = tileValue;
+            currentBoard[newRow][newCol] = 0;
+            newRow += rowDirection;
+            newCol += colDirection;
+            moved = true;
+          }
+
+          if (
+            newRow + rowDirection >= 0 &&
+            newRow + rowDirection < BoardSize &&
+            newCol + colDirection >= 0 &&
+            newCol + colDirection < BoardSize &&
+            currentBoard[newRow + rowDirection][newCol + colDirection] ===
+              tileValue
+          ) {
+            currentBoard[newRow + rowDirection][newCol + colDirection] *= 2;
+            currentBoard[newRow][newCol] = 0;
+            setScore((prevScore) => prevScore + tileValue * 2);
+            moved = true;
+          }
+        }
+      }
+    }
+
+    return moved;
+  };
+
+  const renderBoard = () => {
+    return board.map((row, rowIndex) => (
+      <View key={rowIndex} style={styles.row}>
+        {row.map((cell, colIndex) => (
+          <TouchableOpacity
+            key={colIndex}
+            style={[styles.cell, { backgroundColor: getTileColor(cell) }]}
+          >
+            <Text style={styles.cellText}>{cell !== 0 ? cell : ""}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    ));
+  };
+
+  const getTileColor = (value) => {
+    const colorMap = {
+      0: "#9e9e9e",
+      2: "#64b5f6",
+      4: "#42a5f5",
+      8: "#2196f3",
+      16: "#1e88e5",
+      32: "#1976d2",
+      64: "#1565c0",
+      128: "#0d47a1",
+      256: "#0a4c6e",
+      512: "#b2ebf2",
+      1024: "#80deea",
+      2048: "#4dd0e1",
+    };
+
+    return colorMap[value] || "#9e9e9e";
+  };
+
+  const onSwipe = (gestureName, gestureState) => {
+    const { dx, dy } = gestureState;
+    const direction = getSwipeDirection(dx, dy);
+    if (direction) {
+      setSwipeDirection(direction);
+      handleSwipe(direction);
+    }
+  };
+
+  const getSwipeDirection = (dx, dy) => {
+    const threshold = 50; // Adjust as needed
   
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold) {
+      return dx > 0 ? "RIGHT" : "LEFT";
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > threshold) {
+      return dy > 0 ? "DOWN" : "UP";
+    }
   
+    return null;
+  };
+
+  const restartGame = () => {
+    initializeGame();
+  };
+
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Wordle Game</Text>
-      <Text>Attempts: {attempts}</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setGuess(text)}
-        value={guess}
-        placeholder="Enter your guess"
-      />
-      <Button title="Guess" onPress={handleGuess} />
-      <Text style={styles.answer}>Answer: {targetWord}</Text>
-
-      <View style={styles.enteredWordsContainer}>
-        <Text style={styles.enteredWordsLabel}>Entered Words:</Text>
-        <View style={styles.enteredWordsList}>{enteredWords}</View>
+    <GestureRecognizer
+      onSwipe={(direction, state) => onSwipe(direction, state)}
+      config={{ velocityThreshold: 0.3, directionalOffsetThreshold: 80 }}
+      style={styles.container}
+    >
+      <View style={styles.container}>
+        <Text style={styles.score}>Score: {score}</Text>
+        <View style={styles.gameBoard}>{renderBoard()}</View>
+        <Text style={styles.instructions}>
+          Swipe to combine tiles and reach 2048!{"\n"}
+          Last Swipe Direction: {swipeDirection}
+        </Text>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={restartGame}>
+            <Text style={styles.buttonText}>Restart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}  onPress={() => navigation.navigate("Homescreen")}>
+            <Text style={styles.buttonText}>Quit to Menu</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </GestureRecognizer>
   );
 };
 
@@ -118,40 +217,49 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+  gameBoard: {
+    flexDirection: "column",
   },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 20,
-    padding: 10,
-    width: 200,
-  },
-  answer: {
-    marginTop: 20,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  highlightedWord: {
+  row: {
     flexDirection: "row",
   },
-  enteredWordsContainer: {
-    marginTop: 10,
+  cell: {
+    width: 80,
+    height: 80,
+    margin: 5,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
   },
-  enteredWordsLabel: {
-    fontSize: 16,
+  cellText: {
+    fontSize: 24,
     fontWeight: "bold",
+    color: "white",
   },
-  enteredWordsList: {
+  score: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  instructions: {
+    fontSize: 16,
+    marginTop: 20,
+    textAlign: "center",
+  },
+  buttonsContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 5,
+    marginTop: 20,
+  },
+  button: {
+    backgroundColor: "#2196f3",
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
-export default Gamescreen;
+export default Game2048;
