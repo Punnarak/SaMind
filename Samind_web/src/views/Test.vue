@@ -244,13 +244,10 @@
                         <v-divider class="mt-3 mb-3" insert></v-divider>
                       </div>
                     </div>
-
-                    <label class="text">Due date</label>
-                    <b-form-datepicker
-                      id="example-datepicker"
-                      v-model="value"
-                      class="mb-2"
-                    ></b-form-datepicker>
+                    <div class="duedate">
+                      <label class="text">Due date</label>
+                      <!-- <v-date-picker v-model="selectedDate"></v-date-picker> -->
+                    </div>
                   </slot>
                 </div>
 
@@ -486,9 +483,6 @@ export default {
     deletePopup: Boolean,
     sendPopup: Boolean,
   },
-  components: {
-    Datepicker,
-  },
   data() {
     return {
       selectedDuplicateTest: null,
@@ -612,7 +606,6 @@ import { onMounted, computed } from "vue";
 import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
-
 // let test = ref([]);
 let test = ref([
   {
