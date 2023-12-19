@@ -497,11 +497,13 @@ export default {
     return {
       selectedDuplicateTest: null,
       selectTest: [],
+      sendPopup: false,
       sendingPopup: false,
       dueDate: null,
       donePopup: false,
-      checkedNames: [],
+      // checkedNames: [],
       dateValidate: false,
+      testDuplicate: [],
     };
   },
   methods: {
@@ -554,21 +556,24 @@ export default {
       });
     },
     handleCheckboxChange(patientId) {
-      const index = this.checkedNames.indexOf(patientId);
+      const index = checkedNames.value.indexOf(patientId);
 
       if (index === -1) {
         // If the patientId is not in the array, add it
-        this.checkedNames.push(patientId);
+        checkedNames.value.push(patientId);
       } else {
         // If the patientId is already in the array, remove it
-        this.checkedNames.splice(index, 1);
+        checkedNames.value.splice(index, 1);
       }
     },
     dateValidation(value) {
       const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
 
       if (!value) {
+        this.dateValidate = false;
         return "Please enter a date";
+      } else {
+        this.dateValidate = true;
       }
 
       if (!dateRegex.test(value)) {
@@ -609,11 +614,15 @@ export default {
       return true;
     },
     handleSendTestClick() {
-      if (!this.dateValidate) {
+      console.log("check", this.dateValidate, checkedNames.value.length);
+      if (this.dateValidate === false || checkedNames.value.length === 0) {
       } else {
+        console.log("Selected Patients IDs:", checkedNames.value);
         this.sendPopup = false;
         this.sendingPopup = true;
-        console.log("Selected Patients IDs:", this.checkedNames);
+        // this.$set(this, "checkedNames", []);
+        checkedNames.value = [];
+
         this.loadSendingAnimation();
       }
     },
@@ -634,6 +643,8 @@ export default {
         setTimeout(() => {
           this.sendingPopup = false;
           this.donePopup = true;
+          // this.checkedNames = []; ---> อย่าลืมเคลียร์ค่าผู้ป่วยที่เลือกในแต่ละรอบ
+          this.dueDate = null;
           this.loadSendingAnimation2();
         }, 3000);
       });
@@ -696,6 +707,21 @@ onMounted(async () => {
 //   },
 // ]);
 let checkedNames = ref([]);
+// let test = ref([]);
+// let test = ref([
+//   {
+//     id: 1,
+//     testName: "Test1",
+//     action: "1",
+//   },
+//   {
+//     id: 2,
+//     testName: "Test2",
+//     action: "1",
+//   },
+// ]);
+// let testDuplicate = ["tset1", "test2", "test3"];
+let testDuplicate = ref([]);
 let searchPatient = ref("");
 const filteredPatients = computed(() => {
   const searchTerm = searchPatient.value.toLowerCase();
@@ -703,8 +729,6 @@ const filteredPatients = computed(() => {
     item.patientName.toLowerCase().includes(searchTerm)
   );
 });
-
-let testDuplicate = ["Test1", "Test2", "Test3"];
 
 const patients = [
   {
@@ -798,6 +822,9 @@ const patients = [
     action: "6%",
   },
 ];
+onMounted(() => {
+  testDuplicate.value = test.value.map((testItem) => testItem.testName);
+});
 // onMounted(async () => {
 //   try {
 //     const response = await axios.get("/questiontype", {
@@ -843,7 +870,7 @@ const filteredTest = computed(() => {
 </script>
 <style scoped>
 .custom-placeholder ::placeholder {
-  font-size: 11.8px;
+  font-size: 11.6px;
 }
 .send-popup-header {
   display: flex;
