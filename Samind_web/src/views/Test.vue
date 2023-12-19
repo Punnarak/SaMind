@@ -41,7 +41,7 @@
       <template v-slot:item.action="{ item }">
         <v-icon
           style="margin-right: 20px"
-          @click="handleEditTest(item.columns.testName)"
+          @click="handleEditTest(item.columns.testname)"
           >mdi-pencil</v-icon
         >
         <v-icon @click="(deletePopup = true), (selectTest = item)"
@@ -56,7 +56,7 @@
 
         <v-icon
           style="margin-left: 20px"
-          @click="handleCopyTest(item.columns.testName)"
+          @click="handleCopyTest(item.columns.testname)"
           >mdi-content-copy</v-icon
         >
         <Transition name="createwith-modal">
@@ -485,6 +485,7 @@
 </template>
 
 <script>
+import axios from "../axios.js";
 export default {
   props: {
     createWithPopup: Boolean,
@@ -509,7 +510,7 @@ export default {
       this.$router.push({
         name: "createtest", // Use the route name instead of path
         query: {
-          testName: "mocktestduplicate",
+          testName: testName,
         },
       });
     },
@@ -539,7 +540,7 @@ export default {
       this.$router.push({
         name: "edittest", // Use the route name instead of path
         query: {
-          testName: "mocktestedit",
+          testName: testName,
         },
       });
     },
@@ -836,7 +837,7 @@ let search = ref("");
 const filteredTest = computed(() => {
   const searchTerm = search.value.toLowerCase();
   return test.value.filter((item) =>
-    item.testName.toLowerCase().includes(searchTerm)
+    item.testname.toLowerCase().includes(searchTerm)
   );
 });
 </script>

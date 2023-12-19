@@ -44,7 +44,7 @@
         >
           Test Detail
         </v-list-subheader>
-        <v-divider inset></v-divider>
+        <v-divider insert></v-divider>
 
         <!-- Test Name -->
         <v-list-item>
@@ -71,7 +71,7 @@
           </v-col>
         </v-list-item>
 
-        <v-divider inset></v-divider>
+        <v-divider insert></v-divider>
         <!-- Question Section -->
         <v-list-item
           class="ml-4"
@@ -104,6 +104,7 @@
                 <v-icon color="white">mdi-plus</v-icon>
               </v-btn>
             </v-row>
+            <!-- Options for the question -->
             <!-- Options for the question -->
             <v-radio-group v-model="question.answer">
               <v-row
@@ -141,9 +142,8 @@
                 </v-col>
               </v-row>
             </v-radio-group>
-
-            <v-divider insert></v-divider>
           </v-col>
+          <v-divider insert></v-divider>
         </v-list-item>
       </v-list>
     </v-card>
@@ -151,19 +151,16 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import axios from "../axios";
+import { onMounted, ref } from "vue";
+import axios from "../axios.js";
+
 export default {
-  props: ["testNameCreate", "questionsCreate"],
   data() {
     return {
       questions: [
         {
-          no: "",
-          question: "",
+          text: "",
           options: [""], // Initialize with an empty option for this question
-          type: "",
-          answer: "",
         },
       ],
       testName: "",
@@ -175,9 +172,6 @@ export default {
       ],
     };
   },
-  created() {
-    // console.log("query param", this.$router.query.testName);
-  },
   mounted() {
     this.mockTestData();
   },
@@ -185,27 +179,47 @@ export default {
   methods: {
     mockTestData() {
       console.log("query param", this.$route.query);
-      if (this.$route.query.testName != null) {
+      if (this.$route.query != null) {
         this.testName = this.$route.query.testName;
-        console.log("copytest: ", this.testName);
+        console.log("edittest: ", this.testName);
+        
+        // let questionsapi = [
+        //   {
+        //     no: 1,
+        //     question: "What is your favorite color?",
+        //     options: ["Red", "Green", "Blue"],
+        //     type: "Mock Type",
+        //     answer: "Red", // Index of the correct answer in the options array
+        //   },
+        //   {
+        //     no: 2,
+        //     question: "How many fingers do you have?",
+        //     options: ["Four", "Five", "Six"],
+        //     type: "Mock Type",
+        //     answer: "Five", // Index of the correct answer in the options array
+        //   },
+        // ];
+        
+          let test = ref([]);
+          const param = {
+            type: this.testName,
+          };
+          axios
+            .post("/viewOneQuestion", param, {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            })
+            .then((response) => {
+              console.log("response123456", response.data);
+              test.value = response.data
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
 
-        let questionsapi = [
-          {
-            no: 1,
-            question: "What is your favorite color?",
-            options: ["Red", "Green", "Blue"],
-            type: "Mock Type",
-            answer: "Red", // Index of the correct answer in the options array
-          },
-          {
-            no: 2,
-            question: "How many fingers do you have?",
-            options: ["Four", "Five", "Six"],
-            type: "Mock Type",
-            answer: "Five", // Index of the correct answer in the options array
-          },
-        ];
-        this.questions = questionsapi;
+        this.questions = test;
         console.log("Questions:", this.questions);
       }
     },
