@@ -503,7 +503,7 @@ export default {
       donePopup: false,
       // checkedNames: [],
       dateValidate: false,
-      testDuplicate: [],
+      // testDuplicate: [],
     };
   },
   methods: {
@@ -675,52 +675,8 @@ import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
 let test = ref([]);
-onMounted(async () => {
-  const param = {
-    therapist_id: 5555,
-  };
-  await axios
-    .post("/allTest", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      test.value = response.data.map((patient, index) => ({
-        no: patient.no,
-        testname: patient.testname,
-
-        // action: patient.action, // Add this line if "action" property is present
-      }));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-});
-// let test = ref([
-//   {
-//     id: 1,
-//     testName: "Test1",
-//     action: "1",
-//   },
-// ]);
 let checkedNames = ref([]);
-// let test = ref([]);
-// let test = ref([
-//   {
-//     id: 1,
-//     testName: "Test1",
-//     action: "1",
-//   },
-//   {
-//     id: 2,
-//     testName: "Test2",
-//     action: "1",
-//   },
-// ]);
-// let testDuplicate = ["tset1", "test2", "test3"];
+
 let testDuplicate = ref([]);
 let searchPatient = ref("");
 const filteredPatients = computed(() => {
@@ -822,8 +778,30 @@ const patients = [
     action: "6%",
   },
 ];
-onMounted(() => {
-  testDuplicate.value = test.value.map((testItem) => testItem.testName);
+onMounted(async () => {
+  const param = {
+    therapist_id: 5555,
+  };
+  await axios
+    .post("/allTest", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      test.value = response.data.map((patient, index) => ({
+        no: patient.no,
+        testname: patient.testname,
+
+        // action: patient.action, // Add this line if "action" property is present
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  testDuplicate.value = test.value.map((testItem) => testItem.testname);
 });
 // onMounted(async () => {
 //   try {
