@@ -179,8 +179,18 @@ export default function Library() {
           borderWidth: 1,
           borderColor: "#569AFF",
           backgroundColor: "#569AFF",
-
-          marginTop: "-9.65%",
+          ...Platform.select({
+      android: { 
+        // marginTop: verticalScale(-38.5),
+        marginTop: "-9.85%",
+        
+     },
+      ios: { 
+        marginTop: verticalScale(-36.2),
+        // marginTop: "-9.65%",
+      },
+    }),
+          // marginTop: "-9.65%",
           marginLeft: "61%",
         }}
       />

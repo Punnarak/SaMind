@@ -459,6 +459,7 @@ const styles = StyleSheet.create({
     // fontSize: 23,
     color: "black",
     marginTop: "1%",
+    // marginLeft: "55%",
     marginLeft: "55%",
     fontWeight: "bold",
   },
@@ -495,10 +496,11 @@ const styles = StyleSheet.create({
   n: {
     ...Platform.select({
       android: {
-        left: 30,
+        left: horizontalScale(25),
         width: horizontalScale(150),
+
       },
-      ios: {},
+      ios: {left: horizontalScale(15),},
     }),
     fontSize: moderateScale(23),
     // fontSize: 23,
