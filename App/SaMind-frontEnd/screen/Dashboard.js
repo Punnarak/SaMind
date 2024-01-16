@@ -5,13 +5,14 @@ import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
-export default function Login({route}) {
+export default function Login({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
-  const [moodCard, setMoodCard] = useState("");
-   useEffect(() => {
+  const [moodCard, setMoodCard] = useState("happy");
+  useEffect(() => {
     console.log("Dashboard Screen", patientId);
     const param = {
       patient_id: patientId,
@@ -19,12 +20,10 @@ export default function Login({route}) {
     axios
       .post("/dashboard_api", param)
       .then((response) => {
-        
-          console.log("in");
-          setData(response.data);
-          console.log ("data:", response.data)
-          setMood(response.data.avgMood)
-
+        console.log("in");
+        setData(response.data);
+        console.log("data:", response.data);
+        setMood(response.data.avgMood);
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -44,6 +43,7 @@ export default function Login({route}) {
       setMoodCard("cheerful");
     }
   };
+
   return (
     <ImageBackground
       source={require("../assets/Game.png")}
@@ -51,9 +51,12 @@ export default function Login({route}) {
     >
       <View
         style={{
+          ...Platform.select({
+            android: { marginTop: 55 },
+            ios: { marginTop: 78 },
+          }),
           flexDirection: "row",
           // marginTop: "20%",
-          marginTop: 78,
         }}
       >
         <Ionicons
@@ -72,6 +75,10 @@ export default function Login({route}) {
         style={{
           flexDirection: "row",
           alignItems: "center",
+          ...Platform.select({
+            android: { marginTop: "-1%" },
+            ios: {},
+          }),
         }}
       >
         <Text style={styles.con1}>Average Mood</Text>
@@ -80,6 +87,7 @@ export default function Login({route}) {
       {moodCard == "cheerful" && (
         <View style={styles.cheerfulbox}>
           <Image
+            //บน
             source={require("../assets/cl.png")}
             style={{
               position: "absolute",
@@ -92,6 +100,7 @@ export default function Login({route}) {
             }}
           />
           <Image
+            // กลาง ขวา
             source={require("../assets/cl.png")}
             style={{
               position: "absolute",
@@ -104,6 +113,7 @@ export default function Login({route}) {
             }}
           />
           <Image
+            //กลาง ซ้าย
             source={require("../assets/cl.png")}
             style={{
               position: "absolute",
@@ -116,24 +126,28 @@ export default function Login({route}) {
             }}
           />
           <Image
+            //ล่าง
             source={require("../assets/cl.png")}
             style={{
+              ...Platform.select({
+                android: { marginTop: "25%" },
+                ios: { marginTop: "27.4%" },
+              }),
               position: "absolute",
               width: 30,
               height: 30,
               zIndex: 4,
               resizeMode: "contain",
-              marginTop: "27.4%",
               marginLeft: "17%",
             }}
           />
           <Image
-            source={require("../assets/m2.png")}
+            source={require("../assets/m1.png")}
             style={{
               width: 50,
               height: 50,
               zIndex: 5,
-              backgroundColor: "#FFD700",
+              backgroundColor: "rgba(255, 204, 77, 1)",
               tintColor: "#000000",
               borderRadius: 30,
               marginTop: "15%",
@@ -149,16 +163,24 @@ export default function Login({route}) {
             }}
           >
             <Text
-              style={{ fontSize: 14, color: "#FBC02D", fontWeight: "bold" }}
+              style={{ fontSize: 14, color: "#D0A449", fontWeight: "bold" }}
             >
               Cheerful
             </Text>
-            <Text style={{ fontSize: 10, color: "#FBC02D", marginTop: "5%" }}>
-              Be happy for this moment.{"\n"}This moment is your life, and{" "}
-              {"\n"}
-              SaMind is also happy for you.
+            <Text style={{ fontSize: 11, color: "#D0A449", marginTop: "5%" }}>
+              This joyous feeling is{"\n"}contagious! Who else can we{"\n"}share
+              it with to brighten their day?
             </Text>
-            <Text style={{ fontSize: 8, color: "#FBC02D", marginTop: "12%" }}>
+            <Text
+              style={{
+                fontSize: 8,
+                color: "#D0A449",
+                ...Platform.select({
+                  android: { marginTop: "8%" },
+                  ios: { marginTop: "12%" },
+                }),
+              }}
+            >
               AVG between {data.dateBetween}
             </Text>
           </View>
@@ -206,12 +228,15 @@ export default function Login({route}) {
           <Image
             source={require("../assets/cl.png")}
             style={{
+              ...Platform.select({
+                android: { marginTop: "25%" },
+                ios: { marginTop: "27.4%" },
+              }),
               position: "absolute",
               width: 30,
               height: 30,
               zIndex: 4,
               resizeMode: "contain",
-              marginTop: "27.4%",
               marginLeft: "17%",
             }}
           />
@@ -221,7 +246,7 @@ export default function Login({route}) {
               width: 50,
               height: 50,
               zIndex: 5,
-              backgroundColor: "#FFB06A",
+              backgroundColor: "rgba(88, 207, 237, 1)",
               tintColor: "#000000",
               borderRadius: 30,
               marginTop: "15%",
@@ -237,16 +262,35 @@ export default function Login({route}) {
             }}
           >
             <Text
-              style={{ fontSize: 14, color: "#E9967A", fontWeight: "bold" }}
+              style={{
+                fontSize: 14,
+                color: "rgba(57, 135, 253, 1)",
+                fontWeight: "bold",
+              }}
             >
               Happy
             </Text>
-            <Text style={{ fontSize: 10, color: "#E9967A", marginTop: "5%" }}>
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(57, 135, 253, 1)",
+                marginTop: "5%",
+              }}
+            >
               Be happy for this moment.{"\n"}This moment is your life, and{" "}
               {"\n"}
               SaMind is also happy for you.
             </Text>
-            <Text style={{ fontSize: 8, color: "#E9967A", marginTop: "12%" }}>
+            <Text
+              style={{
+                fontSize: 8,
+                color: "rgba(57, 135, 253, 1)",
+                ...Platform.select({
+                  android: { marginTop: "8%" },
+                  ios: { marginTop: "12%" },
+                }),
+              }}
+            >
               AVG between {data.dateBetween}
             </Text>
           </View>
@@ -294,22 +338,25 @@ export default function Login({route}) {
           <Image
             source={require("../assets/cl.png")}
             style={{
+              ...Platform.select({
+                android: { marginTop: "25%" },
+                ios: { marginTop: "27.4%" },
+              }),
               position: "absolute",
               width: 30,
               height: 30,
               zIndex: 4,
               resizeMode: "contain",
-              marginTop: "27.4%",
               marginLeft: "17%",
             }}
           />
           <Image
-            source={require("../assets/m2.png")}
+            source={require("../assets/m3.png")}
             style={{
               width: 50,
               height: 50,
               zIndex: 5,
-              backgroundColor: "#C1EAC1",
+              backgroundColor: "rgba(206, 109, 255, 1)",
               tintColor: "#000000",
               borderRadius: 30,
               marginTop: "15%",
@@ -325,16 +372,35 @@ export default function Login({route}) {
             }}
           >
             <Text
-              style={{ fontSize: 14, color: "#808000", fontWeight: "bold" }}
+              style={{
+                fontSize: 14,
+                color: "rgba(135, 0, 204, 1)",
+                fontWeight: "bold",
+              }}
             >
               So so
             </Text>
-            <Text style={{ fontSize: 10, color: "#808000", marginTop: "5%" }}>
-              Be happy for this moment.{"\n"}This moment is your life, and{" "}
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(135, 0, 204, 1)",
+                marginTop: "5%",
+              }}
+            >
+              You have a good day and it{"\n"}have noting to bother you, and{" "}
               {"\n"}
-              SaMind is also happy for you.
+              SaMind will make you happier.
             </Text>
-            <Text style={{ fontSize: 8, color: "#808000", marginTop: "12%" }}>
+            <Text
+              style={{
+                ...Platform.select({
+                  android: { marginTop: "8%" },
+                  ios: { marginTop: "12%" },
+                }),
+                fontSize: 8,
+                color: "rgba(135, 0, 204, 1)",
+              }}
+            >
               AVG between {data.dateBetween}
             </Text>
           </View>
@@ -382,22 +448,25 @@ export default function Login({route}) {
           <Image
             source={require("../assets/cl.png")}
             style={{
+              ...Platform.select({
+                android: { marginTop: "25%" },
+                ios: { marginTop: "27.4%" },
+              }),
               position: "absolute",
               width: 30,
               height: 30,
               zIndex: 4,
               resizeMode: "contain",
-              marginTop: "27.4%",
               marginLeft: "17%",
             }}
           />
           <Image
-            source={require("../assets/m2.png")}
+            source={require("../assets/m4.png")}
             style={{
               width: 50,
               height: 50,
               zIndex: 5,
-              backgroundColor: "#e8e8e8",
+              backgroundColor: "rgba(131, 131, 255, 1)",
               tintColor: "#000000",
               borderRadius: 30,
               marginTop: "15%",
@@ -413,16 +482,34 @@ export default function Login({route}) {
             }}
           >
             <Text
-              style={{ fontSize: 14, color: "#696969", fontWeight: "bold" }}
+              style={{
+                fontSize: 14,
+                color: "rgba(60, 90, 154, 1)",
+                fontWeight: "bold",
+              }}
             >
               Bad
             </Text>
-            <Text style={{ fontSize: 10, color: "#696969", marginTop: "5%" }}>
-              Be happy for this moment.{"\n"}This moment is your life, and{" "}
-              {"\n"}
-              SaMind is also happy for you.
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(60, 90, 154, 1)",
+                marginTop: "5%",
+              }}
+            >
+              Don’t be sad for this moment.You{"\n"}can pass through it and meet
+              a better thing, and Samind always beside you
             </Text>
-            <Text style={{ fontSize: 8, color: "#696969", marginTop: "12%" }}>
+            <Text
+              style={{
+                ...Platform.select({
+                  android: { marginTop: "8%" },
+                  ios: { marginTop: "5%" },
+                }),
+                fontSize: 9,
+                color: "rgba(60, 90, 154, 1)",
+              }}
+            >
               AVG between {data.dateBetween}
             </Text>
           </View>
@@ -468,24 +555,28 @@ export default function Login({route}) {
             }}
           />
           <Image
+            //ล่าง
             source={require("../assets/cl.png")}
             style={{
+              ...Platform.select({
+                android: { marginTop: "25%" },
+                ios: { marginTop: "27.4%" },
+              }),
               position: "absolute",
               width: 30,
               height: 30,
               zIndex: 4,
               resizeMode: "contain",
-              marginTop: "27.4%",
               marginLeft: "17%",
             }}
           />
           <Image
-            source={require("../assets/m2.png")}
+            source={require("../assets/m5.png")}
             style={{
               width: 50,
               height: 50,
               zIndex: 5,
-              backgroundColor: "#FFC0CB",
+              backgroundColor: "rgba(156, 156, 160, 1)",
               tintColor: "#000000",
               borderRadius: 30,
               marginTop: "15%",
@@ -501,16 +592,35 @@ export default function Login({route}) {
             }}
           >
             <Text
-              style={{ fontSize: 14, color: "#800020", fontWeight: "bold" }}
+              style={{
+                fontSize: 14,
+                color: "rgba(37, 39, 28, 1)",
+                fontWeight: "bold",
+              }}
             >
               Terrible
             </Text>
-            <Text style={{ fontSize: 10, color: "#800020", marginTop: "5%" }}>
-              Be happy for this moment.{"\n"}This moment is your life, and{" "}
-              {"\n"}
-              SaMind is also happy for you.
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(37, 39, 28, 1)",
+                marginTop: "5%",
+              }}
+            >
+              It's okay to feel sad in this moment.{"\n"}Grief is a natural part
+              of life, and {"\n"}
+              SaMind is here to listen.
             </Text>
-            <Text style={{ fontSize: 8, color: "#800020", marginTop: "12%" }}>
+            <Text
+              style={{
+                ...Platform.select({
+                  android: { marginTop: "8%" },
+                  ios: { marginTop: "12%" },
+                }),
+                fontSize: 9,
+                color: "rgba(37, 39, 28, 1)",
+              }}
+            >
               AVG between {data.dateBetween}
             </Text>
           </View>
@@ -536,10 +646,23 @@ export default function Login({route}) {
                 marginTop: "1%",
               }}
             >
-              <Text style={styles.q}>{data.historyTest && data.historyTest.type1 !== null ? data.historyTest.type1 : null }</Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ {data.historyTest && data.historyTest.date1 !== null ? data.historyTest.date1 : null }</Text>
+              <Text style={styles.q}>
+                {data.historyTest && data.historyTest.type1 !== null
+                  ? data.historyTest.type1
+                  : null}
+              </Text>
+              <Text style={styles.d}>
+                ทดสอบเมื่อวันที่{" "}
+                {data.historyTest && data.historyTest.date1 !== null
+                  ? data.historyTest.date1
+                  : null}
+              </Text>
             </View>
-            <Text style={styles.r}>{data.historyTest && data.historyTest.result1 !== null ? data.historyTest.result1 : null }</Text>
+            <Text style={styles.r}>
+              {data.historyTest && data.historyTest.result1 !== null
+                ? data.historyTest.result1
+                : null}
+            </Text>
           </View>
           <View
             style={{
@@ -563,13 +686,28 @@ export default function Login({route}) {
                 marginTop: "1%",
               }}
             >
-              <Text style={styles.q}>{data.historyTest && data.historyTest.type2 !== null ? data.historyTest.type2 : null }</Text>
-              <Text style={styles.d}>ทดสอบเมื่อวันที่ {data.historyTest && data.historyTest.date2 !== null ? data.historyTest.date2 : null }</Text>
+              <Text style={styles.q}>
+                {data.historyTest && data.historyTest.type2 !== null
+                  ? data.historyTest.type2
+                  : null}
+              </Text>
+              <Text style={styles.d}>
+                ทดสอบเมื่อวันที่{" "}
+                {data.historyTest && data.historyTest.date2 !== null
+                  ? data.historyTest.date2
+                  : null}
+              </Text>
             </View>
-            <Text style={styles.r2}>{data.historyTest && data.historyTest.result2 !== null ? data.historyTest.result2 : null }</Text>
+            <Text style={styles.r2}>
+              {data.historyTest && data.historyTest.result2 !== null
+                ? data.historyTest.result2
+                : null}
+            </Text>
           </View>
         </View>
-        <Text style={styles.title}>อารมณ์ของ {data.name} จากบทสนทนากับ SaMind</Text>
+        <Text style={styles.title}>
+          อารมณ์ของ {data.name} จากบทสนทนากับ SaMind
+        </Text>
 
         <View style={styles.moodavgbox}>
           <View
@@ -620,7 +758,12 @@ export default function Login({route}) {
               >
                 <View style={styles.perbox}>
                   <Text style={styles.moodN}>Positive</Text>
-                  <Text style={styles.moodper}>{data.avatarMoodDetec && data.avatarMoodDetec.positive !== null ? data.avatarMoodDetec.positive : "0%"}</Text>
+                  <Text style={styles.moodper}>
+                    {data.avatarMoodDetec &&
+                    data.avatarMoodDetec.positive !== null
+                      ? data.avatarMoodDetec.positive
+                      : "0%"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -647,7 +790,12 @@ export default function Login({route}) {
               >
                 <View style={styles.perbox}>
                   <Text style={styles.moodN}>Neutral</Text>
-                  <Text style={styles.moodper}>{data.avatarMoodDetec && data.avatarMoodDetec.neutral !== null ? data.avatarMoodDetec.neutral : "0%"}</Text>
+                  <Text style={styles.moodper}>
+                    {data.avatarMoodDetec &&
+                    data.avatarMoodDetec.neutral !== null
+                      ? data.avatarMoodDetec.neutral
+                      : "0%"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -703,12 +851,20 @@ export default function Login({route}) {
               >
                 <View style={styles.perboxa}>
                   <Text style={styles.moodNa}>Negative</Text>
-                  <Text style={styles.moodpera}>{data.avatarMoodDetec && data.avatarMoodDetec.negative !== null ? data.avatarMoodDetec.negative : "0%"}</Text>
+                  <Text style={styles.moodpera}>
+                    {data.avatarMoodDetec &&
+                    data.avatarMoodDetec.negative !== null
+                      ? data.avatarMoodDetec.negative
+                      : "0%"}
+                  </Text>
                 </View>
               </View>
             </View>
-            <Text style={styles.moodNa}>Last talk:{data.dateAvatar !== null ? data.dateAvatar : "No last talk"}</Text>
           </View>
+          <Text style={styles.moodDate}>
+            Last talk:
+            {data.dateAvatar !== null ? data.dateAvatar : "No last talk"}
+          </Text>
         </View>
 
         <View style={styles.undertag}>
@@ -734,6 +890,10 @@ export default function Login({route}) {
 
 const styles = StyleSheet.create({
   container2: {
+    ...Platform.select({
+      android: { marginTop: "-1%" },
+      ios: {},
+    }),
     flex: 1,
     backgroundColor: "white",
     alignItems: "center",
@@ -772,8 +932,8 @@ const styles = StyleSheet.create({
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#FFFF99",
-    borderColor: "#FFFF99",
+    backgroundColor: "#FFF283",
+    borderColor: "#FFF283",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",
@@ -784,8 +944,8 @@ const styles = StyleSheet.create({
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#FFDAB9",
-    borderColor: "#ADD8E6",
+    backgroundColor: "rgba(147, 233, 255, 1)",
+    borderColor: "rgba(147, 233, 255, 1)",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",
@@ -796,8 +956,8 @@ const styles = StyleSheet.create({
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#C1D7C5",
-    borderColor: "#C1D7C5",
+    backgroundColor: "rgba(225, 195, 255, 1)",
+    borderColor: "rgba(225, 195, 255, 1)",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",
@@ -808,8 +968,8 @@ const styles = StyleSheet.create({
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#D3D3D3",
-    borderColor: "#D3D3D3",
+    backgroundColor: "rgba(178, 178, 255, 1)",
+    borderColor: "rgba(178, 178, 255, 1)",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",
@@ -820,8 +980,8 @@ const styles = StyleSheet.create({
     height: "17%",
     // height: 144,
     borderWidth: 1,
-    backgroundColor: "#FFB6C1",
-    borderColor: "#FFB6C1",
+    backgroundColor: "rgba(175, 175, 214, 1)",
+    borderColor: "rgba(175, 175, 214, 1)",
     borderRadius: 16,
     marginTop: "3%",
     marginBottom: "7%",
@@ -863,18 +1023,17 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
   },
   r: {
-    marginLeft: "5%",
+    // marginLeft: "5%", --> for demo
     fontSize: 10,
     color: "#FE493B",
     fontWeight: "bold",
   },
   r2: {
-    marginLeft: "5%",
+    // marginLeft: "5%", --> for demo
     fontSize: 10,
     color: "#FACA42",
     fontWeight: "bold",
   },
-
   title: {
     marginBottom: "4%",
     fontSize: 11,
@@ -957,12 +1116,40 @@ const styles = StyleSheet.create({
     marginTop: "45%",
     marginLeft: "-28%",
   },
+  moodDate: {
+    fontSize: 10,
+    color: "gray",
+    fontWeight: "bold",
+
+    bottom: 0,
+    left: 100,
+  },
   undertag: {
+    ...Platform.select({
+      android: {
+        marginTop: "-1%",
+        elevation: 10,
+        shadowColor: "black", // IOS
+        shadowOffset: { height: 1, width: 1 }, // IOS
+        shadowOpacity: 1, // IOS
+        shadowRadius: 1, //IOS
+
+        height: verticalScale(67.8),
+        width: horizontalScale(380),
+        shadowColor: "rgba(0,0,0, 1)", // IOS
+        backgroundColor: "white",
+
+        flexDirection: "row",
+        alignItems: "center",
+        // marginTop: "7%",
+      },
+      ios: { marginTop: "3%", shadowColor: "rgba(0,0,0, 0.3)" },
+    }),
     width: "120%",
     height: 69.8,
-    marginTop: "2%",
+
     backgroundColor: "white",
-    shadowColor: "rgba(0,0,0, 0.3)", // IOS
+
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
