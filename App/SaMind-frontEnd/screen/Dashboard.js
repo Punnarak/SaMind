@@ -31,7 +31,10 @@ export default function Login({ route }) {
   }, []);
 
   const setMood = (mood) => {
-    if (mood >= 0 && mood <= 1) {
+    mood = parseFloat(mood)
+    mood = mood.toFixed(0);
+    console.log(mood)
+    if (mood == 1) {
       setMoodCard("terrible");
     } else if (mood >= 2 && mood < 3) {
       setMoodCard("bad");
@@ -39,7 +42,7 @@ export default function Login({ route }) {
       setMoodCard("soso");
     } else if (mood >= 4 && mood < 5) {
       setMoodCard("happy");
-    } else if (mood > 4 && mood <= 5) {
+    } else if (mood == 5 ) {
       setMoodCard("cheerful");
     }
   };
@@ -615,7 +618,9 @@ export default function Login({ route }) {
               style={{
                 ...Platform.select({
                   android: { marginTop: "8%" },
-                  ios: { marginTop: "12%" },
+                  ios: { 
+                    marginTop: "12%"
+                   },
                 }),
                 fontSize: 9,
                 color: "rgba(37, 39, 28, 1)",
