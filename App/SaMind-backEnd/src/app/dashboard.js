@@ -142,6 +142,7 @@ router.post('/mood_tracker_post', async (req, res) => {
 //     });
 // });
 
+
 //latest change 17/12/2566
 // router.post('/get_name_user', (req, res) => {
 //   const requestBody = req.body;
@@ -236,26 +237,65 @@ async function getNameUser(patientId) {
 // });
 
 //function getAverageScores
-async function getAverageScores(patientId) {
+// async function getAverageScores(patientId) {
+//   const avgScoreQuery = `
+//     SELECT AVG(score)::numeric(10, 2) AS average_score
+//     FROM mood_tracker
+//     WHERE patient_id = $1
+//       AND date_time >= CURRENT_DATE - INTERVAL '6 days'
+//       AND date_time < CURRENT_DATE + INTERVAL '1 day';
+//   `;
+
+//   try {
+//     const result = await client.query(avgScoreQuery, [patientId]);
+
+//     if (result.rows.length === 0 || result.rows[0].average_score === null || result.rows[0].average_score === undefined) {
+//       return { error: 'Patient not found or has no mood tracker entries.' };
+//     }
+
+//     const average_score = Number(result.rows[0].average_score); // Ensure it's a number
+
+//     const startDate = new Date();
+//     startDate.setDate(startDate.getDate() - 6);
+
+//     const endDate = new Date();
+
+//     const formattedStartDate = `${startDate.getDate()} ${getMonthName(startDate.getMonth())} ${startDate.getFullYear()}`;
+//     const formattedEndDate = `${endDate.getDate()} ${getMonthName(endDate.getMonth())} ${endDate.getFullYear()}`;
+
+//     const dateBetween = `${formattedStartDate} - ${formattedEndDate}`;
+
+//     return {
+//       avgMood: average_score.toFixed(2),
+//       dateBetween,
+//     };
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     return { error: 'An error occurred while fetching average scores' };
+//   }
+// }
+
+//function getAverageScores
+async function getAverageScores(patient_id) {
   const avgScoreQuery = `
-    SELECT AVG(score)::numeric(10, 2) AS average_score
+    SELECT AVG(score)::numeric(10, 2) AS average_score,
+           MIN(date_time) AS earliest_date
     FROM mood_tracker
     WHERE patient_id = $1
-      AND date_time >= CURRENT_DATE - INTERVAL '6 days'
-      AND date_time < CURRENT_DATE + INTERVAL '1 day';
+    GROUP BY patient_id
+    ORDER BY earliest_date DESC
+    LIMIT 7;
   `;
 
   try {
-    const result = await client.query(avgScoreQuery, [patientId]);
-
-    if (result.rows.length === 0 || result.rows[0].average_score === null || result.rows[0].average_score === undefined) {
-      return { error: 'Patient not found or has no mood tracker entries.' };
+    const result = await client.query(avgScoreQuery, [patient_id]);
+    if (result.rows.length === 0 || !result.rows[0].earliest_date) {
+      return { avgMood: null, dateBetween: null };
     }
 
-    const average_score = Number(result.rows[0].average_score); // Ensure it's a number
+    const average_score = result.rows[0].average_score;
 
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 6);
+    const startDate = new Date(result.rows[0].earliest_date);
 
     const endDate = new Date();
 
@@ -264,25 +304,29 @@ async function getAverageScores(patientId) {
 
     const dateBetween = `${formattedStartDate} - ${formattedEndDate}`;
 
-    return {
-      avgMood: average_score.toFixed(2),
-      dateBetween,
-    };
+    return { avgMood: average_score, dateBetween };
   } catch (err) {
     console.error('Error executing query:', err);
-    return { error: 'An error occurred while fetching average scores' };
+    throw err;
   }
 }
 
-
 function getMonthName(month) {
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ];
   return months[month];
 }
 
+
+// function getMonthName(month) {
+//   const months = [
+//     'January', 'February', 'March', 'April', 'May', 'June',
+//     'July', 'August', 'September', 'October', 'November', 'December'
+//   ];
+//   return months[month];
+// }
 
 //least fix 17/12/2023
 // router.post('/two_latest_question', (req, res) => {
@@ -618,6 +662,7 @@ function formatDate(timestamp) {
 //   }
 // });
 
+//main api
 router.post('/dashboard_api', async (req, res) => {
   const { patient_id } = req.body;
 
@@ -644,6 +689,41 @@ router.post('/dashboard_api', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
+// router.post('/dashboard_api', async (req, res) => {
+//   const { patient_id } = req.body;
+
+//   try {
+//     // Call the two APIs sequentially
+//     const nameResult = await getNameUser(patient_id);
+//     console.log('nameResult:', nameResult);
+
+//     const avgMoodResult = await getAverageScores(patient_id);
+//     console.log('avgMoodResult:', avgMoodResult);
+
+//     const historyTestResult = await getHistoryTest(patient_id);
+//     console.log('historyTestResult:', historyTestResult);
+
+//     const avatarMoodDetectionResult = await getAvatarMoodDetection(patient_id);
+//     console.log('avatarMoodDetectionResult:', avatarMoodDetectionResult);
+
+//     // Combine the results into the desired format
+//     const mergedResult = {
+//       name: nameResult.name,
+//       avgMood: avgMoodResult.avgMood,
+//       dateBetween: avgMoodResult.dateBetween,
+//       historyTest: historyTestResult.historyTest,
+//       dateAvatar: avatarMoodDetectionResult.date,
+//       avatarMoodDetec: avatarMoodDetectionResult.avatarMoodDetec,
+//     };
+
+//     res.json(mergedResult);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'An error occurred while fetching data.' });
+//   }
+// });
+
 
 
 
