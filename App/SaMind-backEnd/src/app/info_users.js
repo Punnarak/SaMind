@@ -7,6 +7,7 @@ const jsonParser = bodyParser.json()
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+// const client = require('./connection.js');
 const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
 
 router.post('/info_patient_post', (req, res) => {
@@ -27,6 +28,141 @@ router.post('/info_patient_post', (req, res) => {
         res.status(500).json({ error: 'An error occurred' });
       });
 });
+
+
+router.post('/update_info_patient', async (req, res) => {
+  const { patient_id, email, fname, lname } = req.body;
+
+  if (!patient_id || !email || !fname || !lname) {
+    return res.status(400).json({ error: 'patient_id, email, fname, and lname are required fields.' });
+  }
+
+  const updateFields = Object.keys(req.body).filter(key => key !== 'patient_id');
+  const updateValues = updateFields.map((key, index) => `${key} = $${index + 2}`).join(', ');
+
+  const updateQuery = `
+    UPDATE patient
+    SET ${updateValues}
+    WHERE patient_id = $1
+    RETURNING *;
+  `;
+
+  try {
+    const result = await client.query(updateQuery, [patient_id, email, fname, lname]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: 'Patient not found.' });
+    }
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+router.post('/update_info_user', async (req, res) => {
+  const { patient_id, email, password } = req.body;
+
+  if (!patient_id || !email || !password) {
+    return res.status(400).json({ error: 'patient_id, email, and password are required fields.' });
+  }
+
+  // Hash the password before updating
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const updateQuery = `
+    UPDATE users
+    SET email = $2, password = $3
+    WHERE patient_id = $1
+    RETURNING *;
+  `;
+
+  try {
+    const result = await client.query(updateQuery, [patient_id, email, hashedPassword]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: 'User not found.' });
+    }
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+//merge upper 2 api
+router.post('/update_info', async (req, res) => {
+  const { patient_id, email, fname, lname, password } = req.body;
+
+  if (!patient_id || !email) {
+    return res.status(400).json({ error: 'patient_id and email are required fields.' });
+  }
+
+  // Update patient information
+  const updatePatientFields = ['fname', 'lname'].filter(key => req.body[key] !== undefined);
+  const updatePatientValues = updatePatientFields.map((key, index) => `${key} = $${index + 3}`).join(', ');
+
+  const updatePatientQuery = `
+    UPDATE patient
+    SET email = $2, ${updatePatientValues}
+    WHERE patient_id = $1
+    RETURNING *;
+  `;
+
+  // Update user information
+  if (password !== undefined) {
+    // Hash the password before updating
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updateUserQuery = `
+      UPDATE users
+      SET email = $2, password = $3
+      WHERE patient_id = $1
+      RETURNING *;
+    `;
+
+    try {
+      const resultUser = await client.query(updateUserQuery, [patient_id, email, hashedPassword]);
+      if (resultUser.rows.length > 0) {
+        // User updated successfully, now update patient information
+        try {
+          const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
+          if (resultPatient.rows.length > 0) {
+            res.status(200).json(resultPatient.rows[0]);
+          } else {
+            res.status(404).json({ error: 'Patient not found.' });
+          }
+        } catch (errPatient) {
+          console.error('Error executing patient update query:', errPatient);
+          res.status(500).json({ error: 'An error occurred during patient update.' });
+        }
+      } else {
+        res.status(404).json({ error: 'User not found.' });
+      }
+    } catch (errUser) {
+      console.error('Error executing user update query:', errUser);
+      res.status(500).json({ error: 'An error occurred during user update.' });
+    }
+  } else {
+    // Update patient information only
+    try {
+      const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
+      if (resultPatient.rows.length > 0) {
+        res.status(200).json(resultPatient.rows[0]);
+      } else {
+        res.status(404).json({ error: 'Patient not found.' });
+      }
+    } catch (errPatient) {
+      console.error('Error executing patient update query:', errPatient);
+      res.status(500).json({ error: 'An error occurred during patient update.' });
+    }
+  }
+});
+
+
+
+
 
 // router.get('/info_patient_get', (req, res) => {
 //     const patient_id = req.query.patient_id; // Get the id parameter from the query
@@ -76,9 +212,9 @@ router.post('/info_patient_post', (req, res) => {
 //     });
 // });
 
-router.get('/info_patient_get', (req, res) => {
+router.post('/info_patient_get', (req, res) => {
   const patient_id = req.query.patient_id; // Get the id parameter from the query
-  let query = 'SELECT users.email, patient.patient_id, patient.fname, patient.lname, users.password FROM users LEFT JOIN patient ON patient.patient_id = users.patient_id';
+  let query = 'SELECT users.email, patient.patient_id, patient.fname, patient.lname FROM users LEFT JOIN patient ON patient.patient_id = users.patient_id';
 
   // Check if the id parameter is provided
   if (patient_id) {
@@ -92,18 +228,19 @@ router.get('/info_patient_get', (req, res) => {
 
   client.query(query, queryParams)
     .then(result => {
-      // Decode the base64-encoded password
-      const decodedResult = result.rows.map(row => {
-        return {
+      if (result.rows.length > 0) {
+        const row = result.rows[0]; // Take the first row, assuming there's only one result
+        const decodedResult = {
           email: row.email,
           patient_id: row.patient_id,
           fname: row.fname,
           lname: row.lname,
-          password: Buffer.from(row.password, 'base64').toString('utf-8'),
         };
-      });
 
-      res.json(decodedResult);
+        res.json(decodedResult);
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
     })
     .catch(err => {
       console.error('Error executing query:', err);
