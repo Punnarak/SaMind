@@ -351,10 +351,6 @@ const PopcatGame = () => {
         <Image source={imageSource} style={styles.popcatImage} />
       </TouchableWithoutFeedback>
       <Text style={styles.countText}>{popCount}</Text>
-      <Text style={styles.instructions}>
-        Tap on Popcat to increase the count!{"\n"}
-        Last Swipe Direction: {swipeDirection}
-      </Text>
       <View style={styles.buttonsContainer}>
         <View style={styles.row}>
           <TouchableOpacity
@@ -365,7 +361,7 @@ const PopcatGame = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { width: (windowWidth / 2)- 25, backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3" }]}
-            onPress={popCount < 200 ? null : () => navigateToGame(1)}
+            onPress={popCount < 200 ? null : () => navigation.navigate("Game1")}
             disabled={popCount < 200}
           >
             <Text style={styles.buttonText}>Game 1</Text>

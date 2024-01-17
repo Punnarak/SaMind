@@ -24,6 +24,8 @@ import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
 import Gamescreen from "./screen/Game";
 
+import Game1 from "./screen/Game1";
+
 const Stack = createStackNavigator();
 
 const MainStack = () => {
@@ -132,6 +134,11 @@ const MainStack = () => {
       <Stack.Screen
         name="Gamescreen"
         component={Gamescreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Game1"
+        component={Game1}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
