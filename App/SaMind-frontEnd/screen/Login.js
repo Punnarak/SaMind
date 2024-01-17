@@ -19,8 +19,7 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 //View -> UIView
 export default function Login() {
   const navigation = useNavigation();
-  const { passwordVisibility, togglePasswordVisibility } =
-    usePasswordVisibility();
+  const { passwordVisibility, togglePasswordVisibility } = usePasswordVisibility();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
