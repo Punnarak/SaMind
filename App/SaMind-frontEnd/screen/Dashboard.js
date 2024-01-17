@@ -26,7 +26,7 @@ export default function Login({ route }) {
         setMood(response.data.avgMood);
       })
       .catch((error) => {
-        console.error("Axios error:", error);
+         console.error("Axios error:", error);
       });
   }, []);
 
