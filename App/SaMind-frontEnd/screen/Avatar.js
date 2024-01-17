@@ -189,7 +189,7 @@ export default function Notification() {
           title={isListening ? "Stop Listening" : "Start Listening"}
           onPress={isListening ? handleStopListening : handleStartListening}
         />
-        <Text>Transcription: {transcription}</Text>
+        <Text>{transcription}</Text>
       </View>
       {/* speech to text ---> react native cli*/}
       {/* <View>

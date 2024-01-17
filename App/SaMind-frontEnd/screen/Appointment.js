@@ -200,7 +200,7 @@ export default function Calendar({ route }) {
                   textAlign: "center",
                 }}
               >
-                DR.Somsak Saetang
+                DR.Samind Weerasuk
               </Text>
             )}
             {confirm ? null : (

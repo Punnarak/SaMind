@@ -41,7 +41,7 @@
       <template v-slot:item.action="{ item }">
         <v-icon
           style="margin-right: 20px"
-          @click="handleEditTest(item.columns.testName)"
+          @click="handleEditTest(item.columns.testname)"
           >mdi-pencil</v-icon
         >
         <v-icon @click="(deletePopup = true), (selectTest = item)"
@@ -56,7 +56,7 @@
 
         <v-icon
           style="margin-left: 20px"
-          @click="handleCopyTest(item.columns.testName)"
+          @click="handleCopyTest(item.columns.testname)"
           >mdi-content-copy</v-icon
         >
         <Transition name="createwith-modal">
@@ -201,7 +201,7 @@
               <div class="modal-container send">
                 <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
-                    >Send “{{ item.columns.testName }}”
+                    >Send “{{ item.columns.testname }}”
                   </slot>
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
@@ -211,7 +211,7 @@
                     ><v-text-field
                       class="mt-2 mb-3"
                       density="comfortable"
-                      variant="Solo"
+                      variant="outlined"
                       style="
                         height: 50px;
                         flex-shrink: 0;
@@ -486,6 +486,8 @@
 
 <script>
 let checkedNames = ref([]);
+
+import axios from "../axios.js";
 export default {
   props: {
     createWithPopup: Boolean,
@@ -503,7 +505,7 @@ export default {
       donePopup: false,
       // checkedNames: [],
       dateValidate: false,
-      testDuplicate: [],
+      // testDuplicate: [],
     };
   },
   methods: {
@@ -542,7 +544,7 @@ export default {
       this.$router.push({
         name: "edittest", // Use the route name instead of path
         query: {
-          testName: "mocktestedit",
+          testName: testName,
         },
       });
     },
@@ -557,8 +559,10 @@ export default {
     },
     handleCheckboxChange(patientId) {
       const index = checkedNames.value.indexOf(patientId);
-
-      if (index === -1) {
+      console.log("index", index, patientId);
+      if (index !== -1) {
+        // ---> จริงๆ เป็น index === -1 ---> ที่เป็น !== -1 ตอนนี้เพราะจะทำ demo
+        console.log("inn");
         // If the patientId is not in the array, add it
         checkedNames.value.push(patientId);
       } else {
@@ -673,20 +677,9 @@ import { onMounted, computed } from "vue";
 import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
-// let test = ref([]);
-let test = ref([
-  {
-    id: 1,
-    testName: "Test1",
-    action: "1",
-  },
-  {
-    id: 2,
-    testName: "Test2",
-    action: "1",
-  },
-]);
-// let testDuplicate = ["tset1", "test2", "test3"];
+
+let test = ref([]);
+
 let testDuplicate = ref([]);
 let searchPatient = ref("");
 const filteredPatients = computed(() => {
@@ -788,8 +781,30 @@ const patients = [
     action: "6%",
   },
 ];
-onMounted(() => {
-  testDuplicate.value = test.value.map((testItem) => testItem.testName);
+onMounted(async () => {
+  const param = {
+    therapist_id: 5555,
+  };
+  await axios
+    .post("/allTest", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      test.value = response.data.map((patient, index) => ({
+        no: patient.no,
+        testname: patient.testname,
+
+        // action: patient.action, // Add this line if "action" property is present
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  testDuplicate.value = test.value.map((testItem) => testItem.testname);
 });
 // onMounted(async () => {
 //   try {
@@ -819,9 +834,9 @@ const headers = [
     title: "No.",
     align: "center",
     sortable: false,
-    key: "id",
+    key: "no",
   },
-  { title: "Test Name", key: "testName", sortable: false, align: "center" }, // Update key to "testName"
+  { title: "Test Name", key: "testname", sortable: false, align: "center" }, // Update key to "testName"
   { title: "Action", key: "action", sortable: false, align: "center" },
 ];
 
@@ -830,7 +845,7 @@ let search = ref("");
 const filteredTest = computed(() => {
   const searchTerm = search.value.toLowerCase();
   return test.value.filter((item) =>
-    item.testName.toLowerCase().includes(searchTerm)
+    item.testname.toLowerCase().includes(searchTerm)
   );
 });
 </script>

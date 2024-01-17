@@ -10,17 +10,31 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import assignData from "../upcomingData";
+// import assignData from "../upcomingData";
+import axios from "./axios.js";
 
 export default function IndividualTestList({ route }) {
   const { patientId } = route.params || {};
-  const [individualTestList, setInividualTestList] = useState(
-    individualTestList ? individualTestList : assignData
-  );
+  const [individualTestList, setInividualTestList] = useState([]);
   const navigation = useNavigation();
 
   useEffect(() => {
     console.log("Individual Test List Screen", patientId);
+    const param = {
+      patient_id: patientId,
+    };
+    axios
+      .post("/assignment_status_wait", param)
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          setInividualTestList(response.data);
+        }
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
   }, []);
 
   return (
@@ -70,7 +84,7 @@ export default function IndividualTestList({ route }) {
                         fontStyle: "italic",
                       }}
                     >
-                      {item.title}
+                      {item.createBy} {item.testName}
                     </Text>
                     <Text
                       style={{
@@ -150,7 +164,8 @@ const styles = StyleSheet.create({
   container3: {
     backgroundColor: "white",
     alignItems: "center",
-    width: "790%",
+    // width: "790%"
+    width: "400%",
     height: "77%",
     paddingTop: 10,
     flex: 1,

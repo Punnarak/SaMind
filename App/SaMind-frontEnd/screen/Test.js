@@ -10,16 +10,33 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "./axios.js";
 
 export default function Notification({ route }) {
   const { patientId } = route.params || {};
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
     console.log("Test Screen", patientId);
   }, []);
-
+  const param = {
+    patient_id: patientId,
+  };
+  axios
+    .post("/assignment_status_wait", param)
+    .then((response) => {
+      if (response.data.length != 0) {
+        console.log("in");
+        setDisabled(false)
+      } else {
+        setDisabled(true)
+      }
+      console.log(response.data, response.data.length);
+    })
+    .catch((error) => {
+      console.error("Axios error:", error);
+    });
   return (
     // <View style={styles.container1}>
     <ImageBackground

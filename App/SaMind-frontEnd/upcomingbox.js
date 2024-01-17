@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
-import moment from 'moment';
+import moment from "moment";
 
 const NotificationBox = ({ item, index, data }) => {
   const navigation = useNavigation();
@@ -86,7 +86,7 @@ const NotificationBox = ({ item, index, data }) => {
     "December",
   ];
 
-  const [hours, minutes] = item.time.split(':');
+  const [hours, minutes] = item.time.split(":");
 
   // Create a new Date object and set the hours and minutes
   const dateObject = new Date();
@@ -94,7 +94,11 @@ const NotificationBox = ({ item, index, data }) => {
   dateObject.setMinutes(parseInt(minutes, 10));
 
   // Format the time using Date object methods
-  const formattedTime = dateObject.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+  const formattedTime = dateObject.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
   return (
     <View style={{ flexDirection: "row" }}>
       <View
@@ -106,9 +110,13 @@ const NotificationBox = ({ item, index, data }) => {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <I name="date-range" size={20} color="#D88A63" />
-          <Text style={[styles.header]}>{months[data.month-1]+" "+data.date+" - "+formattedTime}</Text>
+          <Text style={[styles.header]}>
+            {months[data.month - 1] + " " + data.date + " - " + formattedTime}
+          </Text>
         </View>
-        <Text style={[styles.detail]}>{item.therapist_fname+" "+item.therapist_lname}</Text>
+        <Text style={[styles.detail]}>
+          {item.therapist_fname + " " + item.therapist_lname}
+        </Text>
 
         {/* Location section - Conditionally rendered based on the isExpanded state */}
         {isExpanded && (
@@ -201,14 +209,15 @@ const styles = StyleSheet.create({
     paddingVertical: "8%",
   },
 
-  header: { ...Platform.select({
-    android: {
-      left: "0%",
-    },
-    ios: {
-      left: "320%",
-    },
-  }),
+  header: {
+    ...Platform.select({
+      android: {
+        left: "320%",
+      },
+      ios: {
+        left: "0%",
+      },
+    }),
     fontSize: 17,
     color: "#D88A63",
     fontWeight: "bold",
@@ -219,14 +228,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#D88A63",
   },
-  lodetail: {  ...Platform.select({
-    android: {
-      left: "390%",
-    },
-    ios: {
-      left: "320%",
-    },
-  }),fontSize: 15, color: "#D88A63" },
+  lodetail: {
+    ...Platform.select({
+      android: {
+        left: "390%",
+      },
+      ios: {
+        left: "320%",
+      },
+    }),
+    fontSize: 15,
+    color: "#D88A63",
+  },
   description: {
     marginTop: "12.2%",
     fontSize: 15,

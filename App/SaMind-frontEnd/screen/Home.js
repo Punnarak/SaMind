@@ -51,10 +51,11 @@ export default function Home({ route }) {
           setDisabled(false);
         }
         if (response.data.fname) {
+          console.log("DDDDDD", response.data.fname);
           setFName(response.data.fname);
         }
         setSelectedMenu(response.data.moodscore);
-        console.log("checkin", response.data.checkin);
+        console.log("checkin", response.data.checkin, response.data.fname);
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -272,7 +273,7 @@ export default function Home({ route }) {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Dashboardscreen")}
+              onPress={() => navigation.navigate("Dashboardscreen", {patientId})}
             >
               <Text style={styles.Textb}>DASHBOARD</Text>
               <I
@@ -284,7 +285,7 @@ export default function Home({ route }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Loginscreen")}
+              onPress={() => navigation.navigate("Gamescreen")}
             >
               <Text style={styles.Textb}>GAME</Text>
               <I
@@ -458,6 +459,7 @@ const styles = StyleSheet.create({
     // fontSize: 23,
     color: "black",
     marginTop: "1%",
+    // marginLeft: "55%",
     marginLeft: "55%",
     fontWeight: "bold",
   },
@@ -494,10 +496,11 @@ const styles = StyleSheet.create({
   n: {
     ...Platform.select({
       android: {
-        left: 30,
+        left: horizontalScale(25),
         width: horizontalScale(150),
+
       },
-      ios: {},
+      ios: {left: horizontalScale(15),},
     }),
     fontSize: moderateScale(23),
     // fontSize: 23,

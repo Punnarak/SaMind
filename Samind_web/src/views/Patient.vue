@@ -30,9 +30,9 @@
             >mdi-circle</v-icon
           >
           {{
-            item.columns.mood > 400
+            item.columns.mood === "negative"
               ? "negative"
-              : item.columns.mood > 200
+              : item.columns.mood === "neutral"
               ? "neutral"
               : "positive"
           }}
@@ -49,9 +49,8 @@
               path: 'patientdashboard',
               query: {
                 patientId: item.columns.patientId,
-                name: item.columns.patientName,
+                name: item.columns.name,
                 age: item.columns.age,
-                // gender: item.columns.gender,
                 mood: item.columns.mood,
               },
             })
@@ -89,26 +88,41 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
-// onMounted(async () => {
-//   try {
-//     let url = "/question";
-//     await axios
-//       .get(url)
-//       .then((response) => {
-//         console.log(response.data)
-//       })
 
-//   } catch (error) {
-//     console.error("Error fetching products:", error);
-//   }
-// });
+let patients = ref([]);
+onMounted(async () => {
+  const param = {
+    therapist_id: 5555,
+  };
+  await axios
+    .post("/patientList", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      patients.value = response.data.map((patient, index) => ({
+        no: patient.no,
+        patientId: patient.patientId,
+        name: patient.name,
+        age: patient.age,
+        mood: patient.mood,
+        // action: patient.action, // Add this line if "action" property is present
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+});
 
 let search = ref("");
 
 const filteredPatients = computed(() => {
   const searchTerm = search.value.toLowerCase();
-  return patients.filter((item) =>
-    item.patientName.toLowerCase().includes(searchTerm)
+  return patients.value.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm)
   );
 });
 
@@ -120,118 +134,120 @@ const headers = [
     title: "No.",
     align: "center",
     sortable: false,
-    key: "id",
+    key: "no",
   },
   { title: "Patient ID", key: "patientId", align: "start", sortable: false },
-  { title: "Patient Name", key: "patientName", sortable: false },
+  { title: "Patient Name", key: "name", sortable: false },
   { title: "Age", key: "age", align: "center", sortable: false },
   { title: "Mood", key: "mood", align: "center", sortable: false },
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
-const patients = [
-  {
-    id: "01",
-    patientId: "PID001",
-    patientName: "Somsak Test1",
-    age: 24,
-    gender: "male",
-    mood: 4,
-    action: "1%",
-  },
-  {
-    id: "02",
-    patientId: "PID002",
-    patientName: "Somsee Test2",
-    age: 37,
-    gender: "female",
-    mood: 4.3,
-    action: "1%",
-  },
-  {
-    id: "03",
-    patientId: "PID003",
-    patientName: "Somchai Test3",
-    age: 23,
-    gender: "male",
-    mood: 6,
-    action: "7%",
-  },
-  {
-    id: "04",
-    patientId: "PID004",
-    patientName: "Somsom Test4",
-    age: 67,
-    gender: "male",
-    mood: 4.3,
-    action: "8%",
-  },
-  {
-    id: "05",
-    patientId: "PID005",
-    patientName: "Somcheng Test5",
-    age: 49,
-    gender: "female",
-    mood: 3.9,
-    action: "16%",
-  },
-  {
-    id: "06",
-    patientId: "PID006",
-    patientName: "Sompon Test6",
-    age: 94,
-    gender: "female",
-    mood: 0,
-    action: "0%",
-  },
-  {
-    id: "07",
-    patientId: "PID007",
-    patientName: "Somporn Test7",
-    age: 98,
-    gender: "male",
-    mood: 600,
-    action: "2%",
-  },
-  {
-    id: "08",
-    patientId: "PID008",
-    patientName: "Sommon Test8",
-    age: 87,
-    gender: "female",
-    mood: 400,
-    action: "45%",
-  },
-  {
-    id: "09",
-    patientId: "PID009",
-    patientName: "Somrak Test9",
-    age: 51,
-    gender: "male",
-    mood: 200,
-    action: "22%",
-  },
-  {
-    id: "10",
-    patientId: "PID010",
-    patientName: "Somjit Test10",
-    age: 65,
-    gender: "female",
-    mood: 7,
-    action: "6%",
-  },
-  {
-    id: "11",
-    patientId: "PID011",
-    patientName: "Somjit Test11",
-    age: 65,
-    gender: "female",
-    mood: 7,
-    action: "6%",
-  },
-];
+
+// const patients = [
+//   {
+//     id: "01",
+//     patientId: "PID001",
+//     patientName: "Somsak Test1",
+//     age: 24,
+//     gender: "male",
+//     mood: 4,
+//     action: "1%",
+//   },
+//   {
+//     id: "02",
+//     patientId: "PID002",
+//     patientName: "Somsee Test2",
+//     age: 37,
+//     gender: "female",
+//     mood: 4.3,
+//     action: "1%",
+//   },
+//   {
+//     id: "03",
+//     patientId: "PID003",
+//     patientName: "Somchai Test3",
+//     age: 23,
+//     gender: "male",
+//     mood: 6,
+//     action: "7%",
+//   },
+//   {
+//     id: "04",
+//     patientId: "PID004",
+//     patientName: "Somsom Test4",
+//     age: 67,
+//     gender: "male",
+//     mood: 4.3,
+//     action: "8%",
+//   },
+//   {
+//     id: "05",
+//     patientId: "PID005",
+//     patientName: "Somcheng Test5",
+//     age: 49,
+//     gender: "female",
+//     mood: 3.9,
+//     action: "16%",
+//   },
+//   {
+//     id: "06",
+//     patientId: "PID006",
+//     patientName: "Sompon Test6",
+//     age: 94,
+//     gender: "female",
+//     mood: 0,
+//     action: "0%",
+//   },
+//   {
+//     id: "07",
+//     patientId: "PID007",
+//     patientName: "Somporn Test7",
+//     age: 98,
+//     gender: "male",
+//     mood: 600,
+//     action: "2%",
+//   },
+//   {
+//     id: "08",
+//     patientId: "PID008",
+//     patientName: "Sommon Test8",
+//     age: 87,
+//     gender: "female",
+//     mood: 400,
+//     action: "45%",
+//   },
+//   {
+//     id: "09",
+//     patientId: "PID009",
+//     patientName: "Somrak Test9",
+//     age: 51,
+//     gender: "male",
+//     mood: 200,
+//     action: "22%",
+//   },
+//   {
+//     id: "10",
+//     patientId: "PID010",
+//     patientName: "Somjit Test10",
+//     age: 65,
+//     gender: "female",
+//     mood: 7,
+//     action: "6%",
+//   },
+//   {
+//     id: "11",
+//     patientId: "PID011",
+//     patientName: "Somjit Test11",
+//     age: 65,
+//     gender: "female",
+//     mood: 7,
+//     action: "6%",
+//   },
+// ];
+
 function getColor(mood) {
-  if (mood > 400) return "red";
-  else if (mood > 200) return "orange";
+  if (mood === "negative") return "red";
+  else if (mood === "neutral") return "orange";
   else return "green";
 }
 </script>

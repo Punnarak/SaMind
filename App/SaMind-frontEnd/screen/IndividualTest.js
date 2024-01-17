@@ -24,122 +24,27 @@ export default function Notification({ route }) {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [modal, setModal] = useState(false);
   const [check, setCheck] = useState(true); //กรณีคนตอบไม่หมดแล้วส่ง เอาไว้เช็ค
-  const [data, setData] = useState([
-    {
-      id: 1,
-      question: "1. เบื่อ ทำอะไร ๆ ก็ไม่เพลิดเพลิน",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 2,
-      question: "2. ไม่สบายใจ ซึมเศร้า หรือท้อแท้",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 3,
-      question: "3. หลับยาก หรือหลับ ๆ ตื่น ๆ หรือหลับมากไป",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 4,
-      question: "4. เหนื่อยง่าย หรือไม่ค่อยมีแรง",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 5,
-      question: "5. เบื่ออาหาร หรือกินมากเกินไป",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 6,
-      question:
-        "6. รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว หรือเป็นคนทำให้ตัวเอง หรือครอบครัวผิดหวัง",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 7,
-      question:
-        "7. สมาธิไม่ดีเวลาทำอะไร เช่น ดูโทรทัศน์ ฟังวิทยุ หรือทำงานท่ีต้องใช้ความตั้งใจ",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 8,
-      question:
-        "8. พูดหรือทำอะไรช้าจนคนอื่นมองเห็น หรือกระสับกระส่ายจนท่านอยู่ไม่นิ่งเหมือนเคย",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-    {
-      id: 9,
-      question: "9. คิดทำร้ายตนเอง หรือคิดว่าถ้าตาย ๆ ไปเสียคงจะดี",
-      options: [
-        "ไม่เลย",
-        "มีบางวันหรือไม่บ่อย",
-        "มีค่อนข้างบ่อย",
-        "มีเกือบทุกวัน",
-      ],
-    },
-  ]);
+  const [data, setData] = useState([]);
 
   let questions = [];
   useEffect(() => {
-    console.log("Individaul Test Screen", patientId, item.title);
-    // Make a GET request to fetch data from "/question?type=test2"
-    // axios
-    //   .get("/question?type=PHQ9")
-    //   .then((response) => {
-    //     // Set the fetched data in your state
-    //     // response.data = [];
-    //     if (response.data.length != 0) {
-    //       console.log("in");
-    //       setData(response.data);
-    //     }
-
-    //     console.log(response.data, response.data.length);
-    //   })
-    //   .catch((error) => {
-    //     // Handle any errors here
-    //     console.error("Axios error:", error);
-    //   });
+    console.log("Individaul Test Screen", patientId, item.testName);
+    const param = {
+      patient_id: patientId,
+      test_name: item.testName,
+    };
+    axios
+      .post("/individual_test_post", param)
+      .then((response) => {
+        if (response.data.length != 0) {
+          console.log("in");
+          setData(response.data)
+        }
+        console.log(response.data, response.data.length);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
   }, []);
   questions = data;
   // const questions =
@@ -149,7 +54,7 @@ export default function Notification({ route }) {
   };
   const toggleConfirm = () => {
     setModal(!modal);
-    navigation.navigate("IndividualTestList", { patientId });
+    navigation.navigate("Testscreen", { patientId });
   };
 
   const handleOptionSelect = (questionId, option) => {
@@ -161,27 +66,25 @@ export default function Notification({ route }) {
 
   const handleFormSubmit = () => {
     let lData = data.length;
-    let result = 0;
     console.log("Selected options:", selectedOptions);
     if (Object.keys(selectedOptions).length != lData) {
       setCheck(false);
     } else if (Object.keys(selectedOptions).length == lData) {
       setCheck(true);
+      const param = {
+        patientId: patientId,
+        type: item.testName,
+        answer: selectedOptions,
+      };
+      axios
+        .post("/receive_answer_individual_post", param)
+        .then((response) => {
+          console.log("submit success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
     }
-    // const param = {
-    //   score: result,
-    //   type: "PHQ9",
-    //   patient_id: patientId,
-    // };
-    // axios
-    //   .post("/score_question_post", param)
-    //   .then((response) => {
-    //     console.log("submit success", response.data);
-    //   })
-    //   .catch((error) => {
-    //     // Handle any errors here
-    //     console.error("Axios error:", error);
-    //   });
     setModal(!modal);
   };
 
@@ -216,22 +119,22 @@ export default function Notification({ route }) {
             onPress={() => navigation.goBack()}
           />
         </View>
-        <Text style={styles.header}>{item.title}</Text>
+        <Text style={styles.header}>{item.testName}</Text>
       </ImageBackground>
 
       <View style={styles.container3}>
         <ScrollView style={{ width: "100%" }}>
           <View>
             {questions.map((question) => (
-              <View key={question.id}>
-                <Text style={styles.question}>{question.question}</Text>
+              <View key={question.no}>
+                <Text style={styles.question}>{question.no}{". "}{question.question}</Text>
                 {question.options.map((option) => (
                   <RadioItem
                     key={option}
                     value={option}
                     label={option}
-                    selected={selectedOptions[question.id] === option}
-                    onSelect={() => handleOptionSelect(question.id, option)}
+                    selected={selectedOptions[question.no] === option}
+                    onSelect={() => handleOptionSelect(question.no, option)}
                   />
                 ))}
               </View>

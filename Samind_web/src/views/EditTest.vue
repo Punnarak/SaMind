@@ -2,7 +2,7 @@
   <v-col class="px-10">
     <!-- Header and buttons -->
     <v-row align="center">
-      <v-col cols="6" style="font-weight: 600"> Create Test </v-col>
+      <v-col cols="6" style="font-weight: 600"> Edit Test </v-col>
       <v-spacer></v-spacer>
       <v-col cols="2">
         <v-btn
@@ -151,7 +151,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import axios from "../axios.js";
 
 export default {
   data() {
@@ -180,25 +181,45 @@ export default {
       console.log("query param", this.$route.query);
       if (this.$route.query != null) {
         this.testName = this.$route.query.testName;
-        console.log("copytest: ", this.testName);
+        console.log("edittest: ", this.testName);
+        
+        // let questionsapi = [
+        //   {
+        //     no: 1,
+        //     question: "What is your favorite color?",
+        //     options: ["Red", "Green", "Blue"],
+        //     type: "Mock Type",
+        //     answer: "Red", // Index of the correct answer in the options array
+        //   },
+        //   {
+        //     no: 2,
+        //     question: "How many fingers do you have?",
+        //     options: ["Four", "Five", "Six"],
+        //     type: "Mock Type",
+        //     answer: "Five", // Index of the correct answer in the options array
+        //   },
+        // ];
+        
+          let test = ref([]);
+          const param = {
+            type: this.testName,
+          };
+          axios
+            .post("/viewOneQuestion", param, {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            })
+            .then((response) => {
+              console.log("response123456", response.data);
+              test.value = response.data
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
 
-        let questionsapi = [
-          {
-            no: 1,
-            question: "What is your favorite color?",
-            options: ["Red", "Green", "Blue"],
-            type: "Mock Type",
-            answer: "Red", // Index of the correct answer in the options array
-          },
-          {
-            no: 2,
-            question: "How many fingers do you have?",
-            options: ["Four", "Five", "Six"],
-            type: "Mock Type",
-            answer: "Five", // Index of the correct answer in the options array
-          },
-        ];
-        this.questions = questionsapi;
+        this.questions = test;
         console.log("Questions:", this.questions);
       }
     },

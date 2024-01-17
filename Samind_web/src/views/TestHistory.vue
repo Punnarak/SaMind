@@ -209,19 +209,19 @@ const historys = [
   {
     id: "04",
     testName: "test1",
-    result: "10",
+    result: "-",
     date: "Oct 16, 2023 13:00",
   },
   {
     id: "05",
     testName: "test2",
-    result: "20",
+    result: "-",
     date: "Oct 17, 2023 13:00",
   },
   {
     id: "06",
     testName: "test3",
-    result: "10",
+    result: "-",
     date: "Oct 18, 2023 13:00",
   },
 ];
