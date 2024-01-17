@@ -599,25 +599,21 @@ export default {
     //Calendar Day
     currentDay() {
       const days = [
-        "Sunday",
         "Monday",
         "Tuesday",
         "Wednesday",
         "Thursday",
         "Friday",
         "Saturday",
+        "Sunday",
       ];
-      return (
-        days[
-          this.currentDate.getDay() !== 0
-            ? this.currentDate.getDay() - 1
-            : this.currentDate.getDay()
-        ] +
-        " " +
-        this.currentDate.getDate()
-      );
+
+      const adjustedDayIndex = (this.currentDate.getDay() - 1 + 7) % 7; // Adjust for Sunday
+
+      return days[adjustedDayIndex] + " " + this.currentDate.getDate();
     },
     nextDay() {
+      console.log("nextDay");
       const nextDay = new Date(this.selectedDate);
       nextDay.setDate(nextDay.getDate() + 1);
       this.selectedDate = nextDay;
@@ -626,6 +622,7 @@ export default {
       this.updateCalendar();
     },
     prevDay() {
+      console.log("prevDay");
       const prevDay = new Date(this.selectedDate);
       prevDay.setDate(prevDay.getDate() - 1);
       this.selectedDate = prevDay;
