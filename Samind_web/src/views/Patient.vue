@@ -49,7 +49,7 @@
               path: 'patientdashboard',
               query: {
                 patientId: item.columns.patientId,
-                name: item.columns.patientName,
+                name: item.columns.name,
                 age: item.columns.age,
                 mood: item.columns.mood,
               },
@@ -117,7 +117,6 @@ onMounted(async () => {
     });
 });
 
-
 let search = ref("");
 
 const filteredPatients = computed(() => {
@@ -143,7 +142,6 @@ const headers = [
   { title: "Mood", key: "mood", align: "center", sortable: false },
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
-
 
 // const patients = [
 //   {

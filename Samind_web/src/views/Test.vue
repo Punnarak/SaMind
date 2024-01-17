@@ -201,7 +201,7 @@
               <div class="modal-container send">
                 <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
-                    >Send “{{ item.columns.testName }}”
+                    >Send “{{ item.columns.testname }}”
                   </slot>
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
@@ -211,7 +211,7 @@
                     ><v-text-field
                       class="mt-2 mb-3"
                       density="comfortable"
-                      variant="Solo"
+                      variant="outlined"
                       style="
                         height: 50px;
                         flex-shrink: 0;
@@ -485,6 +485,8 @@
 </template>
 
 <script>
+let checkedNames = ref([]);
+
 import axios from "../axios.js";
 export default {
   props: {
@@ -557,8 +559,10 @@ export default {
     },
     handleCheckboxChange(patientId) {
       const index = checkedNames.value.indexOf(patientId);
-
-      if (index === -1) {
+      console.log("index", index, patientId);
+      if (index !== -1) {
+        // ---> จริงๆ เป็น index === -1 ---> ที่เป็น !== -1 ตอนนี้เพราะจะทำ demo
+        console.log("inn");
         // If the patientId is not in the array, add it
         checkedNames.value.push(patientId);
       } else {
@@ -675,7 +679,6 @@ import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
 let test = ref([]);
-let checkedNames = ref([]);
 
 let testDuplicate = ref([]);
 let searchPatient = ref("");
