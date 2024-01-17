@@ -28,7 +28,7 @@ export default function IndividualTestList({ route }) {
       .then((response) => {
         if (response.data.length != 0) {
           console.log("in");
-          setInividualTestList(response.data)
+          setInividualTestList(response.data);
         }
         console.log(response.data, response.data.length);
       })
@@ -84,8 +84,7 @@ export default function IndividualTestList({ route }) {
                         fontStyle: "italic",
                       }}
                     >
-                      {item.createBy}{" "}
-                      {item.testName}
+                      {item.createBy} {item.testName}
                     </Text>
                     <Text
                       style={{
@@ -165,7 +164,8 @@ const styles = StyleSheet.create({
   container3: {
     backgroundColor: "white",
     alignItems: "center",
-    width: "790%",
+    // width: "790%"
+    width: "400%",
     height: "77%",
     paddingTop: 10,
     flex: 1,
