@@ -21,24 +21,23 @@ export default function Profile({ route }) {
   const [flag, setFlag] = useState()
   //info
   const [data, setData] = useState({});
+  const param = {
+    patient_id: patientId,
+  };
+
+  axios
+    .post("/info_patient_get", param)
+    .then((response) => {
+      setData(response.data);
+    })
+    .catch((error) => {
+      console.error("Axios error:", error);
+    });
 
   useEffect(() => {
-    setFlag(update)
-    console.log("Profile Screen",patientId);
-    const param = {
-      patient_id: patientId,
-    };
-    axios
-      .post("/info_patient_get", param)
-      .then((response) => {
-        console.log("in");
-        setData(response.data)
-        console.log("data:", response.data);
-      })
-      .catch((error) => {
-         console.error("Axios error:", error);
-      });
-  }, [flag]);
+    console.log("Profile Screen",patientId)
+  }, []);
+
 
   return (
     <View style={styles.container1}>
