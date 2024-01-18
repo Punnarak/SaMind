@@ -4,43 +4,41 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  Alert,
-  Image,
-  Linking,
-  Pressable,
   TouchableOpacity,
   TextInput,
   Platform,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import usePasswordVisibility1 from "../usePasswordVisibility1";
-import { Icon } from "react-native-elements";
-import useCheck from "../usecheck";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import axios from "./axios.js";
 
-export default function Login() {
+export default function Profile({ route }) {
+  const { patientId, update } = route.params || {};
   const navigation = useNavigation();
-  const { passwordVisibility, togglePasswordVisibility } =
-    usePasswordVisibility();
-  const { passwordVisibility1, togglePasswordVisibility1 } =
-    usePasswordVisibility1();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [Conpassword, setConPassword] = useState("");
-  const [isChecked, setIsChecked] = useState(false);
 
-  const handleCheckboxToggle = () => {
-    setIsChecked(!isChecked);
-  };
-  const handleLogin = async () => {};
+  const [flag, setFlag] = useState()
+  //info
+  const [data, setData] = useState({});
+
   useEffect(() => {
-    console.log("Profile Screen");
-  }, []);
+    setFlag(update)
+    console.log("Profile Screen",patientId);
+    const param = {
+      patient_id: patientId,
+    };
+    axios
+      .post("/info_patient_get", param)
+      .then((response) => {
+        console.log("in");
+        setData(response.data)
+        console.log("data:", response.data);
+      })
+      .catch((error) => {
+         console.error("Axios error:", error);
+      });
+  }, [flag]);
 
   return (
     <View style={styles.container1}>
@@ -57,29 +55,25 @@ export default function Login() {
         onPress={() => navigation.goBack()}
       />
       <View style={styles.container2}>
-        <Text style={styles.wel}>Punya Hasinanan</Text>
+        <Text style={styles.wel}>{data.fname && data.lname ? data.fname +" "+ data.lname : "Punya Hasinanan"}</Text>
         <Text style={styles.title1}>Name</Text>
         <TextInput
           editable={false}
-          placeholder="Punya"
+          placeholder={data.fname ? data.fname : "Punya"}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
-          //   value={email}
-          //   onChangeText={setEmail}
         />
         <Text style={styles.title2}>Surname</Text>
         <TextInput
           editable={false}
-          placeholder="Hasinanan"
+          placeholder={data.lname ? data.lname : "Hasinanan"}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
-          value={email}
-          onChangeText={setEmail}
         />
         <Text style={styles.title1}>Email</Text>
         <TextInput
           editable={false}
-          placeholder="Punya@gmail.com"
+          placeholder={data.email ? data.email : "Pun@gmail.com"}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
         />
@@ -93,7 +87,7 @@ export default function Login() {
         >
           <TouchableOpacity
             style={styles.loginb}
-            onPress={() => navigation.navigate("Editscreen")}
+            onPress={() => navigation.navigate("Editscreen", {patientId,data})}
           >
             <Text style={styles.text}>Edit</Text>
           </TouchableOpacity>

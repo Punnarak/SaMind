@@ -112,7 +112,7 @@ export default function Home({ route }) {
         </View>
         <TouchableOpacity
           style={styles.boxper}
-          onPress={() => navigation.navigate("Profilescreen")}
+          onPress={() => navigation.navigate("Profilescreen",{patientId})}
         >
           <Icon
             name="person-outline"
