@@ -4,7 +4,7 @@ const usePasswordVisibility = () => {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
 
   const togglePasswordVisibility = () => {
-    setPasswordVisibility(!passwordVisibility);
+    setPasswordVisibility((prevVisibility) => !prevVisibility);
   };
 
   return { passwordVisibility, togglePasswordVisibility };
