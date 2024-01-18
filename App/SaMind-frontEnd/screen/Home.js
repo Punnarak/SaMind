@@ -35,31 +35,36 @@ export default function Home({ route }) {
   const [fName, setFName] = useState("Punya");
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
+  const fetchData = async () => {
+    try {
+      const response = await axios.post("/check_mood_per_day_get", {
+        patient_id: patientId,
+      });
+
+      if (response.data.checkin === true) {
+        setCheckIn(true);
+        setDisabled(true);
+      } else {
+        setCheckIn(false);
+        setDisabled(false);
+      }
+
+      if (response.data.fname) {
+        setFName(response.data.fname);
+      }
+
+      setSelectedMenu(response.data.moodscore);
+    } catch (error) {
+      console.error("Axios error:", error);
+    }
+  };
   useEffect(() => {
     console.log("Home Screen", patientId);
-    const param = {
-      patient_id: patientId,
-    };
-    axios
-      .post("/check_mood_per_day_get", param)
-      .then((response) => {
-        if (response.data.checkin === true) {
-          setCheckIn(true);
-          setDisabled(true);
-        } else {
-          setCheckIn(false);
-          setDisabled(false);
-        }
-        if (response.data.fname) {
-          console.log("DDDDDD", response.data.fname);
-          setFName(response.data.fname);
-        }
-        setSelectedMenu(response.data.moodscore);
-        console.log("checkin", response.data.checkin, response.data.fname);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+    const onFocus = navigation.addListener('focus', () => {
+      console.log("Screen is focused");
+      fetchData();
+    });
+    return onFocus
   }, []);
 
   const handleMenuPress = (menu) => {
