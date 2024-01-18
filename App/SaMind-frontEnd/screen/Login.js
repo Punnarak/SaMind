@@ -18,8 +18,10 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 //View -> UIView
 export default function Login() {
+  const isIOS = Platform.OS === "ios";
   const navigation = useNavigation();
-  const { passwordVisibility, togglePasswordVisibility } = usePasswordVisibility();
+  const { passwordVisibility, togglePasswordVisibility } =
+    usePasswordVisibility();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -102,16 +104,18 @@ export default function Login() {
             }}
           />
           <Text style={styles.errorText}>{passwordError}</Text>
-          <TouchableOpacity
-            style={styles.eyeI}
-            onPress={togglePasswordVisibility}
-          >
-            <Feather
-              name={passwordVisibility ? "eye-off" : "eye"}
-              size={20}
-              color="#569AFF"
-            />
-          </TouchableOpacity>
+          {isIOS ? null : (
+            <TouchableOpacity
+              style={styles.eyeI}
+              onPress={togglePasswordVisibility}
+            >
+              <Feather
+                name={passwordVisibility ? "eye-off" : "eye"}
+                size={20}
+                color="#569AFF"
+              />
+            </TouchableOpacity>
+          )}
           <Text
             style={{
               color: "#605B5B",

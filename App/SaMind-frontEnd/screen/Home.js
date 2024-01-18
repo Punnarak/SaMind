@@ -112,7 +112,7 @@ export default function Home({ route }) {
         </View>
         <TouchableOpacity
           style={styles.boxper}
-          onPress={() => navigation.navigate("Profilescreen",{patientId})}
+          onPress={() => navigation.navigate("Profilescreen", { patientId })}
         >
           <Icon
             name="person-outline"
@@ -273,7 +273,9 @@ export default function Home({ route }) {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Dashboardscreen", {patientId})}
+              onPress={() =>
+                navigation.navigate("Dashboardscreen", { patientId })
+              }
             >
               <Text style={styles.Textb}>DASHBOARD</Text>
               <I
@@ -496,11 +498,10 @@ const styles = StyleSheet.create({
   n: {
     ...Platform.select({
       android: {
-        left: horizontalScale(25),
+        left: horizontalScale(27),
         width: horizontalScale(150),
-
       },
-      ios: {left: horizontalScale(15),},
+      ios: { left: horizontalScale(0) },
     }),
     fontSize: moderateScale(23),
     // fontSize: 23,
