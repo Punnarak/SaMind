@@ -16,13 +16,16 @@ import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import axios from "./axios.js";
+const isIOS = Platform.OS === "ios";
 
-export default function EditProfile({route}) {
+export default function EditProfile({ route }) {
   const { patientId, data } = route.params || {};
-  console.log("patientId",patientId)
+  console.log("patientId", patientId);
   const navigation = useNavigation();
-  const { passwordVisibility, togglePasswordVisibility } = usePasswordVisibility();
-  const { passwordVisibility1, togglePasswordVisibility1 } = usePasswordVisibility1();
+  const { passwordVisibility, togglePasswordVisibility } =
+    usePasswordVisibility();
+  const { passwordVisibility1, togglePasswordVisibility1 } =
+    usePasswordVisibility1();
   //info
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
@@ -34,8 +37,8 @@ export default function EditProfile({route}) {
   const [passwordError, setPasswordError] = useState("");
   const [conPassword, setConPassword] = useState("");
   const [conPasswordError, setConPasswordError] = useState("");
-  const [checkEmail, setCheckEmail] = useState('');
-  const [update, setUpdate] = useState(false)
+  const [checkEmail, setCheckEmail] = useState("");
+  const [update, setUpdate] = useState(false);
 
   const handleSavePress = () => {
     setNameError(" ");
@@ -63,30 +66,37 @@ export default function EditProfile({route}) {
       setConPasswordError("*");
     }
 
-    if (name && surname && email && password && conPassword && password === conPassword &&checkEmail === true) {
+    if (
+      name &&
+      surname &&
+      email &&
+      password &&
+      conPassword &&
+      password === conPassword &&
+      checkEmail === true
+    ) {
       const param = {
         patient_id: patientId,
         fname: name,
         lname: surname,
         email: email,
-        password: password
+        password: password,
       };
       axios
-      .post("/update_info", param)
-      .then((response) => {
-        console.log("update complete",response.data);
-        setUpdate(true)
-      })
-      .catch((error) => {
-         console.error("Axios error:", error);
-      });
+        .post("/update_info", param)
+        .then((response) => {
+          console.log("update complete", response.data);
+          setUpdate(true);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Save Complete");
-      navigation.navigate("Profilescreen",{patientId, update})      
+      navigation.navigate("Profilescreen", { patientId, update });
     }
   };
 
   const checkPassword = () => {
-
     if (password !== conPassword) {
       setConPasswordError("Not matching");
     } else {
@@ -106,9 +116,9 @@ export default function EditProfile({route}) {
   };
   useEffect(() => {
     console.log("Edit Profile Screen", patientId);
-    setName(data.fname)
-    setSurname(data.lname)
-    setEmail(data.email)
+    setName(data.fname);
+    setSurname(data.lname);
+    setEmail(data.email);
   }, []);
   useEffect(() => {
     if (email != "") {
@@ -129,15 +139,19 @@ export default function EditProfile({route}) {
         onPress={() => navigation.goBack()}
       />
       <View style={styles.container2}>
-        <Text style={styles.wel}>{data.fname && data.lname ? data.fname + " " + data.lname : "Punya Hasinanan"}</Text>
+        <Text style={styles.wel}>
+          {data.fname && data.lname
+            ? data.fname + " " + data.lname
+            : "Punya Hasinanan"}
+        </Text>
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: 'center'
-        }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-        <Text style={styles.title1}>Name</Text>
-        <Text style={styles.errorNameText}>{nameError}</Text>
+          <Text style={styles.title1}>Name</Text>
+          <Text style={styles.errorNameText}>{nameError}</Text>
         </View>
         <TextInput
           placeholder={data.fname ? data.fname : "Punya"}
@@ -145,39 +159,39 @@ export default function EditProfile({route}) {
           style={styles.TextInput}
           value={name}
           onChangeText={(text) => {
-              setName(text);
+            setName(text);
 
-              setNameError(text.trim() === "" ? "*" : " ");
-            }}
+            setNameError(text.trim() === "" ? "*" : " ");
+          }}
         />
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: 'center'
-        }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-        <Text style={styles.title2}>Surname</Text>
-        <Text style={styles.errorSurnameText}>{surnameError}</Text>
+          <Text style={styles.title2}>Surname</Text>
+          <Text style={styles.errorSurnameText}>{surnameError}</Text>
         </View>
         <TextInput
-          placeholder={data.lname ? data.lname :"Hasinanan"}
+          placeholder={data.lname ? data.lname : "Hasinanan"}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
           value={surname}
           onChangeText={(text) => {
-              setSurname(text);
+            setSurname(text);
 
-              setSurnameError(text.trim() === "" ? "*" : " ");
-            }}
+            setSurnameError(text.trim() === "" ? "*" : " ");
+          }}
         />
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: 'center'
-        }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-        <Text style={styles.title1}>Email</Text>
-        <Text style={styles.errorEmailText}>{emailError}</Text>
+          <Text style={styles.title1}>Email</Text>
+          <Text style={styles.errorEmailText}>{emailError}</Text>
         </View>
         <TextInput
           placeholder={data.email ? data.email : "Punya@gmail.com"}
@@ -185,19 +199,19 @@ export default function EditProfile({route}) {
           style={styles.TextInput}
           value={email}
           onChangeText={(text) => {
-              setEmail(text);
+            setEmail(text);
 
-              setEmailError(text.trim() === "" ? "*" : " ");
-            }}
+            setEmailError(text.trim() === "" ? "*" : " ");
+          }}
         />
-         <View
-        style={{
-          flexDirection: "row",
-          alignItems: 'center'
-        }}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-        <Text style={styles.title3}>Password</Text>
-        <Text style={styles.errorPasswordText}>{passwordError}</Text>
+          <Text style={styles.title3}>Password</Text>
+          <Text style={styles.errorPasswordText}>{passwordError}</Text>
         </View>
         <TextInput
           placeholder="123"
@@ -206,29 +220,31 @@ export default function EditProfile({route}) {
           style={styles.TextInput}
           value={password}
           onChangeText={(text) => {
-              setPassword(text);
+            setPassword(text);
 
-              setPasswordError(text.trim() === "" ? "*" : " ");
-            }}
+            setPasswordError(text.trim() === "" ? "*" : " ");
+          }}
         />
-        <TouchableOpacity
-          style={styles.eyeI}
-          onPress={togglePasswordVisibility}
-        >
-          <Feather
-            name={passwordVisibility ? "eye-off" : "eye"}
-            size={20}
-            color="#569AFF"
-          />
-        </TouchableOpacity>
+        {isIOS ? null : (
+          <TouchableOpacity
+            style={styles.eyeI}
+            onPress={togglePasswordVisibility}
+          >
+            <Feather
+              name={passwordVisibility ? "eye-off" : "eye"}
+              size={20}
+              color="#569AFF"
+            />
+          </TouchableOpacity>
+        )}
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: 'center'
-        }}
-      >
-        <Text style={styles.title4}>Confirm Password </Text>
-        <Text style={styles.errorConPasswordText}>{conPasswordError}</Text>
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text style={styles.title4}>Confirm Password </Text>
+          <Text style={styles.errorConPasswordText}>{conPasswordError}</Text>
         </View>
         <TextInput
           placeholder="123"
@@ -237,26 +253,28 @@ export default function EditProfile({route}) {
           style={styles.TextInput}
           value={conPassword}
           onChangeText={(text) => {
-              setConPassword(text);
+            setConPassword(text);
 
-              setConPasswordError(text.trim() === "" ? "*" : " ");
-            }}
+            setConPasswordError(text.trim() === "" ? "*" : " ");
+          }}
         />
-        <TouchableOpacity
-          style={styles.eyeI}
-          onPress={togglePasswordVisibility1}
-        >
-          <Feather
-            name={passwordVisibility1 ? "eye-off" : "eye"}
-            size={20}
-            color="#569AFF"
-          />
-        </TouchableOpacity>
+        {isIOS ? null : (
+          <TouchableOpacity
+            style={styles.eyeI}
+            onPress={togglePasswordVisibility1}
+          >
+            <Feather
+              name={passwordVisibility1 ? "eye-off" : "eye"}
+              size={20}
+              color="#569AFF"
+            />
+          </TouchableOpacity>
+        )}
         <View
           style={{
             flexDirection: "column",
             alignItems: "center",
-            marginTop: verticalScale(24),
+            marginTop: isIOS ? verticalScale(0) : verticalScale(24),
             // marginTop: "8%",
           }}
         >
@@ -354,7 +372,7 @@ const styles = StyleSheet.create({
     }),
     // marginRight: horizontalScale(128.5),
     // marginRight: "43%",
-    marginTop: verticalScale(15),
+    marginTop: isIOS ? verticalScale(0) : verticalScale(15),
     // marginTop: "5%",
     marginBottom: verticalScale(3),
     // marginBottom: "1%",
@@ -433,64 +451,63 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   errorNameText: {
-    position: 'absolute',
+    position: "absolute",
     ...Platform.select({
-      android: {marginTop: "1%", left: 60},
-      ios: {marginTop: "1%", left: 60},
+      android: { marginTop: "1%", left: 60 },
+      ios: { marginTop: "1%", left: 60 },
     }),
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "left",
     color: "red",
     zIndex: 1,
   },
   errorSurnameText: {
-    position: 'absolute',
+    position: "absolute",
     ...Platform.select({
-      android: {marginTop: "1%", left: 90},
-      ios: {marginTop: "1%", left: 90},
+      android: { marginTop: "1%", left: 90 },
+      ios: { marginTop: "1%", left: 90 },
     }),
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "left",
     color: "red",
     zIndex: 1,
   },
   errorEmailText: {
-    position: 'absolute',
+    position: "absolute",
     ...Platform.select({
-      android: {marginTop: "1%", left: 57},
-      ios: {marginTop: "1%", left: 57},
+      android: { marginTop: "1%", left: 57 },
+      ios: { marginTop: "1%", left: 57 },
     }),
-    fontSize: this.emailError === "*" ? 20 : 20 ,
-    fontWeight: 'bold',
+    fontSize: this.emailError === "*" ? 20 : 20,
+    fontWeight: "bold",
     textAlign: "left",
     color: "red",
     zIndex: 1,
   },
   errorPasswordText: {
-    position:'absolute',
+    position: "absolute",
     ...Platform.select({
-      android: {marginTop: "1%", left: 100},
-      ios: {marginTop: "1%", left: 100},
+      android: { marginTop: "1%", left: 100 },
+      ios: { marginTop: "1%", left: 100 },
     }),
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "left",
     color: "red",
     zIndex: 1,
   },
   errorConPasswordText: {
-    position:'absolute',
+    position: "absolute",
     ...Platform.select({
-      android: {marginTop: "-3%", left: 180},
-      ios: {top: 15, left: 180},
+      android: { marginTop: "-3%", left: 180 },
+      ios: { top: 15, left: 180 },
     }),
     fontSize: this.conPasswordError === "*" ? 20 : 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "left",
     color: "red",
     zIndex: 99,
-  
   },
 });

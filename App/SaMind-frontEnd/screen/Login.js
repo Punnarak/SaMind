@@ -15,10 +15,9 @@ import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-
+const isIOS = Platform.OS === "ios";
 //View -> UIView
 export default function Login() {
-  const isIOS = Platform.OS === "ios";
   const navigation = useNavigation();
   const { passwordVisibility, togglePasswordVisibility } =
     usePasswordVisibility();
@@ -120,7 +119,7 @@ export default function Login() {
             style={{
               color: "#605B5B",
               fontSize: 13,
-              marginTop: 15,
+              marginTop: isIOS ? 0 : 15,
               // marginLeft: "50%",
               marginLeft: 160,
             }}
@@ -145,55 +144,6 @@ export default function Login() {
               Sign up
             </Text>
           </Text>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: verticalScale(32),
-            }}
-          >
-            <View
-              style={{ width: 50, height: 1, backgroundColor: "#569AFF" }}
-            />
-            <View>
-              <Text
-                style={{ width: 50, textAlign: "center", color: "#569AFF" }}
-              >
-                Or
-              </Text>
-            </View>
-            <View
-              style={{ width: 50, height: 1, backgroundColor: "#569AFF" }}
-            />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: "10%",
-              marginLeft: "10%",
-            }}
-          >
-            <TouchableOpacity onPress={() => navigation.navigate("Homescreen")}>
-              <Image
-                source={require("../assets/Apple.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Homescreen")}>
-              <Image
-                source={require("../assets/google.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Homescreen")}>
-              <Image
-                source={require("../assets/facebook.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View> */}
         </View>
       </ImageBackground>
     </View>
