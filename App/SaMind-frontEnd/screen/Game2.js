@@ -102,7 +102,7 @@ const Gamescreen = () => {
 
       if (newAttempts === 5) {
         Alert.alert(
-            "Game Over",
+            "Game Over <3",
             `The correct answer was: ${targetWord}`,
             [
               {
