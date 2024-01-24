@@ -1,6 +1,8 @@
 const client = require('./connection.js');
 const express = require('express');
 const router = express.Router();
+const auth = require('./auth.js').authorization;
+
 
 // router.post('/mood_tracker_post', async (req, res) => {
 //   const { mood_tracker_id, patient_id, score } = req.body;
@@ -663,7 +665,7 @@ function formatDate(timestamp) {
 // });
 
 //main api
-router.post('/dashboard_api', async (req, res) => {
+router.post('/dashboard_api', auth, async (req, res) => {
   const { patient_id } = req.body;
 
   try {
