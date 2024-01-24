@@ -104,8 +104,6 @@
                 <v-icon color="white">mdi-plus</v-icon>
               </v-btn>
             </v-row>
-            <!-- Options for the question -->
-            <!-- Options for the question -->
             <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
@@ -182,7 +180,7 @@ export default {
       if (this.$route.query != null) {
         this.testName = this.$route.query.testName;
         console.log("edittest: ", this.testName);
-        
+
         // let questionsapi = [
         //   {
         //     no: 1,
@@ -199,25 +197,25 @@ export default {
         //     answer: "Five", // Index of the correct answer in the options array
         //   },
         // ];
-        
-          let test = ref([]);
-          const param = {
-            type: this.testName,
-          };
-          axios
-            .post("/viewOneQuestion", param, {
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-            })
-            .then((response) => {
-              console.log("response123456", response.data);
-              test.value = response.data
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
+
+        let test = ref([]);
+        const param = {
+          type: this.testName,
+        };
+        axios
+          .post("/viewOneQuestion", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("response123456", response.data);
+            test.value = response.data;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
         this.questions = test;
         console.log("Questions:", this.questions);

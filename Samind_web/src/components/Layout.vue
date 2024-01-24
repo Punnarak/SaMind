@@ -123,21 +123,25 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item @click="">
+        <v-list-item
+          @click="
+            this.$router.push({
+              path: `/editaccount`,
+            })
+          "
+        >
           <v-icon>mdi-square-edit-outline</v-icon>
           <span class="pl-2">Edit account</span>
         </v-list-item>
-        <v-list-item @click="">
+        <v-list-item
+          @click="
+            this.$router.push({
+              path: `/`,
+            })
+          "
+        >
           <v-icon>mdi-logout-variant</v-icon>
-          <span
-            class="pl-2"
-            @click="
-              this.$router.push({
-                path: `/`,
-              })
-            "
-            >Sign out</span
-          >
+          <span class="pl-2">Sign out</span>
         </v-list-item>
       </v-list>
     </v-menu>

@@ -23,123 +23,214 @@
                 <v-list-item
                   v-for="(patient, patientIndex) in patients"
                   :key="patientIndex"
+                  :class="{
+                    'confirmed-item': patient.confirmed,
+                    'cancel-item': patient.cancel,
+                  }"
                   class="custom-chip mb-5"
                 >
-                  <div style="margin-top: -10px" v-if="patient.value == ''">
+                  <div v-if="patient.confirmed" class="confirmtext">
+                    <label>
+                      Are you sure you want to
+                      <label style="font-weight: bold">confirm</label> this
+                      meeting reschedule ?</label
+                    >
                     <div
                       style="
                         display: flex;
-                        align-items: center;
-                        margin-top: -30px;
+                        margin-top: 30px;
+                        margin-left: 5px;
                         position: absolute;
                       "
                     >
-                      <div
-                        class="circle mr-2"
+                      <v-btn
+                        class="requestbtn mr-2"
                         style="
+                          color: white;
+                          border: 1px solid white;
                           background-color: rgba(86, 154, 255, 1);
-                          width: 30px;
-                          height: 30px;
+                          box-shadow: none;
                         "
+                        @click="confirm(patientIndex)"
                       >
-                        <v-icon style="color: white">mdi-account</v-icon>
-                      </div>
-
-                      <label class="nametext">{{ patient.patientName }}</label>
+                        confirm
+                      </v-btn>
+                      <v-btn
+                        class="requestbtn"
+                        style="
+                          color: white;
+                          border: 1px solid white;
+                          background-color: rgba(86, 154, 255, 1);
+                          box-shadow: none;
+                        "
+                        @click="cancelConfirm(patientIndex)"
+                      >
+                        cancel
+                      </v-btn>
                     </div>
-                    <br />
-                    <div>
-                      <div class="circle-container">
+                  </div>
+                  <div v-if="patient.cancel" class="confirmtext">
+                    <label>
+                      Are you sure you want to
+                      <label style="font-weight: bold">cancel</label> this
+                      meeting reschedule ?</label
+                    >
+                    <div
+                      style="
+                        display: flex;
+                        margin-top: 30px;
+                        margin-left: 5px;
+                        position: absolute;
+                      "
+                    >
+                      <v-btn
+                        class="requestbtn mr-2"
+                        style="
+                          color: white;
+                          border: 1px solid white;
+                          background-color: rgba(86, 154, 255, 1);
+                          box-shadow: none;
+                        "
+                        @click="confirm(patientIndex)"
+                      >
+                        confirm
+                      </v-btn>
+                      <v-btn
+                        class="requestbtn"
+                        style="
+                          color: white;
+                          border: 1px solid white;
+                          background-color: rgba(86, 154, 255, 1);
+                          box-shadow: none;
+                        "
+                        @click="cancelCancel(patientIndex)"
+                      >
+                        cancel
+                      </v-btn>
+                    </div>
+                  </div>
+                  <div v-if="!patient.confirmed && !patient.cancel">
+                    <div style="margin-top: -10px" v-if="patient.value == ''">
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          margin-top: -30px;
+                          position: absolute;
+                        "
+                      >
                         <div
-                          class="circle"
-                          style="background-color: rgba(0, 191, 99, 1)"
-                        ></div>
-                        <div class="line"></div>
+                          class="circle mr-2"
+                          style="
+                            background-color: rgba(86, 154, 255, 1);
+                            width: 30px;
+                            height: 30px;
+                          "
+                        >
+                          <v-icon style="color: white">mdi-account</v-icon>
+                        </div>
+
+                        <label class="nametext">{{
+                          patient.patientName
+                        }}</label>
+                      </div>
+                      <br />
+                      <div>
+                        <div class="circle-container">
+                          <div
+                            class="circle"
+                            style="background-color: rgba(0, 191, 99, 1)"
+                          ></div>
+                          <div class="line"></div>
+                          <div
+                            class="circle"
+                            style="background-color: rgba(217, 217, 217, 1)"
+                          ></div>
+                        </div>
+
                         <div
-                          class="circle"
-                          style="background-color: rgba(217, 217, 217, 1)"
-                        ></div>
-                      </div>
+                          style="
+                            display: flex;
+                            position: absolute;
+                            margin-top: -74px;
+                            margin-left: 70px;
+                          "
+                        >
+                          <label
+                            class="text mr-8"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            >To</label
+                          >
+                          <label
+                            class="text"
+                            style="
+                              color: rgba(0, 191, 99, 1);
+                              font-weight: 500;
+                              font-size: 13px;
+                              text-align: start;
+                            "
+                            >{{ patient.toDate }}<br />{{ patient.toTime }}
+                          </label>
+                        </div>
 
-                      <div
-                        style="
-                          display: flex;
-                          position: absolute;
-                          margin-top: -74px;
-                          margin-left: 70px;
-                        "
-                      >
-                        <label
-                          class="text mr-8"
-                          style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
-                          >To</label
+                        <div
+                          style="
+                            display: flex;
+                            position: absolute;
+                            margin-top: -20px;
+                            margin-left: 70px;
+                          "
                         >
-                        <label
-                          class="text"
-                          style="
-                            color: rgba(0, 191, 99, 1);
-                            font-weight: 500;
-                            font-size: 13px;
-                            text-align: start;
-                          "
-                          >{{ patient.toDate }}<br />{{ patient.toTime }}
-                        </label>
+                          <label
+                            class="text mr-4"
+                            style="
+                              color: rgba(157, 157, 157, 1);
+                              font-size: 13px;
+                            "
+                            >From</label
+                          ><label
+                            class="text"
+                            style="
+                              color: rgba(157, 157, 157, 1);
+                              font-weight: 500;
+                              font-size: 13px;
+                              text-align: start;
+                            "
+                            >{{ patient.fromDate }}<br />{{ patient.fromTime }}
+                          </label>
+                        </div>
                       </div>
-
-                      <div
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        margin-top: 30px;
+                        margin-left: 5px;
+                        position: absolute;
+                      "
+                    >
+                      <v-btn
+                        class="requestbtn mr-2"
                         style="
-                          display: flex;
-                          position: absolute;
-                          margin-top: -20px;
-                          margin-left: 70px;
+                          color: rgba(0, 191, 99, 1);
+                          border: 1px solid #00bf63;
+                          box-shadow: 0px 0px 2px 0px #00bf63;
                         "
+                        @click="confirm(patientIndex)"
                       >
-                        <label
-                          class="text mr-4"
-                          style="color: rgba(157, 157, 157, 1); font-size: 13px"
-                          >From</label
-                        ><label
-                          class="text"
-                          style="
-                            color: rgba(157, 157, 157, 1);
-                            font-weight: 500;
-                            font-size: 13px;
-                            text-align: start;
-                          "
-                          >{{ patient.fromDate }}<br />{{ patient.fromTime }}
-                        </label>
-                      </div>
-                      <div
+                        confirm
+                      </v-btn>
+                      <v-btn
+                        class="requestbtn"
                         style="
-                          display: flex;
-                          margin-top: 30px;
-                          margin-left: 5px;
-                          position: absolute;
+                          color: rgba(242, 86, 86, 1);
+                          border: 1px solid rgba(242, 86, 86, 1);
+                          box-shadow: 0px 0px 2px 0px rgba(242, 86, 86, 1);
                         "
+                        @click="cancel(patientIndex)"
                       >
-                        <v-btn
-                          class="requestbtn mr-2"
-                          style="
-                            color: rgba(0, 191, 99, 1);
-                            border: 1px solid #00bf63;
-                            border-color: rgba(0, 191, 99, 1);
-                            box-shadow: 0px 0px 2px 0px #00bf63;
-                          "
-                          @click="toggleDetails(patientIndex)"
-                          >confirm</v-btn
-                        >
-                        <v-btn
-                          class="requestbtn"
-                          style="
-                            color: rgba(242, 86, 86, 1);
-                            border: 1px solid rgba(242, 86, 86, 1);
-                            border-color: rgba(242, 86, 86, 1);
-                            box-shadow: 0px 0px 2px 0px rgba(242, 86, 86, 1);
-                          "
-                          @click="toggleDetails(patientIndex)"
-                          >cancel</v-btn
-                        >
-                      </div>
+                        cancel
+                      </v-btn>
                     </div>
                   </div>
                 </v-list-item>
@@ -213,7 +304,11 @@
               </div>
             </div>
             <div class="day-day">
-              <v-menu class="event-container-day">
+              <v-menu
+                class="event-container-day"
+                :position-x="menuPositionX"
+                :position-y="menuPositionY"
+              >
                 <template v-slot:activator="{ props }">
                   <div
                     v-bind="props"
@@ -221,6 +316,7 @@
                     :key="time"
                     class="event-day"
                     :style="getEventStyle(time)"
+                    @click="toggleListVisibility($event)"
                   >
                     <div v-if="eventsDay[time]" class="event-details-day">
                       <span class="title-day">{{
@@ -233,24 +329,13 @@
                       >
                     </div>
                   </div>
-                  <v-list>
-                    <v-list-item @click="">
-                      <span class="pl-2">{{ eventsDay }}</span>
-                    </v-list-item>
-                    <v-list-item @click="">
-                      <v-icon>mdi-logout-variant</v-icon>
-                      <span
-                        class="pl-2"
-                        @click="
-                          this.$router.push({
-                            path: `/`,
-                          })
-                        "
-                        >Sign out</span
-                      >
-                    </v-list-item>
-                  </v-list>
                 </template>
+                <v-list v-if="isListVisible" class="custom-list-style">
+                  <!-- Show v-list only if isListVisible is true -->
+                  <v-list-item @click="">
+                    <span class="pl-2">{{ eventsDay[time] }}</span>
+                  </v-list-item>
+                </v-list>
               </v-menu>
             </div>
           </div>
@@ -369,57 +454,57 @@
   </v-row>
 </template>
 
-<script setup>
-const patients = [
-  {
-    id: "01",
-    patientId: "PID001",
-    patientName: "Somsak Test1",
-    toDate: "Tue, 19 Sep 2023",
-    toTime: "10.00",
-    fromDate: "Tue, 12 Sep 2023",
-    fromTime: "10.00",
-    value: "",
-  },
-  {
-    id: "02",
-    patientId: "PID002",
-    patientName: "Somsee Test2",
-    toDate: "Tue, 19 Sep 2023",
-    toTime: "10.00",
-    fromDate: "Tue, 12 Sep 2023",
-    fromTime: "10.00",
-    value: "",
-  },
-  {
-    id: "03",
-    patientId: "PID003",
-    patientName: "Somchai Test3",
-    toDate: "Tue, 19 Sep 2023",
-    toTime: "10.00",
-    fromDate: "Tue, 12 Sep 2023",
-    fromTime: "10.00",
-    value: "",
-  },
-  {
-    id: "04",
-    patientId: "PID004",
-    patientName: "Somsom Test4",
-    toDate: "Tue, 19 Sep 2023",
-    toTime: "10.00",
-    fromDate: "Tue, 12 Sep 2023",
-    fromTime: "10.00",
-    value: "",
-  },
-];
-</script>
+<script setup></script>
 <script>
 import { startOfWeek, endOfWeek, format } from "date-fns";
+
 export default {
   components: {},
   data() {
     return {
       request: 1,
+      patients: [
+        {
+          id: "01",
+          patientId: "PID001",
+          patientName: "Somsak Test1",
+          toDate: "Tue, 19 Sep 2023",
+          toTime: "10.00",
+          fromDate: "Tue, 12 Sep 2023",
+          fromTime: "10.00",
+          value: "",
+        },
+        {
+          id: "02",
+          patientId: "PID002",
+          patientName: "Somsee Test2",
+          toDate: "Tue, 19 Sep 2023",
+          toTime: "10.00",
+          fromDate: "Tue, 12 Sep 2023",
+          fromTime: "10.00",
+          value: "",
+        },
+        {
+          id: "03",
+          patientId: "PID003",
+          patientName: "Somchai Test3",
+          toDate: "Tue, 19 Sep 2023",
+          toTime: "10.00",
+          fromDate: "Tue, 12 Sep 2023",
+          fromTime: "10.00",
+          value: "",
+        },
+        {
+          id: "04",
+          patientId: "PID004",
+          patientName: "Somsom Test4",
+          toDate: "Tue, 19 Sep 2023",
+          toTime: "10.00",
+          fromDate: "Tue, 12 Sep 2023",
+          fromTime: "10.00",
+          value: "",
+        },
+      ],
       selectedViewType: "month",
       selectedDate: new Date(),
       currentMonth: "",
@@ -429,6 +514,9 @@ export default {
       currentYear: "",
       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       selectedEvent: {},
+      isListVisible: false,
+      menuPositionX: 0,
+      menuPositionY: 0,
       timesDay: [
         "00:00",
         "01:00",
@@ -585,6 +673,10 @@ export default {
   methods: {
     //Calendar Main
     selectDay() {
+      var windowWidth = window.innerWidth;
+
+      // Log the width to the console
+      console.log("Window width: " + windowWidth);
       console.log("Selected DAY");
       this.selectedViewType = "day";
     },
@@ -652,6 +744,11 @@ export default {
         backgroundColor: "transparent",
         borderBottom: "1px solid #ccc",
       };
+    },
+    toggleListVisibility(event) {
+      this.menuPositionX = event.clientX;
+      this.menuPositionY = event.clientY;
+      this.isListVisible = !this.isListVisible;
     },
     //Calendar Week
     currentWeekRange() {
@@ -958,12 +1055,29 @@ export default {
 
       console.log("open", this.requestBarOpen);
     },
-    toggleDetails(index) {
-      this.$set(
-        this.patientDetailsVisible,
-        index,
-        !this.patientDetailsVisible[index]
-      );
+    confirm(index) {
+      if (index >= 0 && index < this.patients.length) {
+        console.log("in");
+        this.patients[index].confirmed = true;
+      }
+    },
+    cancelConfirm(index) {
+      if (index >= 0 && index < this.patients.length) {
+        console.log("in");
+        this.patients[index].confirmed = false;
+      }
+    },
+    cancel(index) {
+      if (index >= 0 && index < this.patients.length) {
+        console.log("in");
+        this.patients[index].cancel = true;
+      }
+    },
+    cancelCancel(index) {
+      if (index >= 0 && index < this.patients.length) {
+        console.log("in");
+        this.patients[index].cancel = false;
+      }
     },
   },
   created() {
@@ -1078,16 +1192,6 @@ h2 {
   box-shadow: 0px 0px 2px 0px #569aff;
   position: relative;
 }
-.custom-chip-value {
-  width: 277px;
-  height: 194px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  border: 1px solid #569aff;
-  box-shadow: 0px 0px 2px 0px #569aff;
-  background-color: #569aff;
-  position: relative;
-}
 .title {
   color: #000;
   font-family: "Poppins", sans-serif;
@@ -1100,6 +1204,23 @@ h2 {
 
 .v-navigation-drawer {
   z-index: 9999; /* Set a higher z-index value for the navigation drawer */
+}
+/* confirm or cancel */
+.confirmed-item,
+.cancel-item {
+  background-color: rgba(86, 154, 255, 1);
+}
+
+.confirmtext {
+  margin-top: -5px;
+  color: #fff;
+  text-align: center;
+  font-family: "Poppins";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 0.13px;
 }
 </style>
 
@@ -1145,7 +1266,11 @@ h2 {
   width: 1000px;
   margin: 0 auto;
 }
-
+@media only screen and (max-width: 1029px) {
+  .calendar-day-size {
+    width: 500px !important;
+  }
+}
 .timeline-day {
   display: flex;
   flex-direction: column;
@@ -1202,11 +1327,16 @@ h2 {
 }
 
 /* .event-day:hover .event-details-day {
-  display: flex; 
+  display: flex;
 } */
 
 .event-day:hover {
   background-color: #f0f0f0;
+}
+
+.custom-list-style {
+  max-width: 297px;
+  max-height: 167px;
 }
 </style>
 

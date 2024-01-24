@@ -59,6 +59,11 @@ const router = createRouter({
           component: () => import("../views/Referral.vue"),
           props: true,
         },
+        {
+          path: "/editaccount",
+          component: () => import("../views/EditAccount.vue"),
+          props: true,
+        },
       ],
     },
   ],
