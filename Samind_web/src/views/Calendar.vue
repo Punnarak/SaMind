@@ -26,6 +26,7 @@
                   :class="{
                     'confirmed-item': patient.confirmed,
                     'cancel-item': patient.cancel,
+                    'sure-item': patient.sureConfirmed || patient.sureCancel,
                   }"
                   class="custom-chip mb-5"
                 >
@@ -51,7 +52,7 @@
                           background-color: rgba(86, 154, 255, 1);
                           box-shadow: none;
                         "
-                        @click="confirm(patientIndex)"
+                        @click="confirmConfirm(patientIndex)"
                       >
                         confirm
                       </v-btn>
@@ -91,7 +92,7 @@
                           background-color: rgba(86, 154, 255, 1);
                           box-shadow: none;
                         "
-                        @click="confirm(patientIndex)"
+                        @click="confirmCancel(patientIndex)"
                       >
                         confirm
                       </v-btn>
@@ -109,7 +110,14 @@
                       </v-btn>
                     </div>
                   </div>
-                  <div v-if="!patient.confirmed && !patient.cancel">
+                  <div
+                    v-if="
+                      !patient.confirmed &&
+                      !patient.cancel &&
+                      !patient.sureCancel &&
+                      !patient.sureConfirmed
+                    "
+                  >
                     <div style="margin-top: -10px" v-if="patient.value == ''">
                       <div
                         style="
@@ -233,6 +241,17 @@
                       </v-btn>
                     </div>
                   </div>
+
+                  <div
+                    v-if="patient.sureConfirmed || patient.sureCancel"
+                    align="center"
+                  >
+                    <img
+                      ref="animationContainer"
+                      src="../assets/check.gif"
+                      style="width: 150px; z-index: 1; position: relative"
+                    />
+                  </div>
                 </v-list-item>
               </v-list>
             </div>
@@ -240,7 +259,6 @@
         </v-col>
       </v-container>
     </v-app>
-
     <!-- Calendar Content -->
     <v-col class="px-10 mt-3" col="8">
       <v-row align="center" class="calendar" justify="center">
@@ -456,7 +474,10 @@
 
 <script setup></script>
 <script>
+import { ref } from "vue";
 import { startOfWeek, endOfWeek, format } from "date-fns";
+import animationpath from "../assets/sending.json";
+import lottie from "lottie-web";
 
 export default {
   components: {},
@@ -1056,30 +1077,74 @@ export default {
       console.log("open", this.requestBarOpen);
     },
     confirm(index) {
+      // confirm case
       if (index >= 0 && index < this.patients.length) {
-        console.log("in");
+        console.log("confirm case");
         this.patients[index].confirmed = true;
       }
     },
-    cancelConfirm(index) {
+    confirmConfirm(index) {
+      // confirm confirm this case
       if (index >= 0 && index < this.patients.length) {
-        console.log("in");
+        console.log("confirm confirm this case");
+        this.patients[index].confirmed = false;
+        this.patients[index].sureConfirmed = true;
+        this.handleSureCase(index);
+      }
+    },
+    cancelConfirm(index) {
+      // cancel in confirm case
+      if (index >= 0 && index < this.patients.length) {
+        console.log("sure to cancel confirm this case");
         this.patients[index].confirmed = false;
       }
     },
     cancel(index) {
+      //cancel case
       if (index >= 0 && index < this.patients.length) {
-        console.log("in");
+        console.log("cancel case");
         this.patients[index].cancel = true;
       }
     },
-    cancelCancel(index) {
+    confirmCancel(index) {
+      // confirm cancel this case
       if (index >= 0 && index < this.patients.length) {
-        console.log("in");
+        console.log("confirm Cancel this case");
+        this.patients[index].cancel = false;
+        this.patients[index].sureCancel = true;
+        this.handleSureCase(index);
+      }
+    },
+    cancelCancel(index) {
+      // cancel in cencel case
+      if (index >= 0 && index < this.patients.length) {
+        console.log("sure to cancel this case");
         this.patients[index].cancel = false;
       }
     },
+    handleSureCase(patient) {
+      this.loadAnimation();
+      setTimeout(() => {
+        console.log("finish", patient);
+        this.patients.splice(patient, 1);
+      }, 3000);
+    },
+    loadAnimation() {
+      this.$nextTick(() => {
+        const animationContainer = this.$refs.animationContainer;
+        console.log("Animation Container:", animationContainer);
+
+        lottie.loadAnimation({
+          container: animationContainer,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData: animationpath,
+        });
+      });
+    },
   },
+
   created() {
     this.selectedDate = new Date();
     this.currentDate = new Date();
@@ -1153,7 +1218,7 @@ h2 {
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.7);
   padding: 20px;
-  z-index: 9999;
+  z-index: 9;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -1207,7 +1272,8 @@ h2 {
 }
 /* confirm or cancel */
 .confirmed-item,
-.cancel-item {
+.cancel-item,
+.sure-item {
   background-color: rgba(86, 154, 255, 1);
 }
 
