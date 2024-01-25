@@ -361,15 +361,15 @@ const PopcatGame = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { width: (windowWidth / 2)- 25, backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3" }]}
-            onPress={popCount < 200 ? null : () => navigation.navigate("Game1")}
-            disabled={popCount < 200}
+            onPress={popCount <= 200 ? null : () => navigation.navigate("Game1")}
+            disabled={popCount <= 200}
           >
             <Text style={styles.buttonText}>Game 1</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { width: (windowWidth / 2)- 25, backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3" }]}
-            onPress={popCount < 200 ? null : () => navigateToGame(3)}
-            disabled={popCount < 200}
+            onPress={popCount <= 200 ? null : () => navigateToGame(3)}
+            disabled={popCount <= 200}
           >
             <Text style={styles.buttonText}>Game 3</Text>
           </TouchableOpacity>
@@ -383,15 +383,15 @@ const PopcatGame = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { width: (windowWidth / 2)- 25 , backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3" }]}
-            onPress={popCount < 200 ? null : () => navigateToGame(2)}
-            disabled={popCount < 200}
+            onPress={popCount <= 200 ? null : () => navigation.navigate("Game2")}
+            disabled={popCount <= 200}
           >
             <Text style={styles.buttonText}>Game 2</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { width: (windowWidth / 2)- 25, backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3" }]}
-            onPress={popCount < 200 ? null : () => navigateToGame(4)}
-            disabled={popCount < 200}
+            onPress={popCount <= 200 ? null : () => navigateToGame(4)}
+            disabled={popCount <= 200}
           >
             <Text style={styles.buttonText}>Game 4</Text>
           </TouchableOpacity>
