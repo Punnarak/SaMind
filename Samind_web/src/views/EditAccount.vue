@@ -152,7 +152,7 @@
                     <div
                       class="modal-footer"
                       align="center"
-                      style="margin-top: -40px"
+                      style="margin-top: -50px"
                     >
                       <slot name="footer">
                         <label
