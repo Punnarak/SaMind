@@ -177,27 +177,11 @@ export default {
   methods: {
     mockTestData() {
       console.log("query param", this.$route.query);
-      if (this.$route.query != null) {
-        console.log("NewTest: ", this.testName);
-      } else {
+      if (!"testName" in this.$route.query) {
+        console.log("NewTest");
+      } else if ("testName" in this.$route.query) {
         this.testName = this.$route.query.testName;
         console.log("Duplicate Test: ", this.testName);
-        // let questionsapi = [
-        //   {
-        //     no: 1,
-        //     question: "What is your favorite color?",
-        //     options: ["Red", "Green", "Blue"],
-        //     type: "Mock Type",
-        //     answer: "Red", // Index of the correct answer in the options array
-        //   },
-        //   {
-        //     no: 2,
-        //     question: "How many fingers do you have?",
-        //     options: ["Four", "Five", "Six"],
-        //     type: "Mock Type",
-        //     answer: "Five", // Index of the correct answer in the options array
-        //   },
-        // ];
 
         let test = ref([]);
         const param = {
@@ -211,7 +195,7 @@ export default {
             },
           })
           .then((response) => {
-            console.log("response123456", response.data);
+            console.log("response in else", response.data);
             test.value = response.data;
           })
           .catch((error) => {

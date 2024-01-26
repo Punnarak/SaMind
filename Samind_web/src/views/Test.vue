@@ -696,23 +696,23 @@ onMounted(async () => {
   const param = {
     therapist_id: 5555,
   };
-  // await axios
-  //   .post("/allTest", param, {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Accept: "application/json",
-  //     },
-  //   })
-  //   .then((response) => {
-  //     console.log("response", response.data);
-  //     test.value = response.data.map((patient, index) => ({
-  //       no: patient.no,
-  //       testname: patient.testname,
-  //     }));
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error:", error);
-  //   });
+  await axios
+    .post("/allTest", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      test.value = response.data.map((patient, index) => ({
+        no: patient.no,
+        testname: patient.testname,
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   testDuplicate.value = test.value
     ? test.value.map((testItem) => testItem.testname)
     : null;
