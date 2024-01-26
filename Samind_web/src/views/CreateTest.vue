@@ -178,9 +178,10 @@ export default {
     mockTestData() {
       console.log("query param", this.$route.query);
       if (this.$route.query != null) {
+        console.log("NewTest: ", this.testName);
+      } else {
         this.testName = this.$route.query.testName;
-        console.log("edittest: ", this.testName);
-
+        console.log("Duplicate Test: ", this.testName);
         // let questionsapi = [
         //   {
         //     no: 1,

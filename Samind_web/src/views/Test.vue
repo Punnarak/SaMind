@@ -354,7 +354,7 @@
                       size="x-large"
                       variant="flat"
                       style="width: 100px; height: 70px"
-                      :disabled="testDuplicate.value ? false : true"
+                      :disabled="testDuplicate.length === 0"
                       @click="
                         (createWithPopup = false), (duplicatePopup = true)
                       "
@@ -542,7 +542,7 @@ export default {
     handleEditTest(testName) {
       console.log("testName in testlist page", testName);
       this.$router.push({
-        name: "edittest", // Use the route name instead of path
+        name: "edittest",
         query: {
           testName: testName,
         },
@@ -692,98 +692,6 @@ const filteredPatients = computed(() => {
   );
 });
 
-const patients = [
-  {
-    id: "01",
-    patientId: "PID001",
-    patientName: "Somsak Test1",
-    age: 24,
-    gender: "male",
-    mood: 4,
-    action: "1%",
-  },
-  {
-    id: "02",
-    patientId: "PID002",
-    patientName: "Somsee Test2",
-    age: 37,
-    gender: "female",
-    mood: 4.3,
-    action: "1%",
-  },
-  {
-    id: "03",
-    patientId: "PID003",
-    patientName: "Somchai Test3",
-    age: 23,
-    gender: "male",
-    mood: 6,
-    action: "7%",
-  },
-  {
-    id: "04",
-    patientId: "PID004",
-    patientName: "Somsom Test4",
-    age: 67,
-    gender: "male",
-    mood: 4.3,
-    action: "8%",
-  },
-  {
-    id: "05",
-    patientId: "PID005",
-    patientName: "Somcheng Test5",
-    age: 49,
-    gender: "female",
-    mood: 3.9,
-    action: "16%",
-  },
-  {
-    id: "06",
-    patientId: "PID006",
-    patientName: "Sompon Test6",
-    age: 94,
-    gender: "female",
-    mood: 0,
-    action: "0%",
-  },
-  {
-    id: "07",
-    patientId: "PID007",
-    patientName: "Somporn Test7",
-    age: 98,
-    gender: "male",
-    mood: 600,
-    action: "2%",
-  },
-  {
-    id: "08",
-    patientId: "PID008",
-    patientName: "Sommon Test8",
-    age: 87,
-    gender: "female",
-    mood: 400,
-    action: "45%",
-  },
-  {
-    id: "09",
-    patientId: "PID009",
-    patientName: "Somrak Test9",
-    age: 51,
-    gender: "male",
-    mood: 200,
-    action: "22%",
-  },
-  {
-    id: "10",
-    patientId: "PID010",
-    patientName: "Somjit Test10",
-    age: 65,
-    gender: "female",
-    mood: 7,
-    action: "6%",
-  },
-];
 onMounted(async () => {
   const param = {
     therapist_id: 5555,
