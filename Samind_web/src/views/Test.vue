@@ -59,99 +59,6 @@
           @click="handleCopyTest(item.columns.testname)"
           >mdi-content-copy</v-icon
         >
-        <Transition name="createwith-modal">
-          <div v-if="createWithPopup" class="modal-mask">
-            <div class="modal-wrapper">
-              <div class="modal-container createwith">
-                <div class="modal-header mt-5" align="center">
-                  <slot class="popupcreateheader" name="header"
-                    ><label
-                      style="
-                        color: #000;
-                        text-align: center;
-                        font-size: 24px;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: normal;
-                      "
-                      >Create Test</label
-                    ></slot
-                  >
-                </div>
-
-                <div class="modal-body mt-10" style="margin-top: 6px">
-                  <slot name="body">
-                    <v-row>
-                      <v-col>
-                        <v-btn
-                          rounded="xl"
-                          class="text-none mx-auto"
-                          color="#569AFF"
-                          block
-                          size="x-large"
-                          variant="flat"
-                          style="width: 100px; height: 70px"
-                          @click="createWithPopup = false"
-                          to="createtest"
-                        >
-                          <v-icon class="mr-2" style="font-size: 27px"
-                            >mdi-file-document-outline</v-icon
-                          >New Test</v-btn
-                        > </v-col
-                      ><v-col>
-                        <v-btn
-                          rounded="xl"
-                          class="text-none mx-auto"
-                          color="rgba(0, 191, 99, 1)"
-                          block
-                          size="x-large"
-                          variant="flat"
-                          style="width: 100px; height: 70px"
-                          @click="
-                            (createWithPopup = false), (duplicatePopup = true)
-                          "
-                        >
-                          <v-row align="center">
-                            <v-icon class="mr-2" style="font-size: 27px"
-                              >mdi-file-document-outline</v-icon
-                            >
-                            <div align="start">
-                              <label style="font-size: 13px; display: block">
-                                Duplicate from
-                              </label>
-                              <label style="font-size: 13px; display: block">
-                                Other Test</label
-                              >
-                            </div></v-row
-                          >
-                        </v-btn></v-col
-                      ></v-row
-                    >
-                  </slot>
-                </div>
-
-                <div class="modal-footer">
-                  <slot name="footer">
-                    <button
-                      class="modal-default-button-duplicate text mt-5"
-                      style="
-                        color: #858585;
-                        text-align: center;
-                        font-size: 17px;
-                        font-style: normal;
-                        font-weight: 600;
-                        line-height: 24px; /* 160% */
-                      "
-                      @click="createWithPopup = false"
-                    >
-                      Cancel
-                    </button>
-                  </slot>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Transition>
 
         <Transition name="delete-modal">
           <div v-if="deletePopup" class="modal-mask">
@@ -374,88 +281,6 @@
             </div>
           </div>
         </Transition>
-
-        <Transition name="duplicate-modal">
-          <div v-if="duplicatePopup" class="modal-mask-duplicate">
-            <div class="modal-wrapper">
-              <div class="modal-container createwith">
-                <div class="modal-header mt-5" align="start">
-                  <slot class="popupcreateheader" name="header"
-                    ><label
-                      class="ml-5"
-                      style="
-                        color: #000;
-                        text-align: center;
-                        font-size: 24px;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: normal;
-                      "
-                      >Duplicate Test</label
-                    ></slot
-                  >
-                </div>
-
-                <div class="modal-body mt-5" style="margin-top: 6px">
-                  <slot name="body">
-                    <v-select
-                      class="dropdown-list mt-4 ml-5"
-                      variant="outlined"
-                      rounded="lg"
-                      style="
-                        width: 330px;
-                        height: 50px;
-                        border-radius: 10px;
-                        z-index: 9999;
-                        position: relative;
-                      "
-                      v-model="selectedDuplicateTest"
-                      :items="testDuplicate"
-                      placeholder="Select Test"
-                    ></v-select
-                  ></slot>
-                </div>
-
-                <div class="modal-footer" align="center">
-                  <slot name="footer">
-                    <button
-                      class="modal-default-button-duplicate text mt-10 mr-16"
-                      style="
-                        color: rgba(60, 155, 242, 1);
-                        text-align: center;
-                        font-size: 17px;
-                        font-style: normal;
-                        font-weight: 600;
-                        line-height: 24px; /* 160% */
-                      "
-                      @click="
-                        (duplicatePopup = false),
-                          handleDuplicateTest(selectedDuplicateTest)
-                      "
-                    >
-                      Next
-                    </button>
-
-                    <button
-                      class="modal-default-button-duplicate text mt-5 ml-16"
-                      style="
-                        color: #858585;
-                        text-align: center;
-                        font-size: 17px;
-                        font-style: normal;
-                        font-weight: 600;
-                        line-height: 24px; /* 160% */
-                      "
-                      @click="duplicatePopup = false"
-                    >
-                      Cancel
-                    </button>
-                  </slot>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Transition>
       </template>
 
       <template v-slot:bottom>
@@ -481,6 +306,181 @@
         </v-row>
       </template>
     </v-data-table>
+    <Transition name="createwith-modal">
+      <div v-if="createWithPopup" class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container createwith">
+            <div class="modal-header mt-5" align="center">
+              <slot class="popupcreateheader" name="header"
+                ><label
+                  style="
+                    color: #000;
+                    text-align: center;
+                    font-size: 24px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                  "
+                  >Create Test</label
+                ></slot
+              >
+            </div>
+
+            <div class="modal-body mt-10" style="margin-top: 6px">
+              <slot name="body">
+                <v-row>
+                  <v-col>
+                    <v-btn
+                      rounded="xl"
+                      class="text-none mx-auto"
+                      color="#569AFF"
+                      block
+                      size="x-large"
+                      variant="flat"
+                      style="width: 100px; height: 70px"
+                      @click="createWithPopup = false"
+                      to="createtest"
+                    >
+                      <v-icon class="mr-2" style="font-size: 27px"
+                        >mdi-file-document-outline</v-icon
+                      >New Test</v-btn
+                    > </v-col
+                  ><v-col>
+                    <v-btn
+                      rounded="xl"
+                      class="text-none mx-auto"
+                      color="rgba(0, 191, 99, 1)"
+                      block
+                      size="x-large"
+                      variant="flat"
+                      style="width: 100px; height: 70px"
+                      :disabled="testDuplicate.length === 0"
+                      @click="
+                        (createWithPopup = false), (duplicatePopup = true)
+                      "
+                    >
+                      <v-row align="center">
+                        <v-icon class="mr-2" style="font-size: 27px"
+                          >mdi-file-document-outline</v-icon
+                        >
+                        <div align="start">
+                          <label style="font-size: 13px; display: block">
+                            Duplicate from
+                          </label>
+                          <label style="font-size: 13px; display: block">
+                            Other Test</label
+                          >
+                        </div></v-row
+                      >
+                    </v-btn></v-col
+                  ></v-row
+                >
+              </slot>
+            </div>
+
+            <div class="modal-footer" align="center">
+              <slot name="footer">
+                <button
+                  class="modal-default-button-duplicate text mt-5"
+                  style="
+                    color: #858585;
+                    text-align: center;
+                    font-size: 17px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 24px; /* 160% */
+                  "
+                  @click="createWithPopup = false"
+                >
+                  Cancel
+                </button>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+    <Transition name="duplicate-modal">
+      <div v-if="duplicatePopup" class="modal-mask-duplicate">
+        <div class="modal-wrapper">
+          <div class="modal-container createwith">
+            <div class="modal-header mt-5" align="start">
+              <slot class="popupcreateheader" name="header"
+                ><label
+                  class="ml-5"
+                  style="
+                    color: #000;
+                    text-align: center;
+                    font-size: 24px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                  "
+                  >Duplicate Test</label
+                ></slot
+              >
+            </div>
+
+            <div class="modal-body mt-5" style="margin-top: 6px">
+              <slot name="body">
+                <v-select
+                  class="dropdown-list mt-4 ml-5"
+                  variant="outlined"
+                  rounded="lg"
+                  style="
+                    width: 330px;
+                    height: 50px;
+                    border-radius: 10px;
+                    z-index: 9999;
+                    position: relative;
+                  "
+                  v-model="selectedDuplicateTest"
+                  :items="testDuplicate"
+                  placeholder="Select Test"
+                ></v-select
+              ></slot>
+            </div>
+
+            <div class="modal-footer" align="center">
+              <slot name="footer">
+                <button
+                  class="modal-default-button-duplicate text mt-10 mr-16"
+                  style="
+                    color: rgba(60, 155, 242, 1);
+                    text-align: center;
+                    font-size: 17px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 24px; /* 160% */
+                  "
+                  @click="
+                    (duplicatePopup = false),
+                      handleDuplicateTest(selectedDuplicateTest)
+                  "
+                >
+                  Next
+                </button>
+
+                <button
+                  class="modal-default-button-duplicate text mt-5 ml-16"
+                  style="
+                    color: #858585;
+                    text-align: center;
+                    font-size: 17px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 24px; /* 160% */
+                  "
+                  @click="duplicatePopup = false"
+                >
+                  Cancel
+                </button>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </v-col>
 </template>
 
@@ -542,7 +542,7 @@ export default {
     handleEditTest(testName) {
       console.log("testName in testlist page", testName);
       this.$router.push({
-        name: "edittest", // Use the route name instead of path
+        name: "edittest",
         query: {
           testName: testName,
         },
@@ -671,14 +671,17 @@ export default {
 };
 </script>
 <script setup>
-import { ref } from "vue";
-// import axios from "../axios.js";
-import { onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
 let test = ref([]);
+// let test = ref([
+//   { no: 1, testname: "Test 1" },
+//   { no: 2, testname: "Test 2" },
+//   { no: 3, testname: "Test 3" },
+// ]);
 
 let testDuplicate = ref([]);
 let searchPatient = ref("");
@@ -689,98 +692,6 @@ const filteredPatients = computed(() => {
   );
 });
 
-const patients = [
-  {
-    id: "01",
-    patientId: "PID001",
-    patientName: "Somsak Test1",
-    age: 24,
-    gender: "male",
-    mood: 4,
-    action: "1%",
-  },
-  {
-    id: "02",
-    patientId: "PID002",
-    patientName: "Somsee Test2",
-    age: 37,
-    gender: "female",
-    mood: 4.3,
-    action: "1%",
-  },
-  {
-    id: "03",
-    patientId: "PID003",
-    patientName: "Somchai Test3",
-    age: 23,
-    gender: "male",
-    mood: 6,
-    action: "7%",
-  },
-  {
-    id: "04",
-    patientId: "PID004",
-    patientName: "Somsom Test4",
-    age: 67,
-    gender: "male",
-    mood: 4.3,
-    action: "8%",
-  },
-  {
-    id: "05",
-    patientId: "PID005",
-    patientName: "Somcheng Test5",
-    age: 49,
-    gender: "female",
-    mood: 3.9,
-    action: "16%",
-  },
-  {
-    id: "06",
-    patientId: "PID006",
-    patientName: "Sompon Test6",
-    age: 94,
-    gender: "female",
-    mood: 0,
-    action: "0%",
-  },
-  {
-    id: "07",
-    patientId: "PID007",
-    patientName: "Somporn Test7",
-    age: 98,
-    gender: "male",
-    mood: 600,
-    action: "2%",
-  },
-  {
-    id: "08",
-    patientId: "PID008",
-    patientName: "Sommon Test8",
-    age: 87,
-    gender: "female",
-    mood: 400,
-    action: "45%",
-  },
-  {
-    id: "09",
-    patientId: "PID009",
-    patientName: "Somrak Test9",
-    age: 51,
-    gender: "male",
-    mood: 200,
-    action: "22%",
-  },
-  {
-    id: "10",
-    patientId: "PID010",
-    patientName: "Somjit Test10",
-    age: 65,
-    gender: "female",
-    mood: 7,
-    action: "6%",
-  },
-];
 onMounted(async () => {
   const param = {
     therapist_id: 5555,
@@ -797,14 +708,14 @@ onMounted(async () => {
       test.value = response.data.map((patient, index) => ({
         no: patient.no,
         testname: patient.testname,
-
-        // action: patient.action, // Add this line if "action" property is present
       }));
     })
     .catch((error) => {
       console.error("Error:", error);
     });
-  testDuplicate.value = test.value.map((testItem) => testItem.testname);
+  testDuplicate.value = test.value
+    ? test.value.map((testItem) => testItem.testname)
+    : null;
 });
 // onMounted(async () => {
 //   try {

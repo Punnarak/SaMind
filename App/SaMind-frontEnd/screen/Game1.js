@@ -12,9 +12,20 @@ const Game2048 = () => {
   const [score, setScore] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState(null);
 
+  const [gameOver, setGameOver] = useState(false);
+
   useEffect(() => {
     initializeGame();
+    startGameTimer();
   }, []);
+
+  const startGameTimer = () => {
+    const timer = setTimeout(() => {
+      setGameOver(true);
+    }, 30000); // 30 seconds
+
+    return () => clearTimeout(timer);
+  };
 
   const initializeGame = () => {
     const initialBoard = Array.from({ length: BoardSize }, () =>
@@ -24,6 +35,11 @@ const Game2048 = () => {
     placeRandomTile(initialBoard);
     setBoard(initialBoard);
     setScore(0);
+  };
+
+  const goBack = () => {
+    // Navigate back to the last screen
+    navigation.goBack();
   };
 
   const placeRandomTile = (currentBoard) => {
@@ -126,6 +142,19 @@ const Game2048 = () => {
   };
 
   const renderBoard = () => {
+
+    if (gameOver) {
+        return (
+          <View>
+            <Text style={styles.gameOverText}>Game Over!</Text>
+            <Text style={styles.finalScore}>Final Score: {score}</Text>
+            <TouchableOpacity style={styles.goBackButton} onPress={goBack}>
+            <Text style={styles.buttonText}>Go Back</Text>
+          </TouchableOpacity>
+          </View>
+        );
+      }
+
     return board.map((row, rowIndex) => (
       <View key={rowIndex} style={styles.row}>
         {row.map((cell, colIndex) => (
@@ -180,9 +209,9 @@ const Game2048 = () => {
     return null;
   };
 
-  const restartGame = () => {
-    initializeGame();
-  };
+//   const restartGame = () => {
+//     initializeGame();
+//   };
 
 
   return (
@@ -199,9 +228,9 @@ const Game2048 = () => {
           Last Swipe Direction: {swipeDirection}
         </Text>
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={restartGame}>
+          {/* <TouchableOpacity style={styles.button} onPress={restartGame}>
             <Text style={styles.buttonText}>Restart</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.button}  onPress={() => navigation.navigate("Homescreen")}>
             <Text style={styles.buttonText}>Quit to Menu</Text>
           </TouchableOpacity>
@@ -259,6 +288,25 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  gameOverText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "red",
+    marginBottom: 10,
+  },
+  finalScore: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  goBackButton: {
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    justifyContent: "center", // Center content vertically
+    alignItems: "center", // Center content horizontally
   },
 });
 

@@ -104,8 +104,6 @@
                 <v-icon color="white">mdi-plus</v-icon>
               </v-btn>
             </v-row>
-            <!-- Options for the question -->
-            <!-- Options for the question -->
             <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
@@ -179,45 +177,30 @@ export default {
   methods: {
     mockTestData() {
       console.log("query param", this.$route.query);
-      if (this.$route.query != null) {
+      if (!"testName" in this.$route.query) {
+        console.log("NewTest");
+      } else if ("testName" in this.$route.query) {
         this.testName = this.$route.query.testName;
-        console.log("edittest: ", this.testName);
-        
-        // let questionsapi = [
-        //   {
-        //     no: 1,
-        //     question: "What is your favorite color?",
-        //     options: ["Red", "Green", "Blue"],
-        //     type: "Mock Type",
-        //     answer: "Red", // Index of the correct answer in the options array
-        //   },
-        //   {
-        //     no: 2,
-        //     question: "How many fingers do you have?",
-        //     options: ["Four", "Five", "Six"],
-        //     type: "Mock Type",
-        //     answer: "Five", // Index of the correct answer in the options array
-        //   },
-        // ];
-        
-          let test = ref([]);
-          const param = {
-            type: this.testName,
-          };
-          axios
-            .post("/viewOneQuestion", param, {
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-            })
-            .then((response) => {
-              console.log("response123456", response.data);
-              test.value = response.data
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
+        console.log("Duplicate Test: ", this.testName);
+
+        let test = ref([]);
+        const param = {
+          type: this.testName,
+        };
+        axios
+          .post("/viewOneQuestion", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("response in else", response.data);
+            test.value = response.data;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
         this.questions = test;
         console.log("Questions:", this.questions);
