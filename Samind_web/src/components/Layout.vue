@@ -114,7 +114,7 @@
     <v-btn icon>
       <v-icon>mdi-bell-outline</v-icon>
     </v-btn>
-    <span class="ml-3">John Doe</span>
+    <span class="ml-3">{{this.firstName}} {{ this.lastName }}</span>
     <v-icon class="ml-3">mdi-account</v-icon>
     <v-menu>
       <template v-slot:activator="{ props }">
@@ -160,12 +160,37 @@ const drawer = ref(null);
 
 <script>
 import Account from "../assets/accountminus.svg";
-
+import axios from "../axios.js";
 export default {
   components: {
     Account,
   },
-  // Other component options...
+  data() {
+    return {
+      firstName: "",
+      lastName: "",
+    }
+  },
+  created() {
+    const param = {
+    therapist_id: 5555,
+  };
+   axios
+    .post("/info_therapist", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("name", response.data);
+      this.firstName = response.data.fname
+      this.lastName = response.data.lname
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  },
 };
 </script>
 <style scoped>
