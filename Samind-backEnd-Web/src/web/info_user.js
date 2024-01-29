@@ -9,6 +9,31 @@ const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by b
 
 router.use(bodyParser.json());
 
+router.post('/all_therapist', (req, res) => {
+    const therapist_id = req.body.therapist_id; // Access therapist_id from request body
+    if (!therapist_id) {
+      return res.status(400).json({ error: 'Therapist ID is required' });
+    }
+  
+    const query = 'SELECT CONCAT(fname, \' \', lname) AS full_name FROM therapist WHERE therapist_id != $1';
+    const queryParams = [therapist_id];
+  
+    client.query(query, queryParams)
+      .then(result => {
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Therapists not found' });
+        }
+        const therapistNames = result.rows.map(row => row.full_name);
+        res.json(therapistNames);
+      })
+      .catch(err => {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'An error occurred' });
+      });
+});
+
+
+
 router.post('/info_therapist', (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     if (!therapist_id) {

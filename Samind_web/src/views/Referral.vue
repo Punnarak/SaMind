@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import axios from "../axios.js";
 export default {
   data() {
     return {
@@ -118,7 +119,40 @@ export default {
       ],
     };
   },
-  created() {},
+  created() {
+    const param = {
+    therapist_id: 5555,
+  };
+    axios
+    .post("/patientList", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      this.patientOptions = response.data.map(patient => patient.name);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
+    axios
+    .post("/all_therapist", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      this.doctorOptions = response.data;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  },
   computed: {},
   methods: {},
 };
