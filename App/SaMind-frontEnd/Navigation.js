@@ -26,6 +26,8 @@ import Gamescreen from "./screen/Game";
 
 import Game1 from "./screen/Game1";
 import Game2 from "./screen/Game2";
+import Game3 from "./screen/Game3";
+import Game4 from "./screen/Game4";
 
 const Stack = createStackNavigator();
 
@@ -145,6 +147,16 @@ const MainStack = () => {
       <Stack.Screen
         name="Game2"
         component={Game2}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Game3"
+        component={Game3}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Game4"
+        component={Game4}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
