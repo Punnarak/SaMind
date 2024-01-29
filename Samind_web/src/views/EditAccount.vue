@@ -114,7 +114,7 @@
               class="save text-none"
               size="x-large"
               variant="flat"
-              @click="savePopup = true"
+              @click="save()"
             >
               Save
             </v-btn>
@@ -125,7 +125,7 @@
                     <div class="modal-header" align="end">
                       <slot class="popupheader" name="header"
                         ><label
-                          @click="savePopup = false"
+                          @click="closePopup()"
                           style="
                             width: 12px;
                             height: 15.724px;
@@ -182,6 +182,7 @@
 </template>
 
 <script>
+import axios from "../axios.js";
 export default {
   data() {
     return {
@@ -204,12 +205,58 @@ export default {
       showPassword: false,
     };
   },
-  created() {},
+  created() {
+    const param = {
+    therapist_id: 5555,
+  };
+   axios
+    .post("/info_therapist", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("name", response.data);
+      this.firstName = response.data.fname
+      this.lastName = response.data.lname
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  },
   computed: {},
   methods: {
-    togglePasswordVisibility() {
+    save(){
+     let param = {
+        therapist_id: 5555,
+        fname : this.firstName,
+        lname : this.lastName,
+        password: this.newPassword
+      }
+      console.log("param", param);
+      axios
+    .post("/update_info_therapist", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("name", response.data);
+     this.savePopup = true
+
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+    },
+    closePopup() {
+      this.savePopup = false;
+      window.location.reload(); // Refresh the page
+    },
+    togglePasswordVisibility() { // ยังไม่ได้ใช้
       this.showPassword = !this.showPassword;
-      // Set the cursor at the end of the input field
       this.$refs.passwordField.focus();
       const length = this.newPassword.length;
       this.$refs.passwordField.setSelectionRange(length, length);

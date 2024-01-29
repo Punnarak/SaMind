@@ -7,7 +7,6 @@ const jsonParser = bodyParser.json()
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-// const client = require('./connection.js');
 const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
 
 router.post('/info_patient_post', (req, res) => {
