@@ -407,7 +407,9 @@
                 <!-- Check if the event time matches the current time slot -->
                 <template v-if="checkTimeEvent(event.time, time)">
                   <!-- Check if the event belongs to the current day -->
-                  <template v-if="isEventOnDay(event, dayIndex)">
+                  <template
+                    v-if="isEventOnDay(event, dayIndex) && isEventOnWeek(event)"
+                  >
                     <div
                       class="event-week-box event"
                       :class="{
@@ -691,27 +693,45 @@ export default {
       events: [
         {
           id: 1,
-          patientName: "Mary Jane",
+          patientName: "Sat 3",
+          date: "3-2-2024",
+          time: "2:00",
+        },
+        {
+          id: 1,
+          patientName: "Tue 30",
           date: "30-1-2024",
-          time: "15:30",
+          time: "2:00",
+        },
+        {
+          id: 1,
+          patientName: "Sat 27",
+          date: "27-1-2024",
+          time: "1:00",
+        },
+        {
+          id: 1,
+          patientName: "Sun 28",
+          date: "28-1-2024",
+          time: "1:00",
         },
         {
           id: 2,
-          patientName: "Kanokpong Janta",
+          patientName: "Wed 31",
           date: "31-1-2024",
-          time: "10:00",
+          time: "1:00",
         },
         {
           id: 2,
-          patientName: "Mary Janta",
+          patientName: "Mon 29",
           date: "29-1-2024",
-          time: "9:00",
+          time: "1:00",
         },
         {
           id: 2,
-          patientName: "Test Janta",
+          patientName: "Thu 1",
           date: "1-2-2024",
-          time: "10:00",
+          time: "1:00",
         },
       ],
       //ใช้ใน calnedar week
@@ -887,24 +907,34 @@ export default {
 
       return eventHour == timeHour;
     },
-    isEventOnDay(event, dayIndex) {
-      const parts = event.date.split("-");
-      const year = parseInt(parts[0]);
-      const month = parseInt(parts[1]) - 1; // Months are zero-based
-      const day = parseInt(parts[2]);
+    isEventOnDay(event, targetDay) {
+      const [day, month, year] = event.date
+        .split("-")
+        .map((part) => parseInt(part));
 
-      // Create a new Date object
-      const d = new Date(year, month, day);
-      console.log(
-        "event",
-        event,
-        year,
-        month,
-        day,
-        this.weekDays[d.getDay() - 1],
-        this.weekDays[d.getDay() - 1] == dayIndex
+      const eventDate = new Date(year, month - 1, day);
+
+      const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      const eventDayName = dayNames[eventDate.getDay()];
+
+      return eventDayName === targetDay;
+    },
+    isEventOnWeek(event) {
+      const start = startOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const end = endOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const startFormat = new Date(format(start, "dd/MM/yyyy"));
+      const endFormat = new Date(format(end, "dd/MM/yyyy"));
+      const eventDate = new Date(
+        event.date.split("-")[2],
+        event.date.split("-")[1] - 1,
+        event.date.split("-")[0]
       );
-      return this.weekDays[d.getDay() - 1] == dayIndex;
+
+      const eventFormat = format(eventDate, "dd/MM/yyyy");
+
+      // console.log("week", eventDate, start, end);
+      return eventDate >= start && eventDate <= end;
     },
     isSpecialTime(time) {
       const parts = time.split(":");
