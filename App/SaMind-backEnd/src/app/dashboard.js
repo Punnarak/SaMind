@@ -665,7 +665,7 @@ function formatDate(timestamp) {
 // });
 
 //main api
-router.post('/dashboard_api', auth, async (req, res) => {
+router.post('/dashboard_api'/*, auth*/, async (req, res) => {
   const { patient_id } = req.body;
 
   try {
