@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Svg, Circle, Path } from "react-native-svg";
-import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  Platform,
+} from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -26,14 +33,14 @@ export default function Login({ route }) {
         setMood(response.data.avgMood);
       })
       .catch((error) => {
-         console.error("Axios error:", error);
+        console.error("Axios error:", error);
       });
   }, []);
 
   const setMood = (mood) => {
-    mood = parseFloat(mood)
+    mood = parseFloat(mood);
     mood = mood.toFixed(0);
-    console.log(mood)
+    console.log(mood);
     if (mood == 1) {
       setMoodCard("terrible");
     } else if (mood >= 2 && mood < 3) {
@@ -42,7 +49,7 @@ export default function Login({ route }) {
       setMoodCard("soso");
     } else if (mood >= 4 && mood < 5) {
       setMoodCard("happy");
-    } else if (mood == 5 ) {
+    } else if (mood == 5) {
       setMoodCard("cheerful");
     }
   };
@@ -618,9 +625,9 @@ export default function Login({ route }) {
               style={{
                 ...Platform.select({
                   android: { marginTop: "8%" },
-                  ios: { 
-                    marginTop: "12%"
-                   },
+                  ios: {
+                    marginTop: "12%",
+                  },
                 }),
                 fontSize: 9,
                 color: "rgba(37, 39, 28, 1)",
@@ -1051,15 +1058,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-  
+
     ...Platform.select({
-      android: { 
+      android: {
         // width: "99.8%",
         width: horizontalScale(320),
-        
-     },
-      ios: {  width: horizontalScale(320),
       },
+      ios: { width: horizontalScale(320) },
     }),
   },
   moodN: {
@@ -1133,9 +1138,10 @@ const styles = StyleSheet.create({
   moodDate: {
     ...Platform.select({
       android: {
-        left: horizontalScale(150), 
+        left: horizontalScale(150),
       },
-      ios: {left: horizontalScale(140) }}),
+      ios: { left: horizontalScale(140) },
+    }),
     fontSize: 10,
     color: "gray",
     fontWeight: "bold",
@@ -1146,7 +1152,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       android: {
         bottom: 0,
-        position: 'absolute',
+        position: "absolute",
         marginTop: "-1%",
         elevation: 10,
         shadowColor: "black", // IOS
@@ -1163,8 +1169,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         // marginTop: "7%",
       },
-      ios: { 
-        marginTop: "3%", shadowColor: "rgba(0,0,0, 0.3)", bottom: 0, position: 'absolute' },
+      ios: {
+        marginTop: "3%",
+        shadowColor: "rgba(0,0,0, 0.3)",
+        bottom: 0,
+        position: "absolute",
+      },
     }),
     width: "120%",
     height: 69.8,

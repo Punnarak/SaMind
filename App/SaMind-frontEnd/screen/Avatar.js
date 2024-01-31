@@ -14,13 +14,13 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import * as Speech from "expo-speech";
+// import * as Speech from "expo-speech";
 // import Voice from "react-native-voice";
-import {
-  requestPermissionsAsync,
-  startSpeechToTextAsync,
-  stopSpeechToTextAsync,
-} from "expo-speech";
+// import {
+//   requestPermissionsAsync,
+//   startSpeechToTextAsync,
+//   stopSpeechToTextAsync,
+// } from "expo-speech";
 
 export default function Notification() {
   const navigation = useNavigation();
@@ -184,13 +184,13 @@ export default function Notification() {
       />
 
       {/* speech to text ---> expo speech api */}
-      <View>
+      {/* <View>
         <Button
           title={isListening ? "Stop Listening" : "Start Listening"}
           onPress={isListening ? handleStopListening : handleStartListening}
         />
         <Text>{transcription}</Text>
-      </View>
+      </View> */}
       {/* speech to text ---> react native cli*/}
       {/* <View>
         <Button

@@ -12,6 +12,7 @@ import {
   ScrollView,
   ImageBackground,
   FlatList,
+  Platform,
 } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import CarouselCardItem, { SLIDER_WIDTH, ITEM_WIDTH } from "../Clibrary";
@@ -180,16 +181,15 @@ export default function Library() {
           borderColor: "#569AFF",
           backgroundColor: "#569AFF",
           ...Platform.select({
-      android: { 
-        // marginTop: verticalScale(-38.5),
-        marginTop: "-9.85%",
-        
-     },
-      ios: { 
-        marginTop: verticalScale(-36.2),
-        // marginTop: "-9.65%",
-      },
-    }),
+            android: {
+              // marginTop: verticalScale(-38.5),
+              marginTop: "-9.85%",
+            },
+            ios: {
+              marginTop: verticalScale(-36.2),
+              // marginTop: "-9.65%",
+            },
+          }),
           // marginTop: "-9.65%",
           marginLeft: "61%",
         }}
