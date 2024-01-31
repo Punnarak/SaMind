@@ -310,6 +310,7 @@
           </v-btn>
         </v-col>
 
+        <!-- calendar day -->
         <div class="calendar-day" v-if="selectedViewType === 'day'">
           <div class="calendar-day-size">
             <div class="timeline-day">
@@ -359,6 +360,7 @@
           </div>
         </div>
 
+        <!-- calendar week -->
         <div class="calendar-week" v-if="selectedViewType === 'week'">
           <div class="calendar-week-grid">
             <!-- First row for day labels and "ALL DAY" -->
@@ -389,14 +391,44 @@
             </div>
 
             <!-- Empty boxes for time slots -->
-            <div
+            <!-- <div
               class="calendar-week-box"
               v-for="dayIndex in 7"
               :key="dayIndex"
-            ></div>
+            ></div> -->
+
+            <div
+              class="calendar-week-box"
+              v-for="(dayIndex, day) in weekDays"
+              :key="dayIndex"
+            >
+              <!-- Render events for the specific time slot and day -->
+              <div v-for="event in events" :key="event.patientName">
+                <!-- Check if the event time matches the current time slot -->
+                <template v-if="checkTimeEvent(event.time, time)">
+                  <!-- Check if the event belongs to the current day -->
+                  <template
+                    v-if="isEventOnDay(event, dayIndex) && isEventOnWeek(event)"
+                  >
+                    <div
+                      class="event-week-box event"
+                      :class="{
+                        'event-box-special': isSpecialTime(event.time),
+                      }"
+                    >
+                      {{ event.patientName }}
+                      <br />
+
+                      {{ showEventWeekTime(event.time, time) }}
+                    </div>
+                  </template>
+                </template>
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- calendar month -->
         <div class="calendar-grid" v-if="selectedViewType === 'month'">
           <div
             v-for="(cell, index) in calendarGrid"
@@ -410,7 +442,7 @@
             <div v-if="index >= 7" class="day-number">{{ cell.day }}</div>
             <br />
 
-            <!-- event chatgpt -->
+            <!-- event -->
             <!-- Display event information here -->
             <div
               class="event-box"
@@ -483,7 +515,10 @@ export default {
   components: {},
   data() {
     return {
+      // ใช้ใน request bar
+      // count request
       request: 1,
+      //request Appointment info
       patients: [
         {
           id: "01",
@@ -526,6 +561,7 @@ export default {
           value: "",
         },
       ],
+      // set calendar type
       selectedViewType: "month",
       selectedDate: new Date(),
       currentMonth: "",
@@ -533,11 +569,10 @@ export default {
       calendarGrid: [],
       currentDate: new Date(),
       currentYear: "",
-      days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       selectedEvent: {},
       isListVisible: false,
-      menuPositionX: 0,
-      menuPositionY: 0,
+      // ใช้เป็นตารางของ calendar day
+      days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       timesDay: [
         "00:00",
         "01:00",
@@ -565,6 +600,7 @@ export default {
         "23:00",
         "24:00",
       ],
+      // ใช้คูณหาตำแหน่งใน calendar day
       timesDayUse: [
         "00:00",
         "00:30",
@@ -635,32 +671,8 @@ export default {
           timeB: "13:00",
         },
       },
-      events: [
-        {
-          id: 1,
-          patientName: "Mary Jane",
-          date: "11-11-2023",
-          time: "15:30",
-        },
-        {
-          id: 2,
-          patientName: "Kanokpong Janta",
-          date: "11-11-2023",
-          time: "10:00",
-        },
-        {
-          id: 2,
-          patientName: "Mary Janta",
-          date: "2-12-2023",
-          time: "15:00",
-        },
-        {
-          id: 2,
-          patientName: "Test Janta",
-          date: "2-12-2023",
-          time: "10:00",
-        },
-      ],
+      menuPositionX: 0,
+      menuPositionY: 0,
       months: [
         "January",
         "February",
@@ -675,11 +687,74 @@ export default {
         "November",
         "December",
       ],
-      dayLabels: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
       requestBarOpen: false,
+      //ใช้ใน calendar Month
+      dayLabels: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
+      events: [
+        {
+          id: 1,
+          patientName: "Sat 3",
+          date: "3-2-2024",
+          time: "2:00",
+        },
+        {
+          id: 1,
+          patientName: "Tue 30",
+          date: "30-1-2024",
+          time: "2:00",
+        },
+        {
+          id: 1,
+          patientName: "Sat 27",
+          date: "27-1-2024",
+          time: "1:00",
+        },
+        {
+          id: 1,
+          patientName: "Sun 28",
+          date: "28-1-2024",
+          time: "1:00",
+        },
+        {
+          id: 2,
+          patientName: "Wed 31",
+          date: "31-1-2024",
+          time: "1:00",
+        },
+        {
+          id: 2,
+          patientName: "Mon 29",
+          date: "29-1-2024",
+          time: "1:00",
+        },
+        {
+          id: 2,
+          patientName: "Thu 1",
+          date: "1-2-2024",
+          time: "1:00",
+        },
+      ],
+      //ใช้ใน calnedar week
       weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       timeSlots: [
-        "9:00",
+        // "9:00",
+        // "10:00",
+        // "11:00",
+        // "12:00",
+        // "13:00",
+        // "14:00",
+        // "15:00",
+        // "16:00",
+        "00:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
         "10:00",
         "11:00",
         "12:00",
@@ -687,6 +762,14 @@ export default {
         "14:00",
         "15:00",
         "16:00",
+        "17:00",
+        "18:00",
+        "19:00",
+        "20:00",
+        "21:00",
+        "22:00",
+        "23:00",
+        "24:00",
       ],
     };
   },
@@ -814,6 +897,66 @@ export default {
       const date = new Date(this.currentDate);
       date.setDate(date.getDate() - date.getDay() + dayIndex);
       return date.getDate();
+    },
+    checkTimeEvent(eventTime, Time) {
+      let partEventTime = eventTime.split(":");
+      let eventHour = parseInt(partEventTime[0]);
+
+      let partTime = Time.split(":");
+      let timeHour = parseInt(partTime[0]);
+
+      return eventHour == timeHour;
+    },
+    isEventOnDay(event, targetDay) {
+      const [day, month, year] = event.date
+        .split("-")
+        .map((part) => parseInt(part));
+
+      const eventDate = new Date(year, month - 1, day);
+
+      const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      const eventDayName = dayNames[eventDate.getDay()];
+
+      return eventDayName === targetDay;
+    },
+    isEventOnWeek(event) {
+      const start = startOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const end = endOfWeek(this.currentDate, { weekStartsOn: 0 });
+      const startFormat = new Date(format(start, "dd/MM/yyyy"));
+      const endFormat = new Date(format(end, "dd/MM/yyyy"));
+      const eventDate = new Date(
+        event.date.split("-")[2],
+        event.date.split("-")[1] - 1,
+        event.date.split("-")[0]
+      );
+
+      const eventFormat = format(eventDate, "dd/MM/yyyy");
+
+      // console.log("week", eventDate, start, end);
+      return eventDate >= start && eventDate <= end;
+    },
+    isSpecialTime(time) {
+      const parts = time.split(":");
+      const min = parseInt(parts[1]);
+
+      return min === 30;
+    },
+    showEventWeekTime(eventTime, time) {
+      let partTime = eventTime.split(":");
+      let eventMinTime = parseInt(partTime[1]);
+
+      if (eventMinTime == 30) {
+        let endTime = this.timeSlots[this.timeSlots.indexOf(time) + 1];
+
+        let partEndTime = endTime.split(":");
+
+        return eventTime + "-" + partEndTime[0] + ":30";
+      } else {
+        return (
+          eventTime + "-" + this.timeSlots[this.timeSlots.indexOf(time) + 1]
+        );
+      }
     },
     //Calendar Month
     hasEvents(day, cell, currentDate) {
@@ -1408,6 +1551,35 @@ h2 {
 
 <!-- calendar Week -->
 <style scoped>
+.event-week-box {
+  position: absolute;
+  padding: 10px;
+  text-align: left;
+  margin: -10px;
+  width: 155px;
+  height: 70px;
+  background-color: rgba(116, 121, 255, 1);
+  border: 1px solid rgba(116, 121, 255, 1);
+  color: rgba(255, 255, 255, 1);
+  border-radius: 15px;
+  font-size: 14px;
+  overflow: hidden;
+}
+.event-box-special {
+  position: absolute;
+  margin-top: 20px !important;
+  padding: 10px;
+  text-align: left;
+  margin: -10px;
+  width: 155px;
+  height: 70px;
+  background-color: rgba(116, 121, 255, 1);
+  border: 1px solid rgba(116, 121, 255, 1);
+  color: rgba(255, 255, 255, 1);
+  border-radius: 15px;
+  font-size: 14px;
+  overflow: hidden;
+}
 .current-day-week {
   background-color: rgba(60, 155, 242, 1);
   border-radius: 100%;
