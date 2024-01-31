@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Svg, Circle, Path } from "react-native-svg";
-import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  Platform,
+} from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-
-export default function Login({ route }) {
+// export default function Dashboard() {
+export default function Dashboard({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
@@ -26,14 +33,14 @@ export default function Login({ route }) {
         setMood(response.data.avgMood);
       })
       .catch((error) => {
-         console.error("Axios error:", error);
+        console.error("Axios error:", error);
       });
   }, []);
 
   const setMood = (mood) => {
-    mood = parseFloat(mood)
+    mood = parseFloat(mood);
     mood = mood.toFixed(0);
-    console.log(mood)
+    console.log(mood);
     if (mood == 1) {
       setMoodCard("terrible");
     } else if (mood >= 2 && mood < 3) {
@@ -42,7 +49,7 @@ export default function Login({ route }) {
       setMoodCard("soso");
     } else if (mood >= 4 && mood < 5) {
       setMoodCard("happy");
-    } else if (mood == 5 ) {
+    } else if (mood == 5) {
       setMoodCard("cheerful");
     }
   };
@@ -132,10 +139,10 @@ export default function Login({ route }) {
             //ล่าง
             source={require("../assets/cl.png")}
             style={{
-              ...Platform.select({
-                android: { marginTop: "25%" },
-                ios: { marginTop: "27.4%" },
-              }),
+              // ...Platform.select({
+              //   android: { marginTop: "25%" },
+              //   ios: { marginTop: "27.4%" },
+              // }),
               position: "absolute",
               width: 30,
               height: 30,
@@ -171,8 +178,8 @@ export default function Login({ route }) {
               Cheerful
             </Text>
             <Text style={{ fontSize: 11, color: "#D0A449", marginTop: "5%" }}>
-              This joyous feeling is{"\n"}contagious! Who else can we{"\n"}share
-              it with to brighten their day?
+              This joyous feeling is{"\n"}contagious! Who else can we{"\n"}
+              share it with to brighten their day?
             </Text>
             <Text
               style={{
@@ -288,10 +295,10 @@ export default function Login({ route }) {
               style={{
                 fontSize: 8,
                 color: "rgba(57, 135, 253, 1)",
-                ...Platform.select({
-                  android: { marginTop: "8%" },
-                  ios: { marginTop: "12%" },
-                }),
+                // ...Platform.select({
+                //   android: { marginTop: "8%" },
+                //   ios: { marginTop: "12%" },
+                // }),
               }}
             >
               AVG between {data.dateBetween}
@@ -396,10 +403,10 @@ export default function Login({ route }) {
             </Text>
             <Text
               style={{
-                ...Platform.select({
-                  android: { marginTop: "8%" },
-                  ios: { marginTop: "12%" },
-                }),
+                // ...Platform.select({
+                //   android: { marginTop: "8%" },
+                //   ios: { marginTop: "12%" },
+                // }),
                 fontSize: 8,
                 color: "rgba(135, 0, 204, 1)",
               }}
@@ -451,10 +458,10 @@ export default function Login({ route }) {
           <Image
             source={require("../assets/cl.png")}
             style={{
-              ...Platform.select({
-                android: { marginTop: "25%" },
-                ios: { marginTop: "27.4%" },
-              }),
+              // ...Platform.select({
+              //   android: { marginTop: "25%" },
+              //   ios: { marginTop: "27.4%" },
+              // }),
               position: "absolute",
               width: 30,
               height: 30,
@@ -505,10 +512,10 @@ export default function Login({ route }) {
             </Text>
             <Text
               style={{
-                ...Platform.select({
-                  android: { marginTop: "8%" },
-                  ios: { marginTop: "5%" },
-                }),
+                // ...Platform.select({
+                //   android: { marginTop: "8%" },
+                //   ios: { marginTop: "5%" },
+                // }),
                 fontSize: 9,
                 color: "rgba(60, 90, 154, 1)",
               }}
@@ -561,10 +568,10 @@ export default function Login({ route }) {
             //ล่าง
             source={require("../assets/cl.png")}
             style={{
-              ...Platform.select({
-                android: { marginTop: "25%" },
-                ios: { marginTop: "27.4%" },
-              }),
+              // ...Platform.select({
+              //   android: { marginTop: "25%" },
+              //   ios: { marginTop: "27.4%" },
+              // }),
               position: "absolute",
               width: 30,
               height: 30,
@@ -616,12 +623,12 @@ export default function Login({ route }) {
             </Text>
             <Text
               style={{
-                ...Platform.select({
-                  android: { marginTop: "8%" },
-                  ios: { 
-                    marginTop: "12%"
-                   },
-                }),
+                // ...Platform.select({
+                //   android: { marginTop: "8%" },
+                //   ios: {
+                //     marginTop: "12%",
+                //   },
+                // }),
                 fontSize: 9,
                 color: "rgba(37, 39, 28, 1)",
               }}
@@ -998,7 +1005,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: "35%",
     paddingVertical: "3%",
-
     marginTop: "-3.2%",
   },
   qbox: {
@@ -1051,15 +1057,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-  
     ...Platform.select({
-      android: { 
+      android: {
         // width: "99.8%",
         width: horizontalScale(320),
-        
-     },
-      ios: {  width: horizontalScale(320),
       },
+      ios: { width: horizontalScale(320) },
     }),
   },
   moodN: {
@@ -1133,44 +1136,44 @@ const styles = StyleSheet.create({
   moodDate: {
     ...Platform.select({
       android: {
-        left: horizontalScale(150), 
+        left: horizontalScale(150),
       },
-      ios: {left: horizontalScale(140) }}),
+      ios: { left: horizontalScale(140) },
+    }),
     fontSize: 10,
     color: "gray",
     fontWeight: "bold",
-
     bottom: 0,
   },
   undertag: {
     ...Platform.select({
       android: {
         bottom: 0,
-        position: 'absolute',
+        position: "absolute",
         marginTop: "-1%",
         elevation: 10,
         shadowColor: "black", // IOS
         shadowOffset: { height: 1, width: 1 }, // IOS
         shadowOpacity: 1, // IOS
         shadowRadius: 1, //IOS
-
         height: verticalScale(67.8),
         width: horizontalScale(380),
         shadowColor: "rgba(0,0,0, 1)", // IOS
         backgroundColor: "white",
-
         flexDirection: "row",
         alignItems: "center",
         // marginTop: "7%",
       },
-      ios: { 
-        marginTop: "3%", shadowColor: "rgba(0,0,0, 0.3)", bottom: 0, position: 'absolute' },
+      ios: {
+        marginTop: "3%",
+        shadowColor: "rgba(0,0,0, 0.3)",
+        bottom: 0,
+        position: "absolute",
+      },
     }),
     width: "120%",
     height: 69.8,
-
     backgroundColor: "white",
-
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS

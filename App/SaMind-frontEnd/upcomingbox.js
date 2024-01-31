@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Animated,
   Easing,
-  Platform,
   TouchableOpacity,
   Image,
   LayoutAnimation,
@@ -14,8 +13,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
-import moment from "moment";
-
 const NotificationBox = ({ item, index, data }) => {
   const navigation = useNavigation();
   const [isRotating, setIsRotating] = useState(false);
@@ -71,34 +68,6 @@ const NotificationBox = ({ item, index, data }) => {
     height: isExpanded ? "90%" : "90%",
   };
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const [hours, minutes] = item.time.split(":");
-
-  // Create a new Date object and set the hours and minutes
-  const dateObject = new Date();
-  dateObject.setHours(parseInt(hours, 10));
-  dateObject.setMinutes(parseInt(minutes, 10));
-
-  // Format the time using Date object methods
-  const formattedTime = dateObject.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
   return (
     <View style={{ flexDirection: "row" }}>
       <View
@@ -110,13 +79,9 @@ const NotificationBox = ({ item, index, data }) => {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <I name="date-range" size={20} color="#D88A63" />
-          <Text style={[styles.header]}>
-            {months[data.month - 1] + " " + data.date + " - " + formattedTime}
-          </Text>
+          <Text style={[styles.header]}>{item.title}</Text>
         </View>
-        <Text style={[styles.detail]}>
-          {item.therapist_fname + " " + item.therapist_lname}
-        </Text>
+        <Text style={[styles.detail]}>{item.docName}</Text>
 
         {/* Location section - Conditionally rendered based on the isExpanded state */}
         {isExpanded && (
@@ -132,16 +97,8 @@ const NotificationBox = ({ item, index, data }) => {
               <Image
                 source={require("./assets/location.png")}
                 style={{
-                  ...Platform.select({
-                    android: {
-                      marginRight: "-54%",
-                      left: 18,
-                    },
-                    ios: {
-                      marginRight: "-57%",
-                    },
-                  }),
                   height: 25,
+                  marginRight: "-57%",
                   resizeMode: "contain",
                 }}
               />
@@ -210,14 +167,6 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    ...Platform.select({
-      android: {
-        left: "320%",
-      },
-      ios: {
-        left: "0%",
-      },
-    }),
     fontSize: 17,
     color: "#D88A63",
     fontWeight: "bold",
@@ -228,18 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#D88A63",
   },
-  lodetail: {
-    ...Platform.select({
-      android: {
-        left: "390%",
-      },
-      ios: {
-        left: "320%",
-      },
-    }),
-    fontSize: 15,
-    color: "#D88A63",
-  },
+  lodetail: { fontSize: 15, color: "#D88A63" },
   description: {
     marginTop: "12.2%",
     fontSize: 15,
