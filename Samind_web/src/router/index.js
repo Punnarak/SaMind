@@ -25,8 +25,8 @@ const router = createRouter({
           component: () => import("../views/Patient.vue"),
         },
         {
-          path: "therapist",
-          component: () => import("../views/Therapist.vue"),
+          path: "managetherapist",
+          component: () => import("../views/ManageTherapist.vue"),
         },
         {
           path: "test",
