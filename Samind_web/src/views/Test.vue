@@ -75,7 +75,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ item.columns.testName }} ?</slot
+                    {{ this.selectTest.columns.testname }} ?</slot
                   >
                 </div>
 
@@ -520,24 +520,24 @@ export default {
     },
     Delete(question, selectTest) {
       console.log("selectTest", selectTest);
-      const type = { type: question.columns.testName };
+      const type = { therapistId : 5555, type: selectTest.columns.testname };
       const typeJSON = JSON.stringify(type, null, 2);
       console.log("test", typeJSON);
 
-      // axios
-      //   .delete("/questionsDel", {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     data: typeJSON, // Send the data directly in the request body
-      //   })
-      //   .then((response) => {
-      //     console.log("delete questions:", response);
-      //     window.location.reload();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });\
+      axios
+        .delete("/questionsDel", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: typeJSON, // Send the data directly in the request body
+        })
+        .then((response) => {
+          console.log("delete questions:", response);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     handleEditTest(testName) {
       console.log("testName in testlist page", testName);

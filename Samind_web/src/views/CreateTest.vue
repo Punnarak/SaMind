@@ -66,6 +66,7 @@
               class="mt-2"
               variant="outlined"
               rounded="lg"
+              v-model="testDescription"
               style="border-radius: 10px; height: 300px"
             ></v-text-field>
           </v-col>
@@ -168,6 +169,7 @@ export default {
           return "You must enter a test name.";
         },
       ],
+      testDescription: "",
     };
   },
   mounted() {
@@ -176,6 +178,7 @@ export default {
 
   methods: {
     mockTestData() {
+      // this.testDescription = "asdasddasdsadadasdasdasdas"
       console.log("query param", this.$route.query);
       if (!"testName" in this.$route.query) {
         console.log("NewTest");
@@ -185,6 +188,7 @@ export default {
 
         let test = ref([]);
         const param = {
+          therapistId: 5555,
           type: this.testName,
         };
         axios
@@ -196,6 +200,7 @@ export default {
           })
           .then((response) => {
             console.log("response in else", response.data);
+            this.testDescription = response.data[0].description
             test.value = response.data;
           })
           .catch((error) => {
@@ -225,7 +230,7 @@ export default {
       this.questions.splice(index, 1);
     },
     createTest() {
-      const testData = this.questions.map((question, index) => ({
+      const questions = this.questions.map((question, index) => ({
         no: index + 1, // Assuming a simple incrementing ID starting from 15
         question: question.question,
         options: question.options,
@@ -234,9 +239,13 @@ export default {
       }));
 
       // Convert testData to JSON string
-      const testDataJSON = JSON.stringify(testData, null, 2);
-
-      console.log("Test Data (JSON):", testDataJSON);
+      // const testDataJSON = JSON.stringify(testData, null, 2);
+      const param = {
+        therapist_id : 5555,
+        description : this.testDescription,
+        questions
+      }
+      console.log("questions (JSON):", JSON.stringify(param, null, 2));
 
       // Add additional logic for handling the created test data if needed
 
@@ -254,7 +263,7 @@ export default {
       //   });
 
       axios
-        .post("/questionAdd", testDataJSON, {
+        .post("/questionAdd", JSON.stringify(param, null, 2), {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

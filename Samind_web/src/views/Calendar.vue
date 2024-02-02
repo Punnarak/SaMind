@@ -510,6 +510,7 @@ import { ref } from "vue";
 import { startOfWeek, endOfWeek, format } from "date-fns";
 import animationpath from "../assets/sending.json";
 import lottie from "lottie-web";
+import axios from "../axios.js";
 
 export default {
   components: {},
@@ -690,50 +691,51 @@ export default {
       requestBarOpen: false,
       //ใช้ใน calendar Month
       dayLabels: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
-      events: [
-        {
-          id: 1,
-          patientName: "Sat 3",
-          date: "3-2-2024",
-          time: "2:00",
-        },
-        {
-          id: 1,
-          patientName: "Tue 30",
-          date: "30-1-2024",
-          time: "2:00",
-        },
-        {
-          id: 1,
-          patientName: "Sat 27",
-          date: "27-1-2024",
-          time: "1:00",
-        },
-        {
-          id: 1,
-          patientName: "Sun 28",
-          date: "28-1-2024",
-          time: "1:00",
-        },
-        {
-          id: 2,
-          patientName: "Wed 31",
-          date: "31-1-2024",
-          time: "1:00",
-        },
-        {
-          id: 2,
-          patientName: "Mon 29",
-          date: "29-1-2024",
-          time: "1:00",
-        },
-        {
-          id: 2,
-          patientName: "Thu 1",
-          date: "1-2-2024",
-          time: "1:00",
-        },
-      ],
+      events: [],
+      // [
+      //   {
+      //     id: 1,
+      //     patientName: "Sat 3",
+      //     date: "3-2-2024",
+      //     time: "2:00",
+      //   },
+      //   {
+      //     id: 1,
+      //     patientName: "Tue 30",
+      //     date: "30-1-2024",
+      //     time: "2:00",
+      //   },
+      //   {
+      //     id: 1,
+      //     patientName: "Sat 27",
+      //     date: "27-1-2024",
+      //     time: "1:00",
+      //   },
+      //   {
+      //     id: 1,
+      //     patientName: "Sun 28",
+      //     date: "28-1-2024",
+      //     time: "1:00",
+      //   },
+      //   {
+      //     id: 2,
+      //     patientName: "Wed 31",
+      //     date: "31-1-2024",
+      //     time: "1:00",
+      //   },
+      //   {
+      //     id: 2,
+      //     patientName: "Mon 29",
+      //     date: "29-1-2024",
+      //     time: "1:00",
+      //   },
+      //   {
+      //     id: 2,
+      //     patientName: "Thu 1",
+      //     date: "1-2-2024",
+      //     time: "1:00",
+      //   },
+      // ],
       //ใช้ใน calnedar week
       weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       timeSlots: [
@@ -774,6 +776,7 @@ export default {
     };
   },
   computed: {},
+  
   methods: {
     //Calendar Main
     selectDay() {
@@ -959,6 +962,60 @@ export default {
       }
     },
     //Calendar Month
+    async fetchEvents  () {
+      let param = {
+        therapist_id: 5555,
+      };
+      await axios
+        .post("/calendar_view", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+          let m = response.data
+          // .map((event, index) => ({
+          //   // id: index + 1,
+          //   patientName: event.patientName,
+          //   date: event.date,
+          //   time: event.time,
+          // }));
+          
+
+          // console.log("this.events",this.events)
+          this.events = 
+           [{
+        patientName: "jare year",
+        date: '29-1-2024',
+        time: "10:00"
+      },{
+        patientName: "30 y",
+        date: '30-1-2024',
+        time: "10:00"
+      }]
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+      // this.events = [{
+      //   patientName: "x y",
+      //   date: '29-1-2024',
+      //   time: "10:00"
+      // },{
+      //   patientName: "30 y",
+      //   date: '30-1-2024',
+      //   time: "10:00"
+      // }]
+      console.log("api event", this.events)
+      // window.location.reload(); 
+    },
+    formatDate(dateString) {
+      const parts = dateString.split("-");
+      const formattedDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
+      return formattedDate;
+    },
     hasEvents(day, cell, currentDate) {
       let tempMonth = currentDate.getMonth();
       let tempYear = currentDate.getFullYear();
@@ -1288,7 +1345,9 @@ export default {
     },
   },
 
-  created() {
+  async created() {
+    await this.fetchEvents();
+
     this.selectedDate = new Date();
     this.currentDate = new Date();
     this.currentYear = this.currentDate.getFullYear();

@@ -66,6 +66,7 @@
               class="mt-2"
               variant="outlined"
               rounded="lg"
+              v-model="description"
               style="border-radius: 10px; height: 300px"
             ></v-text-field>
           </v-col>
@@ -157,6 +158,7 @@ import axios from "../axios.js";
 export default {
   data() {
     return {
+      oldType: "",
       questions: [
         {
           text: "",
@@ -170,6 +172,7 @@ export default {
           return "You must enter a test name.";
         },
       ],
+      description: "",
     };
   },
   mounted() {
@@ -180,6 +183,7 @@ export default {
     mockTestData() {
       console.log("query param", this.$route.query);
       if (this.$route.query != null) {
+        this.oldType = this.$route.query.testName;
         this.testName = this.$route.query.testName;
         console.log("edittest: ", this.testName);
         
@@ -202,6 +206,7 @@ export default {
         
           let test = ref([]);
           const param = {
+            therapistId: 5555,
             type: this.testName,
           };
           axios
@@ -213,6 +218,7 @@ export default {
             })
             .then((response) => {
               console.log("response123456", response.data);
+              this.description = response.data[0].description
               test.value = response.data
             })
             .catch((error) => {
@@ -242,7 +248,7 @@ export default {
       this.questions.splice(index, 1);
     },
     createTest() {
-      const testData = this.questions.map((question, index) => ({
+      const questions = this.questions.map((question, index) => ({
         no: index + 1, // Assuming a simple incrementing ID starting from 15
         question: question.question,
         options: question.options,
@@ -251,9 +257,14 @@ export default {
       }));
 
       // Convert testData to JSON string
-      const testDataJSON = JSON.stringify(testData, null, 2);
-
-      console.log("Test Data (JSON):", testDataJSON);
+      // const testDataJSON = JSON.stringify(testData, null, 2);
+      const param = {
+        therapist_id : 5555,
+        description : this.description,
+        oldType : this.oldType,
+        questions
+      }
+      console.log("questions (JSON):", JSON.stringify(param, null, 2));
 
       // Add additional logic for handling the created test data if needed
 
@@ -271,7 +282,7 @@ export default {
       //   });
 
       axios
-        .post("/questionAdd", testDataJSON, {
+        .post("/questionUpdate", JSON.stringify(param, null, 2), {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
