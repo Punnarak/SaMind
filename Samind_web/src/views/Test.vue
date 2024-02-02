@@ -676,23 +676,39 @@ import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
-let test = ref([]);
-// let test = ref([
-//   { no: 1, testname: "Test 1" },
-//   { no: 2, testname: "Test 2" },
-//   { no: 3, testname: "Test 3" },
-// ]);
+// let test = ref([]);
+let test = ref([
+  { no: 1, testname: "Test 1" },
+  { no: 2, testname: "Test 2" },
+  { no: 3, testname: "Test 3" },
+]);
 
+let patients = ref();
+// []
 let testDuplicate = ref([]);
 let searchPatient = ref("");
 const filteredPatients = computed(() => {
   const searchTerm = searchPatient.value.toLowerCase();
-  return patients.filter((item) =>
+  return patients.value.filter((item) =>
     item.patientName.toLowerCase().includes(searchTerm)
   );
 });
 
 onMounted(async () => {
+  patients.value = [
+    {
+      patientName: "Somsak Test1",
+    },
+    {
+      patientName: "Somsak Test1",
+    },
+    {
+      patientName: "Somsak Test1",
+    },
+    {
+      patientName: "Somsak Test1",
+    },
+  ];
   const param = {
     therapist_id: 5555,
   };
@@ -713,10 +729,27 @@ onMounted(async () => {
     .catch((error) => {
       console.error("Error:", error);
     });
+  await axios
+    .post("/patientList", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      patients.value = response.data.map((patient, index) => ({
+        patientName: patient.patientName,
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   testDuplicate.value = test.value
     ? test.value.map((testItem) => testItem.testname)
     : null;
 });
+
 // onMounted(async () => {
 //   try {
 //     const response = await axios.get("/questiontype", {

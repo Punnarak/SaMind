@@ -9,28 +9,39 @@
         <v-divider :thickness="2" class="dash"></v-divider>
         <v-list density="compact" nav>
           <v-list-item
+            v-if="role === 'admin'"
+            class="mt-2"
+            prepend-icon="mdi-account-multiple"
+            title="Patients"
+            to="/dashboard/managepatient"
+          ></v-list-item>
+          <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-account-multiple"
             title="Patients"
             to="/dashboard/patient"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-clipboard-text-outline"
             title="Test"
             to="/dashboard/test"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-calendar"
             title="Calendar"
             to="/dashboard/calendar"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'admin'"
             class="mt-2"
-            prepend-icon="mdi-account-settings"
-            title="Referral"
-            to="/dashboard/referral"
+            prepend-icon="mdi-clipboard-text-outline"
+            title="Therapists"
+            to="/dashboard/managetherapist"
           ></v-list-item>
         </v-list>
       </v-col>
@@ -63,28 +74,39 @@
         <v-divider :thickness="2" class="dash"></v-divider>
         <v-list density="compact" nav>
           <v-list-item
+            v-if="role === 'admin'"
+            class="mt-2"
+            prepend-icon="mdi-account-multiple"
+            title="Patients"
+            to="/dashboard/managepatient"
+          ></v-list-item>
+          <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-account-multiple"
             title="Patients"
             to="/dashboard/patient"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-clipboard-text-outline"
             title="Test"
             to="/dashboard/test"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-calendar"
             title="Calendar"
             to="/dashboard/calendar"
           ></v-list-item>
           <v-list-item
+            v-if="role === 'admin'"
             class="mt-2"
             prepend-icon="mdi-account-settings"
             title="Referral"
-            to="/dashboard/referral"
+            to="/dashboard/managetherapist"
           ></v-list-item>
         </v-list>
       </v-col>
@@ -114,7 +136,7 @@
     <v-btn icon>
       <v-icon>mdi-bell-outline</v-icon>
     </v-btn>
-    <span class="ml-3">{{this.firstName}} {{ this.lastName }}</span>
+    <span class="ml-3">{{ this.firstName }} {{ this.lastName }}</span>
     <v-icon class="ml-3">mdi-account</v-icon>
     <v-menu>
       <template v-slot:activator="{ props }">
@@ -161,35 +183,39 @@ const drawer = ref(null);
 <script>
 import Account from "../assets/accountminus.svg";
 import axios from "../axios.js";
+
 export default {
   components: {
     Account,
   },
   data() {
     return {
+      role: "",
       firstName: "",
       lastName: "",
-    }
+    };
   },
   created() {
+    this.role = "admin";
     const param = {
-    therapist_id: 5555,
-  };
-   axios
-    .post("/info_therapist", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("name", response.data);
-      this.firstName = response.data.fname
-      this.lastName = response.data.lname
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      therapist_id: 5555,
+    };
+    axios
+      .post("/info_therapist", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("name", response.data);
+        this.role = response.data.role;
+        this.firstName = response.data.fname;
+        this.lastName = response.data.lname;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
 };
 </script>
