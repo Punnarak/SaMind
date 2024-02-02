@@ -23,7 +23,7 @@
             to="/dashboard/patient"
           ></v-list-item>
           <v-list-item
-            v-if="role === 'admin'"
+            v-if="role === 'therapist'"
             class="mt-2"
             prepend-icon="mdi-clipboard-text-outline"
             title="Test"
@@ -41,7 +41,7 @@
             class="mt-2"
             prepend-icon="mdi-clipboard-text-outline"
             title="Therapists"
-            to="/dashboard/therapist"
+            to="/dashboard/managetherapist"
           ></v-list-item>
         </v-list>
       </v-col>
@@ -106,7 +106,7 @@
             class="mt-2"
             prepend-icon="mdi-account-settings"
             title="Referral"
-            to="/dashboard/therapist"
+            to="/dashboard/managetherapist"
           ></v-list-item>
         </v-list>
       </v-col>
