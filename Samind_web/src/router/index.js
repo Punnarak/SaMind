@@ -17,8 +17,16 @@ const router = createRouter({
       component: () => import("../components/Layout.vue"),
       children: [
         {
+          path: "managepatient",
+          component: () => import("../views/ManagePatient.vue"),
+        },
+        {
           path: "patient",
           component: () => import("../views/Patient.vue"),
+        },
+        {
+          path: "therapist",
+          component: () => import("../views/Therapist.vue"),
         },
         {
           path: "test",
