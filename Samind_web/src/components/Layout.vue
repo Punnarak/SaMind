@@ -39,14 +39,14 @@
           <v-list-item
             v-if="role === 'admin'"
             class="mt-2"
-            prepend-icon="mdi-clipboard-text-outline"
+            prepend-icon="mdi-account-key"
             title="Therapists"
             to="/dashboard/managetherapist"
           ></v-list-item>
           <v-list-item
             v-if="role === 'admin'"
             class="mt-2"
-            prepend-icon="mdi-account-settings"
+            prepend-icon="mdi-book-open-variant"
             title="Manage Library"
             to="/dashboard/managelibrary"
           ></v-list-item>
@@ -111,14 +111,14 @@
           <v-list-item
             v-if="role === 'admin'"
             class="mt-2"
-            prepend-icon="mdi-account-settings"
+            prepend-icon="mdi-account-key"
             title="Therapists"
             to="/dashboard/managetherapist"
           ></v-list-item>
           <v-list-item
             v-if="role === 'admin'"
             class="mt-2"
-            prepend-icon="mdi-account-settings"
+            prepend-icon="mdi-book-open-variant"
             title="Manage Library"
             to="/dashboard/managelibrary"
           ></v-list-item>
