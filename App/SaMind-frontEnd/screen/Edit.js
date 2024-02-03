@@ -41,6 +41,7 @@ export default function EditProfile({ route }) {
   const [update, setUpdate] = useState(false);
 
   const handleSavePress = () => {
+    console.log(name, surname, email, password, conPassword);
     setNameError(" ");
     setSurnameError(" ");
     setEmailError(" ");
@@ -51,18 +52,15 @@ export default function EditProfile({ route }) {
     checkPassword();
 
     if (!name) {
-      setPasswordError("*");
+      setNameError("*");
     }
     if (!surname) {
-      setPasswordError("*");
+      setSurnameError("*");
     }
     if (!email) {
       setEmailError("*");
     }
-    if (!password) {
-      setPasswordError("*");
-    }
-    if (!conPassword) {
+    if (password && !conPassword) {
       setConPasswordError("*");
     }
 
@@ -70,8 +68,6 @@ export default function EditProfile({ route }) {
       name &&
       surname &&
       email &&
-      password &&
-      conPassword &&
       password === conPassword &&
       checkEmail === true
     ) {
@@ -116,9 +112,9 @@ export default function EditProfile({ route }) {
   };
   useEffect(() => {
     console.log("Edit Profile Screen", patientId);
-    setName(data.fname);
-    setSurname(data.lname);
-    setEmail(data.email);
+    setName(data.fname ? data.fname : "Punya");
+    setSurname(data.lname ? data.lname : "Hasinanan");
+    setEmail(data.email ? data.email : "pun@gmail.com");
   }, []);
   useEffect(() => {
     if (email != "") {
@@ -502,7 +498,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     ...Platform.select({
       android: { marginTop: "-3%", left: 180 },
-      ios: { top: 15, left: 180 },
+      ios: { top: 0, left: 180 },
     }),
     fontSize: this.conPasswordError === "*" ? 20 : 20,
     fontWeight: "bold",
