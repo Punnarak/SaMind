@@ -32,6 +32,9 @@ export default function Login({ route }) {
   const [Conpassword, setConPassword] = useState("");
   const [submit, setSubmit] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
+  //validate
+  const [timeError, setTimeError] = useState(false);
+
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [isPickerVisibleN, setIsPickerVisibleN] = useState(false);
   const [selectedValueN, setSelectedValueN] = useState(null);
@@ -41,16 +44,53 @@ export default function Login({ route }) {
   const { date, month, year } = route.params || {};
 
   const time = [
-    { id: 1, name: "9:00-10:00   AM", value: "9" },
-    {
-      id: 2,
-      name: "10:00-11:00  AM",
-      value: "10",
-    },
-    { id: 3, name: "1:00-2:00      PM", value: "1" },
-    { id: 4, name: "2:00-3:00      PM", value: "2" },
-    { id: 5, name: "3:00-4:00      PM", value: "3" },
-    { id: 6, name: "4:00-5:00      PM", value: "4" },
+    { id: 1, name: "0:00-1:00 ", value: "0:00" },
+    { id: 2, name: "0:30-1:30 ", value: "0:30" },
+    { id: 3, name: "1:00-2:00 ", value: "1:00" },
+    { id: 4, name: "1:30-2:30 ", value: "1:30" },
+    { id: 5, name: "2:00-3:00 ", value: "2:00" },
+    { id: 6, name: "2:30-3:30 ", value: "2:30" },
+    { id: 7, name: "3:00-4:00 ", value: "3:00" },
+    { id: 8, name: "3:30-4:30 ", value: "3:30" },
+    { id: 9, name: "4:00-5:00 ", value: "4:00" },
+    { id: 10, name: "4:30-5:30 ", value: "4:30" },
+    { id: 11, name: "5:00-6:00 ", value: "5:00" },
+    { id: 12, name: "5:30-6:30 ", value: "5:30" },
+    { id: 13, name: "6:00-7:00 ", value: "6:00" },
+    { id: 14, name: "6:30-7:30 ", value: "6:30" },
+    { id: 15, name: "7:00-8:00 ", value: "7:00" },
+    { id: 16, name: "7:30-8:30 ", value: "7:30" },
+    { id: 17, name: "8:00-9:00 ", value: "8:00" },
+    { id: 18, name: "8:30-9:30 ", value: "8:30" },
+    { id: 19, name: "9:00-10:00 ", value: "9:00" },
+    { id: 20, name: "9:30-10:30 ", value: "9:30" },
+    { id: 21, name: "10:00-11:00 ", value: "10:00" },
+    { id: 22, name: "10:30-11:30 ", value: "10:30" },
+    { id: 23, name: "11:00-12:00 ", value: "11:00" },
+    { id: 24, name: "11:30-12:30 ", value: "11:30" },
+    { id: 25, name: "12:00-13:00 ", value: "12:00" },
+    { id: 26, name: "12:30-13:30 ", value: "12:30" },
+    { id: 27, name: "13:00-14:00 ", value: "13:00" },
+    { id: 28, name: "13:30-14:30 ", value: "13:30" },
+    { id: 29, name: "14:00-15:00 ", value: "14:00" },
+    { id: 30, name: "14:30-15:30 ", value: "14:30" },
+    { id: 31, name: "15:00-16:00 ", value: "15:00" },
+    { id: 32, name: "15:30-16:30 ", value: "15:30" },
+    { id: 33, name: "16:00-17:00 ", value: "16:00" },
+    { id: 34, name: "16:30-17:30 ", value: "16:30" },
+    { id: 35, name: "17:00-18:00 ", value: "17:00" },
+    { id: 36, name: "17:30-18:30 ", value: "17:30" },
+    { id: 37, name: "18:00-19:00 ", value: "18:00" },
+    { id: 38, name: "18:30-19:30 ", value: "18:30" },
+    { id: 39, name: "19:00-20:00 ", value: "19:00" },
+    { id: 40, name: "19:30-20:30 ", value: "19:30" },
+    { id: 41, name: "20:00-21:00 ", value: "20:00" },
+    { id: 42, name: "20:30-21:30 ", value: "20:30" },
+    { id: 43, name: "21:00-22:00 ", value: "21:00" },
+    { id: 44, name: "21:30-22:30 ", value: "21:30" },
+    { id: 45, name: "22:00-23:00 ", value: "22:00" },
+    { id: 46, name: "22:30-23:30 ", value: "22:30" },
+    { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ];
 
   const DrName = [
@@ -71,71 +111,75 @@ export default function Login({ route }) {
   const toggleSubmit = () => {
     setConfirmModal(!confirmModal);
   };
-
   const toggleModal = () => {
     setSubmit(!submit);
   };
   const handleSubmit = () => {
-    const dateString = year + "-" + (month + 1) + "-" + date;
-    const dateFormat = "YYYY-MM-DD";
-    const fulldate = moment(dateString, dateFormat).toDate();
-    const day = fulldate.getDay();
-    let datestring = "";
-    if (date > 3) {
-      datestring = date + "th";
-    } else {
-      if (date === 1) {
-        datestring = date + "st";
-      } else if (date === 2) {
-        datestring = date + "nd";
-      } else if (date === 3) {
-        datestring = date + "rd";
+    if (selectedValue) {
+      setTimeError("");
+      const dateString = year + "-" + (month + 1) + "-" + date;
+      const dateFormat = "YYYY-MM-DD";
+      const fulldate = moment(dateString, dateFormat).toDate();
+      const day = fulldate.getDay();
+      let datestring = "";
+      if (date > 3) {
+        datestring = date + "th";
+      } else {
+        if (date === 1) {
+          datestring = date + "st";
+        } else if (date === 2) {
+          datestring = date + "nd";
+        } else if (date === 3) {
+          datestring = date + "rd";
+        }
       }
-    }
-    const Days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+      const Days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
 
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    setshowdate(
-      datestring + " " + Days[day] + " " + months[month] + " " + year
-    );
-    setSubmit(!submit);
-    const param = {
-      "therapist_id": 9999,
-      "patient_id": 124,
-      "date": dateString,
-      "time": selectedValue
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      setshowdate(
+        datestring + " " + Days[day] + " " + months[month] + " " + year
+      );
+      setSubmit(!submit);
+      const param = {
+        therapist_id: 9999,
+        patient_id: 124,
+        date: dateString,
+        time: selectedValue,
+      };
+      console.log(param);
+      axios
+        .post("/appoint_post", param)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
+    } else {
+      setTimeError("*");
     }
-    console.log(param)
-    axios
-      .post("/appoint_post", param)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
   };
 
   const togglePicker = () => {
@@ -189,6 +233,7 @@ export default function Login({ route }) {
       />
       <View style={styles.container2}>
         <Text style={styles.title1}>Time</Text>
+        <Text style={styles.errorText}>{timeError}</Text>
         <TextInput
           style={[
             styles.hospitalInput,
@@ -241,6 +286,7 @@ export default function Login({ route }) {
         <Text style={styles.title2}>Name</Text>
         <TextInput
           placeholder="Punya"
+          editable={false}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
           value={email}
@@ -248,6 +294,7 @@ export default function Login({ route }) {
         />
         <Text style={styles.title4}>Dr. Name</Text>
         <TextInput
+          editable={false}
           style={[
             styles.Drinput,
             {
@@ -256,11 +303,10 @@ export default function Login({ route }) {
             },
           ]}
           placeholder="Dr.Name"
-          placeholderTextColor={"rgba(96, 91, 91, 0.47)"}
-          editable={false}
+          placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           value={selectedValueN ? selectedValueN : ""}
         />
-        <TouchableOpacity style={[styles.eyeI2]} onPress={togglePickerN}>
+        {/* <TouchableOpacity style={[styles.eyeI2]} onPress={togglePickerN}>
           <Ionicons
             name="chevron-back-outline"
             style={{
@@ -285,9 +331,10 @@ export default function Login({ route }) {
             keyExtractor={(item) => item.id.toString()}
             style={styles.listN}
           />
-        ) : null}
+        ) : null} */}
         <Text style={styles.title3}>Tel</Text>
         <TextInput
+          editable={false}
           placeholder="0890222255"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           secureTextEntry={passwordVisibility}
@@ -310,7 +357,7 @@ export default function Login({ route }) {
             style={styles.outb}
             onPress={() => navigation.navigate("Appoinmentscreen")}
           >
-            <Text style={styles.text}>Sign Out</Text>
+            <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -433,6 +480,20 @@ const styles = StyleSheet.create({
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
+  },
+  errorText: {
+    position: "absolute",
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
+    fontSize: moderateScale(25),
+    fontWeight: "bold",
+    marginTop: verticalScale(25),
+    alignSelf: "flex-start",
+    left: horizontalScale(75),
+    color: "red",
+    zIndex: 1,
   },
   title1: {
     ...Platform.select({
@@ -571,7 +632,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
-    paddingHorizontal: 65,
+    paddingHorizontal: 70,
     borderRadius: 25,
     backgroundColor: "#C6E3FF",
   },
