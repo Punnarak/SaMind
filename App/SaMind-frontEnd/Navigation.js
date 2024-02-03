@@ -22,7 +22,10 @@ import Signupinscreen from "./screen/SignupIn";
 import Generaltestscreen from "./screen/GeneralTest";
 import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
+import IndividualTestListScreen from "./screen/IndividualTestList";
+import IndividualTestScreen from "./screen/IndividualTest";
 import Gamescreen from "./screen/Game";
+
 
 import Game1 from "./screen/Game1";
 import Game2 from "./screen/Game2";
@@ -112,6 +115,16 @@ const MainStack = () => {
       <Stack.Screen
         name="Q2testscreen"
         component={Q2testscreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestListScreen"
+        component={IndividualTestListScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestScreen"
+        component={IndividualTestScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

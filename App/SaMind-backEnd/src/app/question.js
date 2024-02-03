@@ -57,58 +57,58 @@ router.get('/question', (req, res) => {
     });
 });
 
-router.post('/questionAdd', (req, res) => {
-  const requestData = req.body; // Assuming req.body is an array of objects
-  // const email = req.body;
+// router.post('/questionAdd', (req, res) => {
+//   const requestData = req.body; // Assuming req.body is an array of objects
+//   // const email = req.body;
 
-  if (!Array.isArray(requestData)) {
-    return res.status(400).json({ error: 'Request data should be an array of objects.' });
-  }
+//   if (!Array.isArray(requestData)) {
+//     return res.status(400).json({ error: 'Request data should be an array of objects.' });
+//   }
 
-  // Iterate through each item in the array and insert it into the database with auto-generated IDs
-  const insertQueries = requestData.map(item => {
-    const { no, question, options, type } = item;
+//   // Iterate through each item in the array and insert it into the database with auto-generated IDs
+//   const insertQueries = requestData.map(item => {
+//     const { no, question, options, type } = item;
 
-    if (!question || !options || !type || !no) {
-      return res.status(400).json({ error: 'Each item in the array must have question, options, and type fields.' });
-    }
+//     if (!question || !options || !type || !no) {
+//       return res.status(400).json({ error: 'Each item in the array must have question, options, and type fields.' });
+//     }
 
-    const id = uuidv4(); // Generate a new UUID for the question
-    const optionsString = JSON.stringify(options);
+//     const id = uuidv4(); // Generate a new UUID for the question
+//     const optionsString = JSON.stringify(options);
 
-    const insertQuery = 'INSERT INTO questionnaire_new (id, no, question, options, type) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+//     const insertQuery = 'INSERT INTO questionnaire_new (id, no, question, options, type) VALUES ($1, $2, $3, $4, $5) RETURNING *';
 
-    return client.query(insertQuery, [id, no, question, optionsString, type]);
-  });
+//     return client.query(insertQuery, [id, no, question, optionsString, type]);
+//   });
 
-  // Execute all insert queries concurrently
-  Promise.all(insertQueries)
-    .then(results => {
-      const insertedItems = results.map(result => result.rows[0]);
-      // Send an email notification
-      const mailOptions = {
-        from: 'desmotest123@gmail.com',
-        to: 'psho300@gmail.com', //fix this email for next update
-        subject: 'New Question',
-        text: `Test_text Question`,
-        html: `<b>Test_html Question</b>`,
-      };
+//   // Execute all insert queries concurrently
+//   Promise.all(insertQueries)
+//     .then(results => {
+//       const insertedItems = results.map(result => result.rows[0]);
+//       // Send an email notification
+//       const mailOptions = {
+//         from: 'desmotest123@gmail.com',
+//         to: 'psho300@gmail.com', //fix this email for next update
+//         subject: 'New Question',
+//         text: `Test_text Question`,
+//         html: `<b>Test_html Question</b>`,
+//       };
 
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error('Error sending email:', error);
-        } else {
-          console.log('Email notification sent:', info.response);
-        }
-      });
+//       transporter.sendMail(mailOptions, (error, info) => {
+//         if (error) {
+//           console.error('Error sending email:', error);
+//         } else {
+//           console.log('Email notification sent:', info.response);
+//         }
+//       });
 
-      res.status(201).json(insertedItems);
-    })
-    .catch(err => {
-      console.error('Error executing queries:', err);
-      res.status(500).json({ error: 'An error occurred' });
-    });
-});
+//       res.status(201).json(insertedItems);
+//     })
+//     .catch(err => {
+//       console.error('Error executing queries:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
 
 // router.get('/questiontype', (req, res) => {
 //   let query = 'SELECT DISTINCT type FROM questionnaire_new';
@@ -166,20 +166,50 @@ router.post('/questionAdd', (req, res) => {
 //     });
 // });
 
+// router.post('/assignment_status_wait', (req, res) => {
+//   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
+
+//   // Use $1 as a placeholder for the parameter in the query
+//   let query = 'SELECT test_name, detail, turn_in_before, create_by FROM assignment WHERE patient_id = $1 AND status = $2';
+
+//   // Pass an array of parameter values as the second argument to the query function
+//   client.query(query, [patientId, 'WAIT'])
+//     .then(result => {
+//       // Assuming your result.rows has the columns test_name, detail, turn_in_before
+//       const assignments = result.rows.map(row => ({
+//         testName: row.test_name, // Change property name from test_name to testName
+//         detail: row.detail,
+//         createBy: row.create_by,
+//         turnInBefore: formatDate(row.turn_in_before), // Format date as "DD-MM-YYYY"
+//       }));
+
+//       res.json(assignments);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/assignment_status_wait', (req, res) => {
   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
 
   // Use $1 as a placeholder for the parameter in the query
-  let query = 'SELECT test_name, detail, turn_in_before, create_by FROM assignment WHERE patient_id = $1 AND status = $2';
+  let query = `
+    SELECT a.test_name, a.detail, a.turn_in_before, t.fname
+    FROM assignment AS a
+    LEFT JOIN therapist AS t ON CAST(a.create_by AS INTEGER) = t.therapist_id
+    WHERE a.patient_id = $1 AND a.status = $2
+  `;
 
   // Pass an array of parameter values as the second argument to the query function
   client.query(query, [patientId, 'WAIT'])
     .then(result => {
-      // Assuming your result.rows has the columns test_name, detail, turn_in_before
+      // Assuming your result.rows has the columns test_name, detail, turn_in_before, and fname
       const assignments = result.rows.map(row => ({
-        testName: row.test_name, // Change property name from test_name to testName
+        testName: row.test_name,
         detail: row.detail,
-        createBy: row.create_by,
+        createBy: row.fname, // Concatenate "Dr. " with the therapist's first name
         turnInBefore: formatDate(row.turn_in_before), // Format date as "DD-MM-YYYY"
       }));
 
@@ -190,6 +220,8 @@ router.post('/assignment_status_wait', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+
 
 // Function to format date as "DD-MM-YYYY"
 function formatDate(dateString) {

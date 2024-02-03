@@ -107,7 +107,7 @@
               <div class="modal-container send">
                 <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
-                    >Send “{{ item.columns.testname }}”
+                    >Send “{{ this.selectTest.columns.testname }}”
                   </slot>
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
@@ -143,7 +143,6 @@
                             flex-shrink: 0;
                             color: rgba(60, 155, 242, 1);
                           "
-                          v-model="checkedNames"
                           @change="handleCheckboxChange(patient.patientId)"
                         />
                         <label class="ml-4">{{ patient.patientName }}</label>
@@ -559,7 +558,7 @@ export default {
     handleCheckboxChange(patientId) {
       const index = checkedNames.value.indexOf(patientId);
       console.log("index", index, patientId);
-      if (index !== -1) {
+      if (index === -1) {
         // ---> จริงๆ เป็น index === -1 ---> ที่เป็น !== -1 ตอนนี้เพราะจะทำ demo
         console.log("inn");
         // If the patientId is not in the array, add it
@@ -738,7 +737,8 @@ onMounted(async () => {
     .then((response) => {
       console.log("response", response.data);
       patients.value = response.data.map((patient, index) => ({
-        patientName: patient.patientName,
+        patientId: patient.patientId,
+        patientName: patient.name,
       }));
     })
     .catch((error) => {
