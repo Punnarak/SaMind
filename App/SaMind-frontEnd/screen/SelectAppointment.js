@@ -355,7 +355,7 @@ export default function Login({ route }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.outb}
-            onPress={() => navigation.navigate("Appoinmentscreen")}
+            onPress={() => navigation.navigate("Appointmentscreen")}
           >
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
