@@ -107,7 +107,7 @@
               <div class="modal-container send">
                 <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
-                    >Send “{{ item.columns.testname }}”
+                    >Send “{{ this.selectTest.columns.testname }}”
                   </slot>
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
@@ -143,12 +143,28 @@
                             flex-shrink: 0;
                             color: rgba(60, 155, 242, 1);
                           "
-                          v-model="checkedNames"
                           @change="handleCheckboxChange(patient.patientId)"
                         />
                         <label class="ml-4">{{ patient.patientName }}</label>
                         <v-divider class="mt-3 mb-3" insert></v-divider>
                       </div>
+                    </div>
+                    <div class="detail">
+                      <label class="text">Detail</label>
+                      <v-col style="margin-top: -10px; margin-left: -10px">
+                        <v-text-field
+                          class="custom-placeholder mt-2"
+                          density="comfortable"
+                          rounded="lg"
+                          variant="outlined"
+                          placeholder="Enter Detail"
+                          prepend-inner-icon="mdi-format-align-left"
+                          style="width: 380px; height: 45px; flex-shrink: 0"
+                          v-model="detail"
+                          :rules="[detailValidate]"
+                        >
+                        </v-text-field>
+                      </v-col>
                     </div>
                     <div class="duedate">
                       <label class="text">Due date</label>
@@ -502,6 +518,7 @@ export default {
       sendingPopup: false,
       dueDate: null,
       donePopup: false,
+      detail: "",
       // checkedNames: [],
       dateValidate: false,
       // testDuplicate: [],
@@ -559,7 +576,7 @@ export default {
     handleCheckboxChange(patientId) {
       const index = checkedNames.value.indexOf(patientId);
       console.log("index", index, patientId);
-      if (index !== -1) {
+      if (index === -1) {
         // ---> จริงๆ เป็น index === -1 ---> ที่เป็น !== -1 ตอนนี้เพราะจะทำ demo
         console.log("inn");
         // If the patientId is not in the array, add it
@@ -568,6 +585,7 @@ export default {
         // If the patientId is already in the array, remove it
         checkedNames.value.splice(index, 1);
       }
+      console.log("checkName", checkedNames.value);
     },
     dateValidation(value) {
       const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -616,15 +634,29 @@ export default {
 
       return true;
     },
+    detailValidate(value) {
+      if (!value) {
+        return "Please enter a detail";
+      }
+    },
     handleSendTestClick() {
-      console.log("check", this.dateValidate, checkedNames.value.length);
-      if (this.dateValidate === false || checkedNames.value.length === 0) {
+      console.log(
+        "check",
+        this.dateValidate,
+        checkedNames.value.length,
+        this.detail
+      );
+      if (
+        this.dateValidate === false ||
+        checkedNames.value.length === 0 ||
+        this.detail == ""
+      ) {
       } else {
         console.log("Selected Patients IDs:", checkedNames.value);
         this.sendPopup = false;
         this.sendingPopup = true;
-        // this.$set(this, "checkedNames", []);
         checkedNames.value = [];
+        this.detail = "";
 
         this.loadSendingAnimation();
       }
@@ -675,12 +707,12 @@ import lottie from "lottie-web";
 import animationpath from "../assets/sending.json";
 import animationpath2 from "../assets/senddone.json";
 
-// let test = ref([]);
-let test = ref([
-  { no: 1, testname: "Test 1" },
-  { no: 2, testname: "Test 2" },
-  { no: 3, testname: "Test 3" },
-]);
+let test = ref([]);
+// let test = ref([
+//   { no: 1, testname: "Test 1" },
+//   { no: 2, testname: "Test 2" },
+//   { no: 3, testname: "Test 3" },
+// ]);
 
 let patients = ref();
 // []
@@ -694,20 +726,24 @@ const filteredPatients = computed(() => {
 });
 
 onMounted(async () => {
-  patients.value = [
-    {
-      patientName: "Somsak Test1",
-    },
-    {
-      patientName: "Somsak Test1",
-    },
-    {
-      patientName: "Somsak Test1",
-    },
-    {
-      patientName: "Somsak Test1",
-    },
-  ];
+  // patients.value = [
+  //   {
+  //     patientId: "124",
+  //     patientName: "Somsak Test1",
+  //   },
+  //   {
+  //     patientId: "125",
+  //     patientName: "Somsak Test1",
+  //   },
+  //   {
+  //     patientId: "126",
+  //     patientName: "Somsak Test1",
+  //   },
+  //   {
+  //     patientId: "127",
+  //     patientName: "Somsak Test1",
+  //   },
+  // ];
   const param = {
     therapist_id: 5555,
   };
@@ -738,6 +774,7 @@ onMounted(async () => {
     .then((response) => {
       console.log("response", response.data);
       patients.value = response.data.map((patient, index) => ({
+        patientId: patients.patientId,
         patientName: patient.patientName,
       }));
     })
@@ -892,7 +929,7 @@ const filteredTest = computed(() => {
 }
 
 .send {
-  height: 463px;
+  height: 560px;
 }
 .modal-header h3 {
   margin-top: 0;
