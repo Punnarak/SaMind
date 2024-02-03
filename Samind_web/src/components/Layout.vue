@@ -43,6 +43,13 @@
             title="Therapists"
             to="/dashboard/managetherapist"
           ></v-list-item>
+          <v-list-item
+            v-if="role === 'admin'"
+            class="mt-2"
+            prepend-icon="mdi-account-settings"
+            title="Manage Library"
+            to="/dashboard/managelibrary"
+          ></v-list-item>
         </v-list>
       </v-col>
     </v-row>
@@ -105,8 +112,15 @@
             v-if="role === 'admin'"
             class="mt-2"
             prepend-icon="mdi-account-settings"
-            title="Referral"
+            title="Therapists"
             to="/dashboard/managetherapist"
+          ></v-list-item>
+          <v-list-item
+            v-if="role === 'admin'"
+            class="mt-2"
+            prepend-icon="mdi-account-settings"
+            title="Manage Library"
+            to="/dashboard/managelibrary"
           ></v-list-item>
         </v-list>
       </v-col>

@@ -2,7 +2,6 @@
   <v-col class="px-10">
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> TEST LIST </v-col>
-      <!-- <v-spacer></v-spacer> -->
       <v-col cols="5">
         <v-text-field
           class="mt-2"
@@ -520,7 +519,7 @@ export default {
     },
     Delete(question, selectTest) {
       console.log("selectTest", selectTest);
-      const type = { therapistId : 5555, type: selectTest.columns.testname };
+      const type = { therapistId: 5555, type: selectTest.columns.testname };
       const typeJSON = JSON.stringify(type, null, 2);
       console.log("test", typeJSON);
 

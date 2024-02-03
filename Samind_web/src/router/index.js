@@ -17,6 +17,10 @@ const router = createRouter({
       component: () => import("../components/Layout.vue"),
       children: [
         {
+          path: "managelibrary",
+          component: () => import("../views/ManageLibrary.vue"),
+        },
+        {
           path: "managepatient",
           component: () => import("../views/ManagePatient.vue"),
         },

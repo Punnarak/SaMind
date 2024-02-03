@@ -1,14 +1,14 @@
 <template>
   <v-col class="px-10">
     <v-row align="center">
-      <v-col cols="3" style="font-weight: 600"> THERAPIST LIST </v-col>
+      <v-col cols="3" style="font-weight: 600"> MANAGE LIBRARY </v-col>
       <v-col cols="5">
         <v-text-field
           class="mt-2"
           density="comfortable"
           rounded="xl"
           variant="outlined"
-          placeholder="Search Therapist"
+          placeholder="Search Library"
           prepend-inner-icon="mdi-magnify"
           v-model="search"
         ></v-text-field>
@@ -23,9 +23,9 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @click="createPopup = true"
+          @click="createWithPopup = true"
         >
-          <v-icon>mdi-file-document-outline</v-icon>Create Therapist</v-btn
+          <v-icon>mdi-file-document-outline</v-icon>Create Link</v-btn
         >
       </v-col>
     </v-row>
@@ -38,7 +38,39 @@
       class="elevation-1"
       style="border-radius: 10px"
     >
+      <template v-slot:item.mood="{ item }">
+        <v-chip :color="getColor(item.columns.mood)">
+          <v-icon left size="10px" style="margin-right: 10px"
+            >mdi-circle</v-icon
+          >
+          {{
+            item.columns.mood === "negative"
+              ? "negative"
+              : item.columns.mood === "neutral"
+              ? "neutral"
+              : "positive"
+          }}
+        </v-chip>
+      </template>
+
       <template v-slot:item.action="{ item }">
+        <v-btn
+          icon="mdi-magnify"
+          color="blue"
+          size="30px"
+          style="margin-right: 20px"
+          @click="
+            this.$router.push({
+              path: 'patientdashboard',
+              query: {
+                patientId: item.columns.patientId,
+                name: item.columns.name,
+                link: item.columns.link,
+                mood: item.columns.mood,
+              },
+            })
+          "
+        />
         <v-btn
           icon="mdi-pencil"
           color="blue"
@@ -50,7 +82,7 @@
           icon="mdi-delete"
           color="blue"
           size="30px"
-          @click="(deletePopup = true), (selectTherapist = item)"
+          @click="(deletePopup = true), (selectPatient = item)"
         />
 
         <Transition name="delete-modal">
@@ -119,108 +151,6 @@
         </v-row>
       </template>
     </v-data-table>
-    <Transition name="send-modal">
-      <div v-if="sendPopup" class="modal-mask">
-        <div class="modal-wrapper">
-          <div class="modal-container send">
-            <div class="modal-header send-popup-header" align="start">
-              <slot class="popupheader" name="header"
-                >Send “{{ item.columns.testname }}”
-              </slot>
-              <v-icon @click="sendPopup = false">mdi-close</v-icon>
-            </div>
-
-            <div class="modal-body" align="start">
-              <slot name="body"
-                ><v-text-field
-                  class="mt-2 mb-3"
-                  density="comfortable"
-                  variant="outlined"
-                  style="
-                    height: 50px;
-                    flex-shrink: 0;
-                    border-radius: 10px;
-                    border: 1px solid #3c9bf2;
-                  "
-                  placeholder="Search Patient"
-                  v-model="searchPatient"
-                ></v-text-field>
-                <div class="scroll" style="height: 190px; overflow-y: auto">
-                  <div
-                    class="mt-3 ml-4"
-                    v-for="(patient, Index) in filteredPatients"
-                    :key="Index"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'checkbox_' + Index"
-                      :value="patient.patientId"
-                      style="
-                        width: 17px;
-                        height: 17px;
-                        flex-shrink: 0;
-                        color: rgba(60, 155, 242, 1);
-                      "
-                      v-model="checkedNames"
-                      @change="handleCheckboxChange(patient.patientId)"
-                    />
-                    <label class="ml-4">{{ patient.patientName }}</label>
-                    <v-divider class="mt-3 mb-3" insert></v-divider>
-                  </div>
-                </div>
-                <div class="duedate">
-                  <label class="text">Due date</label>
-                  <v-col style="margin-top: -10px; margin-left: -10px">
-                    <v-text-field
-                      class="custom-placeholder mt-2"
-                      density="comfortable"
-                      rounded="lg"
-                      variant="outlined"
-                      placeholder="Enter Date (DD/MM/YYYY)"
-                      prepend-inner-icon="mdi-calendar"
-                      style="width: 208px; height: 45px; flex-shrink: 0"
-                      v-model="dueDate"
-                      :rules="[dateValidation]"
-                    >
-                    </v-text-field>
-                  </v-col>
-                </div>
-              </slot>
-            </div>
-
-            <div
-              class="modal-footer"
-              style="display: flex; justify-content: flex-end"
-            >
-              <slot name="footer">
-                <v-col cols="5">
-                  <v-btn
-                    rounded="xl"
-                    class="text-none mx-auto"
-                    color="#569AFF"
-                    block
-                    size="large"
-                    variant="flat"
-                    style="
-                      color: #fff;
-                      font-size: 15px;
-                      font-style: normal;
-                      font-weight: 500;
-                      line-height: normal;
-                      letter-spacing: 0.13px;
-                      margin-top: -40px;
-                    "
-                    @click="handleSendTestClick()"
-                  >
-                    Send Test</v-btn
-                  >
-                </v-col>
-              </slot>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Transition>
   </v-col>
 </template>
 
@@ -228,44 +158,44 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
 
-let therapists = ref(
+let patients = ref(
   // []
   [
     {
       no: "01",
-      therapistId: "PID001",
       name: "Somsak Test1",
-      email: "th1@gmail.com",
+      link: 24,
+      image: "im1",
     },
     {
       no: "02",
-      therapistId: "PID002",
       name: "Jane Doe",
-      email: "th1@gmail.com",
+      link: 36,
+      image: "im1",
     },
     {
       no: "03",
-      therapistId: "PID003",
       name: "John Smith",
-      email: "th1@gmail.com",
+      link: 45,
+      image: "im1",
     },
     {
       no: "04",
-      therapistId: "PID004",
       name: "Alice Johnson",
-      email: "th1@gmail.com",
+      link: 28,
+      image: "im1",
     },
     {
       no: "05",
-      therapistId: "PID005",
       name: "Michael Brown",
-      email: "th1@gmail.com",
+      link: 52,
+      image: "im1",
     },
     {
       no: "06",
-      therapistId: "PID006",
       name: "Emily Davis",
-      email: "th1@gmail.com",
+      link: 19,
+      image: "im1",
     },
   ]
 );
@@ -282,11 +212,11 @@ onMounted(async () => {
     })
     .then((response) => {
       console.log("response", response.data);
-      therapists.value = response.data.map((patient, index) => ({
+      patients.value = response.data.map((patient, index) => ({
         no: patient.no,
-        therapistId: patient.therapistId,
         name: patient.name,
-        email: patient.email,
+        link: patient.link,
+        image: patient.image,
       }));
     })
     .catch((error) => {
@@ -298,7 +228,7 @@ let search = ref("");
 
 const filteredPatients = computed(() => {
   const searchTerm = search.value.toLowerCase();
-  return therapists.value.filter((item) =>
+  return patients.value.filter((item) =>
     item.name.toLowerCase().includes(searchTerm)
   );
 });
@@ -313,16 +243,17 @@ const headers = [
     sortable: false,
     key: "no",
   },
-  {
-    title: "Therapist ID",
-    key: "therapistId",
-    align: "start",
-    sortable: false,
-  },
-  { title: "Therapist Name", key: "name", sortable: false },
-  { title: "Email", key: "email", align: "start", sortable: false },
+  { title: "Title", key: "name", sortable: false },
+  { title: "Image", key: "image", align: "center", sortable: false },
+  { title: "Link", key: "link", align: "center", sortable: false },
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
+
+function getColor(mood) {
+  if (mood === "negative") return "red";
+  else if (mood === "neutral") return "orange";
+  else return "green";
+}
 </script>
 <script>
 let checkedNames = ref([]);
@@ -335,7 +266,7 @@ export default {
   data() {
     return {
       selectedDuplicateTest: null,
-      selectTherapist: [],
+      selectPatient: [],
       sendPopup: false,
       sendingPopup: false,
       dueDate: null,
