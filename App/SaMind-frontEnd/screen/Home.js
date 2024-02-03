@@ -60,11 +60,11 @@ export default function Home({ route }) {
   };
   useEffect(() => {
     console.log("Home Screen", patientId);
-    const onFocus = navigation.addListener('focus', () => {
+    const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
       fetchData();
     });
-    return onFocus
+    return onFocus;
   }, []);
 
   const handleMenuPress = (menu) => {
@@ -128,10 +128,17 @@ export default function Home({ route }) {
           />
         </TouchableOpacity>
       </View>
-      <Text style={styles.n}>
-        Hi{"  "}
+      <View
+        style={{
+          flexDirection: "row",
+          left: horizontalScale(0),
+          width: 345,
+        }}
+      >
+        <Text style={styles.n}>Hi </Text>
         <Text style={styles.name}>{fName}</Text>
-      </Text>
+      </View>
+
       <Text style={styles.n1}>How are you feeling today?</Text>
       <View
         style={{
@@ -465,9 +472,9 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(22.6),
     // fontSize: 23,
     color: "black",
-    marginTop: "1%",
+    // marginTop: "1%",
     // marginLeft: "55%",
-    marginLeft: "55%",
+    // marginLeft: "0%",
     fontWeight: "bold",
   },
   // checkin button
@@ -514,7 +521,7 @@ const styles = StyleSheet.create({
     marginTop: "0%",
     fontWeight: "bold",
     // marginRight: "62%",
-    marginRight: horizontalScale(233.5),
+    // marginRight: horizontalScale(233.5),
   },
   // How are you feeling today?
   n1: {
