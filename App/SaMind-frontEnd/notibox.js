@@ -26,8 +26,9 @@ const NotificationBox = ({ item, index }) => {
           style={{
             position: "absolute",
             zIndex: 1,
-            marginLeft: "90%",
-            marginTop: item.target !== "Calendarscreen" ? "8.5%" : "6.5%",
+            marginLeft: item.target !== "Calendarscreen" ? "90%" : "90%",
+            left: item.target !== "Calendarscreen" ? 15 : 15,
+            marginTop: item.target !== "Calendarscreen" ? "8.5%" : "10.5%",
             transform: [{ rotateY: "180deg" }],
           }}
           onPress={() => navigation.navigate(item.target)}
