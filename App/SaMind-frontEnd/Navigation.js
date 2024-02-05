@@ -13,6 +13,8 @@ import Calendarscreen from "./screen/Calendar";
 import Libraryscreen from "./screen/Library";
 import Notiscreen from "./screen/Notification";
 import Testscreen from "./screen/Test";
+import IndividualTestListScreen from "./screen/IndividualTestList";
+import IndividualTestScreen from "./screen/IndividualTest";
 import Avatarscreen from "./screen/Avatar";
 import Upcomingscreen from "./screen/Upcoming";
 import Appointmentscreen from "./screen/Appointment";
@@ -112,6 +114,16 @@ const MainStack = () => {
       <Stack.Screen
         name="Q2testscreen"
         component={Q2testscreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestListScreen"
+        component={IndividualTestListScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="IndividualTestScreen"
+        component={IndividualTestScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
