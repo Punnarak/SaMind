@@ -182,6 +182,67 @@ function continueAppointmentCreation(appointment_id, therapist_id, patient_id, d
     });
 }
 
+// router.post('/appoint_post', (req, res) => {
+//   let { therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
+
+//   if (!therapist_id || !patient_id || !date || !time) {
+//     return res.status(400).json({ error: 'therapist_id, patient_id, date, and time are required fields.' });
+//   }
+ 
+//   // Continue with the appointment creation
+//   generateAppointmentIdAndContinueCreation(therapist_id, patient_id, date, time, create_by, confirm, type_appoint, res);
+// });
+
+// // Function to generate appointment_id and continue with the appointment creation
+// function generateAppointmentIdAndContinueCreation(therapist_id, patient_id, date, time, create_by, confirm, type_appoint, res) {
+//   const generateAppointmentIdQuery = 'SELECT NEXTVAL(\'appointment_id_seq\') AS appointment_id';
+
+//   client.query(generateAppointmentIdQuery)
+//     .then(result => {
+//       const appointment_id = result.rows[0].appointment_id;
+
+//       // Continue with the appointment creation
+//       continueAppointmentCreation(appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint, res);
+//     })
+//     .catch(err => {
+//       console.error('Error generating appointment_id:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// }
+
+// // Function to continue with the appointment creation
+// function continueAppointmentCreation(appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint, res) {
+//   // Fetch hospital_name from patient table based on patient_id
+//   const selectPatientQuery = 'SELECT hospital_name FROM patient WHERE patient_id = $1';
+
+//   client.query(selectPatientQuery, [patient_id])
+//     .then(patientResult => {
+//       if (patientResult.rows.length > 0) {
+//         const hospital_name = patientResult.rows[0].hospital_name;
+
+//         // Use the provided appointment_id in the INSERT statement
+//         const insertQuery = 'INSERT INTO appointment_new2 (appointment_id, therapist_id, patient_id, date, "time", location, description, confirm, active_flag, create_by, create_date, update_by, update_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, $11, CURRENT_TIMESTAMP) RETURNING *';
+
+//         client.query(insertQuery, [appointment_id, therapist_id, patient_id, date, time, hospital_name, null, confirm, 'Y', create_by, create_by])
+//           .then(result => {
+//             res.status(201).json(result.rows[0]);
+//           })
+//           .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//           });
+
+//       } else {
+//         res.status(404).json({ error: 'Patient not found' });
+//       }
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// }
+
+
 
 
 // router.get('/appoint_patient_get', (req, res) => {
@@ -265,7 +326,7 @@ function continueAppointmentCreation(appointment_id, therapist_id, patient_id, d
 router.post('/appoint_patient_post', (req, res) => {
   const { patient_id } = req.body;
 
-  let query = 'SELECT to_char(date, \'YYYY-MM-DD\') as date FROM appointment_new';
+  let query = 'SELECT to_char(date, \'YYYY-MM-DD\') as date FROM appointment_new2';
   
   if (patient_id) {
     query += ' WHERE patient_id = $1';
@@ -368,6 +429,46 @@ router.post('/appoint_patient_post', (req, res) => {
 //     });
 // });
 
+// router.post('/upcoming_date_post', (req, res) => {
+//   // Access data directly from req.body
+//   const { patient_id, date } = req.body;
+
+//   // Check if both patient_id and date parameters are provided
+//   if (!patient_id || !date) {
+//     return res.status(400).json({ error: 'Both patient_id and date are required parameters' });
+//   }
+
+//   // Define the base query with parameterized placeholders
+//   const query = `
+//     SELECT 
+//       appointment_new.*, 
+//       therapist.fname AS therapist_fname,
+//       therapist.lname AS therapist_lname
+//     FROM 
+//       appointment_new2
+//     LEFT JOIN 
+//       therapist ON appointment_new.therapist_id = therapist.therapist_id
+//     WHERE 
+//       appointment_new.patient_id = $1 
+//       AND appointment_new.date = $2::date 
+//     ORDER BY 
+//       appointment_new.time`;
+
+//   // Define query parameters
+//   const queryParams = [patient_id, date];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       // Extract the data values from the rows and store them in an array
+//       const appointments = result.rows;
+//       res.json(appointments);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/upcoming_date_post', (req, res) => {
   // Access data directly from req.body
   const { patient_id, date } = req.body;
@@ -380,18 +481,29 @@ router.post('/upcoming_date_post', (req, res) => {
   // Define the base query with parameterized placeholders
   const query = `
     SELECT 
-      appointment_new.*, 
+      appointment_new2.appointment_id,
+      appointment_new2.therapist_id,
+      appointment_new2.patient_id,
+      appointment_new2.date,
+      appointment_new2."time",
+      appointment_new2.location,
+      appointment_new2.description,
+      appointment_new2.confirm,
+      appointment_new2.create_by,
+      appointment_new2.create_date,
+      appointment_new2.update_by,
+      appointment_new2.update_date,
       therapist.fname AS therapist_fname,
       therapist.lname AS therapist_lname
     FROM 
-      appointment_new
+      appointment_new2
     LEFT JOIN 
-      therapist ON appointment_new.therapist_id = therapist.therapist_id
+      therapist ON appointment_new2.therapist_id = therapist.therapist_id
     WHERE 
-      appointment_new.patient_id = $1 
-      AND appointment_new.date = $2::date 
+      appointment_new2.patient_id = $1 
+      AND appointment_new2.date = $2
     ORDER BY 
-      appointment_new.time`;
+      appointment_new2."time"`;
 
   // Define query parameters
   const queryParams = [patient_id, date];
@@ -399,7 +511,10 @@ router.post('/upcoming_date_post', (req, res) => {
   client.query(query, queryParams)
     .then(result => {
       // Extract the data values from the rows and store them in an array
-      const appointments = result.rows;
+      const appointments = result.rows.map(appointment => ({
+        ...appointment,
+        time: formatTime(appointment.time)
+      }));
       res.json(appointments);
     })
     .catch(err => {
@@ -407,6 +522,18 @@ router.post('/upcoming_date_post', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+// Function to format time from "HH:MM:SS" to "h:mm am/pm"
+function formatTime(timeString) {
+  const [hour, minute] = timeString.split(':').map(Number);
+  const ampm = hour >= 12 ? 'pm' : 'am';
+  const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${formattedHour}:${minute < 10 ? '0' : ''}${minute} ${ampm}`;
+}
+
+
+
+
 
 
 router.get('/appoint_therapist_get', (req, res) => {

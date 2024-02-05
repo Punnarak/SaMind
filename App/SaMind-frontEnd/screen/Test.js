@@ -128,7 +128,7 @@ export default function Notification({ route }) {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("NotiScreen")}
+            onPress={() => navigation.navigate("NotiScreen",{patientId})}
           />
           <Feather
             name="smile"

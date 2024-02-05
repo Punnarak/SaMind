@@ -353,7 +353,7 @@ export default function Home({ route }) {
             onPress={
               () =>
                 // Navigate to the Notification screen and pass the data as a param
-                navigation.navigate("Notiscreen")
+                navigation.navigate("Notiscreen",{patientId})
               // navigation.navigate("Notiscreen", {
               //   data: notiData,
               // })
