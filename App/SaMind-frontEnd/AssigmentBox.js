@@ -15,12 +15,12 @@ const NotificationBox = ({ item, index }) => {
             flex: 1,
           }}
         >
-          <Text style={styles.header}>{item.title}</Text>
+          <Text style={styles.header}>{item.testName}</Text>
           <Ionicons
             name="ellipse"
             size={17}
             style={{
-              color: item.status == "no" ? "#FE493B" : "#11dd66",
+              color: item.status == "WAIT" ? "#FE493B" : "#11dd66",
             }}
           />
         </View>
