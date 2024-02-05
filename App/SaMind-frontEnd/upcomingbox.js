@@ -126,7 +126,19 @@ const NotificationBox = ({ item, index, data }) => {
                 marginTop: "5%",
                 flexDirection: "row",
                 alignItems: "center",
-                marginLeft: "-79.5%",
+                // flex: 1,
+                // justifyContent: "flex-start",
+
+                ...Platform.select({
+                  android: {
+                    left: -265,
+                  },
+                  ios: {
+                    // marginLeft: "-79.5%",
+
+                    left: -245,
+                  },
+                }),
               }}
             >
               <Image
@@ -134,11 +146,11 @@ const NotificationBox = ({ item, index, data }) => {
                 style={{
                   ...Platform.select({
                     android: {
-                      marginRight: "-54%",
+                      // marginRight: "-54%",
                       left: 18,
                     },
                     ios: {
-                      marginRight: "-57%",
+                      // marginRight: "-57%",
                     },
                   }),
                   height: 25,
@@ -231,10 +243,10 @@ const styles = StyleSheet.create({
   lodetail: {
     ...Platform.select({
       android: {
-        left: "390%",
+        left: -210,
       },
       ios: {
-        left: "320%",
+        left: -230,
       },
     }),
     fontSize: 15,
