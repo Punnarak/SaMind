@@ -28,9 +28,9 @@ export default function Notification({ route }) {
     .then((response) => {
       if (response.data.length != 0) {
         console.log("in");
-        setDisabled(false)
+        setDisabled(false);
       } else {
-        setDisabled(true)
+        setDisabled(true);
       }
       console.log(response.data, response.data.length);
     })
