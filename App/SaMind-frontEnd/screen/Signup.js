@@ -100,12 +100,12 @@ export default function Login() {
     }
 
     if (
-      firstNameError === " " &&
-      lastNameError === " " &&
-      emailError === " " &&
-      passwordError === " " &&
-      conPasswordError === " " &&
-      hospitalError === " " &&
+      firstNameError == " " &&
+      lastNameError == " " &&
+      emailError == " " &&
+      passwordError == " " &&
+      conPasswordError == " " &&
+      hospitalError == " " &&
       isChecked
     ) {
       console.log("in");
