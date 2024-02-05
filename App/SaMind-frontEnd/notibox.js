@@ -15,7 +15,9 @@ const NotificationBox = ({ item, index }) => {
       <View style={styles.container} key={index}>
         <Text style={[styles.header]}>{item.title}</Text>
         <Text style={[styles.detail]}>Detail: {item.detail}</Text>
-        <Text style={[styles.detail]}>Turn in Before: {item.turnin}</Text>
+        {item.target !== "Calendarscreen" && (
+          <Text style={[styles.detail]}>Turn in Before: {item.turnin}</Text>
+        )}
 
         <Ionicons
           name="chevron-back-outline"
@@ -25,7 +27,7 @@ const NotificationBox = ({ item, index }) => {
             position: "absolute",
             zIndex: 1,
             marginLeft: "90%",
-            marginTop: "8.5%",
+            marginTop: item.target !== "Calendarscreen" ? "8.5%" : "6.5%",
             transform: [{ rotateY: "180deg" }],
           }}
           onPress={() => navigation.navigate(item.target)}

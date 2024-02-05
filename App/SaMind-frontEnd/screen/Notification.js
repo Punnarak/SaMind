@@ -26,6 +26,12 @@ export default function Notification() {
       turnin: "27 Sep 2023",
       target: "Testscreen",
     },
+    {
+      title: "นัดหมาย",
+      detail: "นัดหมายเพิ่ม",
+      turnin: "27 Sep 2023",
+      target: "Calendarscreen",
+    },
   ];
 
   useEffect(() => {
