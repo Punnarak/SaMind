@@ -10,32 +10,42 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import NotiBox from "../notibox";
+import axios from "./axios.js";
 
-export default function Notification() {
+export default function Notification({ route }) {
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
-  const data = [
-    {
-      title: "ทำแบบประเมินโรคซึมเศร้า PHQ-9",
-      detail: "แบบคัดกรองโรคซึมเศร้าแบบ 9 คำถาม",
-      turnin: "27 Sep 2023",
-      target: "Testscreen",
-    },
-    {
-      title: "ทำแบบประเมินโรคซึมเศร้า Q2",
-      detail: "แบบคัดกรองโรคซึมเศร้าแบบ 2 คำถาม",
-      turnin: "27 Sep 2023",
-      target: "Testscreen",
-    },
-    {
-      title: "นัดหมาย",
-      detail: "นัดหมายเพิ่ม",
-      turnin: "27 Sep 2023",
-      target: "Calendarscreen",
-    },
-  ];
+  const [data, setData] = useState([]);
+  // const data = [
+  //   {
+  //     title: "ทำแบบประเมินโรคซึมเศร้า PHQ-9",
+  //     detail: "แบบคัดกรองโรคซึมเศร้าแบบ 9 คำถาม",
+  //     turnin: "27 Sep 2023",
+  //     target: "Testscreen",
+  //   },
+  //   {
+  //     title: "ทำแบบประเมินโรคซึมเศร้า Q2",
+  //     detail: "แบบคัดกรองโรคซึมเศร้าแบบ 2 คำถาม",
+  //     turnin: "27 Sep 2023",
+  //     target: "Testscreen",
+  //   },
+  // ];
 
   useEffect(() => {
-    console.log("Notification Screen");
+    console.log("Notification Screen", patientId);
+    const param = {
+      patientId: patientId,
+    };
+    axios
+      .post("/notiApp", param)
+      .then((response) => {
+        console.log("in");
+        setData(response.data);
+        console.log("data:", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
   }, []);
 
   return (
