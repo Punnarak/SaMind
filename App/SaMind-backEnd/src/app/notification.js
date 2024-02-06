@@ -200,6 +200,86 @@ router.post('/notiAppoint', (req, res) => {
         });
 });
 
+// router.post('/notiApp', (req, res) => {
+//     const patientId = req.body.patientId;
+//     const currentDate = new Date().toISOString().split('T')[0];
+
+//     let assignQuery = `
+//         SELECT 
+//             test_name,
+//             detail,
+//             turn_in_before 
+//         FROM 
+//             assignment 
+//         WHERE 
+//             status = $1 
+//             AND patient_id = $2`;
+//     const assignQueryParams = ['WAIT', patientId];
+
+//     let appointQuery = `
+//         SELECT 
+//             t.fname as therapist_fname, 
+//             a.date, 
+//             a."time",
+//             a.description 
+//         FROM 
+//             public.appointment_new2 AS a 
+//         LEFT JOIN 
+//             public.therapist AS t 
+//         ON 
+//             a.therapist_id = t.therapist_id`;
+
+//     if (patientId) {
+//         appointQuery += ' WHERE a.patient_id = $1'; // Changed from $3 to $1
+//     }
+  
+//     appointQuery += ' AND a.date >= $2'; // Changed from $4 to $2
+//     appointQuery += ' AND a.confirm <> \'N\'';
+//     appointQuery += ' ORDER BY a.date ASC';
+
+//     const appointQueryParams = patientId ? [patientId, currentDate] : [currentDate]; // Changed to match the correct number of parameters
+
+//     let assignments = [];
+//     let appointments = [];
+
+//     client.query(assignQuery, assignQueryParams)
+//         .then(assignResult => {
+//             assignments = assignResult.rows.map(row => {
+//                 const turninDate = row.turn_in_before ? new Date(row.turn_in_before).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+//                 return {
+//                     title: `มีการมอบหมาย ${row.test_name}`,
+//                     detail: row.detail,
+//                     turnin: turninDate,
+//                     target: "Testscreen"
+//                 };
+//             });
+//             return client.query(appointQuery, appointQueryParams);
+//         })
+//         .then(appointResult => {
+//             appointments = appointResult.rows.map(row => {
+//                 const formattedDate = new Date(row.date).toLocaleDateString('en-GB', {
+//                     day: '2-digit',
+//                     month: 'short',
+//                     year: 'numeric'
+//                 });
+//                 const formattedTime = row.time.substring(0, 5);
+
+//                 return {
+//                     title: `${row.therapist_fname} คุณมีการนัดหมายวันที่ ${formattedDate} เวลา ${formattedTime} น.`,
+//                     detail: row.description,
+//                     target: "Calendarscreen"
+//                 };
+//             });
+
+//             const mergedResult = assignments.concat(appointments);
+//             res.json(mergedResult);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
 router.post('/notiApp', (req, res) => {
     const patientId = req.body.patientId;
     const currentDate = new Date().toISOString().split('T')[0];
@@ -234,7 +314,7 @@ router.post('/notiApp', (req, res) => {
     }
   
     appointQuery += ' AND a.date >= $2'; // Changed from $4 to $2
-    appointQuery += ' AND a.confirm <> \'N\'';
+    appointQuery += ' AND a.confirm = \'Y\''; // Added condition for confirm column
     appointQuery += ' ORDER BY a.date ASC';
 
     const appointQueryParams = patientId ? [patientId, currentDate] : [currentDate]; // Changed to match the correct number of parameters
@@ -279,7 +359,6 @@ router.post('/notiApp', (req, res) => {
             res.status(500).json({ error: 'An error occurred' });
         });
 });
-
 
 
 

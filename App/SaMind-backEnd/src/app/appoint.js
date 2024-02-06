@@ -26,6 +26,349 @@ router.post('/appoint_post_byAdmin', (req, res) => {
     });
 });
 
+
+//API get data appointment
+// router.post('/appointConfig', (req, res) => {
+//   const patient_id = req.query.patient_id;
+//   let query = 'SELECT * FROM patient';
+
+//   // Check if the id parameter is provided
+//   if (patient_id) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   const queryParams = patient_id ? [patient_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/appointConfig', (req, res) => {
+  const patientId = req.body.patientId; // Accessing patientId from req.body
+  let query = `
+    SELECT 
+      CONCAT(p.fname, ' ', p.lname) AS "patientName",
+      CONCAT(t.fname, ' ', t.lname) AS "therapistName",
+      p.phone AS "patientPhone"
+    FROM 
+      patient p
+    LEFT JOIN 
+      therapist t ON p.therapist_id = t.therapist_id
+    WHERE p.patient_id = $1`; // Moved condition to WHERE clause
+
+  const queryParams = [patientId]; // Always use an array for parameters
+
+  client.query(query, queryParams)
+    .then(result => {
+      if (result.rows.length > 0) {
+        res.json(result.rows[0]); // Return the first row only
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+// select appointmet
+// router.post('/appointSelect', (req, res) => {
+//   const patient_id = req.query.patient_id;
+//   let query = 'SELECT * FROM patient';
+
+//   // Check if the id parameter is provided
+//   if (patient_id) {
+//     query += ' WHERE patient_id = $1';
+//   }
+
+//   const queryParams = patient_id ? [patient_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/appointSelect', (req, res) => {
+//   // Extract data from the request body
+//   const { patientId, patientName, therapistName, patientPhone, date, time } = req.body;
+
+//   // Convert date format to 'YYYY-MM-DD'
+//   const formattedDate = formatDate(date);
+
+//   // Prepare the INSERT query for appointment_new2 table
+//   const query = `
+//     INSERT INTO public.appointment_new2 (
+//       appointment_id, therapist_id, patient_id, date, time, location,
+//       description, confirm, active_flag, create_by, create_date, update_by, update_date
+//     )
+//     VALUES (
+//       NEXTVAL('appointment_id_seq'), 
+//       (SELECT therapist_id FROM public.patient WHERE fname || ' ' || lname = $1), 
+//       $2, $3, $4, 
+//       (SELECT hospital_name FROM public.patient WHERE patient_id = $2), 
+//       null, 'W', 'Y', $1, 
+//       NOW() + interval '7 hours', 
+//       $1, 
+//       NOW() + interval '7 hours'
+//     )`;
+
+//   // Execute the query
+//   client.query(query, [therapistName, patientId, formattedDate, time])
+//     .then(result => {
+//       res.status(201).json({ message: 'Appointment created successfully' });
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// // Function to format date as 'YYYY-MM-DD'
+// function formatDate(date) {
+//   const parts = date.split('-');
+//   return `${parts[2]}-${parts[1]}-${parts[0]}`;
+// }
+
+// router.post('/appointSelect', (req, res) => {
+//   // Extract data from the request body
+//   const { patientId, date, time } = req.body;
+
+//   // Validate time format
+//   if (!isValidTimeFormat(time)) {
+//     return res.status(400).json({ error: "Invalid time format provided" });
+//   }
+
+//   // Convert date format to 'YYYY-MM-DD'
+//   const formattedDate = formatDate(date);
+
+//   // Convert time format to 'HH:MM:SS'
+//   const formattedTime = formatTime(time);
+
+//   // Check if formattedTime is valid
+//   if (!formattedTime) {
+//     return res.status(400).json({ error: "Invalid time provided" });
+//   }
+
+//   // Prepare the INSERT query for appointment_new2 table
+//   // Prepare the INSERT query for appointment_new2 table
+//   const query = `
+//     INSERT INTO public.appointment_new2 (
+//       appointment_id, therapist_id, patient_id, date, time, location,
+//       description, confirm, active_flag, create_by, create_date, update_by, update_date
+//     )
+//     VALUES (
+//       NEXTVAL('appointment_id_seq'), 
+//       (SELECT therapist_id FROM public.patient WHERE patient_id = $1), 
+//       $2, $3, $4, 
+//       (SELECT hospital_name FROM public.patient WHERE patient_id = $2), 
+//       null, 'W', 'Y', $1, 
+//       TO_CHAR(NOW() + interval '7 hours', 'YYYY-MM-DD HH24:MI:SS'), -- Adjusted to add 7 hours and format
+//       $1, 
+//       TO_CHAR(NOW() + interval '7 hours', 'YYYY-MM-DD HH24:MI:SS') -- Adjusted to add 7 hours and format
+//     )`;
+
+//   // Execute the query
+//   client
+//     .query(query, [patientId, patientId, formattedDate, formattedTime])
+//     .then((result) => {
+//       res.status(201).json({ message: "Appointment created successfully" });
+//     })
+//     .catch((err) => {
+//       console.error("Error executing query:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
+// // Function to validate time format (expects format like "11.00")
+// function isValidTimeFormat(time) {
+//   return /^\d{1,2}:\d{2}$/.test(time);
+// }
+
+
+// // Function to format date as 'YYYY-MM-DD'
+// function formatDate(date) {
+//   const parts = date.split('-');
+//   return `${parts[2]}-${parts[1]}-${parts[0]}`;
+// }
+
+// function formatTime(time) {
+//   return `${time}:00`; // Append seconds to match the 'HH:MM:SS' format
+// }
+
+// router.post('/appointSelect', (req, res) => {
+//   // Extract data from the request body
+//   const { patientId, date, time } = req.body;
+
+//   // Validate time format
+//   if (!isValidTimeFormat(time)) {
+//     return res.status(400).json({ error: "Invalid time format provided" });
+//   }
+
+//   // Convert date format to 'YYYY-MM-DD'
+//   const formattedDate = formatDate(date);
+
+//   // Convert time format to 'HH:MM:SS'
+//   const formattedTime = formatTime(time);
+
+//   // Check if formattedTime is valid
+//   if (!formattedTime) {
+//     return res.status(400).json({ error: "Invalid time provided" });
+//   }
+
+//   // Prepare the INSERT query for appointment_new2 table
+//   const query = `
+//     INSERT INTO public.appointment_new2 (
+//       appointment_id, therapist_id, patient_id, date, time, location,
+//       description, confirm, active_flag, create_by, create_date, update_by, update_date
+//     )
+//     VALUES (
+//       NEXTVAL('appointment_id_seq'), 
+//       (SELECT therapist_id FROM public.patient WHERE patient_id = $1), 
+//       $2, $3, $4, 
+//       (SELECT hospital_name FROM public.patient WHERE patient_id = $2), 
+//       null, 'W', 'Y', $1, 
+//       NOW() + interval '7 hours', -- Adjusted to add 7 hours
+//       $1, 
+//       NOW() + interval '7 hours'   -- Adjusted to add 7 hours
+//     )`;
+
+//   // Execute the query
+//   client
+//     .query(query, [patientId, patientId, formattedDate, formattedTime])
+//     .then((result) => {
+//       res.status(201).json({ message: "Appointment created successfully" });
+//     })
+//     .catch((err) => {
+//       console.error("Error executing query:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
+// // Function to validate time format (expects format like "11:00")
+// function isValidTimeFormat(time) {
+//   return /^\d{1,2}:\d{2}$/.test(time);
+// }
+
+// // Function to format date as 'YYYY-MM-DD'
+// function formatDate(date) {
+//   const parts = date.split('-');
+//   return `${parts[2]}-${parts[1]}-${parts[0]}`;
+// }
+
+// function formatTime(time) {
+//   return `${time}:00`; // Append seconds to match the 'HH:MM:SS' format
+// }
+
+router.post('/appointSelect', (req, res) => {
+  // Extract data from the request body
+  const { patientId, date, time } = req.body;
+
+  // Validate time format
+  if (!isValidTimeFormat(time)) {
+    return res.status(400).json({ error: "Invalid time format provided" });
+  }
+
+  // Convert date format to 'YYYY-MM-DD'
+  const formattedDate = formatDate(date);
+
+  // Convert time format to 'HH:MM:SS'
+  const formattedTime = formatTime(time);
+
+  // Check if formattedTime is valid
+  if (!formattedTime) {
+    return res.status(400).json({ error: "Invalid time provided" });
+  }
+
+  // Get the current timestamp in the desired time zone
+  const currentDateTime = getCurrentDateTime();
+
+  // Prepare the INSERT query for appointment_new2 table
+  const query = `
+    INSERT INTO public.appointment_new2 (
+      appointment_id, therapist_id, patient_id, date, time, location,
+      description, confirm, active_flag, create_by, create_date, update_by, update_date
+    )
+    VALUES (
+      NEXTVAL('appointment_id_seq'), 
+      (SELECT therapist_id FROM public.patient WHERE patient_id = $1), 
+      $2, $3, $4, 
+      (SELECT hospital_name FROM public.patient WHERE patient_id = $2), 
+      null, 'W', 'Y', $1, 
+      $5, 
+      $1, 
+      $5
+    )`;
+
+  // Execute the query
+  client
+    .query(query, [patientId, patientId, formattedDate, formattedTime, currentDateTime])
+    .then((result) => {
+      res.status(201).json({ message: "Appointment created successfully" });
+    })
+    .catch((err) => {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "An error occurred" });
+    });
+});
+
+// Function to validate time format (expects format like "11:00")
+function isValidTimeFormat(time) {
+  return /^\d{1,2}:\d{2}$/.test(time);
+}
+
+// Function to format date as 'YYYY-MM-DD'
+function formatDate(date) {
+  const parts = date.split('-');
+  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+function formatTime(time) {
+  return `${time}:00`; // Append seconds to match the 'HH:MM:SS' format
+}
+
+// Function to get the current date and time adjusted to the desired time zone
+function getCurrentDateTime() {
+  const currentDate = new Date();
+  // Adjust to the desired time zone offset (e.g., +7 hours)
+  currentDate.setHours(currentDate.getHours() + 7);
+  const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+  return formattedDateTime;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // router.post('/appoint_post', (req, res) => {
 //   const { appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
 
