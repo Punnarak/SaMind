@@ -90,7 +90,7 @@
                     <button
                       class="modal-default-button mr-5"
                       style="color: #00bf63"
-                      @click="Delete(item, selectTest), (deletePopup = false)"
+                      @click="deletePopup = false"
                     >
                       Cancel
                     </button>

@@ -34,6 +34,7 @@ export default function Login() {
   const [selectedValue, setSelectedValue] = useState(null);
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   //validate
+  const [checkEmail, setCheckEmail] = useState(false);
   const [firstNameError, setFirstNameError] = useState(" ");
   const [lastNameError, setLastNameError] = useState(" ");
   const [emailError, setEmailError] = useState(" ");
@@ -53,6 +54,11 @@ export default function Login() {
     { id: 6, name: "Hospital 6", value: "hospital6" },
   ];
 
+  useEffect(() => {
+    if (email != "") {
+      validateEmail();
+    }
+  }, [email]);
   const handleSignupPress = () => {
     // Reset previous error messages
     setFirstNameError(" ");
@@ -61,7 +67,7 @@ export default function Login() {
     setPasswordError(" ");
     setConPasswordError(" ");
     setHospitalError(" ");
-
+    validateEmail();
     // Perform basic validation
     if (!firstName) {
       setFirstNameError("First name is required");
@@ -94,19 +100,29 @@ export default function Login() {
     }
 
     if (
-      firstNameError === " " &&
-      lastNameError === " " &&
-      emailError === " " &&
-      passwordError === " " &&
-      conPasswordError === " " &&
-      hospitalError === " " &&
+      firstNameError == " " &&
+      lastNameError == " " &&
+      emailError == " " &&
+      passwordError == " " &&
+      conPasswordError == " " &&
+      hospitalError == " " &&
       isChecked
     ) {
       console.log("in");
       navigation.navigate("Signupinscreen", { animatedNodeTag });
     }
   };
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    if (!emailRegex.test(email)) {
+      setCheckEmail(false);
+      setEmailError("Invalid email address. Please enter a valid email.");
+    } else {
+      setCheckEmail(true);
+      setEmailError(" ");
+    }
+  };
   const handleCheckboxToggle = () => {
     setIsChecked(!isChecked);
   };
@@ -401,7 +417,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     ...Platform.select({
       android: {
-        marginTop: verticalScale(338),
+        marginTop: verticalScale(394),
       },
       ios: {
         marginTop: verticalScale(376),

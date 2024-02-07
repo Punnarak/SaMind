@@ -58,6 +58,17 @@ export default function Library() {
     },
     // เพิ่มลิงก์อื่น ๆ ตามต้องการ
   ]);
+  let [dataIm, setDataIm] = useState([
+    {
+      url: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/05/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.png",
+    },
+    {
+      url: "https://camri.go.th/th/images_file/info_home/images/7%20%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%94%E0%B8%B9%E0%B9%81%E0%B8%A5%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%20%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87%E0%B9%80%E0%B8%9C%E0%B8%8A%E0%B8%B4%E0%B8%8D%E0%B8%A0%E0%B8%B2%E0%B8%A7%E0%B8%B0%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B9%82%E0%B8%A8%E0%B8%81%E0%B9%80%E0%B8%A8%E0%B8%A3%E0%B9%89%E0%B8%B2.jpg",
+    },
+    {
+      url: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/10/Info-checkList-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.jpg",
+    },
+  ]);
   useEffect(() => {
     console.log("Library Screen");
     // Make a GET request to fetch data from "/question?type=test2"
@@ -112,6 +123,18 @@ export default function Library() {
   const [isModalVisible3, setModalVisible3] = useState(false);
   // X button
   const [isButtonVisible, setButtonVisible] = useState(false);
+  const toggleModal = (index) => {
+    if (index === 0) {
+      setModalVisible1(!isModalVisible1);
+      setButtonVisible(!isButtonVisible);
+    } else if (index === 1) {
+      setModalVisible2(!isModalVisible2);
+      setButtonVisible(!isButtonVisible);
+    } else if (index === 2) {
+      setModalVisible3(!isModalVisible3);
+      setButtonVisible(!isButtonVisible);
+    }
+  };
 
   const toggleModal1 = () => {
     setModalVisible1(!isModalVisible1);
@@ -260,7 +283,7 @@ export default function Library() {
       </Modal>
       <Text style={styles.title}>เกร็ดน่ารู้</Text>
       <View style={styles.container2}>
-        <ScrollView horizontal="true" style={{}}>
+        {/* <ScrollView horizontal="true" style={{}}>
           <View
             style={{
               flexDirection: "row",
@@ -294,7 +317,27 @@ export default function Library() {
               />
             </TouchableOpacity>
           </View>
+        </ScrollView> */}
+        {/* <View style={{ flex: 1 }}> */}
+        <ScrollView horizontal={true}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              flex: 1,
+            }}
+          >
+            {dataIm.map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => toggleModal(index)}>
+                <Image
+                  source={{ uri: item.url }}
+                  style={{ width: 188, height: 237, marginLeft: 10 }}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
+        {/* </View> */}
 
         <View style={styles.undertag}>
           <Feather

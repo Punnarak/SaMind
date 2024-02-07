@@ -353,7 +353,7 @@ export default function Home({ route }) {
             onPress={
               () =>
                 // Navigate to the Notification screen and pass the data as a param
-                navigation.navigate("Notiscreen",{patientId})
+                navigation.navigate("Notiscreen", { patientId })
               // navigation.navigate("Notiscreen", {
               //   data: notiData,
               // })
@@ -510,8 +510,7 @@ const styles = StyleSheet.create({
   n: {
     ...Platform.select({
       android: {
-        left: horizontalScale(27),
-        width: horizontalScale(150),
+        left: horizontalScale(0),
       },
       ios: { left: horizontalScale(0) },
     }),

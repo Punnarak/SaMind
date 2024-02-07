@@ -44,7 +44,7 @@
           color="blue"
           size="30px"
           style="margin-right: 20px"
-          @click="handleEditPaitent(item.columns.testname)"
+          @click="(editPopup = true), handleEditAccount(item.columns.name)"
         />
         <v-btn
           icon="mdi-delete"
@@ -68,23 +68,25 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ item.columns.name }} ?</slot
+                    {{ this.selectTherapist.columns.name }} ?</slot
                   >
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer" style="margin-bottom: 40px">
                   <slot name="footer">
                     <button
                       class="modal-default-button"
                       style="color: red"
-                      @click="Delete(item, selectTest), (deletePopup = false)"
+                      @click="
+                        Delete(item, selectTherapist), (deletePopup = false)
+                      "
                     >
                       Delete
                     </button>
                     <button
                       class="modal-default-button mr-5"
                       style="color: #00bf63"
-                      @click="Delete(item, selectTest), (deletePopup = false)"
+                      @click="deletePopup = false"
                     >
                       Cancel
                     </button>
@@ -119,81 +121,127 @@
         </v-row>
       </template>
     </v-data-table>
-    <Transition name="send-modal">
-      <div v-if="sendPopup" class="modal-mask">
+    <Transition name="create-modal">
+      <div v-if="createPopup" class="modal-mask">
         <div class="modal-wrapper">
-          <div class="modal-container send">
-            <div class="modal-header send-popup-header" align="start">
-              <slot class="popupheader" name="header"
-                >Send “{{ item.columns.testname }}”
-              </slot>
-              <v-icon @click="sendPopup = false">mdi-close</v-icon>
+          <div class="modal-container create">
+            <div class="modal-header create-popup-header" align="start">
+              <slot
+                class="popupheader"
+                style="font-weight: bolder"
+                name="header"
+                >Create Therapist Account</slot
+              >
+              <v-icon @click="createPopup = false">mdi-close</v-icon>
             </div>
 
-            <div class="modal-body" align="start">
-              <slot name="body"
-                ><v-text-field
-                  class="mt-2 mb-3"
-                  density="comfortable"
-                  variant="outlined"
-                  style="
-                    height: 50px;
-                    flex-shrink: 0;
-                    border-radius: 10px;
-                    border: 1px solid #3c9bf2;
-                  "
-                  placeholder="Search Patient"
-                  v-model="searchPatient"
-                ></v-text-field>
-                <div class="scroll" style="height: 190px; overflow-y: auto">
-                  <div
-                    class="mt-3 ml-4"
-                    v-for="(patient, Index) in filteredPatients"
-                    :key="Index"
-                  >
-                    <input
-                      type="checkbox"
-                      :id="'checkbox_' + Index"
-                      :value="patient.patientId"
+            <div class="modal-body" align="start" style="left: 100px">
+              <slot name="body">
+                <div style="display: flex; flex-direction: row">
+                  <div class="TherapistId">
+                    <label class="text title">Therapist ID</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist ID"
+                        style="width: 150px; height: 45px; flex-shrink: 0"
+                        v-model="therapistId"
+                        :rules="therapistIdValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="FirstName">
+                    <label class="text title">First Name</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist Firstname"
+                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        v-model="firstName"
+                        :rules="firstNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="LastName">
+                    <label class="text title">Last Name</label>
+                    <v-col
                       style="
-                        width: 17px;
-                        height: 17px;
-                        flex-shrink: 0;
-                        color: rgba(60, 155, 242, 1);
+                        margin-top: -10px;
+                        margin-left: -10px;
+                        margin-bottom: 8px;
                       "
-                      v-model="checkedNames"
-                      @change="handleCheckboxChange(patient.patientId)"
-                    />
-                    <label class="ml-4">{{ patient.patientName }}</label>
-                    <v-divider class="mt-3 mb-3" insert></v-divider>
+                    >
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist Lastname"
+                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        v-model="lastName"
+                        :rules="lastNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
                   </div>
                 </div>
-                <div class="duedate">
-                  <label class="text">Due date</label>
+                <!-- <div style="display: flex; flex-direction: row"> -->
+                <div class="email">
+                  <label class="text title">Email</label>
+                  <v-col
+                    style="
+                      margin-top: -10px;
+                      margin-left: -10px;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Therapist Email"
+                      style="width: 680px; height: 45px; flex-shrink: 0"
+                      v-model="email"
+                      :rules="emailValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <div class="password">
+                  <label class="text title">Password</label>
                   <v-col style="margin-top: -10px; margin-left: -10px">
                     <v-text-field
                       class="custom-placeholder mt-2"
                       density="comfortable"
                       rounded="lg"
                       variant="outlined"
-                      placeholder="Enter Date (DD/MM/YYYY)"
-                      prepend-inner-icon="mdi-calendar"
-                      style="width: 208px; height: 45px; flex-shrink: 0"
-                      v-model="dueDate"
-                      :rules="[dateValidation]"
+                      placeholder="Enter Therapist Password"
+                      style="width: 680px; height: 45px; flex-shrink: 0"
+                      v-model="password"
+                      :rules="passwordValidation"
                     >
                     </v-text-field>
                   </v-col>
                 </div>
+                <!-- </div> -->
               </slot>
             </div>
 
             <div
               class="modal-footer"
-              style="display: flex; justify-content: flex-end"
+              style="display: flex; justify-content: flex-end; margin-top: 50px"
             >
               <slot name="footer">
-                <v-col cols="5">
+                <v-col cols="4">
                   <v-btn
                     rounded="xl"
                     class="text-none mx-auto"
@@ -210,9 +258,158 @@
                       letter-spacing: 0.13px;
                       margin-top: -40px;
                     "
-                    @click="handleSendTestClick()"
+                    @click="handleCreateAccount()"
                   >
-                    Send Test</v-btn
+                    Create Account</v-btn
+                  >
+                </v-col>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <Transition name="Edit-modal">
+      <div v-if="editPopup" class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container create">
+            <div class="modal-header create-popup-header" align="start">
+              <slot
+                class="popupheader"
+                style="font-weight: bolder"
+                name="header"
+                >Edit Therapist Account</slot
+              >
+              <v-icon @click="editPopup = false">mdi-close</v-icon>
+            </div>
+
+            <div class="modal-body" align="start" style="left: 100px">
+              <slot name="body">
+                <div style="display: flex; flex-direction: row">
+                  <div class="TherapistId">
+                    <label class="text title">Therapist ID</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist ID"
+                        style="width: 150px; height: 45px; flex-shrink: 0"
+                        v-model="therapistId"
+                        :rules="therapistIdValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="FirstName">
+                    <label class="text title">First Name</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist Firstname"
+                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        v-model="firstName"
+                        :rules="firstNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="LastName">
+                    <label class="text title">Last Name</label>
+                    <v-col
+                      style="
+                        margin-top: -10px;
+                        margin-left: -10px;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Therapist Lastname"
+                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        v-model="lastName"
+                        :rules="lastNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                </div>
+                <!-- <div style="display: flex; flex-direction: row"> -->
+                <div class="email">
+                  <label class="text title">Email</label>
+                  <v-col
+                    style="
+                      margin-top: -10px;
+                      margin-left: -10px;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Therapist Email"
+                      style="width: 680px; height: 45px; flex-shrink: 0"
+                      v-model="email"
+                      :rules="emailValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <div class="password">
+                  <label class="text title">Password</label>
+                  <v-col style="margin-top: -10px; margin-left: -10px">
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Therapist Password"
+                      style="width: 680px; height: 45px; flex-shrink: 0"
+                      v-model="password"
+                      :rules="passwordValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <!-- </div> -->
+              </slot>
+            </div>
+
+            <div
+              class="modal-footer"
+              style="display: flex; justify-content: flex-end; margin-top: 50px"
+            >
+              <slot name="footer">
+                <v-col cols="4">
+                  <v-btn
+                    rounded="xl"
+                    class="text-none mx-auto"
+                    color="#569AFF"
+                    block
+                    size="large"
+                    variant="flat"
+                    style="
+                      color: #fff;
+                      font-size: 15px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: normal;
+                      letter-spacing: 0.13px;
+                      margin-top: -40px;
+                    "
+                    @click="handleUpdateAccount()"
+                  >
+                    Edit Account</v-btn
                   >
                 </v-col>
               </slot>
@@ -336,16 +533,140 @@ export default {
     return {
       selectedDuplicateTest: null,
       selectTherapist: [],
-      sendPopup: false,
-      sendingPopup: false,
-      dueDate: null,
-      donePopup: false,
+      createPopup: false,
+      editPopup: false,
+      therapistId: "",
+      therapistIdValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Therapist ID";
+          } else {
+            return true;
+          }
+        },
+      ],
+      firstName: "",
+      firstNameValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Firstname";
+          } else {
+            return true;
+          }
+        },
+      ],
+      lastName: "",
+      lastNameValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Lastname";
+          } else {
+            return true;
+          }
+        },
+      ],
+      email: "",
+      emailValidation: [
+        (value) => {
+          if (!value) {
+            this.checkEmail = false;
+            return "You must enter an email address.";
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            this.checkEmail = false;
+            return "Invalid email address. Please enter a valid email.";
+          } else {
+            this.checkEmail = true;
+            return true;
+          }
+        },
+      ],
+      checkEmail: false,
+      password: "",
+      passwordValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Password";
+          } else {
+            return true;
+          }
+        },
+      ],
     };
   },
   methods: {
-    Delete(question, selectTest) {
-      console.log("selectTest", selectTest);
-      const type = { type: question.columns.testName };
+    handleCreateAccount() {
+      if (
+        this.therapistId === "" ||
+        this.firstName === "" ||
+        this.lastName === "" ||
+        this.email === "" ||
+        this.checkEmail === false ||
+        this.password === ""
+      ) {
+      } else {
+        console.log(
+          "Create Therapist Account",
+          this.therapistId,
+          this.firstName,
+          this.lastName,
+          this.email,
+          this.password
+        );
+        this.therapistId = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.password = "";
+        this.checkEmail = false;
+        this.createPopup = false;
+      }
+    },
+    handleEditAccount(therapist) {
+      this.therapistId = "1";
+      this.firstName = therapist;
+      this.lastName = "1";
+      this.email = "pun@gmail.com";
+      this.password = "1";
+      this.checkEmail = true;
+      console.log(
+        "Edit Therapist Account",
+        this.therapistId,
+        this.firstName,
+        this.lastName,
+        this.email,
+        this.password
+      );
+    },
+    handleUpdateAccount() {
+      if (
+        this.therapistId === "" ||
+        this.firstName === "" ||
+        this.lastName === "" ||
+        this.email === "" ||
+        this.checkEmail === false ||
+        this.password === ""
+      ) {
+      } else {
+        console.log(
+          "Update Therapist Account",
+          this.therapistId,
+          this.firstName,
+          this.lastName,
+          this.email,
+          this.password
+        );
+        this.therapistId = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.password = "";
+        this.checkEmail = false;
+        this.editPopup = false;
+      }
+    },
+    Delete(question, selectTherapist) {
+      console.log("selectTherapist", selectTherapist);
+      const type = { type: selectTherapist.columns.name };
       const typeJSON = JSON.stringify(type, null, 2);
       console.log("test", typeJSON);
 
@@ -385,10 +706,16 @@ export default {
 .custom-placeholder ::placeholder {
   font-size: 11.6px;
 }
-.send-popup-header {
+.create-popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: bold;
+  font-size: larger;
+}
+
+.title {
+  font-weight: 500;
 }
 .text {
   font-family: "Poppins", sans-serif;
@@ -465,11 +792,13 @@ export default {
 }
 
 .delete {
-  height: 150px;
+  /* height: 150px; */
+  height: auto;
 }
 
-.send {
-  height: 463px;
+.create {
+  width: 750px;
+  height: 450px;
 }
 .modal-header h3 {
   margin-top: 0;

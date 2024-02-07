@@ -10,11 +10,12 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import NotiBox from "../notibox";
+import axios from "./axios.js";
 
-export default function Notification({route}) {
+export default function Notification({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
-  const [data,setData] = useState([]);
+  const [data, setData] = useState([]);
   // const data = [
   //   {
   //     title: "ทำแบบประเมินโรคซึมเศร้า PHQ-9",
@@ -31,9 +32,9 @@ export default function Notification({route}) {
   // ];
 
   useEffect(() => {
-    console.log("Notification Screen",patientId);
+    console.log("Notification Screen", patientId);
     const param = {
-      patient_id: patientId,
+      patientId: patientId,
     };
     axios
       .post("/notiApp", param)

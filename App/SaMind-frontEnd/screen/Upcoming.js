@@ -42,7 +42,7 @@ export default function Upcoming({ route }) {
       .then((response) => {
         if (response.data.length != 0) {
           console.log("in");
-          setAssignData(response.data)
+          setAssignData(response.data);
         }
 
         console.log(response.data, response.data.length);
@@ -65,7 +65,7 @@ export default function Upcoming({ route }) {
       .then((response) => {
         if (response.data.length != null) {
           console.log("in");
-          setAssignData(response.data)
+          setAssignData(response.data);
         }
 
         console.log(response.data, response.data.length);
@@ -186,7 +186,7 @@ export default function Upcoming({ route }) {
         {selectedMenu == "daily" && (
           <ScrollView style={{}}>
             {assignData.map((item, index) => (
-              <AssignmentBox item={item} index={index} key={index} /> 
+              <AssignmentBox item={item} index={index} key={index} />
             ))}
           </ScrollView>
         )}

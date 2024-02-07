@@ -13,6 +13,8 @@ import Calendarscreen from "./screen/Calendar";
 import Libraryscreen from "./screen/Library";
 import Notiscreen from "./screen/Notification";
 import Testscreen from "./screen/Test";
+import IndividualTestListScreen from "./screen/IndividualTestList";
+import IndividualTestScreen from "./screen/IndividualTest";
 import Avatarscreen from "./screen/Avatar";
 import Upcomingscreen from "./screen/Upcoming";
 import Appointmentscreen from "./screen/Appointment";
