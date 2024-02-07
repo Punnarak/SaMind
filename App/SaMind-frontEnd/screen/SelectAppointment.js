@@ -27,8 +27,8 @@ export default function Login({ route }) {
     usePasswordVisibility();
   const { passwordVisibility1, togglePasswordVisibility1 } =
     usePasswordVisibility1();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [tel, setTel] = useState("");
   const [Conpassword, setConPassword] = useState("");
   const [submit, setSubmit] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -37,12 +37,12 @@ export default function Login({ route }) {
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [isPickerVisibleN, setIsPickerVisibleN] = useState(false);
-  const [selectedValueN, setSelectedValueN] = useState(null);
+  const [doctorName, setDoctorName] = useState(null);
   const [showdate, setshowdate] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const { date, month, year } = route.params || {};
-
+  const { date, month, year,patientId } = route.params || {};
+  const [timeValue, setTimeValue] = useState();
   const time = [
     { id: 1, name: "0:00-1:00 ", value: "0:00" },
     { id: 2, name: "0:30-1:30 ", value: "0:30" },
@@ -103,13 +103,35 @@ export default function Login({ route }) {
     { id: 3, name: "C", value: "C" },
   ];
 
+  
   const toggleUnderstand = () => {
     setConfirmModal(!confirmModal);
     setSubmit(!submit);
-    navigation.navigate("Appointmentscreen");
+   
+    navigation.navigate("Appointmentscreen",{patientId});
   };
   const toggleSubmit = () => {
     setConfirmModal(!confirmModal);
+    const dateApi = date + "-"+ (month + 1) + "-"+ year 
+    const param = {
+      therapistName: doctorName,
+      patientId: 123,
+      patientName:name,
+      date: dateApi,
+      time: selectedValue,
+      patientPhone: tel,
+
+    };
+    console.log(param);
+    axios
+      .post("/appointSelect", param)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Axios error:", error);
+      });
   };
   const toggleModal = () => {
     setSubmit(!submit);
@@ -118,6 +140,7 @@ export default function Login({ route }) {
     if (selectedValue) {
       setTimeError("");
       const dateString = year + "-" + (month + 1) + "-" + date;
+  
       const dateFormat = "YYYY-MM-DD";
       const fulldate = moment(dateString, dateFormat).toDate();
       const day = fulldate.getDay();
@@ -161,22 +184,7 @@ export default function Login({ route }) {
         datestring + " " + Days[day] + " " + months[month] + " " + year
       );
       setSubmit(!submit);
-      const param = {
-        therapist_id: 9999,
-        patient_id: 124,
-        date: dateString,
-        time: selectedValue,
-      };
-      console.log(param);
-      axios
-        .post("/appoint_post", param)
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          // Handle any errors here
-          console.error("Axios error:", error);
-        });
+     
     } else {
       setTimeError("*");
     }
@@ -189,13 +197,13 @@ export default function Login({ route }) {
     setIsPickerVisibleN(!isPickerVisibleN);
   };
   const handleItemPress = (itemValue) => {
-    console.log("Time --> ", itemValue);
-    setSelectedValue(itemValue.name);
+    console.log("Time --> ", itemValue.value);
+    setSelectedValue(itemValue.value);
     setIsPickerVisible(false);
   };
   const handleItemPressN = (itemValue) => {
     console.log("Time --> ", itemValue);
-    setSelectedValueN(itemValue.name);
+    setDoctorName(itemValue.name);
     setIsPickerVisibleN(false);
   };
 
@@ -215,7 +223,22 @@ export default function Login({ route }) {
     );
   };
   useEffect(() => {
-    console.log("Select Appointment Screen");
+    console.log("Select Appointment Screen",patientId);
+      const param = {
+        patientId: patientId,
+      };
+      axios
+        .post("/appointConfig", param)
+        .then((response) => {
+          console.log("in");
+          setName(response.data.patientName);
+          setDoctorName(response.data.therapistName)
+          setTel(response.data.patientPhone)
+          console.log("data:", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
   }, []);
 
   return (
@@ -289,8 +312,8 @@ export default function Login({ route }) {
           editable={false}
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           style={styles.TextInput}
-          value={email}
-          onChangeText={setEmail}
+          value={name}
+          onChangeText={setName}
         />
         <Text style={styles.title4}>Dr. Name</Text>
         <TextInput
@@ -304,7 +327,7 @@ export default function Login({ route }) {
           ]}
           placeholder="Dr.Name"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
-          value={selectedValueN ? selectedValueN : ""}
+          value={doctorName}
         />
         {/* <TouchableOpacity style={[styles.eyeI2]} onPress={togglePickerN}>
           <Ionicons
@@ -339,8 +362,8 @@ export default function Login({ route }) {
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
           secureTextEntry={passwordVisibility}
           style={styles.TextInput}
-          value={password}
-          onChangeText={setPassword}
+          value={tel}
+          onChangeText={setTel}
         />
         <View
           style={{
