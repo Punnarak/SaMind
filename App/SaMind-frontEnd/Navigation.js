@@ -24,8 +24,6 @@ import Signupinscreen from "./screen/SignupIn";
 import Generaltestscreen from "./screen/GeneralTest";
 import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
-import IndividualTestListScreen from "./screen/IndividualTestList";
-import IndividualTestScreen from "./screen/IndividualTest";
 import Gamescreen from "./screen/Game";
 
 
