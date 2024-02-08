@@ -76,6 +76,11 @@ const router = createRouter({
           component: () => import("../views/EditAccount.vue"),
           props: true,
         },
+        {
+          path: "/support",
+          component: () => import("../views/Support.vue"),
+          props: true,
+        },
       ],
     },
   ],
