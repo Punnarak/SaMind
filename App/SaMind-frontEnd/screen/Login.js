@@ -135,7 +135,7 @@ export default function Login() {
             <Text style={styles.text}>Sign in</Text>
           </TouchableOpacity>
 
-          <Text style={styles.n}>
+          {/* <Text style={styles.n}>
             Don't have an account?{"  "}
             <Text
               style={styles.hyper}
@@ -143,7 +143,7 @@ export default function Login() {
             >
               Sign up
             </Text>
-          </Text>
+          </Text> */}
         </View>
       </ImageBackground>
     </View>
