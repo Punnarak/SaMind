@@ -23,7 +23,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @click="createWithPopup = true"
+          @click="createPopup = true"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Patient</v-btn
         >
@@ -76,7 +76,7 @@
           color="blue"
           size="30px"
           style="margin-right: 20px"
-          @click="handleEditPaitent(item.columns.testname)"
+          @click="handleEditAccount(item.columns), (editPopup = true)"
         />
         <v-btn
           icon="mdi-delete"
@@ -100,7 +100,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ item.columns.name }} ?</slot
+                    {{ this.selectPatient.columns.name }} ?</slot
                   >
                 </div>
 
@@ -151,6 +151,336 @@
         </v-row>
       </template>
     </v-data-table>
+    <Transition name="create-modal">
+      <div v-if="createPopup" class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container create">
+            <div class="modal-header create-popup-header" align="start">
+              <slot
+                class="popupheader"
+                style="font-weight: bolder"
+                name="header"
+                >Create Patient Account</slot
+              >
+              <v-icon style="" @click="createPopup = false">mdi-close</v-icon>
+            </div>
+
+            <div class="modal-body" align="start" style="left: 100px">
+              <slot name="body">
+                <div style="display: flex; flex-direction: row">
+                  <div class="TherapistId">
+                    <label class="text title">Patient ID</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient ID"
+                        style="width: 150px; height: 45px; flex-shrink: 0"
+                        v-model="patientId"
+                        :rules="patientIdValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="FirstName">
+                    <label class="text title">First Name</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Firstname"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="firstName"
+                        :rules="firstNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="LastName">
+                    <label class="text title">Last Name</label>
+                    <v-col
+                      style="
+                        margin-top: -10px;
+                        margin-left: -10px;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Lastname"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="lastName"
+                        :rules="lastNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+
+                  <div class="Tel">
+                    <label class="text title">Phone Number</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Phone Number"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="phone"
+                        :rules="phoneValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                </div>
+                <!-- <div style="display: flex; flex-direction: row"> -->
+                <div class="username">
+                  <label class="text title">Email</label>
+                  <v-col
+                    style="
+                      margin-top: -10px;
+                      margin-left: -10px;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Patient Email"
+                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      v-model="email"
+                      :rules="emailValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <div class="password">
+                  <label class="text title">Password</label>
+                  <v-col style="margin-top: -10px; margin-left: -10px">
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Patient Password"
+                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      v-model="password"
+                      :rules="passwordValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <!-- </div> -->
+              </slot>
+            </div>
+
+            <div
+              class="modal-footer"
+              style="display: flex; justify-content: flex-end; margin-top: 50px"
+            >
+              <slot name="footer">
+                <v-col cols="4">
+                  <v-btn
+                    rounded="xl"
+                    class="text-none mx-auto"
+                    color="#569AFF"
+                    block
+                    size="large"
+                    variant="flat"
+                    style="
+                      color: #fff;
+                      font-size: 15px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: normal;
+                      letter-spacing: 0.13px;
+                      margin-top: -40px;
+                    "
+                    @click="handleCreateAccount()"
+                  >
+                    Create Account</v-btn
+                  >
+                </v-col>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <Transition name="edit-modal">
+      <div v-if="editPopup" class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container create">
+            <div class="modal-header create-popup-header" align="start">
+              <slot
+                class="popupheader"
+                style="font-weight: bolder"
+                name="header"
+                >Edit Patient Account</slot
+              >
+              <v-icon @click="editPopup = false">mdi-close</v-icon>
+            </div>
+
+            <div class="modal-body" align="start" style="left: 100px">
+              <slot name="body">
+                <div style="display: flex; flex-direction: row">
+                  <div class="TherapistId">
+                    <label class="text title">Patient ID</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient ID"
+                        style="width: 150px; height: 45px; flex-shrink: 0"
+                        v-model="patientId"
+                        :rules="patientIdValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="FirstName">
+                    <label class="text title">First Name</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Firstname"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="firstName"
+                        :rules="firstNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="LastName">
+                    <label class="text title">Last Name</label>
+                    <v-col
+                      style="
+                        margin-top: -10px;
+                        margin-left: -10px;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Lastname"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="lastName"
+                        :rules="lastNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="Tel">
+                    <label class="text title">Phone Number</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Phone Number"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="phone"
+                        :rules="phoneValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                </div>
+                <!-- <div style="display: flex; flex-direction: row"> -->
+                <div class="username">
+                  <label class="text title">Email</label>
+                  <v-col
+                    style="
+                      margin-top: -10px;
+                      margin-left: -10px;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Patient Email"
+                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      v-model="email"
+                      :rules="emailValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <div class="password">
+                  <label class="text title">Password</label>
+                  <v-col style="margin-top: -10px; margin-left: -10px">
+                    <v-text-field
+                      class="custom-placeholder mt-2"
+                      density="comfortable"
+                      rounded="lg"
+                      variant="outlined"
+                      placeholder="Enter Patient Password"
+                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      v-model="password"
+                      :rules="passwordValidation"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </div>
+                <!-- </div> -->
+              </slot>
+            </div>
+
+            <div
+              class="modal-footer"
+              style="display: flex; justify-content: flex-end; margin-top: 50px"
+            >
+              <slot name="footer">
+                <v-col cols="4">
+                  <v-btn
+                    rounded="xl"
+                    class="text-none mx-auto"
+                    color="#569AFF"
+                    block
+                    size="large"
+                    variant="flat"
+                    style="
+                      color: #fff;
+                      font-size: 15px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: normal;
+                      letter-spacing: 0.13px;
+                      margin-top: -40px;
+                    "
+                    @click="handleUpdateAccount()"
+                  >
+                    Edit Account</v-btn
+                  >
+                </v-col>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </v-col>
 </template>
 
@@ -265,8 +595,6 @@ function getColor(mood) {
 }
 </script>
 <script>
-let checkedNames = ref([]);
-
 import axios from "../axios.js";
 export default {
   props: {
@@ -276,13 +604,152 @@ export default {
     return {
       selectedDuplicateTest: null,
       selectPatient: [],
-      sendPopup: false,
-      sendingPopup: false,
-      dueDate: null,
-      donePopup: false,
+      createPopup: false,
+      editPopup: false,
+      patientId: "",
+      patientIdValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Patient ID";
+          } else {
+            return true;
+          }
+        },
+      ],
+      firstName: "",
+      firstNameValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Firstname";
+          } else {
+            return true;
+          }
+        },
+      ],
+      lastName: "",
+      lastNameValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Lastname";
+          } else {
+            return true;
+          }
+        },
+      ],
+      phone: "",
+      phoneValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Phone Number";
+          } else {
+            return true;
+          }
+        },
+      ],
+      checkEmail: false,
+      email: "",
+      emailValidation: [
+        (value) => {
+          if (!value) {
+            this.checkEmail = false;
+            return "You must enter an email address.";
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            this.checkEmail = false;
+            return "Invalid email address. Please enter a valid email.";
+          } else {
+            this.checkEmail = true;
+            return true;
+          }
+        },
+      ],
+      password: "",
+      passwordValidation: [
+        (value) => {
+          if (!value) {
+            return "please enter Password";
+          } else {
+            return true;
+          }
+        },
+      ],
     };
   },
   methods: {
+    handleCreateAccount() {
+      if (
+        this.patientId === "" ||
+        this.firstName === "" ||
+        this.lastName === "" ||
+        this.email === "" ||
+        this.checkEmail === false ||
+        this.password === ""
+      ) {
+      } else {
+        console.log(
+          "Create Patient Account",
+          this.patientId,
+          this.firstName,
+          this.lastName,
+          this.email,
+          this.password
+        );
+        this.therapistId = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.password = "";
+        this.checkEmail = false;
+        this.createPopup = false;
+      }
+    },
+    handleEditAccount(patient) {
+      let name = patient.name.split(" ");
+      this.patientId = patient.patientId;
+      this.firstName = name[0];
+      this.lastName = name[1];
+      this.phone = "0890222255";
+      this.email = "pun@gmail.com";
+      this.password = "1";
+      this.checkEmail = true;
+      console.log(
+        "Edit Patient Account",
+        this.patientId,
+        this.firstName,
+        this.lastName,
+        this.phone,
+        this.email,
+        this.password
+      );
+    },
+    handleUpdateAccount() {
+      if (
+        this.patientId === "" ||
+        this.firstName === "" ||
+        this.lastName === "" ||
+        this.email === "" ||
+        this.phone === "" ||
+        this.checkEmail === false
+      ) {
+      } else {
+        console.log(
+          "Update Patient Account",
+          this.patientId,
+          this.firstName,
+          this.lastName,
+          this.phone,
+          this.email,
+          this.password
+        );
+        this.patientId = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.password = "";
+        this.phone = "";
+        this.checkEmail = false;
+        this.editPopup = false;
+      }
+    },
     Delete(question, selectTest) {
       console.log("selectTest", selectTest);
       const type = { type: question.columns.testName };
@@ -304,15 +771,6 @@ export default {
       //     console.error("Error:", error);
       //   });\
     },
-    handleEditPaitent(testName) {
-      console.log("testName in testlist page", testName);
-      this.$router.push({
-        name: "edittest",
-        query: {
-          testName: testName,
-        },
-      });
-    },
   },
 };
 </script>
@@ -325,10 +783,12 @@ export default {
 .custom-placeholder ::placeholder {
   font-size: 11.6px;
 }
-.send-popup-header {
+.create-popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: bold;
+  font-size: larger;
 }
 .text {
   font-family: "Poppins", sans-serif;
@@ -394,9 +854,9 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
 }
-.createwith {
-  height: 280px;
-  border: 2px solid #3c9bf2;
+.create {
+  width: 855px;
+  height: 450px;
 }
 
 .dropdown-list {
@@ -408,9 +868,6 @@ export default {
   height: 150px;
 }
 
-.send {
-  height: 463px;
-}
 .modal-header h3 {
   margin-top: 0;
   color: #42b983;
@@ -426,15 +883,6 @@ export default {
 .modal-default-button {
   float: right;
 }
-
-/*
- * The following styles are auto-applied to elements with
- * transition="modal" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the modal transition by editing
- * these styles.
- */
 
 .modal-enter-from {
   opacity: 0;
