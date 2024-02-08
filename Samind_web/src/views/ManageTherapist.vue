@@ -23,7 +23,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @click="createPopup = true"
+          @click="clear(), (createPopup = true)"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Therapist</v-btn
         >
@@ -683,6 +683,13 @@ export default {
       //   .catch((error) => {
       //     console.error("Error:", error);
       //   });\
+    },
+    clear() {
+      this.therapistId = "";
+      this.firstName = "";
+      this.lastName = "";
+      this.email = "";
+      this.password = "";
     },
   },
 };

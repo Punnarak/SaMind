@@ -23,7 +23,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @click="createPopup = true"
+          @click="clear(), (createPopup = true)"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Patient</v-btn
         >
@@ -272,20 +272,48 @@
                       rounded="lg"
                       variant="outlined"
                       placeholder="Enter Patient Password"
-                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      style="
+                        width: 790px;
+                        height: 45px;
+                        flex-shrink: 0;
+                        margin-bottom: 8px;
+                      "
                       v-model="password"
                       :rules="passwordValidation"
                     >
                     </v-text-field>
                   </v-col>
                 </div>
+                <div class="therapist">
+                  <label class="text title">
+                    <v-icon>mdi-stethoscope</v-icon> Therapist</label
+                  >
+                  <v-col style="margin-top: -30px; margin-left: -10px">
+                    <v-select
+                      class="mt-4"
+                      variant="outlined"
+                      rounded="lg"
+                      style="width: 235px; border-radius: 10px"
+                      v-model="selectTherapist"
+                      :items="options"
+                      placeholder="Select Therapist"
+                      :rules="therapistValidation"
+                    >
+                    </v-select>
+                  </v-col>
+                </div>
+
                 <!-- </div> -->
               </slot>
             </div>
 
             <div
               class="modal-footer"
-              style="display: flex; justify-content: flex-end; margin-top: 50px"
+              style="
+                display: flex;
+                justify-content: flex-end;
+                margin-top: -50px;
+              "
             >
               <slot name="footer">
                 <v-col cols="4">
@@ -444,6 +472,25 @@
                     </v-text-field>
                   </v-col>
                 </div>
+
+                <div class="therapist">
+                  <label class="text title">
+                    <v-icon>mdi-stethoscope</v-icon> Therapist</label
+                  >
+                  <v-col style="margin-top: -30px; margin-left: -10px">
+                    <v-select
+                      class="mt-4"
+                      variant="outlined"
+                      rounded="lg"
+                      style="width: 235px; border-radius: 10px"
+                      v-model="selectTherapist"
+                      :items="options"
+                      placeholder="Select Therapist"
+                      :rules="therapistValidation"
+                    >
+                    </v-select>
+                  </v-col>
+                </div>
                 <!-- </div> -->
               </slot>
             </div>
@@ -468,7 +515,7 @@
                       font-weight: 500;
                       line-height: normal;
                       letter-spacing: 0.13px;
-                      margin-top: -40px;
+                      margin-top: -120px;
                     "
                     @click="handleUpdateAccount()"
                   >
@@ -493,6 +540,7 @@ let patients = ref(
   [
     {
       no: "01",
+      therapist: "somesee",
       patientId: "PID001",
       name: "Somsak Test1",
       age: 24,
@@ -581,6 +629,7 @@ const headers = [
     sortable: false,
     key: "no",
   },
+  { title: "Therapist", key: "therapist", align: "start", sortable: false },
   { title: "Patient ID", key: "patientId", align: "start", sortable: false },
   { title: "Patient Name", key: "name", sortable: false },
   { title: "Age", key: "age", align: "center", sortable: false },
@@ -603,6 +652,8 @@ export default {
   data() {
     return {
       selectedDuplicateTest: null,
+      selectTherapist: "",
+      options: ["Dr. Somsak", "Dr. Somsee", "Dr. Somjai"],
       selectPatient: [],
       createPopup: false,
       editPopup: false,
@@ -672,6 +723,15 @@ export default {
           }
         },
       ],
+      therapistValidation: [
+        (value) => {
+          if (!value) {
+            return "please select therapist";
+          } else {
+            return true;
+          }
+        },
+      ],
     };
   },
   methods: {
@@ -680,9 +740,11 @@ export default {
         this.patientId === "" ||
         this.firstName === "" ||
         this.lastName === "" ||
+        this.phone === "" ||
         this.email === "" ||
         this.checkEmail === false ||
-        this.password === ""
+        this.password === "" ||
+        this.selectTherapist === ""
       ) {
       } else {
         console.log(
@@ -691,13 +753,16 @@ export default {
           this.firstName,
           this.lastName,
           this.email,
-          this.password
+          this.password,
+          this.selectTherapist
         );
-        this.therapistId = "";
+        this.patientId = "";
         this.firstName = "";
         this.lastName = "";
+        this.phone = "";
         this.email = "";
         this.password = "";
+        this.selectTherapist = "";
         this.checkEmail = false;
         this.createPopup = false;
       }
@@ -711,6 +776,7 @@ export default {
       this.email = "pun@gmail.com";
       this.password = "1";
       this.checkEmail = true;
+      this.selectTherapist = "Dr. Somsee";
       console.log(
         "Edit Patient Account",
         this.patientId,
@@ -728,7 +794,9 @@ export default {
         this.lastName === "" ||
         this.email === "" ||
         this.phone === "" ||
-        this.checkEmail === false
+        this.checkEmail === false ||
+        this.password === "" ||
+        this.selectTherapist === ""
       ) {
       } else {
         console.log(
@@ -770,6 +838,15 @@ export default {
       //   .catch((error) => {
       //     console.error("Error:", error);
       //   });\
+    },
+    clear() {
+      this.patientId = "";
+      this.firstName = "";
+      this.lastName = "";
+      this.phone = "";
+      this.email = "";
+      this.password = "";
+      this.selectTherapist = "";
     },
   },
 };
@@ -856,7 +933,7 @@ export default {
 }
 .create {
   width: 855px;
-  height: 450px;
+  height: 500px;
 }
 
 .dropdown-list {
