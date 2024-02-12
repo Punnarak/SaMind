@@ -148,6 +148,7 @@
             variant="outlined"
             rounded="lg"
             style="border-radius: 10px; width: 400px; height: 220px"
+            v-model="note"
           ></v-text-field>
         </v-col>
       </v-list>
@@ -156,9 +157,13 @@
 </template>
 
 <script>
+
+import axios from "../axios.js";
+
 export default {
   data() {
     return {
+      patients: null,
       bookday: "",
       selectedPatient: null,
       options: ["Somsak", "Somsee", "Somjai"],
@@ -198,12 +203,31 @@ export default {
         },
       ],
       addingAppointment: false,
+      note: "",
     };
   },
   created() {
     // Access the bookday parameter from the route
     this.bookday = this.$route.query.bookday; // Set it to an empty string if not provided
     console.log("this.bookday", this.bookday);
+    const param = {
+      therapist_id: 5555,
+    };
+    axios
+      .post("/patientList", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.options = response.data.map(patient => patient.name);
+        this.patients = response.data;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
   computed: {
     calculatedEndTime() {
@@ -221,22 +245,40 @@ export default {
 
   methods: {
     async addAppointment() {
-      // Set the loading state
-      this.addingAppointment = true;
+      const foundPatient = this.patients.find(patient => patient.name === this.selectedPatient);
+      const param = {
+        therapistId: 5555,
+        patientId: foundPatient.patientId,
+        date: this.bookday,
+        startTime: this.selectedStartTime,
+        note: this.note  
+      };
+      await axios
+        .post("/therapistAddAppoint", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then(async(response) => {
+          console.log("response", response.data);
+          this.addingAppointment = true;
+          // Simulate an asynchronous operation (e.g., an HTTP request)
+          
 
-      try {
-        // Simulate an asynchronous operation (e.g., an HTTP request)
-        await this.simulateAsyncOperation();
+          // Reset the loading state and provide feedback to the user
+          this.addingAppointment = false;
+          // this.$toast.success("Appointment added successfully"); // Use your preferred feedback mechanism
+          await this.simulateAsyncOperation();
+        })
+        .catch((error) => {
+          // console.error("Error:", error);
+          // Handle the error and reset the loading state
+          console.error("Error adding appointment:", error);
+          this.addingAppointment = false;
+          // this.$toast.error("Failed to add appointment"); // Use your preferred error handling and feedback mechanism
+        });
 
-        // Reset the loading state and provide feedback to the user
-        this.addingAppointment = false;
-        this.$toast.success("Appointment added successfully"); // Use your preferred feedback mechanism
-      } catch (error) {
-        // Handle the error and reset the loading state
-        console.error("Error adding appointment:", error);
-        this.addingAppointment = false;
-        this.$toast.error("Failed to add appointment"); // Use your preferred error handling and feedback mechanism
-      }
     },
     async simulateAsyncOperation() {
       // Simulate an asynchronous operation

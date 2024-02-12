@@ -51,7 +51,7 @@ export default function Calendar({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
-  }, []);
+  }, [highlightedDates]);
 
   const handleDateSelected = (date, month, year, textColor) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
@@ -68,7 +68,8 @@ export default function Calendar({ route }) {
       }
     );
 
-    if (isDateInHighlightedDates) {
+    console.log("textColor",textColor)
+    if (isDateInHighlightedDates && textColor == "#f00") {
       toggleModal();
       if (date > 3) {
         date = date + "th";
@@ -81,8 +82,9 @@ export default function Calendar({ route }) {
           date = date + "rd";
         }
       }
-    } else if (!isDateInHighlightedDates && textColor !== "#f00") {
-      navigation.navigate("Selectappointmentscreen", { date, month, year });
+    } else if (!isDateInHighlightedDates && textColor === 'black' && textColor !== 'lightgray') {
+      console.log(date+ "-"+month+"-"+year)
+      navigation.navigate("Selectappointmentscreen", { date, month, year,patientId });
     }
 
     const day = fulldate.getDay();
