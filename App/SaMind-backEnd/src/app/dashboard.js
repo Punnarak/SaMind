@@ -1027,8 +1027,54 @@ router.post('/check_mood_per_day_get', (req, res) => {
 //     });
 // });
 
+// router.post('/assignmentInfo_post', (req, res) => {
+//   const id = req.query.assign_id;
+//   const type = req.body.type; // Assuming the type is in the request body
+
+//   let query = "SELECT " +
+//     "\"assign_id\" AS \"assignId\", " +
+//     "\"patient_id\" AS \"patientId\", " +
+//     "\"test_name\" AS \"testName\", " +
+//     "\"status\" AS \"status\", " +
+//     "\"active_flag\" AS \"activeFlag\", " +
+//     "\"create_by\" AS \"createBy\", " +
+//     "\"create_date\" AS \"createDate\", " +
+//     "\"update_by\" AS \"updateBy\", " +
+//     "\"update_date\" AS \"updateDate\" " +
+//     "FROM \"assignment\"";
+
+//   if (id) {
+//     query += ' WHERE "assign_id" = $1';
+//   } else {
+//     query += ' WHERE 1=1'; // Add a placeholder WHERE condition if id is not present
+//   }
+
+//   if (type === "daily") {
+//     query += ' AND "create_date"::date = CURRENT_DATE';
+//   } else if (type === "weekly") {
+//     query += ' AND "create_date"::date >= CURRENT_DATE - interval \'6 days\' AND "create_date"::date <= CURRENT_DATE + interval \'1 day\'';
+//   } else if (type === "monthly") {
+//     query += ' AND "create_date" >= date_trunc(\'month\', CURRENT_DATE) AND "create_date" < date_trunc(\'month\', CURRENT_DATE + interval \'1 month\')';
+//   } else if (type === "yearly") {
+//     query += ' AND "create_date" >= date_trunc(\'year\', CURRENT_DATE) AND "create_date" < date_trunc(\'year\', CURRENT_DATE + interval \'1 year\')';
+//   }
+
+//   query += ' ORDER BY "assign_id"';
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/assignmentInfo_post', (req, res) => {
-  const id = req.query.assign_id;
+  const { patient_id } = req.body; // Extract patient_id from request body
   const type = req.body.type; // Assuming the type is in the request body
 
   let query = "SELECT " +
@@ -1043,10 +1089,10 @@ router.post('/assignmentInfo_post', (req, res) => {
     "\"update_date\" AS \"updateDate\" " +
     "FROM \"assignment\"";
 
-  if (id) {
-    query += ' WHERE "assign_id" = $1';
+  if (patient_id) {
+    query += ' WHERE "patient_id" = $1'; // Use patient_id in the WHERE clause
   } else {
-    query += ' WHERE 1=1'; // Add a placeholder WHERE condition if id is not present
+    query += ' WHERE 1=1'; // Add a placeholder WHERE condition if patient_id is not present
   }
 
   if (type === "daily") {
@@ -1061,7 +1107,7 @@ router.post('/assignmentInfo_post', (req, res) => {
 
   query += ' ORDER BY "assign_id"';
 
-  const queryParams = id ? [id] : [];
+  const queryParams = patient_id ? [patient_id] : [];
 
   client.query(query, queryParams)
     .then(result => {
@@ -1072,7 +1118,6 @@ router.post('/assignmentInfo_post', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
-
 
 
 

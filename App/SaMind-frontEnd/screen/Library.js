@@ -351,7 +351,7 @@ export default function Library() {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Notiscreen")}
+            onPress={() => navigation.navigate("Notiscreen",{patientId})}
           />
           <Feather
             name="smile"

@@ -638,6 +638,7 @@ export default {
       if (!value) {
         return "Please enter a detail";
       }
+      // return true;
     },
     handleSendTestClick() {
       console.log(
@@ -652,13 +653,33 @@ export default {
         this.detail == ""
       ) {
       } else {
-        console.log("Selected Patients IDs:", checkedNames.value);
-        this.sendPopup = false;
-        this.sendingPopup = true;
-        checkedNames.value = [];
-        this.detail = "";
+        let param = {
+          therapistId: "5555",
+          testName: this.selectTest.columns.testname,
+          patientId: checkedNames.value,
+          detail: this.detail,
+          dueDate: this.dueDate
+        }
+        axios
+          .post("/therapistSendTest", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("response", response.data);
+            console.log("Selected Patients IDs:", checkedNames.value);
+            this.sendPopup = false;
+            this.sendingPopup = true;
+            checkedNames.value = [];
+            this.detail = "";
 
-        this.loadSendingAnimation();
+            this.loadSendingAnimation();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
 
@@ -774,8 +795,8 @@ onMounted(async () => {
     .then((response) => {
       console.log("response", response.data);
       patients.value = response.data.map((patient, index) => ({
-        patientId: patients.patientId,
-        patientName: patient.patientName,
+        patientName: patient.name,
+        patientId: patient.patientId,
       }));
     })
     .catch((error) => {

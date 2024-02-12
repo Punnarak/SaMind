@@ -589,7 +589,197 @@ router.delete('/questionsDel', (req, res) => {
       });
   });
   
-  
+// router.post('/therapistSendTest', (req, res) => {
+//     const therapistId = req.body.therapistId;
+//     const testName = req.body.testName;
+//     const patientIds = req.body.patientId;
+//     const createBy = therapistId;
+//     const createDate = new Date();
+//     const updateBy = therapistId;
+//     const updateDate = new Date(createDate.getTime() + 7 * 24 * 60 * 60 * 1000); // Adding 7 days
+
+//     // Prepare an array to store promises for each patient insertion
+//     const insertionPromises = [];
+
+//     // Iterate through each patient ID and create a promise for each insertion
+//     patientIds.forEach(patientId => {
+//         const query = `
+//             INSERT INTO public.assignment (
+//                 assign_id, 
+//                 patient_id, 
+//                 test_name, 
+//                 status, 
+//                 active_flag, 
+//                 create_by, 
+//                 create_date, 
+//                 update_by, 
+//                 update_date
+//             ) VALUES (
+//                 NEXTVAL('assign_id_seq'), 
+//                 $1, 
+//                 $2, 
+//                 'WAIT', 
+//                 'Y', 
+//                 $3, 
+//                 $4, 
+//                 $5, 
+//                 $6
+//             )
+//         `;
+
+//         const values = [patientId, testName, createBy, createDate, updateBy, updateDate];
+
+//         const insertionPromise = client.query(query, values);
+//         insertionPromises.push(insertionPromise);
+//     });
+
+//     // Execute all insertion promises
+//     Promise.all(insertionPromises)
+//         .then(() => {
+//             res.json({ message: 'Data inserted successfully' });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/therapistSendTest', (req, res) => {
+//     const therapistId = req.body.therapistId;
+//     const testName = req.body.testName;
+//     const patientIds = req.body.patientId;
+//     const createBy = therapistId;
+//     const createDate = new Date();
+//     // Remove milliseconds from the createDate
+//     createDate.setMilliseconds(0);
+//     const updateBy = therapistId;
+//     const updateDate = new Date(createDate.getTime() + 7 * 24 * 60 * 60 * 1000); // Adding 7 days
+//     // Remove milliseconds from the updateDate
+//     updateDate.setMilliseconds(0);
+
+//     // Prepare an array to store promises for each patient insertion
+//     const insertionPromises = [];
+
+//     // Iterate through each patient ID and create a promise for each insertion
+//     patientIds.forEach(patientId => {
+//         const query = `
+//             INSERT INTO public.assignment (
+//                 assign_id, 
+//                 patient_id, 
+//                 test_name, 
+//                 status, 
+//                 active_flag, 
+//                 create_by, 
+//                 create_date, 
+//                 update_by, 
+//                 update_date
+//             ) VALUES (
+//                 NEXTVAL('assign_id_seq'), 
+//                 $1, 
+//                 $2, 
+//                 'WAIT', 
+//                 'Y', 
+//                 $3, 
+//                 $4, 
+//                 $5, 
+//                 $6
+//             )
+//         `;
+
+//         const values = [patientId, testName, createBy, createDate, updateBy, updateDate];
+
+//         const insertionPromise = client.query(query, values);
+//         insertionPromises.push(insertionPromise);
+//     });
+
+//     // Execute all insertion promises
+//     Promise.all(insertionPromises)
+//         .then(() => {
+//             res.json({ message: 'Data inserted successfully' });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+router.post('/therapistSendTest', (req, res) => {
+    const therapistId = req.body.therapistId;
+    const testName = req.body.testName;
+    const patientIds = req.body.patientId;
+    const detail = req.body.detail; // Adding detail from request body
+    const dueDate = req.body.dueDate; // Adding dueDate from request body
+
+    // Parse dueDate string to a valid Date object
+    const dueDateParts = dueDate.split('/');
+    const dueDateFormatted = new Date(`${dueDateParts[2]}-${dueDateParts[1]}-${dueDateParts[0]}`);
+
+    const createBy = therapistId;
+    const createDate = new Date();
+    // Remove milliseconds from the createDate
+    createDate.setMilliseconds(0);
+    const updateBy = therapistId;
+    const updateDate = new Date(createDate.getTime() + 7 * 24 * 60 * 60 * 1000); // Adding 7 days
+    // Remove milliseconds from the updateDate
+    updateDate.setMilliseconds(0);
+
+    // Prepare an array to store promises for each patient insertion
+    const insertionPromises = [];
+
+    // Iterate through each patient ID and create a promise for each insertion
+    patientIds.forEach(patientId => {
+        const query = `
+            INSERT INTO public.assignment (
+                assign_id, 
+                patient_id, 
+                test_name, 
+                status, 
+                active_flag, 
+                create_by, 
+                create_date, 
+                update_by, 
+                update_date,
+                detail, -- Adding detail column
+                turn_in_before -- Adding turn_in_before column
+            ) VALUES (
+                NEXTVAL('assign_id_seq'), 
+                $1, 
+                $2, 
+                'WAIT', 
+                'Y', 
+                $3, 
+                $4, 
+                $5, 
+                $6,
+                $7, -- Placeholder for detail
+                $8  -- Placeholder for dueDate
+            )
+        `;
+
+        const values = [patientId, testName, createBy, createDate, updateBy, updateDate, detail, dueDateFormatted]; // Adding detail and dueDate to values
+
+        const insertionPromise = client.query(query, values);
+        insertionPromises.push(insertionPromise);
+    });
+
+    // Execute all insertion promises
+    Promise.all(insertionPromises)
+        .then(() => {
+            res.json({ message: 'Data inserted successfully' });
+        })
+        .catch(err => {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'An error occurred' });
+        });
+});
+
+
+
+
+
+
+
+
   
 
 module.exports = router;

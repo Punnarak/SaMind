@@ -20,6 +20,8 @@ const verifyotp = require('./login.js');
 const question = require('./question.js');
 const library = require('./library.js');
 const appoint = require('./appoint.js');
+const notification = require('./notification.js');
+
 
 // Use the API file
 app.use(login);
@@ -30,6 +32,7 @@ app.use(verifyotp);
 app.use(question);
 app.use(library);
 app.use(appoint);
+app.use(notification);
 
 // Test
 const dashboard = require('./dashboard.js');

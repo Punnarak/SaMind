@@ -18,18 +18,15 @@ class MyCalendar extends React.Component {
     "December",
   ];
 
-  _onPress = (item, textColor, rowIndex) => {
-    console.log("textColor", textColor);
+  _onPress = (item, textColor) => {
+    console.log("textColor in calendar component",textColor)
     if (
       this.state.highlightedDates.find(
         (date) =>
           date.getDate() === item &&
           date.getMonth() === this.state.activeDate.getMonth() &&
           date.getFullYear() === this.state.activeDate.getFullYear()
-      ) &&
-      rowIndex === 1 &&
-      item < 31 &&
-      textColor === "#f00"
+      )
     ) {
       console.log(item);
       console.log("Input --> " + this.state.highlightedDates);
@@ -38,40 +35,7 @@ class MyCalendar extends React.Component {
         this.state.activeDate.getMonth(),
         this.state.activeDate.getFullYear(),
         textColor
-      );
-    } else if (
-      this.state.highlightedDates.find(
-        (date) =>
-          date.getDate() === item &&
-          date.getMonth() === this.state.activeDate.getMonth() - 1 &&
-          date.getFullYear() === this.state.activeDate.getFullYear()
-      ) &&
-      rowIndex === 1 &&
-      item < 31 &&
-      textColor === "#f00"
-    ) {
-      this.props.onDateSelected(
-        item,
-        this.state.activeDate.getMonth() - 1,
-        this.state.activeDate.getFullYear(),
-        textColor
-      );
-    } else if (
-      this.state.highlightedDates.find(
-        (date) =>
-          date.getDate() === item &&
-          date.getMonth() === this.state.activeDate.getMonth() + 1 &&
-          date.getFullYear() === this.state.activeDate.getFullYear()
-      ) &&
-      rowIndex >= 5 &&
-      item < 31 &&
-      textColor === "#f00"
-    ) {
-      this.props.onDateSelected(
-        item,
-        this.state.activeDate.getMonth() + 1,
-        this.state.activeDate.getFullYear(),
-        textColor
+        
       );
     } else {
       console.log(
@@ -193,7 +157,7 @@ class MyCalendar extends React.Component {
           (rowIndex === 5 && item < 31 && item < 20) ||
           (rowIndex === 6 && item < 31 && item < 30)
         ) {
-          textColor = "lightgray"; // กำหนดสีดำสำหรับวันที่ไม่ใช่ของเดือนปัจจุบันในแถวอื่นๆ
+          textColor = "lightgray"; // กำหนดสีlightgrayสำหรับวันที่ไม่ใช่ของเดือนปัจจุบันในแถวอื่นๆ
         }
         if (
           this.state.highlightedDates.find(
@@ -203,20 +167,7 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex === 1 &&
-          item < 31 &&
-          textColor !== "lightgray"
-        ) {
-          textColor = "#f00";
-        } else if (
-          this.state.highlightedDates.find(
-            (date) =>
-              date.getDate() === item &&
-              date.getMonth() === this.state.activeDate.getMonth() - 1 &&
-              date.getFullYear() === this.state.activeDate.getFullYear()
-          ) &&
-          rowIndex === 1 &&
-          item < 31 &&
-          textColor === "lightgray"
+          item <25
         ) {
           textColor = "#f00";
         } else if (
@@ -227,7 +178,10 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex >= 2 &&
-          rowIndex <= 5 &&
+          rowIndex <= 5 
+          &&
+          // item > 24 
+          item > 3&&
           item <= 31
         ) {
           textColor = "#f00";
@@ -235,14 +189,13 @@ class MyCalendar extends React.Component {
           this.state.highlightedDates.find(
             (date) =>
               date.getDate() === item &&
-              date.getMonth() === this.state.activeDate.getMonth() + 1 &&
+              date.getMonth() === this.state.activeDate.getMonth() &&
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
-          rowIndex >= 5 &&
-          item < 31 &&
-          textColor === "lightgray"
+          rowIndex === 6 &&
+          item < 31
         ) {
-          textColor = "#f00";
+          // textColor = 'blue'
         }
 
         if (
@@ -263,7 +216,7 @@ class MyCalendar extends React.Component {
               color: textColor,
               fontWeight: rowIndex === 0 ? "bold" : "normal",
             }}
-            onPress={() => this._onPress(item, textColor, rowIndex)}
+            onPress={() => this._onPress(item, textColor)}
           >
             {item !== -1 ? item : ""}
           </RN.Text>

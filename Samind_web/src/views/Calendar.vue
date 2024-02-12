@@ -787,6 +787,30 @@ export default {
       console.log("Window width: " + windowWidth);
       console.log("Selected DAY");
       this.selectedViewType = "day";
+      const day =this.currentDate.getDate();
+      const month = this.currentDate.getMonth() + 1; // Months are zero-based
+      const year = this.currentDate.getFullYear();
+      console.log("currentDay", this.currentDate);
+      let param = {
+        therapist_id: 5555,
+        date: `${day}-${month}-${year}`,
+      };
+      console.log(param)
+      axios
+        .post("/calendarDay", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+           this.eventsDay = response.data
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = []
+        });
     },
     selectWeek() {
       console.log("Selected WEEK");
@@ -818,7 +842,30 @@ export default {
       nextDay.setDate(nextDay.getDate() + 1);
       this.selectedDate = nextDay;
       this.currentDate = nextDay;
+      const day =this.currentDate.getDate();
+      const month = this.currentDate.getMonth() + 1; // Months are zero-based
+      const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
+      let param = {
+        therapist_id: 5555,
+        date: `${day}-${month}-${year}`,
+      };
+      console.log(param)
+      axios
+        .post("/calendarDay", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+           this.eventsDay = response.data
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = []
+        });
       this.updateCalendar();
     },
     prevDay() {
@@ -827,7 +874,30 @@ export default {
       prevDay.setDate(prevDay.getDate() - 1);
       this.selectedDate = prevDay;
       this.currentDate = prevDay;
+      const day =this.currentDate.getDate();
+      const month = this.currentDate.getMonth() + 1; // Months are zero-based
+      const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
+      let param = {
+        therapist_id: 5555,
+        date: `${day}-${month}-${year}`,
+      };
+      console.log(param)
+      axios
+        .post("/calendarDay", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+           this.eventsDay = response.data
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = []
+        });
       this.updateCalendar();
     },
     getEventStyle(time) {
@@ -1216,6 +1286,30 @@ export default {
       }
       this.selectedViewType = "day";
       this.currentDate = currentDate;
+      const d =this.currentDate.getDate();
+      const month = this.currentDate.getMonth() + 1; // Months are zero-based
+      const year = this.currentDate.getFullYear();
+      console.log("currentDay", this.currentDate);
+      let param = {
+        therapist_id: 5555,
+        date: `${d}-${month}-${year}`,
+      };
+      console.log("param",param)
+      axios
+        .post("/calendarDay", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+           this.eventsDay = response.data
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = []
+        });
       this.updateCalendar();
     },
     bookClicked(day, currentDate, cell) {
