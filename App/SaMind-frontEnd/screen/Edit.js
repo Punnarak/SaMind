@@ -361,6 +361,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       android: {
         marginRight: horizontalScale(140),
+        width: horizontalScale(169),
       },
       ios: {
         marginRight: horizontalScale(128.5),

@@ -654,24 +654,25 @@ export default {
         "24:00",
         "24:30",
       ],
-      eventsDay: {
-        //เปลี่ยนวันแล้วให้ยิง api ไปดึงข้อมูลมาในแต่ละรอบ
-        "10:00": {
-          patientName: "John Smith’s session",
-          timeA: "10:00 ",
-          timeB: "11:00",
-        },
-        "13:30": {
-          patientName: "Jane Kim’s session",
-          timeA: "13:30",
-          timeB: "14:30",
-        },
-        "12:00": {
-          patientName: "Jane Kim’s session",
-          timeA: "12:00",
-          timeB: "13:00",
-        },
-      },
+      eventsDay: [],
+      // {
+      //   //เปลี่ยนวันแล้วให้ยิง api ไปดึงข้อมูลมาในแต่ละรอบ
+      //   "10:00": {
+      //     patientName: "John Smith’s session",
+      //     timeA: "10:00 ",
+      //     timeB: "11:00",
+      //   },
+      //   "13:30": {
+      //     patientName: "Jane Kim’s session",
+      //     timeA: "13:30",
+      //     timeB: "14:30",
+      //   },
+      //   "12:00": {
+      //     patientName: "Jane Kim’s session",
+      //     timeA: "12:00",
+      //     timeB: "13:00",
+      //   },
+      // },
       menuPositionX: 0,
       menuPositionY: 0,
       months: [
@@ -776,7 +777,7 @@ export default {
     };
   },
   computed: {},
-  
+
   methods: {
     //Calendar Main
     selectDay() {
@@ -962,7 +963,7 @@ export default {
       }
     },
     //Calendar Month
-    async fetchEvents  () {
+    async fetchEvents() {
       let param = {
         therapist_id: 5555,
       };
@@ -974,27 +975,28 @@ export default {
           },
         })
         .then((response) => {
-          console.log("response", response.data);
-          let m = response.data
+          // console.log("response", response.data);
+          this.events = response.data;
           // .map((event, index) => ({
           //   // id: index + 1,
           //   patientName: event.patientName,
           //   date: event.date,
           //   time: event.time,
           // }));
-          
 
-          // console.log("this.events",this.events)
-          this.events = 
-           [{
-        patientName: "jare year",
-        date: '29-1-2024',
-        time: "10:00"
-      },{
-        patientName: "30 y",
-        date: '30-1-2024',
-        time: "10:00"
-      }]
+          console.log("this.events", this.events);
+          // this.events = [
+          //   {
+          //     patientName: "jare year",
+          //     date: "29-1-2024",
+          //     time: "10:00",
+          //   },
+          //   {
+          //     patientName: "30 y",
+          //     date: "30-1-2024",
+          //     time: "10:00",
+          //   },
+          // ];
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -1008,8 +1010,8 @@ export default {
       //   date: '30-1-2024',
       //   time: "10:00"
       // }]
-      console.log("api event", this.events)
-      // window.location.reload(); 
+      console.log("api event", this.events);
+      // window.location.reload();
     },
     formatDate(dateString) {
       const parts = dateString.split("-");
