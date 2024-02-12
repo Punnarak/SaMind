@@ -47,7 +47,7 @@
             v-if="role === 'admin'"
             class="mt-2"
             prepend-icon="mdi-book-open-variant"
-            title="Manage Library"
+            title="Library"
             to="/dashboard/managelibrary"
           ></v-list-item>
         </v-list>
@@ -60,7 +60,11 @@
           class="mt-2"
           prepend-icon="mdi-message-text"
           title="Support"
-          @click="console.log('Support')"
+          @click="
+            this.$router.push({
+              path: `/support`,
+            })
+          "
         ></v-list-item>
       </div>
     </template>
@@ -119,7 +123,7 @@
             v-if="role === 'admin'"
             class="mt-2"
             prepend-icon="mdi-book-open-variant"
-            title="Manage Library"
+            title="Library"
             to="/dashboard/managelibrary"
           ></v-list-item>
         </v-list>
@@ -132,7 +136,11 @@
           class="mt-2"
           prepend-icon="mdi-message-text"
           title="Support"
-          @click="console.log('Support')"
+          @click="
+            this.$router.push({
+              path: `/support`,
+            })
+          "
         ></v-list-item>
       </div>
     </template>

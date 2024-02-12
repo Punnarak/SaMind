@@ -123,17 +123,22 @@ export default function Library() {
   const [isModalVisible3, setModalVisible3] = useState(false);
   // X button
   const [isButtonVisible, setButtonVisible] = useState(false);
-  const toggleModal = (index) => {
-    if (index === 0) {
-      setModalVisible1(!isModalVisible1);
-      setButtonVisible(!isButtonVisible);
-    } else if (index === 1) {
-      setModalVisible2(!isModalVisible2);
-      setButtonVisible(!isButtonVisible);
-    } else if (index === 2) {
-      setModalVisible3(!isModalVisible3);
-      setButtonVisible(!isButtonVisible);
-    }
+  const [im, setIm] = useState();
+  const toggleModal = (index, item) => {
+    // if (index === 0) {
+    //   setModalVisible1(!isModalVisible1);
+    //   setButtonVisible(!isButtonVisible);
+    // } else if (index === 1) {
+    //   setModalVisible2(!isModalVisible2);
+    //   setButtonVisible(!isButtonVisible);
+    // } else if (index === 2) {
+    //   setModalVisible3(!isModalVisible3);
+    //   setButtonVisible(!isButtonVisible);
+    // }
+    setIm(item.url);
+    setModalVisible1(!isModalVisible1);
+    setButtonVisible(!isButtonVisible);
+    console.log(im);
   };
 
   const toggleModal1 = () => {
@@ -235,9 +240,7 @@ export default function Library() {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <Image
-            source={{
-              uri: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/05/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.png",
-            }}
+            source={{ uri: im }}
             style={{ width: 400, height: 400, resizeMode: "contain" }}
           />
           <Button
@@ -247,7 +250,7 @@ export default function Library() {
           />
         </View>
       </Modal>
-      <Modal isVisible={isModalVisible2} onBackdropPress={toggleModal2}>
+      {/* <Modal isVisible={isModalVisible2} onBackdropPress={toggleModal2}>
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
@@ -280,7 +283,7 @@ export default function Library() {
             isVisible={isButtonVisible}
           />
         </View>
-      </Modal>
+      </Modal> */}
       <Text style={styles.title}>เกร็ดน่ารู้</Text>
       <View style={styles.container2}>
         {/* <ScrollView horizontal="true" style={{}}>
@@ -328,7 +331,10 @@ export default function Library() {
             }}
           >
             {dataIm.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => toggleModal(index)}>
+              <TouchableOpacity
+                key={index}
+                onPress={() => toggleModal(index, item)}
+              >
                 <Image
                   source={{ uri: item.url }}
                   style={{ width: 188, height: 237, marginLeft: 10 }}

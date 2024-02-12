@@ -56,7 +56,7 @@ const First = () => {
       >
         <Text style={styles.text}>Get started</Text>
       </TouchableOpacity>
-      <Text style={styles.n}>
+      {/* <Text style={styles.n}>
         Don't Have Any Account?{"  "}
         <Text
           style={styles.hyper}
@@ -64,7 +64,7 @@ const First = () => {
         >
           Sign up
         </Text>
-      </Text>
+      </Text> */}
     </View>
   );
 };

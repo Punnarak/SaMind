@@ -23,7 +23,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @click="createPopup = true"
+          @click="clear(), (createPopup = true)"
         >
           <v-icon>mdi-file-document-outline</v-icon>Create Therapist</v-btn
         >
@@ -44,7 +44,7 @@
           color="blue"
           size="30px"
           style="margin-right: 20px"
-          @click="(editPopup = true), handleEditAccount(item.columns.name)"
+          @click="(editPopup = true), handleEditAccount(item.columns)"
         />
         <v-btn
           icon="mdi-delete"
@@ -366,7 +366,7 @@
                   </v-col>
                 </div>
                 <div class="password">
-                  <label class="text title">Password</label>
+                  <label class="text title">New Password</label>
                   <v-col style="margin-top: -10px; margin-left: -10px">
                     <v-text-field
                       class="custom-placeholder mt-2"
@@ -376,7 +376,6 @@
                       placeholder="Enter Therapist Password"
                       style="width: 680px; height: 45px; flex-shrink: 0"
                       v-model="password"
-                      :rules="passwordValidation"
                     >
                     </v-text-field>
                   </v-col>
@@ -622,9 +621,10 @@ export default {
       }
     },
     handleEditAccount(therapist) {
-      this.therapistId = "1";
-      this.firstName = therapist;
-      this.lastName = "1";
+      let name = therapist.name.split(" ");
+      this.therapistId = therapist.therapistId;
+      this.firstName = name[0];
+      this.lastName = name[1];
       this.email = "pun@gmail.com";
       this.password = "1";
       this.checkEmail = true;
@@ -643,8 +643,7 @@ export default {
         this.firstName === "" ||
         this.lastName === "" ||
         this.email === "" ||
-        this.checkEmail === false ||
-        this.password === ""
+        this.checkEmail === false
       ) {
       } else {
         console.log(
@@ -685,14 +684,12 @@ export default {
       //     console.error("Error:", error);
       //   });\
     },
-    handleEditPaitent(testName) {
-      console.log("testName in testlist page", testName);
-      this.$router.push({
-        name: "edittest",
-        query: {
-          testName: testName,
-        },
-      });
+    clear() {
+      this.therapistId = "";
+      this.firstName = "";
+      this.lastName = "";
+      this.email = "";
+      this.password = "";
     },
   },
 };
