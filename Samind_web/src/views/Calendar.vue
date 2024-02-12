@@ -459,11 +459,11 @@
                 :key="index"
                 style="text-align: left"
               >
-                <label v-if="index === 0" class="event-info-time"
+                <label v-if="index == 0" class="event-info-time"
                   >{{ event.time }}
                 </label>
                 <br />
-                <label v-if="index === 0" class="event-info-name">{{
+                <label v-if="index == 0" class="event-info-name">{{
                   event.patientName
                 }}</label>
               </div>
@@ -787,7 +787,7 @@ export default {
       console.log("Window width: " + windowWidth);
       console.log("Selected DAY");
       this.selectedViewType = "day";
-      const day =this.currentDate.getDate();
+      const day = this.currentDate.getDate();
       const month = this.currentDate.getMonth() + 1; // Months are zero-based
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
@@ -795,7 +795,7 @@ export default {
         therapist_id: 5555,
         date: `${day}-${month}-${year}`,
       };
-      console.log(param)
+      console.log(param);
       axios
         .post("/calendarDay", param, {
           headers: {
@@ -805,11 +805,11 @@ export default {
         })
         .then((response) => {
           console.log("response", response.data);
-           this.eventsDay = response.data
+          this.eventsDay = response.data;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.eventsDay = []
+          this.eventsDay = [];
         });
     },
     selectWeek() {
@@ -842,7 +842,7 @@ export default {
       nextDay.setDate(nextDay.getDate() + 1);
       this.selectedDate = nextDay;
       this.currentDate = nextDay;
-      const day =this.currentDate.getDate();
+      const day = this.currentDate.getDate();
       const month = this.currentDate.getMonth() + 1; // Months are zero-based
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
@@ -850,7 +850,7 @@ export default {
         therapist_id: 5555,
         date: `${day}-${month}-${year}`,
       };
-      console.log(param)
+      console.log(param);
       axios
         .post("/calendarDay", param, {
           headers: {
@@ -860,11 +860,11 @@ export default {
         })
         .then((response) => {
           console.log("response", response.data);
-           this.eventsDay = response.data
+          this.eventsDay = response.data;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.eventsDay = []
+          this.eventsDay = [];
         });
       this.updateCalendar();
     },
@@ -874,7 +874,7 @@ export default {
       prevDay.setDate(prevDay.getDate() - 1);
       this.selectedDate = prevDay;
       this.currentDate = prevDay;
-      const day =this.currentDate.getDate();
+      const day = this.currentDate.getDate();
       const month = this.currentDate.getMonth() + 1; // Months are zero-based
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
@@ -882,7 +882,7 @@ export default {
         therapist_id: 5555,
         date: `${day}-${month}-${year}`,
       };
-      console.log(param)
+      console.log(param);
       axios
         .post("/calendarDay", param, {
           headers: {
@@ -892,11 +892,11 @@ export default {
         })
         .then((response) => {
           console.log("response", response.data);
-           this.eventsDay = response.data
+          this.eventsDay = response.data;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.eventsDay = []
+          this.eventsDay = [];
         });
       this.updateCalendar();
     },
@@ -1045,7 +1045,6 @@ export default {
           },
         })
         .then((response) => {
-          // console.log("response", response.data);
           this.events = response.data;
           // .map((event, index) => ({
           //   // id: index + 1,
@@ -1071,15 +1070,6 @@ export default {
         .catch((error) => {
           console.error("Error:", error);
         });
-      // this.events = [{
-      //   patientName: "x y",
-      //   date: '29-1-2024',
-      //   time: "10:00"
-      // },{
-      //   patientName: "30 y",
-      //   date: '30-1-2024',
-      //   time: "10:00"
-      // }]
       console.log("api event", this.events);
       // window.location.reload();
     },
@@ -1116,19 +1106,18 @@ export default {
           year = tempYear;
         }
       }
+
+      day = day.toString().padStart(2, "0");
+      month = month.toString().padStart(2, "0");
       // ตรวจสอบว่ามีเหตุการณ์ในวันที่กำหนดหรือไม่
       console.log(
         this.events.some(
-          (event) => event.date === day + "-" + month + "-" + year
+          (event) => event.date == day + "-" + month + "-" + year
         ),
-        day +
-          "-" +
-          (this.currentDate.getMonth() + 1) +
-          "-" +
-          this.currentDate.getFullYear()
+        day + "-" + month + "-" + year
       );
       return this.events.some(
-        (event) => event.date === day + "-" + month + "-" + year
+        (event) => event.date == day + "-" + month + "-" + year
       );
     },
     getEvents(day, cell, currentDate) {
@@ -1158,6 +1147,8 @@ export default {
           year = tempYear;
         }
       }
+      day = day.toString().padStart(2, "0");
+      month = month.toString().padStart(2, "0");
       // ดึงข้อมูลเหตุการณ์ทั้งหมดในวันที่กำหนด
       return this.events.filter(
         (event) => event.date === day + "-" + month + "-" + year
@@ -1284,17 +1275,21 @@ export default {
           );
         }
       }
+
       this.selectedViewType = "day";
-      this.currentDate = currentDate;
-      const d =this.currentDate.getDate();
+      const d = day;
       const month = this.currentDate.getMonth() + 1; // Months are zero-based
       const year = this.currentDate.getFullYear();
-      console.log("currentDay", this.currentDate);
+      this.currentDate = new Date(d + "-" + month + "-" + year);
+      console.log(
+        d + "-" + month + "-" + year,
+        new Date(d + "-" + month + "-" + year)
+      );
       let param = {
         therapist_id: 5555,
         date: `${d}-${month}-${year}`,
       };
-      console.log("param",param)
+      console.log("param", param);
       axios
         .post("/calendarDay", param, {
           headers: {
@@ -1304,11 +1299,11 @@ export default {
         })
         .then((response) => {
           console.log("response", response.data);
-           this.eventsDay = response.data
+          this.eventsDay = response.data;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.eventsDay = []
+          this.eventsDay = [];
         });
       this.updateCalendar();
     },
@@ -1447,6 +1442,8 @@ export default {
     this.selectedDate = new Date();
     this.currentDate = new Date();
     this.currentYear = this.currentDate.getFullYear();
+
+    console.log("currentdate", this.currentDate);
     this.updateCalendar();
   },
 };
