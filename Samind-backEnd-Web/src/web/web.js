@@ -25,6 +25,16 @@ web.use(calendar_view);
 web.use(appointment);
 web.use(login);
 
+//admin api
+const ad_patient = require('./ad_patient.js');
+const ad_therapist = require('./ad_therapist.js');
+
+
+web.use(ad_patient);
+web.use(ad_therapist);
+
+
+
 web.listen(4301, function () {
   console.log('CORS-enabled web server listening on port 4301');
 });
