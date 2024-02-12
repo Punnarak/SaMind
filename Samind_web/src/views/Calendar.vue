@@ -1292,7 +1292,7 @@ export default {
         therapist_id: 5555,
         date: `${d}-${month}-${year}`,
       };
-      console.log(param)
+      console.log("param",param)
       axios
         .post("/calendarDay", param, {
           headers: {
