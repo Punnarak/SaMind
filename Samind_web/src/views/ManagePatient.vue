@@ -193,7 +193,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Firstname"
-                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        style="width: 246px; height: 45px; flex-shrink: 0"
                         v-model="firstName"
                         :rules="firstNameValidation"
                       >
@@ -215,14 +215,33 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Lastname"
-                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        style="width: 246px; height: 45px; flex-shrink: 0"
                         v-model="lastName"
                         :rules="lastNameValidation"
                       >
                       </v-text-field>
                     </v-col>
                   </div>
-
+                </div>
+                <div
+                  style="display: flex; flex-direction: row; margin-bottom: 8px"
+                >
+                  <div class="born">
+                    <label class="text title">Birth Date</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Birth Date"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="born"
+                        :rules="bornValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
                   <div class="Tel">
                     <label class="text title">Phone Number</label>
                     <v-col style="margin-top: -10px; margin-left: -10px">
@@ -237,6 +256,25 @@
                         :rules="phoneValidation"
                       >
                       </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="therapist">
+                    <label class="text title">
+                      <v-icon>mdi-stethoscope</v-icon> Therapist</label
+                    >
+                    <v-col style="margin-top: -20px">
+                      <v-select
+                        class="mt-4"
+                        variant="outlined"
+                        density="comfortable"
+                        rounded="lg"
+                        style="width: 235px; height: 45px; border-radius: 10px"
+                        v-model="selectTherapist"
+                        :items="options"
+                        placeholder="Select Therapist"
+                        :rules="therapistValidation"
+                      >
+                      </v-select>
                     </v-col>
                   </div>
                 </div>
@@ -256,7 +294,7 @@
                       rounded="lg"
                       variant="outlined"
                       placeholder="Enter Patient Email"
-                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      style="width: 670px; height: 45px; flex-shrink: 0"
                       v-model="email"
                       :rules="emailValidation"
                     >
@@ -273,7 +311,7 @@
                       variant="outlined"
                       placeholder="Enter Patient Password"
                       style="
-                        width: 790px;
+                        width: 670px;
                         height: 45px;
                         flex-shrink: 0;
                         margin-bottom: 8px;
@@ -282,24 +320,6 @@
                       :rules="passwordValidation"
                     >
                     </v-text-field>
-                  </v-col>
-                </div>
-                <div class="therapist">
-                  <label class="text title">
-                    <v-icon>mdi-stethoscope</v-icon> Therapist</label
-                  >
-                  <v-col style="margin-top: -30px; margin-left: -10px">
-                    <v-select
-                      class="mt-4"
-                      variant="outlined"
-                      rounded="lg"
-                      style="width: 235px; border-radius: 10px"
-                      v-model="selectTherapist"
-                      :items="options"
-                      placeholder="Select Therapist"
-                      :rules="therapistValidation"
-                    >
-                    </v-select>
                   </v-col>
                 </div>
 
@@ -331,7 +351,7 @@
                       font-weight: 500;
                       line-height: normal;
                       letter-spacing: 0.13px;
-                      margin-top: -40px;
+                      margin-top: 25px;
                     "
                     @click="handleCreateAccount()"
                   >
@@ -387,7 +407,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Firstname"
-                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        style="width: 246px; height: 45px; flex-shrink: 0"
                         v-model="firstName"
                         :rules="firstNameValidation"
                       >
@@ -409,9 +429,29 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Lastname"
-                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        style="width: 246px; height: 45px; flex-shrink: 0"
                         v-model="lastName"
                         :rules="lastNameValidation"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; flex-direction: row; margin-bottom: 8px"
+                >
+                  <div class="born">
+                    <label class="text title">Birth Date</label>
+                    <v-col style="margin-top: -10px; margin-left: -10px">
+                      <v-text-field
+                        class="custom-placeholder mt-2"
+                        density="comfortable"
+                        rounded="lg"
+                        variant="outlined"
+                        placeholder="Enter Patient Birth Date"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
+                        v-model="born"
+                        :rules="bornValidation"
                       >
                       </v-text-field>
                     </v-col>
@@ -432,6 +472,25 @@
                       </v-text-field>
                     </v-col>
                   </div>
+                  <div class="therapist">
+                    <label class="text title">
+                      <v-icon>mdi-stethoscope</v-icon> Therapist</label
+                    >
+                    <v-col style="margin-top: -20px">
+                      <v-select
+                        class="mt-4"
+                        variant="outlined"
+                        density="comfortable"
+                        rounded="lg"
+                        style="width: 235px; height: 45px; border-radius: 10px"
+                        v-model="selectTherapist"
+                        :items="options"
+                        placeholder="Select Therapist"
+                        :rules="therapistValidation"
+                      >
+                      </v-select>
+                    </v-col>
+                  </div>
                 </div>
                 <!-- <div style="display: flex; flex-direction: row"> -->
                 <div class="username">
@@ -449,7 +508,7 @@
                       rounded="lg"
                       variant="outlined"
                       placeholder="Enter Patient Email"
-                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      style="width: 670px; height: 45px; flex-shrink: 0"
                       v-model="email"
                       :rules="emailValidation"
                     >
@@ -465,30 +524,16 @@
                       rounded="lg"
                       variant="outlined"
                       placeholder="Enter Patient Password"
-                      style="width: 790px; height: 45px; flex-shrink: 0"
+                      style="
+                        width: 670px;
+                        height: 45px;
+                        flex-shrink: 0;
+                        margin-bottom: 8px;
+                      "
                       v-model="password"
                       :rules="passwordValidation"
                     >
                     </v-text-field>
-                  </v-col>
-                </div>
-
-                <div class="therapist">
-                  <label class="text title">
-                    <v-icon>mdi-stethoscope</v-icon> Therapist</label
-                  >
-                  <v-col style="margin-top: -30px; margin-left: -10px">
-                    <v-select
-                      class="mt-4"
-                      variant="outlined"
-                      rounded="lg"
-                      style="width: 235px; border-radius: 10px"
-                      v-model="selectTherapist"
-                      :items="options"
-                      placeholder="Select Therapist"
-                      :rules="therapistValidation"
-                    >
-                    </v-select>
                   </v-col>
                 </div>
                 <!-- </div> -->
@@ -515,7 +560,7 @@
                       font-weight: 500;
                       line-height: normal;
                       letter-spacing: 0.13px;
-                      margin-top: -120px;
+                      margin-top: -50px;
                     "
                     @click="handleUpdateAccount()"
                   >
@@ -687,6 +732,38 @@ export default {
           }
         },
       ],
+      born: "",
+      checkBirthDate: false,
+      bornValidation: [
+        (value) => {
+          const dateFormat =
+            /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
+          const enteredDateParts = value.split("/");
+          const enteredDay = parseInt(enteredDateParts[0]);
+          const enteredMonth = parseInt(enteredDateParts[1]) - 1; // Months are zero-indexed
+          const enteredYear = parseInt(enteredDateParts[2]);
+          const enteredDate = new Date(enteredYear, enteredMonth, enteredDay);
+          const currentDate = new Date();
+          currentDate.setHours(0, 0, 0, 0);
+
+          if (!value) {
+            this.checkBirthDate = false;
+            return "Please enter a birth date.";
+          } else {
+            if (!dateFormat.test(value)) {
+              this.checkBirthDate = false;
+              return "Please enter a valid date format (e.g., DD/MM/YYYY).";
+            }
+            if (enteredDate > currentDate) {
+              this.checkBirthDate = false;
+              return "Birth date cannot be in the future.";
+            }
+            this.checkBirthDate = true;
+            return true;
+          }
+        },
+      ],
+
       phone: "",
       phoneValidation: [
         (value) => {
@@ -744,7 +821,9 @@ export default {
         this.email === "" ||
         this.checkEmail === false ||
         this.password === "" ||
-        this.selectTherapist === ""
+        this.selectTherapist === "" ||
+        this.born === "" ||
+        this.checkBirthDate === false
       ) {
       } else {
         console.log(
@@ -754,7 +833,8 @@ export default {
           this.lastName,
           this.email,
           this.password,
-          this.selectTherapist
+          this.selectTherapist,
+          this.born
         );
         this.patientId = "";
         this.firstName = "";
@@ -763,8 +843,10 @@ export default {
         this.email = "";
         this.password = "";
         this.selectTherapist = "";
+        this.born = "";
         this.checkEmail = false;
         this.createPopup = false;
+        this.checkBirthDate = false;
       }
     },
     handleEditAccount(patient) {
@@ -777,6 +859,7 @@ export default {
       this.password = "1";
       this.checkEmail = true;
       this.selectTherapist = "Dr. Somsee";
+      this.born = "12/02/2001";
       console.log(
         "Edit Patient Account",
         this.patientId,
@@ -796,7 +879,9 @@ export default {
         this.phone === "" ||
         this.checkEmail === false ||
         this.password === "" ||
-        this.selectTherapist === ""
+        this.selectTherapist === "" ||
+        this.born === "" ||
+        this.checkBirthDate === false
       ) {
       } else {
         console.log(
@@ -814,6 +899,8 @@ export default {
         this.email = "";
         this.password = "";
         this.phone = "";
+        this.born = "";
+        this.checkBirthDate = false;
         this.checkEmail = false;
         this.editPopup = false;
       }
@@ -932,8 +1019,8 @@ export default {
   transition: all 0.3s ease;
 }
 .create {
-  width: 855px;
-  height: 500px;
+  width: 740px;
+  height: 540px;
 }
 
 .dropdown-list {
