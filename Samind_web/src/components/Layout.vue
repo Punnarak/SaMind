@@ -218,7 +218,7 @@ export default {
     };
   },
   created() {
-    this.role = "therapist";
+    this.role = "admin";
     const param = {
       therapist_id: 5555,
     };
