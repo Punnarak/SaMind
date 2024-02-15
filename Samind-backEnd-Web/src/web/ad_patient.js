@@ -9,26 +9,131 @@ const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by b
 
 router.use(bodyParser.json());
 
-// router.post('/adPatientView', (req, res) => {
-//     const patient_id = req.query.patient_id;
-//     let query = 'SELECT * FROM patient';
-  
-//     // Check if the id parameter is provided
-//     if (patient_id) {
-//       query += ' WHERE patient_id = $1';
-//     }
-  
-//     const queryParams = patient_id ? [patient_id] : [];
-  
-//     client.query(query, queryParams)
-//       .then(result => {
-//         res.json(result.rows);
-//       })
-//       .catch(err => {
-//         console.error('Error executing query:', err);
-//         res.status(500).json({ error: 'An error occurred' });
-//       });
-//   });
+// router.post('/adCreatePatient', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   let query = 'SELECT * FROM therapist';
+
+//   // Check if the id parameter is provided
+//   if (therapist_id) {
+//     query += ' WHERE therapist_id = $1';
+//   }
+
+//   const queryParams = therapist_id ? [therapist_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/adCreatePatient', async (req, res) => {
+  try {
+    const {
+      fname,
+      lname,
+      phone,
+      gender,
+      born,
+      email,
+      password,
+      therapistName
+    } = req.body;
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Calculate age from date of birth
+    const dob = new Date(born);
+    const ageDate = new Date(Date.now() - dob.getTime());
+    const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+
+    // Fetch therapist data
+    const therapistQuery = `
+      SELECT therapist_id, hospital_name 
+      FROM therapist 
+      WHERE fname = $1 AND lname = $2`;
+    const therapistResult = await client.query(therapistQuery, [
+      therapistName.split(' ')[0],
+      therapistName.split(' ')[1]
+    ]);
+
+    const therapistData = therapistResult.rows[0];
+    if (!therapistData) {
+      return res.status(404).json({ error: 'Therapist not found' });
+    }
+
+    // Convert gender to boolean
+    const isMale = gender.toLowerCase() === 'male';
+
+    // Insert patient data
+    const insertPatientQuery = `
+      INSERT INTO public.patient (
+        patient_id,
+        email,
+        fname,
+        lname,
+        age,
+        gender,
+        phone,
+        level,
+        hospital_name,
+        therapist_id,
+        start_date,
+        born
+      ) VALUES (
+        NEXTVAL('patient_id_seq'),
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10
+      ) RETURNING patient_id`;
+
+    const insertPatientParams = [
+      email,
+      fname,
+      lname,
+      age,
+      isMale,
+      phone,
+      'level', // Adjust this accordingly
+      therapistData.hospital_name,
+      therapistData.therapist_id,
+      dob
+    ];
+
+    const insertedPatient = await client.query(insertPatientQuery, insertPatientParams);
+    const patientId = insertedPatient.rows[0].patient_id;
+
+    // Insert user data
+    const insertUserQuery = `
+      INSERT INTO public.users (
+        users_id,
+        email,
+        password,
+        patient_id,
+        verify_user
+      ) VALUES (
+        NEXTVAL('users_id_seq'),
+        $1, $2, $3, 'N'
+      )`;
+
+    const insertUserParams = [
+      email,
+      hashedPassword,
+      patientId
+    ];
+
+    await client.query(insertUserQuery, insertUserParams);
+
+    res.status(201).json({ patient_id: patientId });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
 
 // router.post('/adPatientView', (req, res) => {
 //     const hospitalName = req.body.hospitalName;
@@ -666,7 +771,7 @@ router.post('/adPatientView', (req, res) => {
 //   }
 // });
 
-router.post('/personalData', async (req, res) => {
+router.post('/adPersonalData', async (req, res) => {
     const { patientID } = req.body;
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -1097,7 +1202,7 @@ function formatDate(timestamp) {
 //         });
 // });
 
-router.post('/editPersonalData', async (req, res) => {
+router.post('/adEditPersonalData', async (req, res) => {
     const { patientID, fname, lname, phone, email, password, therapistName } = req.body;
 
     // Extract numeric part of patientID
@@ -1162,6 +1267,77 @@ router.post('/editPersonalData', async (req, res) => {
 });
 
 // router.post('/viewPersonalData', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+//   const formattedPatientID = `PID${numericPatientID}`;
+
+//   let query = `
+//       SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
+//              t.fname AS therapist_fname, t.lname AS therapist_lname
+//       FROM public.patient p
+//       INNER JOIN public.therapist t ON p.hospital_name = t.hospital_name
+//       WHERE p.patient_id = $1
+//   `;
+
+//   const queryParams = [numericPatientID];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const therapists = result.rows.map(row => `${row.therapist_fname} ${row.therapist_lname}`);
+
+//       const formattedResult = {
+//         patientID: formattedPatientID,
+//         fname: result.rows[0].patient_fname,
+//         lname: result.rows[0].patient_lname,
+//         phone: result.rows[0].patient_phone,
+//         email: result.rows[0].patient_email,
+//         therapistAll: therapists
+//       };
+//       res.json(formattedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/adViewPersonalData', (req, res) => {
+  const { patientID } = req.body;
+  const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+  const formattedPatientID = `PID${numericPatientID}`;
+
+  let query = `
+      SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
+             t.fname AS therapist_fname, t.lname AS therapist_lname
+      FROM public.patient p
+      INNER JOIN public.therapist t ON p.hospital_name = t.hospital_name
+      WHERE p.patient_id = $1
+        AND t.admin = 'N' -- Add condition to filter therapists with admin value 'N'
+  `;
+
+  const queryParams = [numericPatientID];
+
+  client.query(query, queryParams)
+    .then(result => {
+      const therapists = result.rows.map(row => `${row.therapist_fname} ${row.therapist_lname}`);
+
+      const formattedResult = {
+        patientID: formattedPatientID,
+        fname: result.rows[0].patient_fname,
+        lname: result.rows[0].patient_lname,
+        phone: result.rows[0].patient_phone,
+        email: result.rows[0].patient_email,
+        therapistAll: therapists
+      };
+      res.json(formattedResult);
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+// router.post('/deletePatient', (req, res) => {
 //     const { patientID } = req.body;
 //     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -1184,81 +1360,55 @@ router.post('/editPersonalData', async (req, res) => {
 //       });
 //   });
 
-// router.post('/viewPersonalData', (req, res) => {
-//     const { patientID } = req.body;
-//     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
-//     const formattedPatientID = `PID${numericPatientID}`;
+router.post('/adDeletePatient', (req, res) => {
+  const { patientID } = req.body;
+  const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
-//     let query = `
-//         SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
-//                t.fname AS therapist_fname, t.lname AS therapist_lname
-//         FROM public.patient p
-//         INNER JOIN public.therapist t ON p.therapist_id = t.therapist_id
-//         WHERE p.patient_id = $1
-//     `;
-  
-//     const queryParams = [numericPatientID];
-  
-//     client.query(query, queryParams)
-//       .then(result => {
-//         const therapists = result.rows
-//           .filter(row => row.admin === 'N') // Filter therapists based on admin column
-//           .map(row => `${row.therapist_fname} ${row.therapist_lname}`);
+  // Start a transaction
+  client.query('BEGIN', (err) => {
+    if (err) {
+      console.error('Error starting transaction:', err);
+      return res.status(500).json({ error: 'An error occurred' });
+    }
 
-//         const formattedResult = {
-//           patientID: formattedPatientID,
-//           fname: result.rows[0].patient_fname,
-//           lname: result.rows[0].patient_lname,
-//           phone: result.rows[0].patient_phone,
-//           email: result.rows[0].patient_email,
-//           therapistAll: therapists
-//         };
-//         res.json(formattedResult);
-//       })
-//       .catch(err => {
-//         console.error('Error executing query:', err);
-//         res.status(500).json({ error: 'An error occurred' });
-//       });
-// });
+    // Define queries to delete data from both tables
+    const deleteUserQuery = 'DELETE FROM public.users WHERE patient_id = $1';
+    const deletePatientQuery = 'DELETE FROM public.patient WHERE patient_id = $1';
 
-router.post('/viewPersonalData', (req, res) => {
-    const { patientID } = req.body;
-    const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
-    const formattedPatientID = `PID${numericPatientID}`;
-
-    let query = `
-        SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
-               t.fname AS therapist_fname, t.lname AS therapist_lname
-        FROM public.patient p
-        INNER JOIN public.therapist t ON p.therapist_id = t.therapist_id
-        WHERE p.patient_id = $1
-    `;
-  
-    const queryParams = [numericPatientID];
-  
-    client.query(query, queryParams)
-      .then(result => {
-        const therapists = result.rows.map(row => `${row.therapist_fname} ${row.therapist_lname}`);
-
-        const formattedResult = {
-          patientID: formattedPatientID,
-          fname: result.rows[0].patient_fname,
-          lname: result.rows[0].patient_lname,
-          phone: result.rows[0].patient_phone,
-          email: result.rows[0].patient_email,
-          therapistAll: therapists
-        };
-        res.json(formattedResult);
-      })
-      .catch(err => {
-        console.error('Error executing query:', err);
-        res.status(500).json({ error: 'An error occurred' });
-      });
+    // Execute both delete queries with the same parameter
+    client.query(deleteUserQuery, [numericPatientID], (err, result) => {
+      if (err) {
+        // Rollback transaction and handle error
+        console.error('Error deleting user:', err);
+        client.query('ROLLBACK', () => {
+          res.status(500).json({ error: 'An error occurred' });
+        });
+      } else {
+        // Execute delete query for patient
+        client.query(deletePatientQuery, [numericPatientID], (err, result) => {
+          if (err) {
+            // Rollback transaction and handle error
+            console.error('Error deleting patient:', err);
+            client.query('ROLLBACK', () => {
+              res.status(500).json({ error: 'An error occurred' });
+            });
+          } else {
+            // Commit transaction if both delete operations succeed
+            client.query('COMMIT', (err) => {
+              if (err) {
+                console.error('Error committing transaction:', err);
+                res.status(500).json({ error: 'An error occurred' });
+              } else {
+                // Send success response
+                res.json({ message: 'User and patient deleted successfully' });
+              }
+            });
+          }
+        });
+      }
+    });
+  });
 });
-
-
-
-
 
 
 
