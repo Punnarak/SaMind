@@ -1242,54 +1242,51 @@ export default {
       this.updateCalendar();
     },
     viewClicked(day, currentDate, cell) {
+      let month = currentDate.getMonth(); // Months are zero-based
+      let year = currentDate.getFullYear();
+
       if (cell.class === "day") {
         console.log(
-          `View clicked: Day ${day}, Month ${
-            currentDate.getMonth() + 1
-          }, Year ${currentDate.getFullYear()}`
+          `View clicked: Day ${day}, Month ${month + 1}, Year ${year}`
         );
       } else if (cell.class === "prev-month-day") {
-        if (currentDate.getMonth() < 0) {
-          console.log(
-            `View clicked: Day ${day}, Month ${currentDate.getMonth(0)}, Year ${
-              currentDate.getFullYear() - 1
-            }`
-          );
+        if (month === 0) {
+          month = 11; // December of previous year
+          year--;
         } else {
-          console.log(
-            `View clicked: Day ${day}, Month ${currentDate.getMonth()}, Year ${currentDate.getFullYear()}`
-          );
+          month--;
         }
+        console.log(
+          `View clicked: Day ${day}, Month ${month + 1}, Year ${year}`
+        );
       } else if (cell.class === "next-month-day") {
-        if (currentDate.getMonth() > 11) {
-          console.log(
-            `View clicked: Day ${day}, Month ${currentDate.getMonth(0)}, Year ${
-              currentDate.getFullYear() + 1
-            }`
-          );
+        if (month === 11) {
+          month = 0; // January of next year
+          year++;
         } else {
-          console.log(
-            `View clicked: Day ${day}, Month ${
-              currentDate.getMonth() + 1
-            }, Year ${currentDate.getFullYear()}`
-          );
+          month++;
         }
+        console.log(
+          `View clicked: Day ${day}, Month ${month + 1}, Year ${year}`
+        );
       }
 
       this.selectedViewType = "day";
-      const d = day;
-      const month = this.currentDate.getMonth() + 1; // Months are zero-based
-      const year = this.currentDate.getFullYear();
-      this.currentDate = new Date(d + "-" + month + "-" + year);
+      this.currentDate = new Date(year, month, day);
+
       console.log(
-        d + "-" + month + "-" + year,
-        new Date(d + "-" + month + "-" + year)
+        "currentDate",
+        day + "-" + (month + 1) + "-" + year,
+        new Date(year, month, day)
       );
+
       let param = {
         therapist_id: 5555,
-        date: `${d}-${month}-${year}`,
+        date: `${year}-${month + 1}-${day}`,
       };
+
       console.log("param", param);
+
       axios
         .post("/calendarDay", param, {
           headers: {
@@ -1305,8 +1302,10 @@ export default {
           console.error("Error:", error);
           this.eventsDay = [];
         });
+
       this.updateCalendar();
     },
+
     bookClicked(day, currentDate, cell) {
       if (cell.class === "day") {
         this.$router.push({

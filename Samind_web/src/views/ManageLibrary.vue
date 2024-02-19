@@ -1453,7 +1453,6 @@ const tipHeader = [
     key: "no",
   },
   { title: "Title", key: "title", sortable: false },
-  { title: "URL", key: "url", display: false },
   { title: "Image", key: "imageUrl", align: "center", sortable: false },
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
