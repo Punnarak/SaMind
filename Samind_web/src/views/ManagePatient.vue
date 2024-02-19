@@ -48,7 +48,7 @@
               ? "negative"
               : item.columns.mood === "neutral"
               ? "neutral"
-              : "positive"
+              : item.columns.mood === "positive" ? 'positive' : '-'
           }}
         </v-chip>
       </template>
@@ -109,14 +109,14 @@
                     <button
                       class="modal-default-button"
                       style="color: red"
-                      @click="Delete(item, selectTest), (deletePopup = false)"
+                      @click="Delete(item, selectPatient), (deletePopup = false)"
                     >
                       Delete
                     </button>
                     <button
                       class="modal-default-button mr-5"
                       style="color: #00bf63"
-                      @click="Delete(item, selectTest), (deletePopup = false)"
+                      @click=" (deletePopup = false)"
                     >
                       Cancel
                     </button>
@@ -168,20 +168,21 @@
             <div class="modal-body" align="start" style="left: 100px">
               <slot name="body">
                 <div style="display: flex; flex-direction: row">
-                  <div class="TherapistId">
-                    <label class="text title">Patient ID</label>
-                    <v-col style="margin-top: -10px; margin-left: -10px">
-                      <v-text-field
-                        class="custom-placeholder mt-2"
+                  <div class="Gender">
+                    <label class="text title">Gender</label>
+                    <v-col style="margin-top: -18px; margin-left: -10px">
+                      <v-select
+                        class="mt-4"
+                        variant="outlined"
                         density="comfortable"
                         rounded="lg"
-                        variant="outlined"
-                        placeholder="Enter Patient ID"
-                        style="width: 150px; height: 45px; flex-shrink: 0"
-                        v-model="patientId"
-                        :rules="patientIdValidation"
+                        style="width: 150px; height: 45px; border-radius: 10px"
+                        v-model="gender"
+                        :items="['Female', 'Male']"
+                        placeholder="Select Gender"
+                        :rules="genderValidation"
                       >
-                      </v-text-field>
+                      </v-select>
                     </v-col>
                   </div>
                   <div class="FirstName">
@@ -193,7 +194,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Firstname"
-                        style="width: 246px; height: 45px; flex-shrink: 0"
+                        style="width: 250px; height: 45px; flex-shrink: 0"
                         v-model="firstName"
                         :rules="firstNameValidation"
                       >
@@ -215,7 +216,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Lastname"
-                        style="width: 246px; height: 45px; flex-shrink: 0"
+                        style="width: 245px; height: 45px; flex-shrink: 0"
                         v-model="lastName"
                         :rules="lastNameValidation"
                       >
@@ -390,12 +391,30 @@
                         density="comfortable"
                         rounded="lg"
                         variant="outlined"
+                        disabled="true"
                         placeholder="Enter Patient ID"
-                        style="width: 150px; height: 45px; flex-shrink: 0"
+                        style="width: 100px; height: 45px; flex-shrink: 0"
                         v-model="patientId"
                         :rules="patientIdValidation"
                       >
                       </v-text-field>
+                    </v-col>
+                  </div>
+                  <div class="Gender">
+                    <label class="text title">Gender</label>
+                    <v-col style="margin-top: -18px; margin-left: -10px">
+                      <v-select
+                        class="mt-4"
+                        variant="outlined"
+                        density="comfortable"
+                        rounded="lg"
+                        style="width: 130px; height: 45px; border-radius: 10px"
+                        v-model="gender"
+                        :items="['Female', 'Male']"
+                        placeholder="Select Gender"
+                        :rules="genderValidation"
+                      >
+                      </v-select>
                     </v-col>
                   </div>
                   <div class="FirstName">
@@ -407,7 +426,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Firstname"
-                        style="width: 246px; height: 45px; flex-shrink: 0"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
                         v-model="firstName"
                         :rules="firstNameValidation"
                       >
@@ -429,7 +448,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Patient Lastname"
-                        style="width: 246px; height: 45px; flex-shrink: 0"
+                        style="width: 200px; height: 45px; flex-shrink: 0"
                         v-model="lastName"
                         :rules="lastNameValidation"
                       >
@@ -630,10 +649,10 @@ let patients = ref(
 );
 onMounted(async () => {
   const param = {
-    therapist_id: 5555,
+    hospitalName:"Siriraj Hospital"
   };
   await axios
-    .post("/patientList", param, {
+    .post("/adPatientView", param, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -642,12 +661,14 @@ onMounted(async () => {
     .then((response) => {
       console.log("response", response.data);
       patients.value = response.data.map((patient, index) => ({
-        no: patient.no,
-        patientId: patient.patientId,
-        name: patient.name,
+        no: patient.No,
+        patientId: patient.patientID,
+        name: patient.patientName,
         age: patient.age,
         mood: patient.mood,
-        // action: patient.action, // Add this line if "action" property is present
+        therapist: patient.therapistName,
+        gender: patient.gender,
+        email: patient.email
       }));
     })
     .catch((error) => {
@@ -685,7 +706,8 @@ const headers = [
 function getColor(mood) {
   if (mood === "negative") return "red";
   else if (mood === "neutral") return "orange";
-  else return "green";
+  else if(mood === 'positive') return "green";
+  else return "lightgray"
 }
 </script>
 <script>
@@ -707,6 +729,16 @@ export default {
         (value) => {
           if (!value) {
             return "please enter Patient ID";
+          } else {
+            return true;
+          }
+        },
+      ],
+      gender: "",
+      genderValidation: [
+        (value) => {
+          if (!value) {
+            return "please select Gender";
           } else {
             return true;
           }
@@ -814,7 +846,7 @@ export default {
   methods: {
     handleCreateAccount() {
       if (
-        this.patientId === "" ||
+        this.gender === "" ||
         this.firstName === "" ||
         this.lastName === "" ||
         this.phone === "" ||
@@ -828,7 +860,6 @@ export default {
       } else {
         console.log(
           "Create Patient Account",
-          this.patientId,
           this.firstName,
           this.lastName,
           this.email,
@@ -836,6 +867,31 @@ export default {
           this.selectTherapist,
           this.born
         );
+        let param = {
+          fname: this.firstName,
+          lname: this.lastName,
+          phone: this.phone,
+          gender: this.gender,
+          born: this.born,
+          email: this.email,
+          password: this.password,
+          therapistName: this.selectTherapist
+        }
+console.log('param',param)
+axios
+    .post("/adCreatePatient", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+        this.gender = ''
         this.patientId = "";
         this.firstName = "";
         this.lastName = "";
@@ -850,16 +906,33 @@ export default {
       }
     },
     handleEditAccount(patient) {
-      let name = patient.name.split(" ");
-      this.patientId = patient.patientId;
-      this.firstName = name[0];
-      this.lastName = name[1];
-      this.phone = "0890222255";
-      this.email = "pun@gmail.com";
-      this.password = "1";
+      let param = {
+        patientID:patient.patientId
+      }
+    //   axios
+    // .post("/adViewPersonalData", param, {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/json",
+    //   },
+    // })
+    // .then((response) => {
+    //   console.log("patientInfo For Edit", response.data);
+      this.patientId = patient.patientID;
+      this.firstName = patient.fname;
+      this.lastName = patient.lname;
+      this.phone = patient.phone;
+      this.email = patient.email;
+      this.password = "";
       this.checkEmail = true;
       this.selectTherapist = "Dr. Somsee";
       this.born = "12/02/2001";
+    // })
+    // .catch((error) => {
+    //   console.error("Error:", error);
+    // });
+    
+     
       console.log(
         "Edit Patient Account",
         this.patientId,
@@ -878,7 +951,6 @@ export default {
         this.email === "" ||
         this.phone === "" ||
         this.checkEmail === false ||
-        this.password === "" ||
         this.selectTherapist === "" ||
         this.born === "" ||
         this.checkBirthDate === false
@@ -905,28 +977,29 @@ export default {
         this.editPopup = false;
       }
     },
-    Delete(question, selectTest) {
-      console.log("selectTest", selectTest);
-      const type = { type: question.columns.testName };
-      const typeJSON = JSON.stringify(type, null, 2);
-      console.log("test", typeJSON);
-
-      // axios
-      //   .delete("/questionsDel", {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     data: typeJSON, // Send the data directly in the request body
-      //   })
-      //   .then((response) => {
-      //     console.log("delete questions:", response);
-      //     window.location.reload();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });\
+    Delete(patient, selectPatient) {
+      console.log(patient)
+      let param = {
+	patientID: selectPatient.columns.patientId
+}
+console.log(param)
+      axios
+    .post("/adDeletePatient", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Delete success", patient,response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
     },
     clear() {
+      this.gender = '';
+      this.born = '';
       this.patientId = "";
       this.firstName = "";
       this.lastName = "";
