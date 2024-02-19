@@ -9,6 +9,29 @@ const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by b
 
 router.use(bodyParser.json());
 
+// router.post('/adCarouselEdit', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   let query = 'SELECT * FROM therapist';
+
+//   // Check if the id parameter is provided
+//   if (therapist_id) {
+//     query += ' WHERE therapist_id = $1';
+//   }
+
+//   const queryParams = therapist_id ? [therapist_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 // router.post('/adCreatePatient', (req, res) => {
 //   const { patientID } = req.body;
 //   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -32,6 +55,150 @@ router.use(bodyParser.json());
 //     });
 // });
 
+// router.post('/adtherapistAll', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   let query = 'SELECT * FROM therapist';
+
+//   // Check if the id parameter is provided
+//   if (therapist_id) {
+//     query += ' WHERE therapist_id = $1';
+//   }
+
+//   const queryParams = therapist_id ? [therapist_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/adTherapistAll', (req, res) => {
+  const { hospitalName } = req.body;
+
+  let query = 'SELECT fname, lname FROM therapist WHERE admin = $1 AND hospital_name = $2';
+  const queryParams = ['N', hospitalName];
+
+  client.query(query, queryParams)
+    .then(result => {
+      const therapistAll = result.rows.map(row => `${row.fname} ${row.lname}`);
+      res.json({ therapistAll });
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+
+// router.post('/adCreatePatient', async (req, res) => {
+//   try {
+//     const {
+//       fname,
+//       lname,
+//       phone,
+//       gender,
+//       born,
+//       email,
+//       password,
+//       therapistName
+//     } = req.body;
+
+//     // Hash password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Calculate age from date of birth
+//     const dob = new Date(born);
+//     const ageDate = new Date(Date.now() - dob.getTime());
+//     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+
+//     // Fetch therapist data
+//     const therapistQuery = `
+//       SELECT therapist_id, hospital_name 
+//       FROM therapist 
+//       WHERE fname = $1 AND lname = $2`;
+//     const therapistResult = await client.query(therapistQuery, [
+//       therapistName.split(' ')[0],
+//       therapistName.split(' ')[1]
+//     ]);
+
+//     const therapistData = therapistResult.rows[0];
+//     if (!therapistData) {
+//       return res.status(404).json({ error: 'Therapist not found' });
+//     }
+
+//     // Convert gender to boolean
+//     const isMale = gender.toLowerCase() === 'male';
+
+//     // Insert patient data
+//     const insertPatientQuery = `
+//       INSERT INTO public.patient (
+//         patient_id,
+//         email,
+//         fname,
+//         lname,
+//         age,
+//         gender,
+//         phone,
+//         level,
+//         hospital_name,
+//         therapist_id,
+//         start_date,
+//         born
+//       ) VALUES (
+//         NEXTVAL('patient_id_seq'),
+//         $1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10
+//       ) RETURNING patient_id`;
+
+//     const insertPatientParams = [
+//       email,
+//       fname,
+//       lname,
+//       age,
+//       isMale,
+//       phone,
+//       'level', // Adjust this accordingly
+//       therapistData.hospital_name,
+//       therapistData.therapist_id,
+//       dob
+//     ];
+
+//     const insertedPatient = await client.query(insertPatientQuery, insertPatientParams);
+//     const patientId = insertedPatient.rows[0].patient_id;
+
+//     // Insert user data
+//     const insertUserQuery = `
+//       INSERT INTO public.users (
+//         users_id,
+//         email,
+//         password,
+//         patient_id,
+//         verify_user
+//       ) VALUES (
+//         NEXTVAL('users_id_seq'),
+//         $1, $2, $3, 'N'
+//       )`;
+
+//     const insertUserParams = [
+//       email,
+//       hashedPassword,
+//       patientId
+//     ];
+
+//     await client.query(insertUserQuery, insertUserParams);
+
+//     res.status(201).json({ patient_id: patientId });
+//   } catch (error) {
+//     console.error('Error executing query:', error);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+
 router.post('/adCreatePatient', async (req, res) => {
   try {
     const {
@@ -48,8 +215,12 @@ router.post('/adCreatePatient', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Convert frontend date format to database date format
+    const [month, day, year] = born.split('/');
+    const formattedBorn = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
     // Calculate age from date of birth
-    const dob = new Date(born);
+    const dob = new Date(formattedBorn);
     const ageDate = new Date(Date.now() - dob.getTime());
     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
 
@@ -101,7 +272,7 @@ router.post('/adCreatePatient', async (req, res) => {
       'level', // Adjust this accordingly
       therapistData.hospital_name,
       therapistData.therapist_id,
-      dob
+      formattedBorn // Use formattedBorn here
     ];
 
     const insertedPatient = await client.query(insertPatientQuery, insertPatientParams);
@@ -134,6 +305,7 @@ router.post('/adCreatePatient', async (req, res) => {
     res.status(500).json({ error: 'An error occurred' });
   }
 });
+
 
 // router.post('/adPatientView', (req, res) => {
 //     const hospitalName = req.body.hospitalName;
@@ -440,88 +612,174 @@ router.post('/adCreatePatient', async (req, res) => {
 //         });
 // });
 
+// router.post('/adPatientView', (req, res) => {
+//     const hospitalName = req.body.hospitalName;
+
+//     // Query to get patient details along with therapist's name
+//     let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, t.fname AS therapist_fname, t.lname AS therapist_lname
+//                  FROM public.patient p
+//                  LEFT JOIN public.therapist t ON p.therapist_id = t.therapist_id
+//                  WHERE p.hospital_name = $1`;
+
+//     const queryParams = [hospitalName];
+
+//     client.query(query, queryParams)
+//         .then(patientResult => {
+//             if (patientResult.rows.length === 0) {
+//                 res.status(404).json({ error: 'No patients found for the given hospital' });
+//                 return;
+//             }
+
+//             const output = [];
+//             let counter = 1;
+
+//             // Loop through each patient to fetch mood data and construct the output object
+//             patientResult.rows.forEach(patient => {
+//                 const patientID = patient.patient_id;
+//                 const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
+//                                           COALESCE(negative, '0%') AS negative,
+//                                           COALESCE(neutral, '0%') AS neutral
+//                                    FROM public.avatar_mood_detection
+//                                    WHERE patient_id = $1`;
+
+//                 client.query(moodQuery, [patientID])
+//                     .then(moodResult => {
+//                         let mood = '-'; // Default mood to '-' if no mood data is available
+
+//                         if (moodResult.rows.length > 0) {
+//                             // Determine the most detected mood
+//                             const moodData = moodResult.rows[0];
+//                             let maxPercentage = 0;
+
+//                             for (const [key, value] of Object.entries(moodData)) {
+//                                 const percentage = parseInt(value);
+//                                 if (percentage > maxPercentage) {
+//                                     maxPercentage = percentage;
+//                                     mood = key;
+//                                 }
+//                             }
+//                         }
+
+//                         // Format the counter to ensure it always has two digits
+//                         const paddedCounter = counter.toString().padStart(2, '0');
+
+//                         // Construct the output object for the current patient
+//                         const patientOutput = {
+//                             "No": paddedCounter,
+//                             "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
+//                             "patientID": `PID${patientID}`,
+//                             "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
+//                             "age": patient.age,
+//                             "mood": mood
+//                         };
+
+//                         // Push the output object to the array
+//                         output.push(patientOutput);
+
+//                         counter++; // Increment the counter for the next patient
+
+//                         // If all patients are processed, send the response
+//                         if (output.length === patientResult.rows.length) {
+//                             res.json(output);
+//                         }
+//                     })
+//                     .catch(moodErr => {
+//                         console.error('Error fetching mood data:', moodErr);
+//                         res.status(500).json({ error: 'An error occurred while fetching mood data' });
+//                     });
+//             });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred while fetching patient data' });
+//         });
+// });
+
 router.post('/adPatientView', (req, res) => {
-    const hospitalName = req.body.hospitalName;
+  const hospitalName = req.body.hospitalName;
 
-    // Query to get patient details along with therapist's name
-    let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, t.fname AS therapist_fname, t.lname AS therapist_lname
-                 FROM public.patient p
-                 LEFT JOIN public.therapist t ON p.therapist_id = t.therapist_id
-                 WHERE p.hospital_name = $1`;
+  // Query to get patient details along with therapist's name, gender, and email
+  let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, p.gender, p.email, t.fname AS therapist_fname, t.lname AS therapist_lname
+               FROM public.patient p
+               LEFT JOIN public.therapist t ON p.therapist_id = t.therapist_id
+               WHERE p.hospital_name = $1`;
 
-    const queryParams = [hospitalName];
+  const queryParams = [hospitalName];
 
-    client.query(query, queryParams)
-        .then(patientResult => {
-            if (patientResult.rows.length === 0) {
-                res.status(404).json({ error: 'No patients found for the given hospital' });
-                return;
-            }
+  client.query(query, queryParams)
+      .then(patientResult => {
+          if (patientResult.rows.length === 0) {
+              res.status(404).json({ error: 'No patients found for the given hospital' });
+              return;
+          }
 
-            const output = [];
-            let counter = 1;
+          const output = [];
+          let counter = 1;
 
-            // Loop through each patient to fetch mood data and construct the output object
-            patientResult.rows.forEach(patient => {
-                const patientID = patient.patient_id;
-                const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
-                                          COALESCE(negative, '0%') AS negative,
-                                          COALESCE(neutral, '0%') AS neutral
-                                   FROM public.avatar_mood_detection
-                                   WHERE patient_id = $1`;
+          // Loop through each patient to fetch mood data and construct the output object
+          patientResult.rows.forEach(patient => {
+              const patientID = patient.patient_id;
+              const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
+                                        COALESCE(negative, '0%') AS negative,
+                                        COALESCE(neutral, '0%') AS neutral
+                                 FROM public.avatar_mood_detection
+                                 WHERE patient_id = $1`;
 
-                client.query(moodQuery, [patientID])
-                    .then(moodResult => {
-                        let mood = '-'; // Default mood to '-' if no mood data is available
+              client.query(moodQuery, [patientID])
+                  .then(moodResult => {
+                      let mood = '-'; // Default mood to '-' if no mood data is available
 
-                        if (moodResult.rows.length > 0) {
-                            // Determine the most detected mood
-                            const moodData = moodResult.rows[0];
-                            let maxPercentage = 0;
+                      if (moodResult.rows.length > 0) {
+                          // Determine the most detected mood
+                          const moodData = moodResult.rows[0];
+                          let maxPercentage = 0;
 
-                            for (const [key, value] of Object.entries(moodData)) {
-                                const percentage = parseInt(value);
-                                if (percentage > maxPercentage) {
-                                    maxPercentage = percentage;
-                                    mood = key;
-                                }
-                            }
-                        }
+                          for (const [key, value] of Object.entries(moodData)) {
+                              const percentage = parseInt(value);
+                              if (percentage > maxPercentage) {
+                                  maxPercentage = percentage;
+                                  mood = key;
+                              }
+                          }
+                      }
 
-                        // Format the counter to ensure it always has two digits
-                        const paddedCounter = counter.toString().padStart(2, '0');
+                      // Format the counter to ensure it always has two digits
+                      const paddedCounter = counter.toString().padStart(2, '0');
 
-                        // Construct the output object for the current patient
-                        const patientOutput = {
-                            "No": paddedCounter,
-                            "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
-                            "patientID": `PID${patientID}`,
-                            "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
-                            "age": patient.age,
-                            "mood": mood
-                        };
+                      // Construct the output object for the current patient
+                      const patientOutput = {
+                          "No": paddedCounter,
+                          "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
+                          "patientID": `PID${patientID}`,
+                          "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
+                          "gender": patient.gender ? "male" : "female",
+                          "age": patient.age,
+                          "email": patient.email,
+                          "mood": mood
+                      };
 
-                        // Push the output object to the array
-                        output.push(patientOutput);
+                      // Push the output object to the array
+                      output.push(patientOutput);
 
-                        counter++; // Increment the counter for the next patient
+                      counter++; // Increment the counter for the next patient
 
-                        // If all patients are processed, send the response
-                        if (output.length === patientResult.rows.length) {
-                            res.json(output);
-                        }
-                    })
-                    .catch(moodErr => {
-                        console.error('Error fetching mood data:', moodErr);
-                        res.status(500).json({ error: 'An error occurred while fetching mood data' });
-                    });
-            });
-        })
-        .catch(err => {
-            console.error('Error executing query:', err);
-            res.status(500).json({ error: 'An error occurred while fetching patient data' });
-        });
+                      // If all patients are processed, send the response
+                      if (output.length === patientResult.rows.length) {
+                          res.json(output);
+                      }
+                  })
+                  .catch(moodErr => {
+                      console.error('Error fetching mood data:', moodErr);
+                      res.status(500).json({ error: 'An error occurred while fetching mood data' });
+                  });
+          });
+      })
+      .catch(err => {
+          console.error('Error executing query:', err);
+          res.status(500).json({ error: 'An error occurred while fetching patient data' });
+      });
 });
+
 
 //first api for merge
 // router.post('/personalData', (req, res) => {
@@ -1202,69 +1460,147 @@ function formatDate(timestamp) {
 //         });
 // });
 
+// router.post('/adEditPersonalData', async (req, res) => {
+//     const { patientID, fname, lname, phone, email, password, therapistName } = req.body;
+
+//     // Extract numeric part of patientID
+//     const numericPatientID = patientID.replace(/\D/g, '');
+
+//     try {
+//         // Update patient data
+//         let query = `UPDATE public.patient 
+//                      SET fname = $1, lname = $2, phone = $3, email = $4 
+//                      WHERE patient_id = $5`;
+
+//         const params = [fname, lname, phone, email, numericPatientID];
+
+//         await client.query(query, params);
+
+//         // Update email and password in users table if provided
+//         if (email && password) {
+//             // Hash the password
+//             const passwordString = String(password);
+//             const hashedPassword = await bcrypt.hash(passwordString, 10);
+
+//             const userQuery = `UPDATE public.users 
+//                                SET email = $1, password = $2 
+//                                WHERE patient_id = $3`;
+
+//             const userParams = [email, hashedPassword, numericPatientID];
+
+//             await client.query(userQuery, userParams);
+//         }
+
+//         // Map therapistName to therapist_id
+//         if (therapistName) {
+//             const therapistQuery = `SELECT therapist_id 
+//                                     FROM public.therapist 
+//                                     WHERE fname || ' ' || lname = $1`;
+
+//             const therapistParams = [therapistName];
+
+//             const therapistResult = await client.query(therapistQuery, therapistParams);
+
+//             if (therapistResult.rows.length > 0) {
+//                 const therapist_id = therapistResult.rows[0].therapist_id;
+
+//                 // Update therapist_id in patient table
+//                 const updateTherapistQuery = `UPDATE public.patient 
+//                                               SET therapist_id = $1 
+//                                               WHERE patient_id = $2`;
+
+//                 const updateTherapistParams = [therapist_id, numericPatientID];
+
+//                 await client.query(updateTherapistQuery, updateTherapistParams);
+//             } else {
+//                 return res.status(400).json({ error: 'Therapist not found' });
+//             }
+//         }
+
+//         res.json({ success: true, message: 'Personal data updated successfully' });
+//     } catch (err) {
+//         console.error('Error updating personal data:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//     }
+// });
+
 router.post('/adEditPersonalData', async (req, res) => {
-    const { patientID, fname, lname, phone, email, password, therapistName } = req.body;
+  const { patientID, fname, lname, phone, email, password, therapistName, gender } = req.body;
 
-    // Extract numeric part of patientID
-    const numericPatientID = patientID.replace(/\D/g, '');
+  // Extract numeric part of patientID
+  const numericPatientID = patientID.replace(/\D/g, '');
 
-    try {
-        // Update patient data
-        let query = `UPDATE public.patient 
-                     SET fname = $1, lname = $2, phone = $3, email = $4 
-                     WHERE patient_id = $5`;
+  // Convert gender string to boolean
+  const genderBoolean = (gender.toLowerCase() === 'male');
 
-        const params = [fname, lname, phone, email, numericPatientID];
+  try {
+      // Update patient data including gender
+      let query = `UPDATE public.patient 
+                   SET fname = $1, lname = $2, phone = $3, email = $4, gender = $5
+                   WHERE patient_id = $6`;
 
-        await client.query(query, params);
+      const params = [fname, lname, phone, email, genderBoolean, numericPatientID];
 
-        // Update email and password in users table if provided
-        if (email && password) {
-            // Hash the password
-            const passwordString = String(password);
-            const hashedPassword = await bcrypt.hash(passwordString, 10);
+      await client.query(query, params);
 
-            const userQuery = `UPDATE public.users 
-                               SET email = $1, password = $2 
-                               WHERE patient_id = $3`;
+      // Update email and password in users table if provided
+      if (email) {
+          let userParams;
+          let userQuery;
 
-            const userParams = [email, hashedPassword, numericPatientID];
+          if (password) {
+              // Hash the new password
+              const hashedPassword = await bcrypt.hash(String(password), 10);
+              userQuery = `UPDATE public.users 
+                           SET email = $1, password = $2 
+                           WHERE patient_id = $3`;
+              userParams = [email, hashedPassword, numericPatientID];
+          } else {
+              // Keep the old password
+              userQuery = `UPDATE public.users 
+                           SET email = $1
+                           WHERE patient_id = $2`;
+              userParams = [email, numericPatientID];
+          }
 
-            await client.query(userQuery, userParams);
-        }
+          await client.query(userQuery, userParams);
+      }
 
-        // Map therapistName to therapist_id
-        if (therapistName) {
-            const therapistQuery = `SELECT therapist_id 
-                                    FROM public.therapist 
-                                    WHERE fname || ' ' || lname = $1`;
+      // Map therapistName to therapist_id
+      if (therapistName) {
+          const therapistQuery = `SELECT therapist_id 
+                                  FROM public.therapist 
+                                  WHERE fname || ' ' || lname = $1`;
 
-            const therapistParams = [therapistName];
+          const therapistParams = [therapistName];
 
-            const therapistResult = await client.query(therapistQuery, therapistParams);
+          const therapistResult = await client.query(therapistQuery, therapistParams);
 
-            if (therapistResult.rows.length > 0) {
-                const therapist_id = therapistResult.rows[0].therapist_id;
+          if (therapistResult.rows.length > 0) {
+              const therapist_id = therapistResult.rows[0].therapist_id;
 
-                // Update therapist_id in patient table
-                const updateTherapistQuery = `UPDATE public.patient 
-                                              SET therapist_id = $1 
-                                              WHERE patient_id = $2`;
+              // Update therapist_id in patient table
+              const updateTherapistQuery = `UPDATE public.patient 
+                                            SET therapist_id = $1 
+                                            WHERE patient_id = $2`;
 
-                const updateTherapistParams = [therapist_id, numericPatientID];
+              const updateTherapistParams = [therapist_id, numericPatientID];
 
-                await client.query(updateTherapistQuery, updateTherapistParams);
-            } else {
-                return res.status(400).json({ error: 'Therapist not found' });
-            }
-        }
+              await client.query(updateTherapistQuery, updateTherapistParams);
+          } else {
+              return res.status(400).json({ error: 'Therapist not found' });
+          }
+      }
 
-        res.json({ success: true, message: 'Personal data updated successfully' });
-    } catch (err) {
-        console.error('Error updating personal data:', err);
-        res.status(500).json({ error: 'An error occurred' });
-    }
+      res.json({ success: true, message: 'Personal data updated successfully' });
+  } catch (err) {
+      console.error('Error updating personal data:', err);
+      res.status(500).json({ error: 'An error occurred' });
+  }
 });
+
+
+
 
 // router.post('/viewPersonalData', (req, res) => {
 //   const { patientID } = req.body;
@@ -1301,6 +1637,42 @@ router.post('/adEditPersonalData', async (req, res) => {
 //     });
 // });
 
+// router.post('/adViewPersonalData', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+//   const formattedPatientID = `PID${numericPatientID}`;
+
+//   let query = `
+//       SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
+//              t.fname AS therapist_fname, t.lname AS therapist_lname
+//       FROM public.patient p
+//       INNER JOIN public.therapist t ON p.hospital_name = t.hospital_name
+//       WHERE p.patient_id = $1
+//         AND t.admin = 'N' -- Add condition to filter therapists with admin value 'N'
+//   `;
+
+//   const queryParams = [numericPatientID];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const therapists = result.rows.map(row => `${row.therapist_fname} ${row.therapist_lname}`);
+
+//       const formattedResult = {
+//         patientID: formattedPatientID,
+//         fname: result.rows[0].patient_fname,
+//         lname: result.rows[0].patient_lname,
+//         phone: result.rows[0].patient_phone,
+//         email: result.rows[0].patient_email,
+//         therapistAll: therapists
+//       };
+//       res.json(formattedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/adViewPersonalData', (req, res) => {
   const { patientID } = req.body;
   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -1310,16 +1682,17 @@ router.post('/adViewPersonalData', (req, res) => {
       SELECT p.patient_id, p.fname AS patient_fname, p.lname AS patient_lname, p.phone AS patient_phone, p.email AS patient_email,
              t.fname AS therapist_fname, t.lname AS therapist_lname
       FROM public.patient p
-      INNER JOIN public.therapist t ON p.hospital_name = t.hospital_name
+      INNER JOIN public.therapist t ON p.therapist_id = t.therapist_id
       WHERE p.patient_id = $1
-        AND t.admin = 'N' -- Add condition to filter therapists with admin value 'N'
   `;
 
   const queryParams = [numericPatientID];
 
   client.query(query, queryParams)
     .then(result => {
-      const therapists = result.rows.map(row => `${row.therapist_fname} ${row.therapist_lname}`);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Patient not found' });
+      }
 
       const formattedResult = {
         patientID: formattedPatientID,
@@ -1327,7 +1700,7 @@ router.post('/adViewPersonalData', (req, res) => {
         lname: result.rows[0].patient_lname,
         phone: result.rows[0].patient_phone,
         email: result.rows[0].patient_email,
-        therapistAll: therapists
+        therapist: `${result.rows[0].therapist_fname} ${result.rows[0].therapist_lname}`
       };
       res.json(formattedResult);
     })
@@ -1336,6 +1709,7 @@ router.post('/adViewPersonalData', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 // router.post('/deletePatient', (req, res) => {
 //     const { patientID } = req.body;

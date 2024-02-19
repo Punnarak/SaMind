@@ -125,57 +125,132 @@ router.post('/adTherapistView', (req, res) => {
       });
 });
 
+// router.post('/adTherapistEdit', (req, res) => {
+//   const { therapistID, fname, lname, email, password } = req.body;
+
+//   // Extract numeric ID from therapistID
+//   const numericTherapistID = parseInt(therapistID.match(/\d+/)[0]);
+
+//   // Hash the password
+//   bcrypt.hash(password, 10, (err, hashedPassword) => {
+//     if (err) {
+//       console.error('Error hashing password:', err);
+//       return res.status(500).json({ error: 'An error occurred' });
+//     }
+
+//     let query = 'UPDATE therapist SET ';
+//     const queryParams = [];
+
+//     // Check and add fields to be updated
+//     if (fname) {
+//       query += 'fname = $1, ';
+//       queryParams.push(fname);
+//     }
+//     if (lname) {
+//       query += 'lname = $2, ';
+//       queryParams.push(lname);
+//     }
+//     if (email) {
+//       query += 'email = $3, ';
+//       queryParams.push(email);
+//     }
+//     if (password) {
+//       query += 'password = $4, ';
+//       queryParams.push(hashedPassword);
+//     }
+
+//     // Remove the trailing comma and space
+//     query = query.slice(0, -2);
+
+//     // Add WHERE clause to update only if therapist_id matches
+//     query += ' WHERE therapist_id = $5';
+//     queryParams.push(numericTherapistID);
+
+//     client.query(query, queryParams)
+//       .then(result => {
+//         res.json({ message: 'Therapist data updated successfully' });
+//       })
+//       .catch(err => {
+//         console.error('Error executing query:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//       });
+//   });
+// });
+
 router.post('/adTherapistEdit', (req, res) => {
   const { therapistID, fname, lname, email, password } = req.body;
 
   // Extract numeric ID from therapistID
   const numericTherapistID = parseInt(therapistID.match(/\d+/)[0]);
 
-  // Hash the password
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error('Error hashing password:', err);
-      return res.status(500).json({ error: 'An error occurred' });
-    }
+  // Check if password is provided
+  if (password) {
+    // Hash the provided password
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        console.error('Error hashing password:', err);
+        return res.status(500).json({ error: 'An error occurred' });
+      }
 
-    let query = 'UPDATE therapist SET ';
-    const queryParams = [];
-
-    // Check and add fields to be updated
-    if (fname) {
-      query += 'fname = $1, ';
-      queryParams.push(fname);
-    }
-    if (lname) {
-      query += 'lname = $2, ';
-      queryParams.push(lname);
-    }
-    if (email) {
-      query += 'email = $3, ';
-      queryParams.push(email);
-    }
-    if (password) {
-      query += 'password = $4, ';
-      queryParams.push(hashedPassword);
-    }
-
-    // Remove the trailing comma and space
-    query = query.slice(0, -2);
-
-    // Add WHERE clause to update only if therapist_id matches
-    query += ' WHERE therapist_id = $5';
-    queryParams.push(numericTherapistID);
-
-    client.query(query, queryParams)
+      updateTherapist(numericTherapistID, fname, lname, email, hashedPassword, res);
+    });
+  } else {
+    // If password is not provided, retrieve the existing password from the database
+    client.query('SELECT password FROM therapist WHERE therapist_id = $1', [numericTherapistID])
       .then(result => {
-        res.json({ message: 'Therapist data updated successfully' });
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Therapist not found' });
+        }
+
+        const existingPassword = result.rows[0].password;
+        updateTherapist(numericTherapistID, fname, lname, email, existingPassword, res);
       })
       .catch(err => {
-        console.error('Error executing query:', err);
+        console.error('Error retrieving existing password:', err);
         res.status(500).json({ error: 'An error occurred' });
       });
-  });
+  }
 });
+
+function updateTherapist(therapistID, fname, lname, email, password, res) {
+  let query = 'UPDATE therapist SET ';
+  const queryParams = [];
+
+  // Check and add fields to be updated
+  if (fname) {
+    query += 'fname = $1, ';
+    queryParams.push(fname);
+  }
+  if (lname) {
+    query += 'lname = $2, ';
+    queryParams.push(lname);
+  }
+  if (email) {
+    query += 'email = $3, ';
+    queryParams.push(email);
+  }
+  if (password) {
+    query += 'password = $4, ';
+    queryParams.push(password);
+  }
+
+  // Remove the trailing comma and space
+  query = query.slice(0, -2);
+
+  // Add WHERE clause to update only if therapist_id matches
+  query += ' WHERE therapist_id = $5';
+  queryParams.push(therapistID);
+
+  client.query(query, queryParams)
+    .then(result => {
+      res.json({ message: 'Therapist data updated successfully' });
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+}
+
 
 // router.post('/adTherapistDelete', (req, res) => {
 //   const { therapistID } = req.body;

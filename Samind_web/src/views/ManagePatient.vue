@@ -38,6 +38,7 @@
       class="elevation-1"
       style="border-radius: 10px"
     >
+
       <template v-slot:item.mood="{ item }">
         <v-chip :color="getColor(item.columns.mood)">
           <v-icon left size="10px" style="margin-right: 10px"
@@ -104,7 +105,7 @@
                   >
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer" style="margin-bottom: 40px">
                   <slot name="footer">
                     <button
                       class="modal-default-button"
@@ -596,9 +597,20 @@
 </template>
 
 <script setup>
+// import { ref, computed, onMounted } from "vue";
+// import axios from "../axios.js";
+
+
+function getColor(mood) {
+  if (mood === "negative") return "red";
+  else if (mood === "neutral") return "orange";
+  else if(mood === 'positive') return "green";
+  else return "lightgray"
+}
+</script>
+<script>
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
-
 let patients = ref(
   // []
   [
@@ -647,34 +659,6 @@ let patients = ref(
     },
   ]
 );
-onMounted(async () => {
-  const param = {
-    hospitalName:"Siriraj Hospital"
-  };
-  await axios
-    .post("/adPatientView", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      patients.value = response.data.map((patient, index) => ({
-        no: patient.No,
-        patientId: patient.patientID,
-        name: patient.patientName,
-        age: patient.age,
-        mood: patient.mood,
-        therapist: patient.therapistName,
-        gender: patient.gender,
-        email: patient.email
-      }));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-});
 
 let search = ref("");
 
@@ -703,21 +687,59 @@ const headers = [
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
 
-function getColor(mood) {
-  if (mood === "negative") return "red";
-  else if (mood === "neutral") return "orange";
-  else if(mood === 'positive') return "green";
-  else return "lightgray"
-}
-</script>
-<script>
-import axios from "../axios.js";
 export default {
   props: {
     deletePopup: Boolean,
   },
+  async created(){
+  this.hospitalName = "Siriraj Hospital";
+  const param = {
+    hospitalName: this.hospitalName
+  };
+  await axios
+    .post("/adPatientView", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      patients.value = response.data.map((patient, index) => ({
+        no: patient.No,
+        patientId: patient.patientID,
+        name: patient.patientName,
+        age: patient.age,
+        mood: patient.mood,
+        therapist: patient.therapistName,
+        gender: patient.gender,
+        email: patient.email,
+        phone: patient.phone
+      }));
+
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    }); 
+
+    await axios
+    .post("/adTherapistAll", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      this.options = response.data.therapistAll
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    }); 
+    },
   data() {
     return {
+      hospitalName: "",
       selectedDuplicateTest: null,
       selectTherapist: "",
       options: ["Dr. Somsak", "Dr. Somsee", "Dr. Somjai"],
@@ -849,7 +871,7 @@ export default {
         this.gender === "" ||
         this.firstName === "" ||
         this.lastName === "" ||
-        this.phone === "" ||
+        this.phone === "" || this.phone === undefined ||
         this.email === "" ||
         this.checkEmail === false ||
         this.password === "" ||
@@ -903,36 +925,24 @@ axios
         this.checkEmail = false;
         this.createPopup = false;
         this.checkBirthDate = false;
+        window.location.reload();
       }
     },
     handleEditAccount(patient) {
-      let param = {
-        patientID:patient.patientId
-      }
-    //   axios
-    // .post("/adViewPersonalData", param, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Accept: "application/json",
-    //   },
-    // })
-    // .then((response) => {
-    //   console.log("patientInfo For Edit", response.data);
-      this.patientId = patient.patientID;
-      this.firstName = patient.fname;
-      this.lastName = patient.lname;
-      this.phone = patient.phone;
-      this.email = patient.email;
+      console.log("patientInfo For Edit", patient);
+      this.patientId = patients.value.find(item => item.patientId === patient.patientId).patientId
+      this.gender = patients.value.find(item => item.patientId === patient.patientId).gender
+      let name = patients.value.find(item => item.patientId === patient.patientId).name.split(" ");
+
+      this.firstName = name[0];
+      this.lastName = name[1];
+      this.phone = patients.value.find(item => item.patientId === patient.patientId).phone;
+      this.email = patients.value.find(item => item.patientId === patient.patientId).email;
       this.password = "";
       this.checkEmail = true;
-      this.selectTherapist = "Dr. Somsee";
+      this.selectTherapist = patients.value.find(item => item.patientId === patient.patientId).therapist;
       this.born = "12/02/2001";
-    // })
-    // .catch((error) => {
-    //   console.error("Error:", error);
-    // });
     
-     
       console.log(
         "Edit Patient Account",
         this.patientId,
@@ -949,14 +959,50 @@ axios
         this.firstName === "" ||
         this.lastName === "" ||
         this.email === "" ||
-        this.phone === "" ||
+        this.phone === "" || this.phone === undefined ||
         this.checkEmail === false ||
         this.selectTherapist === "" ||
         this.born === "" ||
         this.checkBirthDate === false
       ) {
       } else {
-        console.log(
+        let param 
+        if(this.password !== ""){
+          param = {
+patientID: this.patientId,
+fname: this.firstName,
+lname: this.lastName,
+phone: this.phone,
+gender: this.gender,
+born: this.born,
+email: this.email,
+password: this.password,
+therapistName: this.selectTherapist
+}
+        }else{
+          param = {
+patientID: this.patientId,
+fname: this.firstName,
+lname: this.lastName,
+phone: this.phone,
+gender: this.gender,
+born: this.born,
+email: this.email,
+therapistName: this.selectTherapist
+}
+
+        }
+        console.log('param',param)
+axios
+    .post("/adEditPersonalData", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Update success", response.data);
+      console.log(
           "Update Patient Account",
           this.patientId,
           this.firstName,
@@ -972,9 +1018,16 @@ axios
         this.password = "";
         this.phone = "";
         this.born = "";
+        this.gender = "";
+        this.selectTherapist = ""
         this.checkBirthDate = false;
         this.checkEmail = false;
         this.editPopup = false;
+        window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
       }
     },
     Delete(patient, selectPatient) {
@@ -992,6 +1045,7 @@ console.log(param)
     })
     .then((response) => {
       console.log("Delete success", patient,response.data);
+      window.location.reload();
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -1102,7 +1156,7 @@ console.log(param)
 }
 
 .delete {
-  height: 150px;
+  height: auto;
 }
 
 .modal-header h3 {
