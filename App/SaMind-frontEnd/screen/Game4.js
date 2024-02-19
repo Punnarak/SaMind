@@ -126,7 +126,7 @@
 
 
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const NumberGame = () => {
@@ -211,6 +211,10 @@ const NumberGame = () => {
   };
 
   return (
+    <ImageBackground
+      source={require("../assets/room.jpg")}
+      style={{ width: "100%", resizeMode: "cover", flex: 1 }}
+    >
     <View style={styles.container}>
       {gameOver ? (
         <View>
@@ -239,6 +243,7 @@ const NumberGame = () => {
         </View>
       )}
     </View>
+    </ImageBackground>
   );
   
 };
@@ -262,6 +267,8 @@ const styles = StyleSheet.create({
   numberGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "center",
+  alignItems: "center", 
   },
   numberBlock: {
     width: 80,
