@@ -8,13 +8,15 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   ProgressBarAndroid,
-  ImageBackground
+  ImageBackground,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const windowWidth = Dimensions.get("window").width;
 
 const PopcatGame = ({ route }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
@@ -26,6 +28,24 @@ const PopcatGame = ({ route }) => {
   const [progress2, setProgress2] = useState(1);
   const [progress3, setProgress3] = useState(1);
   const [sleepMode, setSleepMode] = useState(false);
+
+  const [appleCount, setAppleCount] = useState(3);
+  const [fishCount, setFishCount] = useState(3);
+  const [riceCount, setRiceCount] = useState(3);
+  const [meatCount, setMeatCount] = useState(3);
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const handleEatingButtonPress = () => {
+    toggleModal();
+  };
+
+  const increaseHungryBar = (value) => {
+    const newProgress = progress2 + value;
+    setProgress2(Math.min(newProgress, 1));
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -166,6 +186,10 @@ const PopcatGame = ({ route }) => {
   };
 
   const restartGame = () => {
+    setAppleCount(3);
+    setFishCount(3);
+    setMeatCount(3);
+    setRiceCount(3);
     setPopCount(0);
     setImageSource(require("../assets/egg1.png"));
   };
@@ -185,6 +209,57 @@ const PopcatGame = ({ route }) => {
       enterSleepMode();
     } else {
       exitSleepMode();
+    }
+  };
+
+  const handleFoodSelection = (foodType) => {
+    switch (foodType) {
+      case "Apple":
+        if (appleCount > 0) {
+          setPopCount((prevCount) => prevCount + 10);
+          setAppleCount((prevCount) => prevCount - 1);
+          increaseHungryBar(0.1);
+          // if (appleCount === 1) {
+          //   setIsModalVisible(false);
+          // }
+          toggleModal();
+        }
+        break;
+      case "Fish":
+        if (fishCount > 0) {
+          setPopCount((prevCount) => prevCount + 20);
+          setFishCount((prevCount) => prevCount - 1);
+          increaseHungryBar(0.2);
+          // if (fishCount === 1) {
+          //   setIsModalVisible(false);
+          // }
+          toggleModal();
+        }
+        break;
+      case "Rice":
+        if (riceCount > 0) {
+          setPopCount((prevCount) => prevCount + 30);
+          setRiceCount((prevCount) => prevCount - 1);
+          increaseHungryBar(0.3);
+          // if (riceCount === 1) {
+          //   setIsModalVisible(false);
+          // }
+          toggleModal();
+        }
+        break;
+      case "Meat":
+        if (meatCount > 0) {
+          setPopCount((prevCount) => prevCount + 40);
+          setMeatCount((prevCount) => prevCount - 1);
+          increaseHungryBar(0.4);
+          // if (meatCount === 1) {
+          //   setIsModalVisible(false);
+          // }
+          toggleModal();
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -208,7 +283,7 @@ const PopcatGame = ({ route }) => {
         </TouchableWithoutFeedback>
         <Text style={styles.countText}>{popCount}</Text>
         <View style={styles.progressBars}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 ,marginLeft: '5%', marginRight: '5%'}}>
+        <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>Health</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
@@ -219,7 +294,7 @@ const PopcatGame = ({ route }) => {
               progressBarStyle={{ height: 20 }}
             />
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 ,marginLeft: '5%', marginRight: '5%'}}>
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>Hungry</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
@@ -230,7 +305,7 @@ const PopcatGame = ({ route }) => {
               progressBarStyle={{ height: 20 }}
             />
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 ,marginLeft: '5%', marginRight: '5%'}}>
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
             <Text style={styles.progressBarLabel}>Stamina</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
@@ -245,7 +320,7 @@ const PopcatGame = ({ route }) => {
         <View style={styles.buttonsContainer}>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, { width: windowWidth / 4 }]}
+              style={[styles.button, { width: (windowWidth / 2) - 25 }]}
               onPress={restartGame}
               disabled={sleepMode}
             >
@@ -256,20 +331,94 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: (windowWidth / 2) - 25,
-                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
                 },
               ]}
-              onPress={popCount <= 0 ? null : () => navigation.navigate("Game1")}
+              onPress={popCount <= 0 ? null : () => handleEatingButtonPress()}
               disabled={popCount <= 0 || sleepMode}
             >
               <Text style={styles.buttonText}>Eating</Text>
             </TouchableOpacity>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={isModalVisible}
+              onRequestClose={() => {
+                toggleModal();
+              }}
+            >
+              <View style={styles.modalBackground}>
+                {/* <ImageBackground
+                  source={require("../assets/bedroom.jpg")}
+                  style={{ resizeMode: "fit", flex: 1 }}
+                > */}
+                  <TouchableWithoutFeedback onPress={toggleModal}>
+                  <View style={styles.centeredView}>
+                  <View style={styles.modalViewRow}>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        {
+                          backgroundColor:
+                            appleCount <= 0 ? "#9e9e9e" : "#2196f3",
+                        },
+                      ]}
+                      onPress={() => handleFoodSelection("Apple")}
+                      disabled={appleCount <= 0}
+                    >
+                      <Text style={styles.modalButtonText}>Apple</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        {
+                          backgroundColor:
+                            fishCount <= 0 ? "#9e9e9e" : "#2196f3",
+                        },
+                      ]}
+                      onPress={() => handleFoodSelection("Fish")}
+                      disabled={fishCount <= 0}
+                    >
+                      <Text style={styles.modalButtonText}>Fish</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        {
+                          backgroundColor:
+                            riceCount <= 0 ? "#9e9e9e" : "#2196f3",
+                        },
+                      ]}
+                      onPress={() => handleFoodSelection("Rice")}
+                      disabled={riceCount <= 0}
+                    >
+                      <Text style={styles.modalButtonText}>Rice</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        {
+                          backgroundColor:
+                            meatCount <= 0 ? "#9e9e9e" : "#2196f3",
+                        },
+                      ]}
+                      onPress={() => handleFoodSelection("Meat")}
+                      disabled={meatCount <= 0}
+                    >
+                      <Text style={styles.modalButtonText}>Meat</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                  </TouchableWithoutFeedback>
+                {/* </ImageBackground> */}
+              </View>
+            </Modal>
             <TouchableOpacity
               style={[
                 styles.button,
                 {
                   width: (windowWidth / 2) - 25,
-                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => navigation.navigate("Game4")}
@@ -280,7 +429,7 @@ const PopcatGame = ({ route }) => {
           </View>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, { width: windowWidth / 4 }]}
+              style={[styles.button, {width: (windowWidth / 2) - 25}]}
               onPress={() => navigation.navigate("Homescreen")}
               disabled={sleepMode}
             >
@@ -291,7 +440,7 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: (windowWidth / 2) - 25,
-                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => navigation.navigate("Phq9gametestscreen", { patientId })}
@@ -386,6 +535,72 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalButton: {
+    backgroundColor: "#2196f3",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  foodOptionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  modalButton: {
+    backgroundColor: "#2196f3",
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    elevation: 2,
+    marginBottom: 10,
+  },
+  modalBackground: {
+    flex: 1,
+  },
+  modalViewRow:{
+    margin: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  }
 });
 
 export default PopcatGame;

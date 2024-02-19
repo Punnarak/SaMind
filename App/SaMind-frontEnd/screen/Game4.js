@@ -127,8 +127,10 @@
 
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const NumberGame = () => {
+  const navigation = useNavigation();
   const [numbers, setNumbers] = useState([]);
   const [nextExpectedNumber, setNextExpectedNumber] = useState(1);
   const [clickedNumbers, setClickedNumbers] = useState([]);
@@ -215,7 +217,7 @@ const NumberGame = () => {
           <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
             {nextExpectedNumber === 16 ? `You Win! Score: ${score !== null ? score : 0}` : 'Game Over! Score: 0'}
           </Text>
-          <Button title="Play Again" onPress={resetGame} />
+          <Button title="Confirm" onPress={() => navigation.goBack()} />
         </View>
       ) : (
         <View>
