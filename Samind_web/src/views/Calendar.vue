@@ -1626,6 +1626,7 @@ h2 {
   width: 1000px;
   margin: 0 auto;
 }
+
 @media only screen and (max-width: 1029px) {
   .calendar-day-size {
     width: 500px !important;
@@ -1895,6 +1896,13 @@ h2 {
   position: absolute;
   top: 5px; /* Adjust top position for the number */
   left: 5px; /* Adjust left position for the number */
+}
+@media only screen and (max-width: 768px) {
+  .day,
+  .calendar-box {
+    width: calc(100% / 7); /* Adjust width for smaller screens */
+    max-width: none; /* Reset max-width */
+  }
 }
 
 .calendar-box {

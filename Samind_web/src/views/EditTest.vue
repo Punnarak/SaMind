@@ -106,7 +106,6 @@
               </v-btn>
             </v-row>
             <!-- Options for the question -->
-            <!-- Options for the question -->
             <v-radio-group v-model="question.answer">
               <v-row
                 v-for="(option, optionIndex) in question.options"
@@ -162,7 +161,7 @@ export default {
       questions: [
         {
           text: "",
-          options: [""], // Initialize with an empty option for this question
+          options: [""],
         },
       ],
       testName: "",
@@ -186,7 +185,7 @@ export default {
         this.oldType = this.$route.query.testName;
         this.testName = this.$route.query.testName;
         console.log("edittest: ", this.testName);
-        
+
         // let questionsapi = [
         //   {
         //     no: 1,
@@ -203,27 +202,27 @@ export default {
         //     answer: "Five", // Index of the correct answer in the options array
         //   },
         // ];
-        
-          let test = ref([]);
-          const param = {
-            therapistId: 5555,
-            type: this.testName,
-          };
-          axios
-            .post("/viewOneQuestion", param, {
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-            })
-            .then((response) => {
-              console.log("response123456", response.data);
-              this.description = response.data[0].description
-              test.value = response.data
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
+
+        let test = ref([]);
+        const param = {
+          therapistId: 5555,
+          type: this.testName,
+        };
+        axios
+          .post("/viewOneQuestion", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("response123456", response.data);
+            this.description = response.data[0].description;
+            test.value = response.data;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
         this.questions = test;
         console.log("Questions:", this.questions);
@@ -259,11 +258,11 @@ export default {
       // Convert testData to JSON string
       // const testDataJSON = JSON.stringify(testData, null, 2);
       const param = {
-        therapist_id : 5555,
-        description : this.description,
-        oldType : this.oldType,
-        questions
-      }
+        therapist_id: 5555,
+        description: this.description,
+        oldType: this.oldType,
+        questions,
+      };
       console.log("questions (JSON):", JSON.stringify(param, null, 2));
 
       // Add additional logic for handling the created test data if needed
