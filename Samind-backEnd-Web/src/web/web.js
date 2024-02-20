@@ -28,10 +28,12 @@ web.use(login);
 //admin api
 const ad_patient = require('./ad_patient.js');
 const ad_therapist = require('./ad_therapist.js');
+const ad_library = require('./ad_library.js');
 
 
 web.use(ad_patient);
 web.use(ad_therapist);
+web.use(ad_library);
 
 
 
