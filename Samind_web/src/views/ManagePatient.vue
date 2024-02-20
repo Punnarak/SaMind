@@ -254,6 +254,7 @@
                         style="width: 200px; height: 45px; flex-shrink: 0"
                         v-model="phone"
                         :rules="phoneValidation"
+                        maxlength="10"
                       >
                       </v-text-field>
                     </v-col>
@@ -468,6 +469,7 @@
                         style="width: 200px; height: 45px; flex-shrink: 0"
                         v-model="phone"
                         :rules="phoneValidation"
+                        maxlength="10"
                       >
                       </v-text-field>
                     </v-col>
@@ -766,13 +768,8 @@ export default {
 
       phone: "",
       phoneValidation: [
-        (value) => {
-          if (!value) {
-            return "please enter Phone Number";
-          } else {
-            return true;
-          }
-        },
+        (value) => !!value || "please enter Phone number", // Required validation
+        (value) => /^\d{10}$/.test(value) || "Phone number must be 10 digits", // Length validation
       ],
       checkEmail: false,
       email: "",
