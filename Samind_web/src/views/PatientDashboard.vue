@@ -175,6 +175,7 @@
                     path: 'patienttesthistory',
                     query: {
                       patientName: patientName,
+                      patientId: patientId
                     },
                   })
                 "

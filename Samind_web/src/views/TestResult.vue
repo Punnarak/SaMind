@@ -126,50 +126,30 @@ export default {
 
   methods: {
     mockTestData() {
-      this.questions = [
-        {
-          question: "What is your favorite color?",
-          options: ["Red", "Green", "Blue"],
-          selectedAnswer: "Red",
-        },
-        {
-          question: "How many fingers do you have?",
-          options: ["Four", "Five", "Six"],
-          selectedAnswer: null,
-        },
-      ];
+      // this.questions = [
+      //   {
+      //     question: "What is your favorite color?",
+      //     options: ["Red", "Green", "Blue"],
+      //     selectedAnswer: "Red",
+      //   },
+      //   {
+      //     question: "How many fingers do you have?",
+      //     options: ["Four", "Five", "Six"],
+      //     selectedAnswer: null,
+      //   },
+      // ];
 
       this.testName = "Sample Test";
       this.description = "This is a sample test for demonstration purposes.";
-      console.log("query param", this.$route.query);
-      // if (this.$route.query != null) {
-      //   this.testName = this.$route.query.testName;
-      //   console.log("edittest: ", this.testName);
+      console.log("query test param", this.$route.query,this.$route.query.questions);
+      if (this.$route.query != null) {
+        this.testName = this.$route.query.testName;
+        this.description = this.$route.query.description;
+        let receivedQuestions = JSON.parse(this.$route.query.questions);
 
-      //   let test = ref([]);
-      //   const param = {
-      //     therapistId: 5555,
-      //     type: this.testName,
-      //   };
-      //   axios
-      //     .post("/viewOneQuestion", param, {
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //         Accept: "application/json",
-      //       },
-      //     })
-      //     .then((response) => {
-      //       console.log("response123456", response.data);
-      //       this.description = response.data[0].description;
-      //       test.value = response.data;
-      //     })
-      //     .catch((error) => {
-      //       console.error("Error:", error);
-      //     });
-
-      //   this.questions = test;
-      //   console.log("Questions:", this.questions);
-      // }
+        this.questions = receivedQuestions;
+        console.log("Questions:", this.questions);
+      }
     },
   },
 };
