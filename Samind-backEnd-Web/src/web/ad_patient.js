@@ -78,6 +78,456 @@ router.use(bodyParser.json());
 //     });
 // });
 
+// router.post('/adAllTestHistory', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   let query = 'SELECT * FROM therapist';
+
+//   // Check if the id parameter is provided
+//   if (therapist_id) {
+//     query += ' WHERE therapist_id = $1';
+//   }
+
+//   const queryParams = therapist_id ? [therapist_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/adAllTestHistory', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   // Query to retrieve test history for the given patientID
+//   const query = `
+//     SELECT
+//       ROW_NUMBER() OVER () AS "No",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+//         ELSE ts.answer->>'test'
+//       END AS "testName",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+//         ELSE jsonb_build_object(
+//           '1', ts.answer->>'1',
+//           '2', ts.answer->>'2',
+//           '3', ts.answer->>'3',
+//           '4', ts.answer->>'4',
+//           '5', ts.answer->>'5'
+//         )::text
+//       END AS "result",
+//       TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+//     FROM
+//       test_score ts
+//     WHERE
+//       ts.patient_id = $1
+//   `;
+
+//   const queryParams = [numericPatientID];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const formattedResult = result.rows.map(row => ({
+//         No: row.No.toString().padStart(2, '0'),
+//         testName: row.testName,
+//         result: row.result,
+//         date: row.date
+//       }));
+//       res.json(formattedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/adAllTestHistory', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   // Query to retrieve test history for the given patientID
+//   const query = `
+//     SELECT
+//       ROW_NUMBER() OVER () AS "No",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+//         ELSE COALESCE(ts.type, ts.answer->>'test')
+//       END AS "testName",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+//         ELSE jsonb_build_object(
+//           '1', ts.answer->>'1',
+//           '2', ts.answer->>'2',
+//           '3', ts.answer->>'3',
+//           '4', ts.answer->>'4',
+//           '5', ts.answer->>'5'
+//         )::text
+//       END AS "result",
+//       TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+//     FROM
+//       test_score ts
+//     WHERE
+//       ts.patient_id = $1
+//   `;
+
+//   const queryParams = [numericPatientID];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const formattedResult = result.rows.map(row => ({
+//         No: row.No.toString().padStart(2, '0'),
+//         testName: row.testName,
+//         result: row.result,
+//         date: row.date
+//       }));
+//       res.json(formattedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// this api it work now 20/02/2025
+// router.post('/adAllTestHistory', (req, res) => {
+//   const { patientID } = req.body;
+//   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//   // Query to retrieve test history for the given patientID
+//   const query = `
+//     SELECT
+//       ROW_NUMBER() OVER () AS "No",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+//         ELSE COALESCE(ts.type, ts.answer->>'test')
+//       END AS "testName",
+//       CASE
+//         WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+//         ELSE ts.answer::text
+//       END AS "result",
+//       TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+//     FROM
+//       test_score ts
+//     WHERE
+//       ts.patient_id = $1
+//   `;
+
+//   const queryParams = [numericPatientID];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       const formattedResult = result.rows.map(row => {
+//         let resultObj;
+//         try {
+//           resultObj = JSON.parse(row.result);
+//         } catch (error) {
+//           console.error('Error parsing JSON:', error);
+//           resultObj = row.result;
+//         }
+//         return {
+//           No: row.No.toString().padStart(2, '0'),
+//           testName: row.testName,
+//           result: resultObj,
+//           date: row.date
+//         };
+//       });
+//       res.json(formattedResult);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/adAllTestHistory', async (req, res) => {
+//   try {
+//     const { patientID } = req.body;
+//     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//     // Query to retrieve test history for the given patientID
+//     const query = `
+//       SELECT
+//         ROW_NUMBER() OVER () AS "No",
+//         CASE
+//           WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+//           ELSE COALESCE(ts.type, ts.answer->>'test')
+//         END AS "testName",
+//         CASE
+//           WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+//           ELSE ts.answer::text
+//         END AS "result",
+//         TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+//       FROM
+//         test_score ts
+//       WHERE
+//         ts.patient_id = $1
+//     `;
+
+//     const queryParams = [numericPatientID];
+
+//     const testResults = await client.query(query, queryParams);
+
+//     const formattedResult = [];
+
+//     for (const row of testResults.rows) {
+//       let resultObj;
+//       try {
+//         resultObj = JSON.parse(row.result);
+//       } catch (error) {
+//         console.error('Error parsing JSON:', error);
+//         resultObj = row.result;
+//       }
+
+//       formattedResult.push({
+//         No: row.No.toString().padStart(2, '0'),
+//         testName: row.testName,
+//         result: resultObj,
+//         date: row.date
+//       });
+//     }
+
+//     const finalResult = [];
+
+//     for (const row of formattedResult) {
+//       let description = '';
+//       let selectedAnswers = {};
+
+//       if (row.testName === 'aaa') {
+//         const queryQuestionnaire = `
+//           SELECT description
+//           FROM questionnaire_new2
+//           WHERE test_name = $1
+//         `;
+
+//         const questionnaireResult = await client.query(queryQuestionnaire, [row.testName]);
+
+//         if (questionnaireResult.rows.length > 0) {
+//           description = questionnaireResult.rows[0].description;
+//         }
+
+//         if (row.result && typeof row.result === 'object') {
+//           selectedAnswers = {
+//             question: Object.keys(row.result).map((key, index) => ({
+//               question: key,
+//               options: ["aaa", "bbb"],
+//               selectedAnswer: row.result[key]
+//             }))
+//           };
+//         }
+//       }
+
+//       finalResult.push({
+//         No: row.No,
+//         testName: row.testName,
+//         result: row.result,
+//         date: row.date,
+//         description,
+//         ...selectedAnswers
+//       });
+//     }
+
+//     res.json(finalResult);
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+
+// router.post('/adAllTestHistory', async (req, res) => {
+//   try {
+//     const { patientID } = req.body;
+//     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+//     // Query to retrieve test history for the given patientID
+//     const query = `
+//       SELECT
+//         ROW_NUMBER() OVER () AS "No",
+//         CASE
+//           WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+//           ELSE COALESCE(ts.type, ts.answer->>'test')
+//         END AS "testName",
+//         CASE
+//           WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+//           ELSE ts.answer::text
+//         END AS "result",
+//         TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+//       FROM
+//         test_score ts
+//       WHERE
+//         ts.patient_id = $1
+//     `;
+
+//     const queryParams = [numericPatientID];
+
+//     const testResults = await client.query(query, queryParams);
+
+//     const formattedResult = [];
+
+//     for (const row of testResults.rows) {
+//       let resultObj;
+//       try {
+//         resultObj = JSON.parse(row.result);
+//       } catch (error) {
+//         console.error('Error parsing JSON:', error);
+//         resultObj = row.result;
+//       }
+
+//       formattedResult.push({
+//         No: row.No.toString().padStart(2, '0'),
+//         testName: row.testName,
+//         result: resultObj,
+//         date: row.date
+//       });
+//     }
+
+//     const finalResult = [];
+
+//     for (const row of formattedResult) {
+//       let description = '';
+//       let selectedAnswers = {};
+//       let questions = [];
+
+//       const queryQuestionnaire = `
+//         SELECT description, no, question
+//         FROM questionnaire_new2
+//         WHERE test_name = $1
+//       `;
+
+//       const questionnaireResult = await client.query(queryQuestionnaire, [row.testName]);
+
+//       if (questionnaireResult.rows.length > 0) {
+//         description = questionnaireResult.rows[0].description;
+//         questions = questionnaireResult.rows.map(q => ({
+//           question: q.question,
+//           options: ["aaa", "bbb"], // Default options, you can modify this to fetch options from the database
+//           selectedAnswer: row.result[q.no.toString()] || '' // Default selected answer
+//         }));
+//       }
+
+//       finalResult.push({
+//         No: row.No,
+//         testName: row.testName,
+//         result: row.result,
+//         date: row.date,
+//         description,
+//         question: questions
+//       });
+//     }
+
+//     res.json(finalResult);
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+
+router.post('/adAllTestHistory', async (req, res) => {
+  try {
+    const { patientID } = req.body;
+    const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
+
+    // Query to retrieve test history for the given patientID
+    const query = `
+      SELECT
+        ROW_NUMBER() OVER () AS "No",
+        CASE
+          WHEN ts.type IN ('PHQ9', '2Q') THEN ts.type
+          ELSE COALESCE(ts.type, ts.answer->>'test')
+        END AS "testName",
+        CASE
+          WHEN ts.type IN ('PHQ9', '2Q') THEN ts.score::text
+          ELSE ts.answer::text
+        END AS "result",
+        TO_CHAR(ts.date_time, 'Mon DD, YYYY HH24:MI') AS "date"
+      FROM
+        test_score ts
+      WHERE
+        ts.patient_id = $1
+    `;
+
+    const queryParams = [numericPatientID];
+
+    const testResults = await client.query(query, queryParams);
+
+    const formattedResult = [];
+
+    for (const row of testResults.rows) {
+      let resultObj;
+      try {
+        resultObj = JSON.parse(row.result);
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        resultObj = row.result;
+      }
+
+      formattedResult.push({
+        No: row.No.toString().padStart(2, '0'),
+        testName: row.testName,
+        result: resultObj,
+        date: row.date
+      });
+    }
+
+    const finalResult = [];
+
+    for (const row of formattedResult) {
+      let description = '';
+      let selectedAnswers = {};
+      let questions = [];
+
+      const queryQuestionnaire = `
+        SELECT description, no, question, options
+        FROM questionnaire_new2
+        WHERE test_name = $1
+      `;
+
+      const questionnaireResult = await client.query(queryQuestionnaire, [row.testName]);
+
+      if (questionnaireResult.rows.length > 0) {
+        description = questionnaireResult.rows[0].description;
+        questions = questionnaireResult.rows.map(q => ({
+          question: q.question,
+          options: q.options, // Fetch options from the database
+          selectedAnswer: row.result[q.no.toString()] || '' // Default selected answer
+        }));
+      }
+
+      finalResult.push({
+        No: row.No,
+        testName: row.testName,
+        result: row.result,
+        date: row.date,
+        description,
+        question: questions
+      });
+    }
+
+    res.json(finalResult);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.post('/adTherapistAll', (req, res) => {
   const { hospitalName } = req.body;
 
@@ -695,11 +1145,96 @@ router.post('/adCreatePatient', async (req, res) => {
 //         });
 // });
 
+// router.post('/adPatientView', (req, res) => {
+//   const hospitalName = req.body.hospitalName;
+
+//   // Query to get patient details along with therapist's name, gender, and email
+//   let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, p.gender, p.email, t.fname AS therapist_fname, t.lname AS therapist_lname
+//                FROM public.patient p
+//                LEFT JOIN public.therapist t ON p.therapist_id = t.therapist_id
+//                WHERE p.hospital_name = $1`;
+
+//   const queryParams = [hospitalName];
+
+//   client.query(query, queryParams)
+//       .then(patientResult => {
+//           if (patientResult.rows.length === 0) {
+//               res.status(404).json({ error: 'No patients found for the given hospital' });
+//               return;
+//           }
+
+//           const output = [];
+//           let counter = 1;
+
+//           // Loop through each patient to fetch mood data and construct the output object
+//           patientResult.rows.forEach(patient => {
+//               const patientID = patient.patient_id;
+//               const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
+//                                         COALESCE(negative, '0%') AS negative,
+//                                         COALESCE(neutral, '0%') AS neutral
+//                                  FROM public.avatar_mood_detection
+//                                  WHERE patient_id = $1`;
+
+//               client.query(moodQuery, [patientID])
+//                   .then(moodResult => {
+//                       let mood = '-'; // Default mood to '-' if no mood data is available
+
+//                       if (moodResult.rows.length > 0) {
+//                           // Determine the most detected mood
+//                           const moodData = moodResult.rows[0];
+//                           let maxPercentage = 0;
+
+//                           for (const [key, value] of Object.entries(moodData)) {
+//                               const percentage = parseInt(value);
+//                               if (percentage > maxPercentage) {
+//                                   maxPercentage = percentage;
+//                                   mood = key;
+//                               }
+//                           }
+//                       }
+
+//                       // Format the counter to ensure it always has two digits
+//                       const paddedCounter = counter.toString().padStart(2, '0');
+
+//                       // Construct the output object for the current patient
+//                       const patientOutput = {
+//                           "No": paddedCounter,
+//                           "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
+//                           "patientID": `PID${patientID}`,
+//                           "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
+//                           "gender": patient.gender ? "male" : "female",
+//                           "age": patient.age,
+//                           "email": patient.email,
+//                           "mood": mood
+//                       };
+
+//                       // Push the output object to the array
+//                       output.push(patientOutput);
+
+//                       counter++; // Increment the counter for the next patient
+
+//                       // If all patients are processed, send the response
+//                       if (output.length === patientResult.rows.length) {
+//                           res.json(output);
+//                       }
+//                   })
+//                   .catch(moodErr => {
+//                       console.error('Error fetching mood data:', moodErr);
+//                       res.status(500).json({ error: 'An error occurred while fetching mood data' });
+//                   });
+//           });
+//       })
+//       .catch(err => {
+//           console.error('Error executing query:', err);
+//           res.status(500).json({ error: 'An error occurred while fetching patient data' });
+//       });
+// });
+
 router.post('/adPatientView', (req, res) => {
   const hospitalName = req.body.hospitalName;
 
-  // Query to get patient details along with therapist's name, gender, and email
-  let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, p.gender, p.email, t.fname AS therapist_fname, t.lname AS therapist_lname
+  // Query to get patient details along with therapist's name, gender, email, born, and phone
+  let query = `SELECT p.fname AS patient_fname, p.lname AS patient_lname, p.age, p.patient_id, p.gender, p.email, p.born, p.phone, t.fname AS therapist_fname, t.lname AS therapist_lname
                FROM public.patient p
                LEFT JOIN public.therapist t ON p.therapist_id = t.therapist_id
                WHERE p.hospital_name = $1`;
@@ -743,17 +1278,19 @@ router.post('/adPatientView', (req, res) => {
                           }
                       }
 
-                      // Format the counter to ensure it always has two digits
-                      const paddedCounter = counter.toString().padStart(2, '0');
+                      // Format the born date to DD/MM/YYYY format
+                      const bornDate = patient.born ? new Date(patient.born).toLocaleDateString('en-GB') : '';
 
                       // Construct the output object for the current patient
                       const patientOutput = {
-                          "No": paddedCounter,
+                          "No": counter.toString().padStart(2, '0'),
                           "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
                           "patientID": `PID${patientID}`,
                           "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
                           "gender": patient.gender ? "male" : "female",
                           "age": patient.age,
+                          "born": bornDate,
+                          "phone": patient.phone,
                           "email": patient.email,
                           "mood": mood
                       };
@@ -779,6 +1316,7 @@ router.post('/adPatientView', (req, res) => {
           res.status(500).json({ error: 'An error occurred while fetching patient data' });
       });
 });
+
 
 
 //first api for merge
