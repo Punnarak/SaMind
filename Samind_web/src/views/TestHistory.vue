@@ -92,11 +92,21 @@
             color: getColor(item.columns.result, item.columns.testName),
           }"
         >
-          {{
-            item.columns.testName !== "PHQ9" && item.columns.testName !== "2Q"
-              ? item.columns.result
-              : getResult(item.columns.result, item.columns.testName)
-          }}
+          <template
+            v-if="
+              item.columns.testName !== 'PHQ9' && item.columns.testName !== '2Q'
+            "
+          >
+            <v-chip
+              color="blue"
+              @click="() => $router.push('/dashboard/testresult')"
+            >
+              see result
+            </v-chip>
+          </template>
+          <template v-else>
+            {{ getResult(item.columns.result, item.columns.testName) }}
+          </template>
         </label>
       </template>
 
