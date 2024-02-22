@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import CarouselCardItem, { SLIDER_WIDTH, ITEM_WIDTH } from "../Clibrary";
-import dataL from "../dataL";
+// import dataL from "../dataL";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
@@ -67,6 +67,51 @@ export default function Library() {
     },
     {
       url: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/10/Info-checkList-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.jpg",
+    },
+  ]);
+
+  let [dataCa, setDataCa] = useState([
+    {
+      title: "10 ตุลาคมวันสุขภาพจิต",
+      url: "https://www.lovecarestation.com/10-ตุลาคม-วันสุขภาพจิตโลก",
+      imgUrl: require("../assets/p1.jpg"),
+      header: {
+        alignItems: "center",
+        fontSize: 16,
+        fontWeight: "bold",
+        paddingLeft: 20,
+        marginTop: "-13%",
+        backgroundColor: "rgba(217, 217, 217, 0.47);",
+        padding: "4%",
+      },
+    },
+    {
+      title: "สุขภาพจิตไทย...วัดใจไปพร้อมกัน",
+      url: "https://www.thailandplus.tv/archives/403806",
+      imgUrl: require("../assets/p2.jpg"),
+      header: {
+        alignItems: "center",
+        fontSize: 16,
+        fontWeight: "bold",
+        paddingLeft: 20,
+        marginTop: "-13%",
+        backgroundColor: "rgba(217, 217, 217, 0.47);",
+        padding: "4%",
+      },
+    },
+    {
+      title: "สุขภาพจิตวัยรุ่น",
+      url: "https://www.hitap.net/166484",
+      imgUrl: require("../assets/p3.jpg"),
+      header: {
+        alignItems: "center",
+        fontSize: 16,
+        fontWeight: "bold",
+        paddingLeft: 20,
+        marginTop: "-13%",
+        backgroundColor: "rgba(217, 217, 217, 0.47);",
+        padding: "4%",
+      },
     },
   ]);
   useEffect(() => {
@@ -224,7 +269,7 @@ export default function Library() {
       />
       <Carousel
         ref={isCarousel}
-        data={dataL}
+        data={dataCa}
         renderItem={CarouselCardItem}
         sliderWidth={SLIDER_WIDTH}
         itemWidth={ITEM_WIDTH}
@@ -351,7 +396,7 @@ export default function Library() {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Notiscreen",{patientId})}
+            onPress={() => navigation.navigate("Notiscreen", { patientId })}
           />
           <Feather
             name="smile"

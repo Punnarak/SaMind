@@ -19,10 +19,10 @@ const CarouselCardItem = ({ item, index }) => {
       <ImageLink
         imageSource={item.imgUrl}
         link={item.url}
-        style={styles.image}
+        // style={styles.image}
       />
 
-      <Text style={[styles.header, item.header]}>{item.title}</Text>
+      <Text style={[item.header]}>{item.title}</Text>
     </View>
   );
 };
