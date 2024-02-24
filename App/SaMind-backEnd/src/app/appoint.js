@@ -348,27 +348,6 @@ function getCurrentDateTime() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // router.post('/appoint_post', (req, res) => {
 //   const { appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
 
