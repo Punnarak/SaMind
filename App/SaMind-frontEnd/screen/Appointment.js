@@ -20,8 +20,6 @@ import axios from "./axios.js";
 import DateTimePicker from "@react-native-community/datetimepicker";
 const isAndroid = Platform.OS === "android";
 export default function Calendar({ route }) {
-  console.log("Calendar Screen");
-
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -32,30 +30,33 @@ export default function Calendar({ route }) {
   const [timeError, setTimeError] = useState(false);
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
+  const [selectedTimeLabel, setSelectedTimeLabel] = useState(null);
   const [showdate, setshowdate] = useState([]);
+  const [oldDate, setOldDate] = useState([]);
+  const [newAppString, setNewAppString] = useState("");
   //   const [isCalendarVisible, setCalendarVisible] = useState(true);
   const { patientId } = route.params || {};
   const time = [
-    { id: 1, name: "0:00-1:00 ", value: "0:00" },
-    { id: 2, name: "0:30-1:30 ", value: "0:30" },
-    { id: 3, name: "1:00-2:00 ", value: "1:00" },
-    { id: 4, name: "1:30-2:30 ", value: "1:30" },
-    { id: 5, name: "2:00-3:00 ", value: "2:00" },
-    { id: 6, name: "2:30-3:30 ", value: "2:30" },
-    { id: 7, name: "3:00-4:00 ", value: "3:00" },
-    { id: 8, name: "3:30-4:30 ", value: "3:30" },
-    { id: 9, name: "4:00-5:00 ", value: "4:00" },
-    { id: 10, name: "4:30-5:30 ", value: "4:30" },
-    { id: 11, name: "5:00-6:00 ", value: "5:00" },
-    { id: 12, name: "5:30-6:30 ", value: "5:30" },
-    { id: 13, name: "6:00-7:00 ", value: "6:00" },
-    { id: 14, name: "6:30-7:30 ", value: "6:30" },
-    { id: 15, name: "7:00-8:00 ", value: "7:00" },
-    { id: 16, name: "7:30-8:30 ", value: "7:30" },
-    { id: 17, name: "8:00-9:00 ", value: "8:00" },
-    { id: 18, name: "8:30-9:30 ", value: "8:30" },
-    { id: 19, name: "9:00-10:00 ", value: "9:00" },
-    { id: 20, name: "9:30-10:30 ", value: "9:30" },
+    { id: 1, name: "00:00-01:00 ", value: "00:00" },
+    { id: 2, name: "00:30-01:30 ", value: "00:30" },
+    { id: 3, name: "01:00-02:00 ", value: "01:00" },
+    { id: 4, name: "01:30-02:30 ", value: "01:30" },
+    { id: 5, name: "02:00-03:00 ", value: "02:00" },
+    { id: 6, name: "02:30-03:30 ", value: "02:30" },
+    { id: 7, name: "03:00-04:00 ", value: "03:00" },
+    { id: 8, name: "03:30-04:30 ", value: "03:30" },
+    { id: 9, name: "04:00-05:00 ", value: "04:00" },
+    { id: 10, name: "04:30-05:30 ", value: "04:30" },
+    { id: 11, name: "05:00-06:00 ", value: "05:00" },
+    { id: 12, name: "05:30-06:30 ", value: "05:30" },
+    { id: 13, name: "06:00-07:00 ", value: "06:00" },
+    { id: 14, name: "06:30-07:30 ", value: "06:30" },
+    { id: 15, name: "07:00-08:00 ", value: "07:00" },
+    { id: 16, name: "07:30-08:30 ", value: "07:30" },
+    { id: 17, name: "08:00-09:00 ", value: "08:00" },
+    { id: 18, name: "08:30-09:30 ", value: "08:30" },
+    { id: 19, name: "09:00-10:00 ", value: "09:00" },
+    { id: 20, name: "09:30-10:30 ", value: "09:30" },
     { id: 21, name: "10:00-11:00 ", value: "10:00" },
     { id: 22, name: "10:30-11:30 ", value: "10:30" },
     { id: 23, name: "11:00-12:00 ", value: "11:00" },
@@ -84,6 +85,7 @@ export default function Calendar({ route }) {
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ];
+  console.log("Calendar Screen", patientId);
   const renderLink = ({ item }) => {
     return (
       <Text style={styles.link} onPress={() => handleItemPress(item)}>
@@ -95,6 +97,7 @@ export default function Calendar({ route }) {
   const handleItemPress = (itemValue) => {
     console.log("Time --> ", itemValue.value);
     setSelectedValue(itemValue.value);
+    setSelectedTimeLabel(itemValue.name);
     setIsPickerVisible(false);
   };
 
@@ -105,6 +108,7 @@ export default function Calendar({ route }) {
       setTimeError("");
     }
   }, [selectedValue]);
+
   useEffect(() => {
     console.log("Appointment Screen", patientId);
     const param = {
@@ -135,6 +139,7 @@ export default function Calendar({ route }) {
   const handleDateSelected = (date, month, year, textColor) => {
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
     const dateString = year + "-" + (month + 1) + "-" + date;
+    setOldDate(dateString);
     const dateFormat = "YYYY-MM-DD";
     const fulldate = moment(dateString, dateFormat).toDate();
     console.log("fulldate--> " + fulldate);
@@ -205,6 +210,7 @@ export default function Calendar({ route }) {
   };
 
   const showPicker = () => {
+    console.log("open picker");
     setShowDatePicker(true);
   };
 
@@ -230,7 +236,36 @@ export default function Calendar({ route }) {
       console.log("confirm state", !confirm);
       setConfirm(!confirm);
       setWaitDocToCon(!waitDocToCon);
-      console.log("postpone is success", newAppointment, selectedValue);
+      const selectedDateFormatted = moment(newAppointment).format("YYYY-MM-DD");
+      let parts = oldDate.split("-");
+
+      let date = new Date(parts[0], parts[1] - 1, parts[2]);
+
+      let formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+
+      const param = {
+        patientID: patientId,
+        oldDate: formattedDate,
+        newDate: selectedDateFormatted,
+        newTime: selectedValue,
+      };
+      console.log(param);
+      axios
+        .post("/appointChangeDateTime", param)
+        .then((response) => {
+          console.log(
+            "postpone is success",
+            oldDate,
+            newAppointment,
+            selectedValue
+          );
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
     } else {
       setTimeError("*");
     }
@@ -241,7 +276,7 @@ export default function Calendar({ route }) {
     setNewAppointment(new Date());
     setSelectedValue(null);
     setIsPickerVisible(false);
-    navigation.navigate("Appointmentscreen");
+    navigation.navigate("Appointmentscreen", { patientId });
   };
   return (
     <ImageBackground
@@ -347,7 +382,7 @@ export default function Calendar({ route }) {
                           paddingHorizontal: horizontalScale(8),
                           paddingVertical: verticalScale(6),
                         }}
-                        value={newAppointment}
+                        value={newAppString}
                       />
                       <Ionicons
                         name="calendar-outline"
@@ -363,12 +398,12 @@ export default function Calendar({ route }) {
                           is24Hour={true}
                           display="calendar"
                           onChange={(event, selectedDate) => {
-                            const currentDate = selectedDate || newAppointment;
-                            console.log("currentDate", currentDate);
-                            setNewAppointment(
-                              currentDate
-                              // .moment.dateFormat("DD-MM-YYYY")
-                            );
+                            if (event.type === "set") {
+                              const selectedDateFormatted =
+                                moment(selectedDate).format("DD-MM-YYYY");
+                              setNewAppString(selectedDateFormatted);
+                              setNewAppointment(selectedDate);
+                            }
                             setShowDatePicker(false);
                           }}
                           style={{
@@ -458,7 +493,7 @@ export default function Calendar({ route }) {
                     placeholder="Choose time..."
                     placeholderTextColor={"rgba(96, 91, 91, 0.47)"}
                     editable={false}
-                    value={selectedValue ? selectedValue : ""}
+                    value={selectedTimeLabel ? selectedTimeLabel : ""}
                   />
                 </View>
                 <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker}>
