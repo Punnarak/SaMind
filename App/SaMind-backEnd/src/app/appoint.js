@@ -347,6 +347,233 @@ function getCurrentDateTime() {
   return formattedDateTime;
 }
 
+// router.post('/appointChangeDateTime', (req, res) => {
+//   const id = req.query.id; // Get the id parameter from the query
+//   let query = 'SELECT * FROM library';
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE id = $1';
+//   }
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/appointChangeDateTime', (req, res) => {
+//   const { patientID, oldDate, newDate, newTime } = req.body;
+  
+//   // Check if patientID, oldDate, newDate, and newTime are provided
+//   if (!patientID || !oldDate || !newDate || !newTime) {
+//     return res.status(400).json({ error: 'Missing required parameters' });
+//   }
+
+//   // Check if newTime is in the correct format (HH:MM)
+//   if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(newTime)) {
+//     return res.status(400).json({ error: 'Invalid time format. Please use HH:MM format' });
+//   }
+
+//   // Check if oldDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(oldDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Check if newDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Update data in the database
+//   const updateQuery = `
+//     UPDATE public.appointment_new2
+//     SET change_date = $1, change_time = $2
+//     WHERE patient_id = $3 AND date = $4
+//   `;
+  
+//   const values = [newDate, newTime, patientID, oldDate];
+  
+//   client.query(updateQuery, values)
+//     .then(result => {
+//       res.json({ message: 'Data updated successfully' });
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/appointChangeDateTime', (req, res) => {
+//   const { patientID, oldDate, newDate, newTime } = req.body;
+  
+//   // Check if patientID, oldDate, newDate, and newTime are provided
+//   if (!patientID || !oldDate || !newDate || !newTime) {
+//     return res.status(400).json({ error: 'Missing required parameters' });
+//   }
+
+//   // Check if newTime is in the correct format (HH:MM)
+//   if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(newTime)) {
+//     return res.status(400).json({ error: 'Invalid time format. Please use HH:MM format' });
+//   }
+
+//   // Check if oldDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(oldDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Check if newDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Update data in the database
+//   const updateQuery = `
+//     UPDATE public.appointment_new2
+//     SET 
+//       change_date = $1, 
+//       change_time = $2,
+//       confirm = CASE 
+//                   WHEN confirm = 'Y' THEN 'W' 
+//                   ELSE confirm 
+//                 END
+//     WHERE patient_id = $3 AND date = $4 AND confirm != 'W'
+//   `;
+  
+//   const values = [newDate, newTime, patientID, oldDate];
+  
+//   client.query(updateQuery, values)
+//     .then(result => {
+//       res.json({ message: 'Data updated successfully' });
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/appointChangeDateTime', (req, res) => {
+//   const { patientID, oldDate, newDate, newTime } = req.body;
+  
+//   // Check if patientID, oldDate, newDate, and newTime are provided
+//   if (!patientID || !oldDate || !newDate || !newTime) {
+//     return res.status(400).json({ error: 'Missing required parameters' });
+//   }
+
+//   // Check if newTime is in the correct format (HH:MM)
+//   if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(newTime)) {
+//     return res.status(400).json({ error: 'Invalid time format. Please use HH:MM format' });
+//   }
+
+//   // Check if oldDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(oldDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Check if newDate is in the correct format (YYYY-MM-DD)
+//   if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+//     return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+//   }
+
+//   // Get current date and time
+//   const currentDate = getCurrentDateTime();
+
+//   // Update data in the database
+//   const updateQuery = `
+//     UPDATE public.appointment_new2
+//     SET 
+//       change_date = $1, 
+//       change_time = $2,
+//       confirm = CASE 
+//                   WHEN confirm = 'Y' THEN 'W' 
+//                   ELSE confirm 
+//                 END,
+//       update_by = $3,
+//       update_date = $4
+//     WHERE patient_id = $5 AND date = $6 AND confirm != 'W'
+//   `;
+  
+//   const values = [newDate, newTime, patientID, currentDate, patientID, oldDate];
+  
+//   client.query(updateQuery, values)
+//     .then(result => {
+//       res.json({ message: 'Data updated successfully' });
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/appointChangeDateTime', (req, res) => {
+  const { patientID, oldDate, newDate, newTime } = req.body;
+  
+  // Check if patientID, oldDate, newDate, and newTime are provided
+  if (!patientID || !oldDate || !newDate || !newTime) {
+    return res.status(400).json({ error: 'Missing required parameters' });
+  }
+
+  // Check if newTime is in the correct format (HH:MM)
+  if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(newTime)) {
+    return res.status(400).json({ error: 'Invalid time format. Please use HH:MM format' });
+  }
+
+  // Check if oldDate is in the correct format (YYYY-MM-DD)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(oldDate)) {
+    return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+  }
+
+  // Check if newDate is in the correct format (YYYY-MM-DD)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+    return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+  }
+
+  // Get current date and time
+  const currentDate = getCurrentDateTime();
+
+  // Update data in the database
+  const updateQuery = `
+    UPDATE public.appointment_new2
+    SET 
+      change_date = $1, 
+      change_time = $2,
+      confirm = CASE 
+                  WHEN confirm = 'Y' THEN 'W'
+                  ELSE confirm
+                END,
+      update_by = $3,
+      update_date = $4
+    WHERE patient_id = $5 AND date = $6 AND confirm IN ('Y', 'W')
+  `;
+  
+  const values = [newDate, newTime, patientID, currentDate, patientID, oldDate];
+  
+  client.query(updateQuery, values)
+    .then(result => {
+      res.json({ message: 'Data updated successfully' });
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+// Function to get current date and time
+// function getCurrentDateTime() {
+//   const currentDate = new Date();
+//   // Adjust to the desired time zone offset (e.g., +7 hours)
+//   currentDate.setHours(currentDate.getHours() + 7);
+//   const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+//   return formattedDateTime;
+// }
+
+
 
 // router.post('/appoint_post', (req, res) => {
 //   const { appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
@@ -852,11 +1079,6 @@ function formatTime(timeString) {
   const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
   return `${formattedHour}:${minute < 10 ? '0' : ''}${minute} ${ampm}`;
 }
-
-
-
-
-
 
 router.get('/appoint_therapist_get', (req, res) => {
   const id = req.query.therapist_id; // Get the id parameter from the query
