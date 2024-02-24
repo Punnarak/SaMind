@@ -13,7 +13,7 @@
             style="width: auto"
           >
             <row>
-              <label class="title ml-5"> APPOINTMENT REQUEST </label>
+              <label class="title ml-5 mr-10"> APPOINTMENT REQUEST </label>
               <v-btn icon variant="text" @click="toggleRequestBar">
                 <v-icon>mdi-close</v-icon>
               </v-btn></row
@@ -97,8 +97,9 @@
                               font-weight: 500;
                               font-size: 13px;
                               text-align: start;
+                              margin-left: -20px;
                             "
-                            >{{ patient.toDate }}<br />{{ patient.toTime }}
+                            >{{ patient.fromDate }}<br />{{ patient.fromTime }}
                           </label>
                         </div>
                       </div>
@@ -900,7 +901,6 @@ export default {
     selectDay() {
       var windowWidth = window.innerWidth;
 
-      // Log the width to the console
       console.log("Window width: " + windowWidth);
       console.log("Selected DAY");
       this.selectedViewType = "day";
@@ -1486,16 +1486,17 @@ export default {
     confirm(index) {
       // confirm case
       if (index >= 0 && index < this.patients.length) {
-        console.log("confirm case");
+        console.log("confirm case", index);
         this.patients[index].confirmed = true;
       }
     },
     confirmConfirm(index) {
       // confirm confirm this case
       if (index >= 0 && index < this.patients.length) {
-        console.log("confirm confirm this case");
+        console.log("confirm confirm this case", index);
         this.patients[index].confirmed = false;
         this.patients[index].sureConfirmed = true;
+        this.patients[index].value = "Y";
         this.handleSureCase(index);
       }
     },
@@ -1519,6 +1520,7 @@ export default {
         console.log("confirm Cancel this case");
         this.patients[index].cancel = false;
         this.patients[index].sureCancel = true;
+        this.patients[index].value = "N";
         this.handleSureCase(index);
       }
     },
@@ -1530,6 +1532,30 @@ export default {
       }
     },
     handleSureCase(patient) {
+      let param = {
+        patientID: this.patients[patient].patientId,
+        patientName: this.patients[patient].patientName,
+        dateFrom: this.patients[patient].fromDate,
+        timeFrom: this.patients[patient].fromTime,
+        dateTo: this.patients[patient].toDate,
+        timeTo: this.patients[patient].toTime,
+        confirm: this.patients[patient].value,
+      };
+      console.log(param);
+      axios
+        .post("/appointmentRequestConfirm", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = [];
+        });
       this.loadAnimation();
       setTimeout(() => {
         console.log("finish", patient);
@@ -1554,7 +1580,35 @@ export default {
 
   async created() {
     await this.fetchEvents();
-
+    let param = {
+      therapist_id: 5555,
+    };
+    console.log(param);
+    axios
+      .post("/appointmentRequestView", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.request = response.data.length;
+        this.patients = response.data.map((patient, index) => ({
+          id: index + 1,
+          patientId: patient.patientID,
+          patientName: patient.patientName,
+          toDate: patient.dateTo,
+          toTime: patient.timeTo,
+          fromDate: patient.dateFrom,
+          fromTime: patient.timeFrom,
+          value: "",
+        }));
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        this.eventsDay = [];
+      });
     this.selectedDate = new Date();
     this.currentDate = new Date();
     this.currentYear = this.currentDate.getFullYear();
