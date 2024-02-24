@@ -24,9 +24,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import axios from "./axios.js";
 
-export default function Library() {
+export default function Library({ route }) {
   const navigation = useNavigation();
-
+  const { hospitalName } = route.params || {};
   const [searchText, setSearchText] = useState("");
   const [filteredLinks, setFilteredLinks] = useState([]);
   let [data, setData] = useState([
@@ -60,13 +60,16 @@ export default function Library() {
   ]);
   let [dataIm, setDataIm] = useState([
     {
-      url: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/05/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.png",
+      imageUrl:
+        "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/05/how-to-%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.png",
     },
     {
-      url: "https://camri.go.th/th/images_file/info_home/images/7%20%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%94%E0%B8%B9%E0%B9%81%E0%B8%A5%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%20%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87%E0%B9%80%E0%B8%9C%E0%B8%8A%E0%B8%B4%E0%B8%8D%E0%B8%A0%E0%B8%B2%E0%B8%A7%E0%B8%B0%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B9%82%E0%B8%A8%E0%B8%81%E0%B9%80%E0%B8%A8%E0%B8%A3%E0%B9%89%E0%B8%B2.jpg",
+      imageUrl:
+        "https://camri.go.th/th/images_file/info_home/images/7%20%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%94%E0%B8%B9%E0%B9%81%E0%B8%A5%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%20%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87%E0%B9%80%E0%B8%9C%E0%B8%8A%E0%B8%B4%E0%B8%8D%E0%B8%A0%E0%B8%B2%E0%B8%A7%E0%B8%B0%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B9%82%E0%B8%A8%E0%B8%81%E0%B9%80%E0%B8%A8%E0%B8%A3%E0%B9%89%E0%B8%B2.jpg",
     },
     {
-      url: "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/10/Info-checkList-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.jpg",
+      imageUrl:
+        "https://www.rama.mahidol.ac.th/ramachannel/wp-content/uploads/2020/10/Info-checkList-%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95.jpg",
     },
   ]);
 
@@ -115,19 +118,28 @@ export default function Library() {
     },
   ]);
   useEffect(() => {
-    console.log("Library Screen");
-    // Make a GET request to fetch data from "/question?type=test2"
+    console.log("Library Screen", hospitalName);
+    let param = {
+      hospitalName: hospitalName,
+    };
     axios
-      .get("/library")
+      .post("/library", { param })
       .then((response) => {
-        // Set the fetched data in your state
         // response.data = [];
         if (response.data.length != 0) {
           console.log("in");
-          setData(response.data);
+          setDataCa(
+            response.data.carousel.map((item, index) => ({
+              title: item.name,
+              url: item.url,
+              imgUrl: item.imageUrl,
+            }))
+          );
+          setDataIm(response.data.tip);
+          setData(response.data.link);
         }
 
-        console.log(response.data, response.data.length);
+        console.log(response.data.carousel);
       })
       .catch((error) => {
         // Handle any errors here
@@ -157,7 +169,6 @@ export default function Library() {
   };
 
   const handleLinkPress = (link) => {
-    // ทำสิ่งที่คุณต้องการเมื่อผู้ใช้กดลิงก์ เช่นเปิดลิงก์ในเบราว์เซอร์
     Linking.openURL(link.url);
     console.log("Opening link:", link.url);
   };
@@ -170,17 +181,7 @@ export default function Library() {
   const [isButtonVisible, setButtonVisible] = useState(false);
   const [im, setIm] = useState();
   const toggleModal = (index, item) => {
-    // if (index === 0) {
-    //   setModalVisible1(!isModalVisible1);
-    //   setButtonVisible(!isButtonVisible);
-    // } else if (index === 1) {
-    //   setModalVisible2(!isModalVisible2);
-    //   setButtonVisible(!isButtonVisible);
-    // } else if (index === 2) {
-    //   setModalVisible3(!isModalVisible3);
-    //   setButtonVisible(!isButtonVisible);
-    // }
-    setIm(item.url);
+    setIm(item.imageUrl);
     setModalVisible1(!isModalVisible1);
     setButtonVisible(!isButtonVisible);
     console.log(im);
@@ -240,7 +241,7 @@ export default function Library() {
         <FlatList
           data={filteredLinks}
           renderItem={renderLink}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.libraryId.toString()}
           style={styles.list}
         />
       ) : null}
@@ -381,7 +382,7 @@ export default function Library() {
                 onPress={() => toggleModal(index, item)}
               >
                 <Image
-                  source={{ uri: item.url }}
+                  source={{ uri: item.imageUrl }}
                   style={{ width: 188, height: 237, marginLeft: 10 }}
                 />
               </TouchableOpacity>

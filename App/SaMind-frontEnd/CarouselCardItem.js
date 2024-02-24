@@ -15,7 +15,7 @@ import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
 const CarouselCardItem = ({ item, index }) => {
   return (
     <View style={styles.container} key={index}>
-      <Image source={item.imgUrl} style={styles.image} />
+      <Image source={{ uri: item.imgUrl }} style={styles.image} />
       <Text style={[styles.header, item.header]}>{item.title}</Text>
       <Text style={[styles.body, item.body]}>{item.content}</Text>
     </View>
@@ -30,15 +30,8 @@ const styles = StyleSheet.create({
     // height: 600,
     borderRadius: 15,
   },
+
   header: {
-    // ...Platform.select({
-    //   android: {
-    //     marginTop: "20%",
-    //   },
-    //   ios: {
-    // marginTop: "30%",
-    //   },
-    // }),
     fontSize: moderateScale(64),
     marginTop: verticalScale(100),
     marginLeft: horizontalScale(10),

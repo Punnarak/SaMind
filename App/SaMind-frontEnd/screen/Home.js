@@ -27,7 +27,7 @@ import axios from "./axios.js";
 const isAndroid = Platform.OS === "android";
 
 export default function Home({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, hospitalName } = route.params || {};
   const navigation = useNavigation();
   const [selectedMenu, setSelectedMenu] = useState();
   const [checkIn, setCheckIn] = useState(false);
@@ -320,7 +320,9 @@ export default function Home({ route }) {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Libraryscreen")}
+              onPress={() =>
+                navigation.navigate("Libraryscreen", { hospitalName })
+              }
             >
               <Text style={styles.Textb}>LIBRARY</Text>
               <I
