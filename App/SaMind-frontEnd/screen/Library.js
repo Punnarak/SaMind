@@ -26,7 +26,7 @@ import axios from "./axios.js";
 
 export default function Library({ route }) {
   const navigation = useNavigation();
-  const { hospitalName } = route.params || {};
+  const { patientId, hospitalName } = route.params || {};
   const [searchText, setSearchText] = useState("");
   const [filteredLinks, setFilteredLinks] = useState([]);
   let [data, setData] = useState([
@@ -118,7 +118,7 @@ export default function Library({ route }) {
     },
   ]);
   useEffect(() => {
-    console.log("Library Screen", hospitalName);
+    console.log("Library Screen", patientId, hospitalName);
     let param = {
       hospitalName: hospitalName,
     };
@@ -404,7 +404,7 @@ export default function Library({ route }) {
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Avatarscreen")}
+            onPress={() => navigation.navigate("Avatarscreen", { patientId })}
           />
         </View>
       </View>
