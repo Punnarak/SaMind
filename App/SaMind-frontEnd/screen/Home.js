@@ -326,7 +326,10 @@ export default function Home({ route }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() =>
-                navigation.navigate("Libraryscreen", { hospitalName })
+                navigation.navigate("Libraryscreen", {
+                  patientId,
+                  hospitalName,
+                })
               }
             >
               <Text style={styles.Textb}>LIBRARY</Text>
@@ -357,21 +360,14 @@ export default function Home({ route }) {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={
-              () =>
-                // Navigate to the Notification screen and pass the data as a param
-                navigation.navigate("Notiscreen", { patientId })
-              // navigation.navigate("Notiscreen", {
-              //   data: notiData,
-              // })
-            }
+            onPress={() => navigation.navigate("Notiscreen", { patientId })}
           />
           <Feather
             name="smile"
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Avatarscreen")}
+            onPress={() => navigation.navigate("Avatarscreen", { patientId })}
           />
         </View>
       </View>
