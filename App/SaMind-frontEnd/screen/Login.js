@@ -25,6 +25,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [patientId, setPatientId] = useState(123);
+  const [hospitalName, setHospitalName] = useState("siriraj-Hospital");
   //validate
   const [checkEmail, setCheckEmail] = useState(false);
   const [emailError, setEmailError] = useState(" ");
@@ -54,7 +55,7 @@ export default function Login() {
     if (email && password && checkEmail === true) {
       console.log("Login Complete");
       // setPatientId("123");
-      navigation.navigate("Homescreen", { patientId });
+      navigation.navigate("Homescreen", { patientId, hospitalName });
     }
   };
   const validateEmail = () => {

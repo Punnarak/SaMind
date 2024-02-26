@@ -14,7 +14,14 @@
       <div class="d-none d-md-block">
         <img
           src="../assets/signin/avatar.svg"
-          style="position: absolute; bottom: 0px; left: 20px; z-index: 0"
+          style="
+            position: absolute;
+            bottom: 0px;
+            left: 20px;
+            z-index: 0;
+            width: 700px;
+            height: auto;
+          "
         />
       </div>
     </div>

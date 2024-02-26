@@ -13,7 +13,7 @@
             style="width: auto"
           >
             <row>
-              <label class="title ml-5"> POSTPONE MEETING REQUEST </label>
+              <label class="title ml-5 mr-10"> APPOINTMENT REQUEST </label>
               <v-btn icon variant="text" @click="toggleRequestBar">
                 <v-icon>mdi-close</v-icon>
               </v-btn></row
@@ -27,9 +27,115 @@
                     'confirmed-item': patient.confirmed,
                     'cancel-item': patient.cancel,
                     'sure-item': patient.sureConfirmed || patient.sureCancel,
+                    'new-appointment': patient.new,
                   }"
                   class="custom-chip mb-5"
                 >
+                  <div
+                    v-if="
+                      !patient.confirmed &&
+                      !patient.cancel &&
+                      !patient.sureCancel &&
+                      !patient.sureConfirmed &&
+                      patient.toDate === '-' &&
+                      patient.toTime === '-'
+                    "
+                  >
+                    <div style="margin-top: -10px" v-if="patient.value == ''">
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          margin-top: -40px;
+                          position: absolute;
+                        "
+                      >
+                        <div
+                          class="circle mr-2"
+                          style="
+                            background-color: rgba(86, 154, 255, 1);
+                            width: 30px;
+                            height: 30px;
+                          "
+                        >
+                          <v-icon style="color: white">mdi-account</v-icon>
+                        </div>
+
+                        <label class="nametext">{{
+                          patient.patientName
+                        }}</label>
+                      </div>
+                      <br />
+                      <div>
+                        <div class="circle-container">
+                          <div
+                            class="circle"
+                            style="
+                              background-color: rgba(0, 191, 99, 1);
+                              margin-bottom: 35px;
+                            "
+                          ></div>
+                        </div>
+
+                        <div
+                          style="
+                            display: flex;
+                            position: absolute;
+                            margin-top: -50px;
+                            margin-left: 70px;
+                          "
+                        >
+                          <label
+                            class="text mr-8"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            >Request</label
+                          >
+                          <label
+                            class="text"
+                            style="
+                              color: rgba(0, 191, 99, 1);
+                              font-weight: 500;
+                              font-size: 13px;
+                              text-align: start;
+                              margin-left: -20px;
+                            "
+                            >{{ patient.fromDate }}<br />{{ patient.fromTime }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        margin-top: 30px;
+                        margin-left: 5px;
+                        position: absolute;
+                      "
+                    >
+                      <v-btn
+                        class="requestbtn mr-2"
+                        style="
+                          color: rgba(0, 191, 99, 1);
+                          border: 1px solid #00bf63;
+                          box-shadow: 0px 0px 2px 0px #00bf63;
+                        "
+                        @click="confirm(patientIndex)"
+                      >
+                        confirm
+                      </v-btn>
+                      <v-btn
+                        class="requestbtn"
+                        style="
+                          color: rgba(242, 86, 86, 1);
+                          border: 1px solid rgba(242, 86, 86, 1);
+                          box-shadow: 0px 0px 2px 0px rgba(242, 86, 86, 1);
+                        "
+                        @click="cancel(patientIndex)"
+                      >
+                        cancel
+                      </v-btn>
+                    </div>
+                  </div>
                   <div v-if="patient.confirmed" class="confirmtext">
                     <label>
                       Are you sure you want to
@@ -115,7 +221,9 @@
                       !patient.confirmed &&
                       !patient.cancel &&
                       !patient.sureCancel &&
-                      !patient.sureConfirmed
+                      !patient.sureConfirmed &&
+                      patient.toDate !== '-' &&
+                      patient.toTime !== '-'
                     "
                   >
                     <div style="margin-top: -10px" v-if="patient.value == ''">
@@ -561,6 +669,16 @@ export default {
           fromTime: "10.00",
           value: "",
         },
+        {
+          id: "05",
+          patientId: "PID004",
+          patientName: "Somsom Test4",
+          toDate: "-",
+          toTime: "-",
+          fromDate: "Tue, 12 Sep 2023",
+          fromTime: "10.00",
+          value: "",
+        },
       ],
       // set calendar type
       selectedViewType: "month",
@@ -783,7 +901,6 @@ export default {
     selectDay() {
       var windowWidth = window.innerWidth;
 
-      // Log the width to the console
       console.log("Window width: " + windowWidth);
       console.log("Selected DAY");
       this.selectedViewType = "day";
@@ -1369,16 +1486,17 @@ export default {
     confirm(index) {
       // confirm case
       if (index >= 0 && index < this.patients.length) {
-        console.log("confirm case");
+        console.log("confirm case", index);
         this.patients[index].confirmed = true;
       }
     },
     confirmConfirm(index) {
       // confirm confirm this case
       if (index >= 0 && index < this.patients.length) {
-        console.log("confirm confirm this case");
+        console.log("confirm confirm this case", index);
         this.patients[index].confirmed = false;
         this.patients[index].sureConfirmed = true;
+        this.patients[index].value = "Y";
         this.handleSureCase(index);
       }
     },
@@ -1402,6 +1520,7 @@ export default {
         console.log("confirm Cancel this case");
         this.patients[index].cancel = false;
         this.patients[index].sureCancel = true;
+        this.patients[index].value = "N";
         this.handleSureCase(index);
       }
     },
@@ -1413,6 +1532,30 @@ export default {
       }
     },
     handleSureCase(patient) {
+      let param = {
+        patientID: this.patients[patient].patientId,
+        patientName: this.patients[patient].patientName,
+        dateFrom: this.patients[patient].fromDate,
+        timeFrom: this.patients[patient].fromTime,
+        dateTo: this.patients[patient].toDate,
+        timeTo: this.patients[patient].toTime,
+        confirm: this.patients[patient].value,
+      };
+      console.log(param);
+      axios
+        .post("/appointmentRequestConfirm", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response", response.data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          this.eventsDay = [];
+        });
       this.loadAnimation();
       setTimeout(() => {
         console.log("finish", patient);
@@ -1437,7 +1580,35 @@ export default {
 
   async created() {
     await this.fetchEvents();
-
+    let param = {
+      therapist_id: 5555,
+    };
+    console.log(param);
+    axios
+      .post("/appointmentRequestView", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.request = response.data.length;
+        this.patients = response.data.map((patient, index) => ({
+          id: index + 1,
+          patientId: patient.patientID,
+          patientName: patient.patientName,
+          toDate: patient.dateTo,
+          toTime: patient.timeTo,
+          fromDate: patient.dateFrom,
+          fromTime: patient.timeFrom,
+          value: "",
+        }));
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        this.eventsDay = [];
+      });
     this.selectedDate = new Date();
     this.currentDate = new Date();
     this.currentYear = this.currentDate.getFullYear();

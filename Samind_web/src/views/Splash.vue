@@ -1,12 +1,12 @@
 <template>
   <v-main>
-    <v-row class="px-10 above-images" style="margin-top: 10%">
+    <v-row class="px-2 above-images" style="margin-top: 10%">
       <v-col
-        class="pl-10"
+        class="pl-2"
         cols="12"
         md="6"
         sm="12"
-        style="margin-left: 50px; margin-bottom: -90px"
+        style="margin-left: 100px; margin-bottom: -90px"
       >
         <div class="title">SaMind</div>
         <div class="subtitle">Website for Psychiatrist</div>
@@ -22,19 +22,19 @@
         >
           Sign in
         </v-btn>
+        <img
+          src="../assets/splash/sun.svg"
+          style="
+            position: absolute;
+            top: 35px;
+            left: 250px;
+            width: 450px;
+            z-index: -1;
+          "
+        />
       </v-col>
     </v-row>
     <div class="d-none d-md-block">
-      <img
-        src="../assets/splash/sun.svg"
-        style="
-          position: absolute;
-          top: 35px;
-          left: 250px;
-          width: 450px;
-          z-index: 0;
-        "
-      />
       <img
         src="../assets/splash/avatar.svg"
         style="
@@ -47,13 +47,8 @@
       />
       <img
         src="../assets/splash/hospital.png"
-        style="
-          position: absolute;
-          right: 0px;
-          bottom: 80px;
-          /* width: 550px; */
-          z-index: 0;
-        "
+        class="hospital-img"
+        style="position: absolute; right: 0px; bottom: 80px; z-index: 0"
       />
     </div>
   </v-main>
@@ -106,5 +101,38 @@
 
 .above-images {
   z-index: 1;
+}
+
+/* Responsive Styles */
+@media only screen and (max-width: 960px) {
+  .title {
+    font-size: 72px;
+  }
+  .subtitle {
+    font-size: 18px;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .title {
+    font-size: 48px;
+  }
+  .subtitle {
+    font-size: 14px;
+  }
+}
+</style>
+<style scoped>
+/* Your existing styles */
+
+/* Responsive Styles */
+@media only screen and (max-width: 960px) {
+  .hospital-img {
+    width: 400px; /* Adjust the width as per your design */
+  }
+}
+@media only screen and (max-width: 600px) {
+  .hospital-img {
+    width: 250px; /* Adjust the width as per your design */
+  }
 }
 </style>

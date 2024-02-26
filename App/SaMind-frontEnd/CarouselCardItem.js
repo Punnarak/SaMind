@@ -30,15 +30,8 @@ const styles = StyleSheet.create({
     // height: 600,
     borderRadius: 15,
   },
+
   header: {
-    // ...Platform.select({
-    //   android: {
-    //     marginTop: "20%",
-    //   },
-    //   ios: {
-    // marginTop: "30%",
-    //   },
-    // }),
     fontSize: moderateScale(64),
     marginTop: verticalScale(100),
     marginLeft: horizontalScale(10),
