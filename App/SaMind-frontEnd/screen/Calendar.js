@@ -66,7 +66,13 @@ export default function Calendar({ route }) {
           console.log("OUT");
           data = response.data;
         }
-        navigation.navigate("Upcomingscreen", { patientId, data, date, month, year });
+        navigation.navigate("Upcomingscreen", {
+          patientId,
+          data,
+          date,
+          month,
+          year,
+        });
       } catch (error) {
         // Handle any errors here
         console.error("Axios error:", error);
