@@ -37,8 +37,8 @@ export default function Home({ route }) {
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   const fetchData = async () => {
-    const patient = await AsyncStorage.getItem("patientId");
-    console.log("storage", patient);
+    // const patient = await AsyncStorage.getItem("patientId");
+    // console.log("storage", patient);
     try {
       const response = await axios.post("/check_mood_per_day_get", {
         patient_id: patientId,
@@ -66,6 +66,7 @@ export default function Home({ route }) {
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
       fetchData();
+      console.log("mood", selectedMenu);
     });
 
     return onFocus;
