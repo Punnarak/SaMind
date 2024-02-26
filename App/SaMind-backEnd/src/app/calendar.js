@@ -1,9 +1,9 @@
 const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
+const auth = require('./auth.js').authorization;
 
-
-router.get('/calendar_get', (req, res) => {
+router.get('/calendar_get', auth, (req, res) => {
   const patient_id = req.query.patient_id;
   let query = 'SELECT * FROM appointment_new';
 

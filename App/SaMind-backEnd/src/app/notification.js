@@ -52,7 +52,7 @@ const auth = require('./auth.js').authorization;
 //         });
 // });
 
-router.post('/notiAssign', (req, res) => {
+router.post('/notiAssign', auth, (req, res) => {
     const patientId = req.body.patientId; // Get patientId from the request body
     if (!patientId) {
         return res.status(400).json({ error: 'Patient ID is required in the request body' });
@@ -143,7 +143,7 @@ router.post('/notiAssign', (req, res) => {
 //         });
 // });
 
-router.post('/notiAppoint', (req, res) => {
+router.post('/notiAppoint', auth, (req, res) => {
     const id = req.body.patientId; // Use req.body.patientId instead of req.query.patient_id
     const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
     let query = `
@@ -280,7 +280,7 @@ router.post('/notiAppoint', (req, res) => {
 //         });
 // });
 
-router.post('/notiApp', (req, res) => {
+router.post('/notiApp', auth, (req, res) => {
     const patientId = req.body.patientId;
     const currentDate = new Date().toISOString().split('T')[0];
 

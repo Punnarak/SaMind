@@ -2,6 +2,7 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const auth = require('./auth.js').authorization;
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -16,7 +17,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.get('/question', (req, res) => {
+router.get('/question', auth, (req, res) => {
   const type = req.query.type; // Get the type parameter from the query
   let query = 'SELECT no, question, options, type FROM questionnaire_new';
 
@@ -191,7 +192,7 @@ router.get('/question', (req, res) => {
 //     });
 // });
 
-router.post('/assignment_status_wait', (req, res) => {
+router.post('/assignment_status_wait', auth, (req, res) => {
   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
 
   // Use $1 as a placeholder for the parameter in the query
@@ -255,7 +256,7 @@ function formatDate(dateString) {
 //     });
 // });
 
-router.post('/individual_test_post', (req, res) => {
+router.post('/individual_test_post', auth, (req, res) => {
   const patientId = req.body.patient_id;
   const testName = req.body.test_name;
 
@@ -365,7 +366,7 @@ router.post('/individual_test_post', (req, res) => {
 //   }
 // });
 
-router.post('/receive_answer_individual_post', async (req, res) => {
+router.post('/receive_answer_individual_post', auth, async (req, res) => {
   const { type, patientId, answer } = req.body;
 
   if (!type || !patientId || !answer) {
@@ -485,7 +486,7 @@ router.post('/receive_answer_individual_post', async (req, res) => {
 //     });
 // });
 
-router.post('/map_answer_individual_test', (req, res) => {
+router.post('/map_answer_individual_test', auth, (req, res) => {
   const patientId = req.body.patientId;
   const testType = req.body.type;
 
@@ -528,7 +529,7 @@ router.post('/map_answer_individual_test', (req, res) => {
     });
 });
 
-router.post('/get_question_for_map', (req, res) => {
+router.post('/get_question_for_map', auth, (req, res) => {
   const type = req.query.test_name; // Get the id parameter from the query
   let query = 'SELECT no, question, options, test_name FROM questionnaire_new2';
 
@@ -549,7 +550,7 @@ router.post('/get_question_for_map', (req, res) => {
     });
 });
 
-router.post('/get_answer_for_map', (req, res) => {
+router.post('/get_answer_for_map', auth, (req, res) => {
   const patientId = req.body.patientId;
   const type = req.body.type;
   let query = 'SELECT patient_id, type, answer FROM test_score WHERE';
@@ -746,7 +747,7 @@ router.post('/get_answer_for_map', (req, res) => {
 //   res.json(mergedResults);
 // });
 
-router.post('/answer_map_question_from_user', async (req, res) => {
+router.post('/answer_map_question_from_user', auth, async (req, res) => {
   const type = req.body.type;
   const patientId = req.body.patient_id;
 
@@ -784,7 +785,7 @@ router.post('/answer_map_question_from_user', async (req, res) => {
 
 
 // ver use body
-router.delete('/questionsDel', (req, res) => {
+router.delete('/questionsDel', auth, (req, res) => {
   const type = req.body.type; // Get the type from the request body
 
   if (!type) {
@@ -804,7 +805,7 @@ router.delete('/questionsDel', (req, res) => {
     });
 });
 
-router.post('/score_question_post', async (req, res) => {
+router.post('/score_question_post', auth, async (req, res) => {
   const { score, type, patient_id } = req.body;
 
   if (!score || !type || !patient_id) {
@@ -842,7 +843,7 @@ router.post('/score_question_post', async (req, res) => {
   }
 });
 
-router.get('/score_question_get', (req, res) => {
+router.get('/score_question_get', auth, (req, res) => {
   const id = req.query.patient_id; // Get the id parameter from the query
   let query = 'SELECT * FROM test_score';
 
@@ -891,7 +892,7 @@ router.get('/score_question_get', (req, res) => {
 //     });
 // });
 
-router.get('/finish_two_latest_question_get', (req, res) => {
+router.get('/finish_two_latest_question_get', auth, (req, res) => {
   const id = req.query.patient_id; // Get the id parameter from the query
   let query = 'SELECT * FROM test_score';
 

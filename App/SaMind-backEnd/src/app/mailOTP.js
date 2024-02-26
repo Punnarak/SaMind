@@ -3,6 +3,7 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 const router = express.Router();
+const auth = require('./auth.js').authorization;
 
 router.use(express.json());
 
@@ -17,7 +18,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.post("/send-otp", async (req, res) => {
+router.post("/send-otp", auth, async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -58,7 +59,7 @@ function isValidEmail(email) {
   return emailRegex.test(email);
 }
 
-router.post("/verify-otp", async (req, res) => {
+router.post("/verify-otp", auth, async (req, res) => {
   const { email, otp } = req.body;
 
   try {

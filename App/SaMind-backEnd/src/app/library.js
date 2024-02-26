@@ -1,6 +1,7 @@
 const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
+const auth = require('./auth.js').authorization;
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ const router = express.Router();
 //     });
 // });
 
-router.post('/library', (req, res) => {
+router.post('/library', auth, (req, res) => {
   const hospitalName = req.body.hospitalName; // Get the hospitalName from the request body
   let query = `SELECT 
                   library_id AS "libraryId", 
@@ -163,7 +164,7 @@ router.post('/library', (req, res) => {
  *             example:
  *               error: An error occurred
  */
-router.post('/libraryAdd', (req, res) => {
+router.post('/libraryAdd', auth, (req, res) => {
   const { id, name, url} = req.body;
 
   if (!id || !name || !url) {

@@ -63,7 +63,7 @@ const auth = require('./auth.js').authorization;
 //   }
 // });
 
-router.post('/mood_tracker_post', async (req, res) => {
+router.post('/mood_tracker_post', auth, async (req, res) => {
   const { patient_id, score } = req.body;
 
   if (!patient_id || !score) {
@@ -847,7 +847,7 @@ router.post('/dashboard_api', auth, async (req, res) => {
 //     });
 // });
 
-router.post('/check_mood_per_day_get', (req, res) => {
+router.post('/check_mood_per_day_get', auth, (req, res) => {
   const id = req.body.patient_id;
 
   // Get the current date and time
@@ -1073,7 +1073,7 @@ router.post('/check_mood_per_day_get', (req, res) => {
 //     });
 // });
 
-router.post('/assignmentInfo_post', (req, res) => {
+router.post('/assignmentInfo_post', auth, (req, res) => {
   const { patient_id } = req.body; // Extract patient_id from request body
   const type = req.body.type; // Assuming the type is in the request body
 
