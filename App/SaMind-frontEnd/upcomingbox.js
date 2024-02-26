@@ -86,19 +86,8 @@ const NotificationBox = ({ item, index, data }) => {
     "December",
   ];
 
-  const [hours, minutes] = item.time.split(":");
-
-  // Create a new Date object and set the hours and minutes
-  const dateObject = new Date();
-  dateObject.setHours(parseInt(hours, 10));
-  dateObject.setMinutes(parseInt(minutes, 10));
-
-  // Format the time using Date object methods
-  const formattedTime = dateObject.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const formattedTime = item.time;
+  console.log(item.time, formattedTime);
   return (
     <View style={{ flexDirection: "row" }}>
       <View
