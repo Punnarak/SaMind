@@ -18,26 +18,31 @@ export default function Profile({ route }) {
   const { patientId, update } = route.params || {};
   const navigation = useNavigation();
 
-  const [flag, setFlag] = useState()
+  const [flag, setFlag] = useState();
   //info
   const [data, setData] = useState({});
-  const param = {
-    patient_id: patientId,
-  };
-
-  axios
-    .post("/info_patient_get", param)
-    .then((response) => {
-      setData(response.data);
-    })
-    .catch((error) => {
-      console.error("Axios error:", error);
-    });
 
   useEffect(() => {
-    console.log("Profile Screen",patientId)
-  }, []);
+    console.log("Profile Screen", patientId);
 
+    const onFocus = navigation.addListener("focus", () => {
+      console.log("Screen is focused");
+      const param = {
+        patient_id: patientId,
+      };
+      axios
+        .post("/info_patient_get", param)
+        .then((response) => {
+          console.log(response.data);
+          setData(response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
+    });
+
+    return onFocus;
+  }, []);
 
   return (
     <View style={styles.container1}>
@@ -54,7 +59,11 @@ export default function Profile({ route }) {
         onPress={() => navigation.goBack()}
       />
       <View style={styles.container2}>
-        <Text style={styles.wel}>{data.fname && data.lname ? data.fname +" "+ data.lname : "Punya Hasinanan"}</Text>
+        <Text style={styles.wel}>
+          {data.fname && data.lname
+            ? data.fname + " " + data.lname
+            : "Punya Hasinanan"}
+        </Text>
         <Text style={styles.title1}>Name</Text>
         <TextInput
           editable={false}
@@ -86,7 +95,9 @@ export default function Profile({ route }) {
         >
           <TouchableOpacity
             style={styles.loginb}
-            onPress={() => navigation.navigate("Editscreen", {patientId,data})}
+            onPress={() =>
+              navigation.navigate("Editscreen", { patientId, data })
+            }
           >
             <Text style={styles.text}>Edit</Text>
           </TouchableOpacity>

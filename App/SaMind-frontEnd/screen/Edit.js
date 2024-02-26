@@ -251,7 +251,13 @@ export default function EditProfile({ route }) {
           onChangeText={(text) => {
             setConPassword(text);
 
-            setConPasswordError(text.trim() === "" ? "*" : " ");
+            setConPasswordError(
+              text.trim() === ""
+                ? "*"
+                : text.trim() !== password
+                ? "Not matching"
+                : ""
+            );
           }}
         />
         {isIOS ? null : (
