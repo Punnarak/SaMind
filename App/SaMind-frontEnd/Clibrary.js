@@ -30,7 +30,7 @@ const ImageLink = ({ imageSource, link }) => {
   const handlePress = () => {
     Linking.openURL(link);
   };
-  console.log(imageSource);
+  // console.log(imageSource);
   return (
     <TouchableOpacity onPress={handlePress}>
       <Image
