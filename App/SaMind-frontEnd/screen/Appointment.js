@@ -111,29 +111,34 @@ export default function Calendar({ route }) {
 
   useEffect(() => {
     console.log("Appointment Screen", patientId);
-    const param = {
-      patient_id: patientId,
-    };
-    let dateStrings;
-    axios
-      .post("/appoint_patient_post", param)
-      .then((response) => {
-        if (response.data.length != 0) {
-          console.log("in");
-          dateStrings = response.data;
-          const dateFormat = "YYYY-MM-DD";
-          const dates = dateStrings.map((dateString) =>
-            moment(dateString, dateFormat).toDate()
-          );
-          setHighlightedDates(dates);
-        }
+    const onFocus = navigation.addListener("focus", () => {
+      console.log("Screen is focused");
+      const param = {
+        patient_id: patientId,
+      };
+      let dateStrings;
+      axios
+        .post("/appoint_patient_post", param)
+        .then((response) => {
+          if (response.data.length != 0) {
+            console.log("in");
+            dateStrings = response.data;
+            const dateFormat = "YYYY-MM-DD";
+            const dates = dateStrings.map((dateString) =>
+              moment(dateString, dateFormat).toDate()
+            );
+            setHighlightedDates(dates);
+          }
 
-        console.log(response.data, response.data.length);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
+          console.log(response.data, response.data.length);
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
+    });
+
+    return onFocus;
   }, []);
   // }, [highlightedDates]);
   const handleDateSelected = (date, month, year, textColor) => {
