@@ -158,7 +158,7 @@ export default function Forgotpassword() {
             </Text>
           ) : (
             <Text style={styles.confirmlink}>
-              We have sent confirmation email,{"\n"}please confirm via the link.
+              We have sent confirmation email,{"\n"}please confirm via the OTP.
             </Text>
           )}
         </View>
