@@ -352,6 +352,102 @@ router.post("/reset_password", async (req, res) => {
   }
 });
 
+// Function to generate a 6-digit OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
+
+// Function to send OTP to the provided email
+async function sendOTP(email, otp) {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "desmotest123@gmail.com",
+        pass: "uovg pqyt utur dvyz",
+      },
+    });
+
+    await transporter.sendMail({
+      from: "desmotest123@gmail.com",
+      to: email,
+      subject: "Your OTP for Password Reset",
+      text: `Your OTP is: ${otp}`,
+    });
+
+    console.log("OTP sent successfully");
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    throw error; // Throw error to handle it in the calling function
+  }
+}
+
+router.post("/forgotPassword", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if the email is valid
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Invalid email address" });
+    }
+
+    // Hash the new password
+    const hash = await bcrypt.hash(password, saltRounds);
+
+    // Update user's password in the database
+    await client.query(
+      "UPDATE public.users SET password = $1 WHERE email = $2",
+      [hash, email]
+    );
+
+    // Generate OTP
+    const otpValue = generateOTP();
+
+    // Save OTP to database
+    await client.query("INSERT INTO otp_data (email, otp) VALUES ($1, $2)", [
+      email,
+      otpValue,
+    ]);
+
+    // Send OTP to the provided email
+    await sendOTP(email, otpValue);
+
+    res.json({ message: "Password updated successfully. OTP sent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+router.post("/verifyOtpForgotPassword", async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    // Check if the OTP matches the one in the database
+    const otpResult = await client.query(
+      "SELECT * FROM otp_data WHERE email = $1 AND otp = $2",
+      [email, otp]
+    );
+
+    if (otpResult.rows.length === 0) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Delete the OTP entry from the database after successful verification
+    await client.query("DELETE FROM otp_data WHERE email = $1", [email]);
+
+    res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred" });
+  }
+});
+
+
+
+
 function authenticate(req, res, next) {
   // ตรวจสอบการยืนยันตัวตนที่นี่
   // ตัวอย่างเช่นตรวจสอบค่า Authorization ใน req.headers หรือตรวจสอบการตรวจสอบเซสชัน
@@ -482,13 +578,114 @@ function authenticate(req, res, next) {
 //   }
 // });
 
+// router.post("/login", jsonParser, async function (req, res, next) {
+//   const email = req.body.email;
+//   const password = req.body.password;
+
+//   // const query = {
+//   //   text: "SELECT * FROM users WHERE email = $1 AND verify_user = $2",
+//   //   values: [email, "Y"],
+//   // };
+
+//   const query = {
+//     text: "SELECT * FROM users WHERE email = $1",
+//     values: [email],
+//   };
+
+//   try {
+//     const result = await client.query(query);
+
+//     if (result.rows.length === 0) {
+//       return res.json({ status: "error", message: "No user found" });
+//     }
+
+//     const hashedPassword = result.rows[0].password;
+
+//     // Use bcrypt.compare to check if the provided password matches the hashed password
+//     const isLogin = await bcrypt.compare(password, hashedPassword);
+
+//     if (isLogin) {
+//       const { id, email, patient_id } = result.rows[0];
+//       const token = jwt.sign({ id, email, patient_id }, secret, {
+//         expiresIn: "1h",
+//       });
+
+//       return res
+//         .cookie("access_token", token, {
+//           httpOnly: true,
+//           secure: process.env.NODE_ENV === "production",
+//         })
+//         .status(200)
+//         .json({ status: "ok", message: "Login success", user: result.rows[0] });
+//     } else {
+//       return res.json({ status: "error", message: "Login failed" });
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     return res.json({
+//       status: "error",
+//       message: "An error occurred during login",
+//     });
+//   }
+// });
+
+// router.post("/login", jsonParser, async function (req, res, next) {
+//   const email = req.body.email;
+//   const password = req.body.password;
+
+//   const query = {
+//     text: "SELECT users_id, email, password, patient_id FROM users WHERE email = $1",
+//     values: [email],
+//   };
+
+//   try {
+//     const result = await client.query(query);
+
+//     if (result.rows.length === 0) {
+//       return res.json({ status: "error", message: "No user found" });
+//     }
+
+//     const hashedPassword = result.rows[0].password;
+
+//     if (!hashedPassword) {
+//       return res.json({ status: "error", message: "Password is not set for the user" });
+//     }
+
+//     // Use bcrypt.compare to check if the provided password matches the hashed password
+//     const isLogin = await bcrypt.compare(password, hashedPassword);
+
+//     if (isLogin) {
+//       const { users_id, email, patient_id, verify_user } = result.rows[0];
+//       const token = jwt.sign({ users_id, email, patient_id }, secret, {
+//         expiresIn: "1h",
+//       });
+
+//       return res
+//         .cookie("access_token", token, {
+//           httpOnly: true,
+//           secure: process.env.NODE_ENV === "production",
+//         })
+//         .status(200)
+//         .json({ status: "ok", message: "Login success", user: { users_id, email, patient_id, verify_user } });
+//     } else {
+//       return res.json({ status: "error", message: "Login failed" });
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     return res.json({
+//       status: "error",
+//       message: "An error occurred during login",
+//     });
+//   }
+// });
+
 router.post("/login", jsonParser, async function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
   const query = {
-    text: "SELECT * FROM users WHERE email = $1 AND verify_user = $2",
-    values: [email, "Y"],
+    text: "SELECT u.users_id, u.email, u.patient_id, p.hospital_name, u.password FROM users u LEFT JOIN patient p ON u.patient_id = p.patient_id WHERE u.email = $1",
+    values: [email],
   };
 
   try {
@@ -500,12 +697,16 @@ router.post("/login", jsonParser, async function (req, res, next) {
 
     const hashedPassword = result.rows[0].password;
 
+    if (!hashedPassword) {
+      return res.json({ status: "error", message: "Password is not set for the user" });
+    }
+
     // Use bcrypt.compare to check if the provided password matches the hashed password
     const isLogin = await bcrypt.compare(password, hashedPassword);
 
     if (isLogin) {
-      const { id, email, patient_id } = result.rows[0];
-      const token = jwt.sign({ id, email, patient_id }, secret, {
+      const { users_id, email, patient_id, hospital_name } = result.rows[0];
+      const token = jwt.sign({ users_id, email, patient_id, hospital_name }, secret, {
         expiresIn: "1h",
       });
 
@@ -515,7 +716,7 @@ router.post("/login", jsonParser, async function (req, res, next) {
           secure: process.env.NODE_ENV === "production",
         })
         .status(200)
-        .json({ status: "ok", message: "Login success", user: result.rows[0] });
+        .json({ status: "ok", message: "Login success", user: { users_id, email, patient_id, hospital_name } });
     } else {
       return res.json({ status: "error", message: "Login failed" });
     }
@@ -527,6 +728,8 @@ router.post("/login", jsonParser, async function (req, res, next) {
     });
   }
 });
+
+
 
 router.post("/logout", auth, (req, res) => {
   return res
