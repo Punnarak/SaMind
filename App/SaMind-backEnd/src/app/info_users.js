@@ -209,11 +209,47 @@ router.post('/update_info', auth, async (req, res) => {
 //     });
 // });
 
+// router.post('/info_patient_get', auth, (req, res) => {
+//   const patient_id = req.query.patient_id; // Get the id parameter from the query
+//   let query = 'SELECT users.email, patient.patient_id, patient.fname, patient.lname FROM users LEFT JOIN patient ON patient.patient_id = users.patient_id';
+
+//   // Check if the id parameter is provided
+//   if (patient_id) {
+//     query += ' WHERE patient.patient_id = $1';
+//   }
+
+//   // Add an "ORDER BY" clause to sort the result by the "patient_id" column
+//   query += ' ORDER BY patient.patient_id';
+
+//   const queryParams = patient_id ? [patient_id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       if (result.rows.length > 0) {
+//         const row = result.rows[0]; // Take the first row, assuming there's only one result
+//         const decodedResult = {
+//           email: row.email,
+//           patient_id: row.patient_id,
+//           fname: row.fname,
+//           lname: row.lname,
+//         };
+
+//         res.json(decodedResult);
+//       } else {
+//         res.status(404).json({ error: 'Patient not found' });
+//       }
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/info_patient_get', auth, (req, res) => {
-  const patient_id = req.query.patient_id; // Get the id parameter from the query
+  const patient_id = req.body.patient_id; // Get the patient_id from the request body
   let query = 'SELECT users.email, patient.patient_id, patient.fname, patient.lname FROM users LEFT JOIN patient ON patient.patient_id = users.patient_id';
 
-  // Check if the id parameter is provided
+  // Check if the patient_id is provided
   if (patient_id) {
     query += ' WHERE patient.patient_id = $1';
   }
@@ -244,6 +280,7 @@ router.post('/info_patient_get', auth, (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 router.post('/info_therapist_post', auth, (req, res) => {
   const { therapist_id, fname, lname, phone, email, hospital_name } = req.body;

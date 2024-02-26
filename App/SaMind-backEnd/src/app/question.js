@@ -805,11 +805,55 @@ router.delete('/questionsDel', auth, (req, res) => {
     });
 });
 
+// router.post('/score_question_post', auth, async (req, res) => {
+//   const { score, type, patient_id } = req.body;
+
+//   if (!score || !type || !patient_id) {
+//     return res.status(400).json({ error: 'score, type, and patient_id are required fields.' });
+//   }
+
+//   // Use a sequence to generate the score_id
+//   const generateScoreIdQuery = 'SELECT NEXTVAL(\'score_id_seq\') AS score_id';
+
+//   // Insert the new entry
+//   const insertQuery = 'INSERT INTO test_score (score_id, score, type, date_time, patient_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+
+//   var currentDate = new Date();
+//   var day = currentDate.getDate();
+//   var month = currentDate.getMonth() + 1; // To start the month from 1
+//   var year = currentDate.getFullYear();
+//   var hours = currentDate.getHours();
+//   var minutes = currentDate.getMinutes();
+//   var seconds = currentDate.getSeconds();
+//   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+//   try {
+//     // Execute the query to generate the score_id
+//     const scoreIdResult = await client.query(generateScoreIdQuery);
+
+//     // Extract the generated score_id from the result
+//     const generatedScoreId = scoreIdResult.rows[0].score_id;
+
+//     // Insert the new entry with the generated score_id
+//     const insertResult = await client.query(insertQuery, [generatedScoreId, score, type, formattedDate, patient_id]);
+//     res.status(201).json(insertResult.rows[0]);
+//   } catch (error) {
+//     console.error('Error executing query:', error);
+//     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
+//   }
+// });
+
 router.post('/score_question_post', auth, async (req, res) => {
   const { score, type, patient_id } = req.body;
 
-  if (!score || !type || !patient_id) {
-    return res.status(400).json({ error: 'score, type, and patient_id are required fields.' });
+  // Check if type and patient_id are present
+  if (!type || !patient_id) {
+    return res.status(400).json({ error: 'type and patient_id are required fields.' });
+  }
+
+  // Check if score is a number and non-negative
+  if (typeof score !== 'number' || score < 0) {
+    return res.status(400).json({ error: 'score must be a non-negative number.' });
   }
 
   // Use a sequence to generate the score_id
@@ -842,6 +886,7 @@ router.post('/score_question_post', auth, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while inserting the new entry' });
   }
 });
+
 
 router.get('/score_question_get', auth, (req, res) => {
   const id = req.query.patient_id; // Get the id parameter from the query
