@@ -29,18 +29,22 @@ export default function Dashboard({ route }) {
     axios
       .post("/dashboard_api", param)
       .then((response) => {
-        console.log("in");
         setData(response.data);
         console.log("data:", response.data);
-        // setMood(response.data.avgMood);
-        handleColor1(
-          response.data.historyTest.type1,
-          response.data.historyTest.result1
-        );
-        handleColor2(
-          response.data.historyTest.type2,
-          response.data.historyTest.result2
-        );
+        setMood(response.data.avgMood);
+        if (response.data.historyTest.type1) {
+          handleColor1(
+            response.data.historyTest.type1,
+            response.data.historyTest.result1
+          );
+        }
+
+        if (response.data.historyTest.type2) {
+          handleColor2(
+            response.data.historyTest.type2,
+            response.data.historyTest.result2
+          );
+        }
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -73,8 +77,21 @@ export default function Dashboard({ route }) {
         setColor1("red");
       }
     }
-
-    console.log(result);
+    if (type === "PHQ9") {
+      if (
+        result.includes(
+          "ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก"
+        )
+      ) {
+        setColor1("#11dd66");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับน้อย")) {
+        setColor1("#FFDE59");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับปานกลาง")) {
+        setColor1("#FF914D");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับรุนแรง")) {
+        setColor1("#FF5757");
+      }
+    }
   };
   const handleColor2 = (type, result) => {
     if (type === "2Q") {
@@ -695,7 +712,13 @@ export default function Dashboard({ route }) {
         </View>
       )}
       <View style={styles.container2}>
-        <View style={styles.qbox}>
+        <View
+          style={
+            data.historyTest && data.historyTest.hasOwnProperty("result2")
+              ? [styles.qbox, { paddingBottom: "3%" }]
+              : styles.qbox
+          }
+        >
           <View style={styles.box}>
             <Text style={styles.wel}>Test History</Text>
           </View>
@@ -751,14 +774,17 @@ export default function Dashboard({ route }) {
                 style={{
                   textAlign: "center",
                   justifyContent: "center",
-                  marginLeft: "40%",
+                  ...Platform.select({
+                    android: { marginTop: "6%", marginLeft: "40%" },
+                    ios: { marginTop: "6%", marginLeft: "41%" },
+                  }),
                 }}
               >
                 No Data
               </Text>
             )}
           </View>
-          {data.historyTest && data.historyTest.result1 !== null ? (
+          {data.historyTest && data.historyTest.hasOwnProperty("result2") ? (
             <View
               style={{
                 marginTop: "3%",
@@ -784,7 +810,7 @@ export default function Dashboard({ route }) {
               marginTop: "4%",
             }}
           >
-            {data.historyTest && data.historyTest.result1 !== null ? (
+            {data.historyTest && data.historyTest.hasOwnProperty("result2") ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -985,7 +1011,9 @@ export default function Dashboard({ route }) {
           </View>
           <Text style={styles.moodDate}>
             Last talk:
-            {data.dateAvatar !== null ? data.dateAvatar : "No last talk"}
+            {data.avatarMoodDetec && data.dateAvatar !== null
+              ? data.dateAvatar
+              : "No last talk"}
           </Text>
         </View>
 
@@ -1124,7 +1152,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-    paddingVertical: "3%",
+    paddingTop: "3%",
     width: "99.8%",
   },
   wel: {
@@ -1156,10 +1184,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   title: {
-    marginBottom: "4%",
     fontSize: 11,
     color: "black",
     fontWeight: "bold",
+    ...Platform.select({
+      android: {
+        marginBottom: "2%",
+      },
+      ios: { marginBottom: "4%" },
+    }),
   },
   moodavgbox: {
     marginBottom: "1%",
