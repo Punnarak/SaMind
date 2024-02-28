@@ -17,7 +17,7 @@ const CarouselCardItem = ({ item, index }) => {
   return (
     <View style={styles.container} key={index}>
       <ImageLink
-        imageSource={{ uri: item.imgUrl }}
+        imageSource={item.imgUrl}
         link={item.url}
         style={styles.image}
       />
@@ -30,10 +30,15 @@ const ImageLink = ({ imageSource, link }) => {
   const handlePress = () => {
     Linking.openURL(link);
   };
-
+  console.log(imageSource);
   return (
     <TouchableOpacity onPress={handlePress}>
-      <Image source={imageSource} style={styles.image} />
+      <Image
+        source={{
+          uri: String(imageSource),
+        }}
+        style={styles.image}
+      />
     </TouchableOpacity>
   );
 };

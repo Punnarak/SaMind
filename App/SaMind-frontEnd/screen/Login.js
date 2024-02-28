@@ -10,7 +10,8 @@ import {
   ImageBackground,
   Platform,
 } from "react-native";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "./axios.js";
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
@@ -40,7 +41,21 @@ export default function Login() {
       validateEmail();
     }
   }, [email]);
-
+  const storePatientId = async (patientId) => {
+    console.log("storepatient", patientId);
+    try {
+      await AsyncStorage.setItem("patientId", patientId);
+    } catch (error) {
+      console.error("Error storing token:", error);
+    }
+  };
+  const storeToken = async (token) => {
+    try {
+      await AsyncStorage.setItem("token", token);
+    } catch (error) {
+      console.error("Error storing token:", error);
+    }
+  };
   const handleLoginPress = () => {
     setEmailError(" ");
     setPasswordError(" ");
@@ -53,9 +68,28 @@ export default function Login() {
       setPasswordError("Password is required");
     }
     if (email && password && checkEmail === true) {
-      console.log("Login Complete");
-      // setPatientId("123");
-      navigation.navigate("Homescreen", { patientId, hospitalName });
+      let param = {
+        email: email,
+        password: password,
+      };
+      console.log("param", param);
+      axios
+        .post("/login", param)
+        .then((response) => {
+          console.log("response", response.data);
+          console.log("Login Complete");
+          setPatientId(response.data.user.patient_id);
+          setHospitalName(response.data.user.hospital_name);
+          // storePatientId(response.data.user.patient_id);
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
+
+      if (patientId !== undefined && hospitalName !== undefined) {
+        navigation.navigate("Homescreen", { patientId, hospitalName });
+      }
     }
   };
   const validateEmail = () => {

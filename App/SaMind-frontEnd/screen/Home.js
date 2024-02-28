@@ -14,6 +14,7 @@ import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import axios from "./axios.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import data from "../notiData";
 // const getDeviceModel = () => {
@@ -36,6 +37,8 @@ export default function Home({ route }) {
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   const fetchData = async () => {
+    const patient = await AsyncStorage.getItem("patientId");
+    console.log("storage", patient);
     try {
       const response = await axios.post("/check_mood_per_day_get", {
         patient_id: patientId,
@@ -64,6 +67,7 @@ export default function Home({ route }) {
       console.log("Screen is focused");
       fetchData();
     });
+
     return onFocus;
   }, []);
 
