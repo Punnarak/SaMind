@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
   errorEmailText: {
     position: "absolute",
     ...Platform.select({
-      android: { marginTop: "1%", left: 57 },
+      android: { top: 18, left: 67 },
       ios: { top: 18, left: 67 },
     }),
     fontSize: this.emailError === "*" ? 20 : 20,
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   errorPasswordText: {
     position: "absolute",
     ...Platform.select({
-      android: { marginTop: "1%", left: 100 },
+      android: { top: 100, left: 145 },
       ios: { top: 100, left: 145 },
     }),
     fontSize: 20,
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
   errorConPasswordText: {
     position: "absolute",
     ...Platform.select({
-      android: { marginTop: "-3%", left: 180 },
+      android: { top: 183, left: 175 },
       ios: { top: 183, left: 175 },
     }),
     fontSize: this.conPasswordError === "*" ? 20 : 20,
