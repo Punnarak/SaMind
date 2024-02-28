@@ -12,6 +12,7 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "./axios.js";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -34,6 +35,10 @@ const PopcatGame = ({ route }) => {
   const [riceCount, setRiceCount] = useState(3);
   const [meatCount, setMeatCount] = useState(3);
 
+
+  const [gameData, setGameData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
@@ -46,6 +51,24 @@ const PopcatGame = ({ route }) => {
     const newProgress = progress2 + value;
     setProgress2(Math.min(newProgress, 1));
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/game_get_id", {
+          params: { patientId: patientId }
+        });
+        setGameData(response.data);
+        setIsLoading(false);
+        console.log("Fetched data:", response.data); // Logging the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [patientId]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -262,6 +285,14 @@ const PopcatGame = ({ route }) => {
         break;
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
