@@ -32,18 +32,20 @@ export default function Dashboard({ route }) {
         setData(response.data);
         console.log("data:", response.data);
         setMood(response.data.avgMood);
-        if (response.data.historyTest.type1) {
-          handleColor1(
-            response.data.historyTest.type1,
-            response.data.historyTest.result1
-          );
-        }
+        if (response.data.hasOwnProperty("historyTest")) {
+          if (response.data.hasOwnProperty.hasOwnProperty("type1")) {
+            handleColor1(
+              response.data.historyTest.type1,
+              response.data.historyTest.result1
+            );
+          }
 
-        if (response.data.historyTest.type2) {
-          handleColor2(
-            response.data.historyTest.type2,
-            response.data.historyTest.result2
-          );
+          if (response.data.historyTest.hasOwnProperty("type2")) {
+            handleColor2(
+              response.data.historyTest.type2,
+              response.data.historyTest.result2
+            );
+          }
         }
       })
       .catch((error) => {
@@ -702,8 +704,12 @@ export default function Dashboard({ route }) {
               style={{
                 fontSize: 11,
                 color: "rgba(37, 39, 28, 1)",
-                marginTop: "3%",
+
                 fontWeight: "700",
+                ...Platform.select({
+                  android: { marginTop: "2%", left: 9 },
+                  ios: { marginTop: "4%" },
+                }),
               }}
             >
               No Average Mood
@@ -775,8 +781,8 @@ export default function Dashboard({ route }) {
                   textAlign: "center",
                   justifyContent: "center",
                   ...Platform.select({
-                    android: { marginTop: "6%", marginLeft: "40%" },
-                    ios: { marginTop: "6%", marginLeft: "41%" },
+                    android: { marginTop: "4%", marginLeft: "41%" },
+                    ios: { marginTop: "4%", marginLeft: "41%" },
                   }),
                 }}
               >
