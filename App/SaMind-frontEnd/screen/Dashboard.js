@@ -32,7 +32,7 @@ export default function Dashboard({ route }) {
         console.log("in");
         setData(response.data);
         console.log("data:", response.data);
-        setMood(response.data.avgMood);
+        // setMood(response.data.avgMood);
         handleColor1(
           response.data.historyTest.type1,
           response.data.historyTest.result1
@@ -685,7 +685,7 @@ export default function Dashboard({ route }) {
               style={{
                 fontSize: 11,
                 color: "rgba(37, 39, 28, 1)",
-                marginTop: "5%",
+                marginTop: "3%",
                 fontWeight: "700",
               }}
             >
@@ -1296,5 +1296,16 @@ const styles = StyleSheet.create({
   picul: {
     marginLeft: "9%",
   },
-  no: {},
+  no: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
+  },
 });
