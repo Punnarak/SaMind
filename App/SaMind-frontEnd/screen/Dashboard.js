@@ -18,7 +18,9 @@ export default function Dashboard({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
-  const [moodCard, setMoodCard] = useState("happy");
+  const [moodCard, setMoodCard] = useState("no");
+  const [color1, setColor1] = useState("green");
+  const [color2, setColor2] = useState("green");
   useEffect(() => {
     console.log("Dashboard Screen", patientId);
     const param = {
@@ -31,6 +33,14 @@ export default function Dashboard({ route }) {
         setData(response.data);
         console.log("data:", response.data);
         setMood(response.data.avgMood);
+        handleColor1(
+          response.data.historyTest.type1,
+          response.data.historyTest.result1
+        );
+        handleColor2(
+          response.data.historyTest.type2,
+          response.data.historyTest.result2
+        );
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -51,9 +61,31 @@ export default function Dashboard({ route }) {
       setMoodCard("happy");
     } else if (mood == 5) {
       setMoodCard("cheerful");
+    } else if (mood == 0 || mood === null || mood === undefined) {
+      setMoodCard("no");
     }
   };
+  const handleColor1 = (type, result) => {
+    if (type === "2Q") {
+      if (result.includes("ไม่มีแนวโน้ม")) {
+        setColor1("green");
+      } else if (result == 0) {
+        setColor1("red");
+      }
+    }
 
+    console.log(result);
+  };
+  const handleColor2 = (type, result) => {
+    if (type === "2Q") {
+      if (result.includes("ไม่มีแนวโน้ม")) {
+        setColor2("green");
+      } else if (result == 0) {
+        setColor2("red");
+      }
+    }
+    console.log(result);
+  };
   return (
     <ImageBackground
       source={require("../assets/Game.png")}
@@ -638,7 +670,30 @@ export default function Dashboard({ route }) {
           </View>
         </View>
       )}
-
+      {moodCard == "no" && (
+        <View style={styles.no}>
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "18%",
+              marginLeft: "35%",
+              zIndex: 7,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(37, 39, 28, 1)",
+                marginTop: "5%",
+                fontWeight: "700",
+              }}
+            >
+              No Average Mood
+            </Text>
+          </View>
+        </View>
+      )}
       <View style={styles.container2}>
         <View style={styles.qbox}>
           <View style={styles.box}>
@@ -651,39 +706,77 @@ export default function Dashboard({ route }) {
               marginTop: "4%",
             }}
           >
+            {data.historyTest && data.historyTest.result1 !== null ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // marginTop: "4%",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "column",
+                    // alignItems: "center",
+                    marginTop: "1%",
+                  }}
+                >
+                  <Text style={styles.q}>
+                    {data.historyTest && data.historyTest.type1 !== null
+                      ? data.historyTest.type1
+                      : null}
+                  </Text>
+                  <Text style={styles.d}>
+                    ทดสอบเมื่อวันที่{" "}
+                    {data.historyTest && data.historyTest.date1 !== null
+                      ? data.historyTest.date1
+                      : null}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: color1,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {data.historyTest && data.historyTest.result1 !== null
+                    ? data.historyTest.result1
+                    : null}
+                </Text>
+              </View>
+            ) : (
+              <Text
+                style={{
+                  textAlign: "center",
+                  justifyContent: "center",
+                  marginLeft: "40%",
+                }}
+              >
+                No Data
+              </Text>
+            )}
+          </View>
+          {data.historyTest && data.historyTest.result1 !== null ? (
             <View
               style={{
-                flexDirection: "column",
-                // alignItems: "center",
-                marginTop: "1%",
+                marginTop: "3%",
+                paddingHorizontal: "3%",
+                height: 1,
+                backgroundColor: "#F9E5DB",
               }}
-            >
-              <Text style={styles.q}>
-                {data.historyTest && data.historyTest.type1 !== null
-                  ? data.historyTest.type1
-                  : null}
-              </Text>
-              <Text style={styles.d}>
-                ทดสอบเมื่อวันที่{" "}
-                {data.historyTest && data.historyTest.date1 !== null
-                  ? data.historyTest.date1
-                  : null}
-              </Text>
-            </View>
-            <Text style={styles.r}>
-              {data.historyTest && data.historyTest.result1 !== null
-                ? data.historyTest.result1
-                : null}
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: "3%",
-              paddingHorizontal: "3%",
-              height: 1,
-              backgroundColor: "#F9E5DB",
-            }}
-          />
+            />
+          ) : (
+            <View
+              style={{
+                marginTop: "3%",
+                paddingHorizontal: "3%",
+                height: 1,
+                backgroundColor: "#FFF7F3",
+              }}
+            />
+          )}
           <View
             style={{
               flexDirection: "row",
@@ -691,30 +784,47 @@ export default function Dashboard({ route }) {
               marginTop: "4%",
             }}
           >
-            <View
-              style={{
-                flexDirection: "column",
-                // alignItems: "center",
-                marginTop: "1%",
-              }}
-            >
-              <Text style={styles.q}>
-                {data.historyTest && data.historyTest.type2 !== null
-                  ? data.historyTest.type2
-                  : null}
-              </Text>
-              <Text style={styles.d}>
-                ทดสอบเมื่อวันที่{" "}
-                {data.historyTest && data.historyTest.date2 !== null
-                  ? data.historyTest.date2
-                  : null}
-              </Text>
-            </View>
-            <Text style={styles.r2}>
-              {data.historyTest && data.historyTest.result2 !== null
-                ? data.historyTest.result2
-                : null}
-            </Text>
+            {data.historyTest && data.historyTest.result1 !== null ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // marginTop: "4%",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "column",
+                    // alignItems: "center",
+                    marginTop: "1%",
+                  }}
+                >
+                  <Text style={styles.q}>
+                    {data.historyTest && data.historyTest.type2 !== null
+                      ? data.historyTest.type2
+                      : null}
+                  </Text>
+                  <Text style={styles.d}>
+                    ทดสอบเมื่อวันที่{" "}
+                    {data.historyTest && data.historyTest.date2 !== null
+                      ? data.historyTest.date2
+                      : null}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: color2,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {data.historyTest && data.historyTest.result2 !== null
+                    ? data.historyTest.result2
+                    : null}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
         <Text style={styles.title}>
@@ -1186,4 +1296,5 @@ const styles = StyleSheet.create({
   picul: {
     marginLeft: "9%",
   },
+  no: {},
 });
