@@ -63,7 +63,7 @@ const auth = require('./auth.js').authorization;
 //   }
 // });
 
-router.post('/mood_tracker_post', async (req, res) => {
+router.post('/mood_tracker_post', auth, async (req, res) => {
   const { patient_id, score } = req.body;
 
   if (!patient_id || !score) {
@@ -529,7 +529,6 @@ async function getAvatarMoodDetection(patientId) {
   }
 }
 
-
 // Function to format date as "2 December 2023 at 23:37:57"
 function formatDate(timestamp) {
   const dateObj = new Date(timestamp);
@@ -665,7 +664,7 @@ function formatDate(timestamp) {
 // });
 
 //main api
-router.post('/dashboard_api'/*, auth*/, async (req, res) => {
+router.post('/dashboard_api', auth, async (req, res) => {
   const { patient_id } = req.body;
 
   try {
@@ -847,35 +846,122 @@ router.post('/dashboard_api'/*, auth*/, async (req, res) => {
 //     });
 // });
 
-router.post('/check_mood_per_day_get', (req, res) => {
+// router.post('/check_mood_per_day_get', auth, (req, res) => {
+//   const id = req.body.patient_id;
+
+//   // Get the current date and time
+//   const currentDate = new Date();
+//   const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+
+//   // Build the SQL query with a left join on the patient table
+//   let query = 'SELECT mood_tracker.*, patient.fname FROM mood_tracker';
+//   query += ' LEFT JOIN patient ON mood_tracker.patient_id = patient.patient_id';
+
+//   const queryParams = [];
+
+//   console.log(currentDate);
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE mood_tracker.patient_id = $1::integer'; // Explicitly cast to integer
+//     queryParams.push(id);
+//   }
+
+//   // Add a condition to check if the date_time column matches the current date
+//   query += ' AND mood_tracker.date_time::date = $2';
+//   queryParams.push(formattedDate.slice(0, 10));
+
+//   // Add an "ORDER BY" clause to sort the result by the mood_tracker id column
+//   query += ' ORDER BY mood_tracker_id';
+
+//   // Execute the query to get the mood data
+//   client.query(query, queryParams)
+//     .then(moodResult => {
+//       // Check if there are rows in the mood result
+//       const hasMoodRows = moodResult.rows.length > 0;
+
+//       let responseObject = {
+//         fname: hasMoodRows ? moodResult.rows[0].fname : null,
+//         checkin: hasMoodRows,
+//         moodscore: hasMoodRows ? moodResult.rows[0].score : null,
+//       };
+
+//       // If patient_id is provided, fetch the name directly within the API
+//       if (id) {
+//         const nameQuery = 'SELECT fname FROM patient WHERE patient_id = $1';
+//         const nameQueryParams = [id];
+
+//         client.query(nameQuery, nameQueryParams)
+//           .then(nameResult => {
+//             // If the name is found, update the responseObject
+//             if (nameResult.rows.length > 0) {
+//               responseObject.fname = nameResult.rows[0].fname; // Update key to "fname"
+//             }
+//             // Return the JSON object
+//             res.json(responseObject);
+//           })
+//           .catch(err => {
+//             console.error('Error executing name query:', err);
+//             res.json(responseObject); // Return the mood data even if there's an error fetching the name
+//           });
+//       } else {
+//         // Return the JSON object without fetching the name
+//         res.json(responseObject);
+//       }
+//     })
+//     .catch(err => {
+//       console.error('Error executing mood query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+
+router.post("/check_mood_per_day_get", auth, (req, res) => {
   const id = req.body.patient_id;
 
-  // Get the current date and time
-  const currentDate = new Date();
-  const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  };
+  const currentDate = new Date().toLocaleString("en-US", options);
+  const dateString = currentDate;
+  const [datePart, timePart] = dateString.split(", ");
+  const [month, day, year] = datePart.split("/");
+  const [hours, minutes, seconds] = timePart
+    .split(":")
+    .map((part) => parseInt(part));
+
+  // Create a new Date object with the parsed values
+  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.000`;
+
+  // console.log(formattedDate);
 
   // Build the SQL query with a left join on the patient table
-  let query = 'SELECT mood_tracker.*, patient.fname FROM mood_tracker';
-  query += ' LEFT JOIN patient ON mood_tracker.patient_id = patient.patient_id';
+  let query = "SELECT mood_tracker.*, patient.fname FROM mood_tracker";
+  query += " LEFT JOIN patient ON mood_tracker.patient_id = patient.patient_id";
 
   const queryParams = [];
-
   // Check if the id parameter is provided
   if (id) {
-    query += ' WHERE mood_tracker.patient_id = $1::integer'; // Explicitly cast to integer
+    query += " WHERE mood_tracker.patient_id = $1::integer"; // Explicitly cast to integer
     queryParams.push(id);
   }
 
   // Add a condition to check if the date_time column matches the current date
-  query += ' AND mood_tracker.date_time::date = $2';
+  query += " AND mood_tracker.date_time::date = $2";
   queryParams.push(formattedDate.slice(0, 10));
 
   // Add an "ORDER BY" clause to sort the result by the mood_tracker id column
-  query += ' ORDER BY mood_tracker_id';
+  query += " ORDER BY mood_tracker_id";
 
   // Execute the query to get the mood data
-  client.query(query, queryParams)
-    .then(moodResult => {
+  client
+    .query(query, queryParams)
+    .then((moodResult) => {
       // Check if there are rows in the mood result
       const hasMoodRows = moodResult.rows.length > 0;
 
@@ -887,11 +973,12 @@ router.post('/check_mood_per_day_get', (req, res) => {
 
       // If patient_id is provided, fetch the name directly within the API
       if (id) {
-        const nameQuery = 'SELECT fname FROM patient WHERE patient_id = $1';
+        const nameQuery = "SELECT fname FROM patient WHERE patient_id = $1";
         const nameQueryParams = [id];
 
-        client.query(nameQuery, nameQueryParams)
-          .then(nameResult => {
+        client
+          .query(nameQuery, nameQueryParams)
+          .then((nameResult) => {
             // If the name is found, update the responseObject
             if (nameResult.rows.length > 0) {
               responseObject.fname = nameResult.rows[0].fname; // Update key to "fname"
@@ -899,8 +986,8 @@ router.post('/check_mood_per_day_get', (req, res) => {
             // Return the JSON object
             res.json(responseObject);
           })
-          .catch(err => {
-            console.error('Error executing name query:', err);
+          .catch((err) => {
+            console.error("Error executing name query:", err);
             res.json(responseObject); // Return the mood data even if there's an error fetching the name
           });
       } else {
@@ -908,9 +995,9 @@ router.post('/check_mood_per_day_get', (req, res) => {
         res.json(responseObject);
       }
     })
-    .catch(err => {
-      console.error('Error executing mood query:', err);
-      res.status(500).json({ error: 'An error occurred' });
+    .catch((err) => {
+      console.error("Error executing mood query:", err);
+      res.status(500).json({ error: "An error occurred" });
     });
 });
 
@@ -1073,7 +1160,7 @@ router.post('/check_mood_per_day_get', (req, res) => {
 //     });
 // });
 
-router.post('/assignmentInfo_post', (req, res) => {
+router.post('/assignmentInfo_post', auth, (req, res) => {
   const { patient_id } = req.body; // Extract patient_id from request body
   const type = req.body.type; // Assuming the type is in the request body
 

@@ -3,9 +3,9 @@
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> LIBRARY </v-col>
       <v-col class="calendar-type" cols="4" align="center">
-        <button @click="menu = 'carousel'">CAROUSEL</button>
-        <button @click="menu = 'tip'">TIP</button>
-        <button @click="menu = 'link'">LINK</button>
+        <button @click="menu = 'carousel', this.dataEachMenu()">CAROUSEL</button>
+        <button @click="menu = 'tip', this.dataEachMenu()">TIP</button>
+        <button @click="menu = 'link', this.dataEachMenu()">LINK</button>
       </v-col>
     </v-row>
     <v-col class="px-10" v-if="menu == 'carousel'">
@@ -69,7 +69,7 @@
             color="blue"
             size="30px"
             style="margin-right: 20px"
-            @click="handleEditCarousel(item.columns)"
+            @click="handleEditCarousel(item.columns), (select = item)"
           />
           <v-btn
             icon="mdi-delete"
@@ -238,7 +238,7 @@
                   <div class="modal-body" style="margin-top: 6px" align="start">
                     <slot name="body"
                       >Are you sure you want to delete :
-                      {{ select.columns.name }} ?</slot
+                      {{ select.columns.title }} ?</slot
                     >
                   </div>
 
@@ -247,7 +247,7 @@
                       <button
                         class="modal-default-button"
                         style="color: red"
-                        @click="Delete(item, selectTest), (deletePopup = false)"
+                        @click="Delete(item, select), (deletePopup = false)"
                       >
                         Delete
                       </button>
@@ -527,7 +527,7 @@
                       <button
                         class="modal-default-button"
                         style="color: red"
-                        @click="Delete(item, selectTest), (deletePopup = false)"
+                        @click="Delete(item, select), (deletePopup = false)"
                       >
                         Delete
                       </button>
@@ -627,7 +627,7 @@
             color="blue"
             size="30px"
             style="margin-right: 20px"
-            @click="handleEditLink(item.columns)"
+            @click="handleEditLink(item.columns),(select = item)"
           />
           <v-btn
             icon="mdi-delete"
@@ -746,7 +746,7 @@
                   <div class="modal-body" style="margin-top: 6px" align="start">
                     <slot name="body"
                       >Are you sure you want to delete :
-                      {{ select.columns.title }} ?</slot
+                      {{ this.select.columns.title }} ?</slot
                     >
                   </div>
 
@@ -755,7 +755,7 @@
                       <button
                         class="modal-default-button"
                         style="color: red"
-                        @click="Delete(item, selectTest), (deletePopup = false)"
+                        @click="Delete(item, select), (deletePopup = false)"
                       >
                         Delete
                       </button>
@@ -1286,6 +1286,14 @@
 </template>
 
 <script setup>
+const carouselPage = ref(1);
+const carouselPerPage = ref(10);
+const tipPage = ref(1);
+const tipPerPage = ref(10);
+const linkPage = ref(1);
+const linkPerPage = ref(10);
+</script>
+<script>
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
 
@@ -1372,30 +1380,6 @@ let link = ref(
     },
   ]
 );
-onMounted(async () => {
-  const param = {
-    therapist_id: 5555,
-  };
-  await axios
-    .post("/patientList", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      carousel.value = response.data.map((patient, index) => ({
-        no: patient.no,
-        name: patient.name,
-        link: patient.link,
-        image: patient.image,
-      }));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-});
 
 let searchCarousel = ref("");
 let searchTip = ref("");
@@ -1420,19 +1404,13 @@ const filteredLink = computed(() => {
     item.title.toLowerCase().includes(searchTerm)
   );
 });
-const carouselPage = ref(1);
-const carouselPerPage = ref(10);
-const tipPage = ref(1);
-const tipPerPage = ref(10);
-const linkPage = ref(1);
-const linkPerPage = ref(10);
 
 const carouselHeader = [
   {
     title: "No.",
     align: "center",
     sortable: false,
-    key: "no",
+    key: "No",
   },
   { title: "Title", key: "title", sortable: false },
 
@@ -1450,7 +1428,7 @@ const tipHeader = [
     title: "No.",
     align: "center",
     sortable: false,
-    key: "no",
+    key: "No",
   },
   { title: "Title", key: "title", sortable: false },
   { title: "Image", key: "imageUrl", align: "center", sortable: false },
@@ -1461,7 +1439,7 @@ const linkHeader = [
     title: "No.",
     align: "center",
     sortable: false,
-    key: "no",
+    key: "No",
   },
   { title: "Title", key: "title", sortable: false },
   {
@@ -1473,16 +1451,13 @@ const linkHeader = [
   },
   { title: "Action", key: "action", align: "center", sortable: false },
 ];
-</script>
-<script>
-import axios from "../axios.js";
-import console from "console";
 export default {
   props: {
     deletePopup: Boolean,
   },
   data() {
     return {
+      hospitalName: "",
       select: [],
       createCarouselPopup: false,
       createTipPopup: false,
@@ -1529,29 +1504,95 @@ export default {
       if (this.title === "" || this.url == "" || this.imageUrl === "") {
       } else {
         // console.log("Create Link", this.title, this.url);
+        let param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+	url:this.url,
+	imageUrl:this.imageUrl,
+	type:"carousel"
+}
+        axios
+    .post("/adLibraryCreate", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
         this.createCarouselPopup = false;
         this.title = "";
         this.url = "";
         this.imageUrl = "";
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
       }
     },
     handleCreateTip() {
       if (this.title === "" || this.imageUrl === "") {
       } else {
         // console.log("Create Link", this.title, this.url);
-        this.createTipPopup = false;
+        let param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+	imageUrl:this.imageUrl,
+	type:"tip"
+}
+        axios
+    .post("/adLibraryCreate", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+      this.createTipPopup = false;
         this.title = "";
         this.imageUrl = "";
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+      
       }
     },
     handleCreateLink() {
       if (this.title === "" || this.url === "") {
       } else {
         // console.log("Create Link", this.title, this.url);
-        this.createLinkPopup = false;
-      }
+        let param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+	url:this.url,
+	type:"link"
+}
+        axios
+    .post("/adLibraryCreate", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+      
+      this.createLinkPopup = false;
       this.title = "";
       this.url = "";
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+        
+      }
+     
     },
     handleEditCarousel(carousel) {
       this.editCarouselPopup = true;
@@ -1565,8 +1606,7 @@ export default {
       this.editTipPopup = true;
       this.title = tip.title;
       this.imageUrl = tip.imageUrl;
-      // console.log("Edit Link");
-      // console.log("Edit Link", this.title, this.url);
+     
     },
     handleEditLink(link) {
       this.editLinkPopup = true;
@@ -1576,56 +1616,156 @@ export default {
       // console.log("Edit Link", this.title, this.url);
     },
     handleUpdateCarousel() {
+      let param
       if (this.title === "" || this.url === "" || this.imageUrl == "") {
       } else {
-        // console.log("Update Link");
-        // console.log("Update Link: ", this.title, this.url);
-        this.title = "";
+        if(this.title === this.select.columns.title){
+           param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+  url: this.url,
+	imageUrl:this.imageUrl,
+	type:"carousel"
+}
+        }else if(this.title !== this.select.columns.title){
+           param = {
+          hospitalName:this.hospitalName,
+	title:this.select.columns.title,
+  titleNew: this.title,
+  url: this.url,
+	imageUrl:this.imageUrl,
+	type:"carousel"
+}
+        }
+        
+        axios
+    .post("/adLibraryEdit", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Edit success", response.data);
+      this.title = "";
         this.url = "";
         this.imageUrl = "";
         this.editCarouselPopup = false;
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+       
+     
       }
     },
     handleUpdateTip() {
       if (this.title === "" || this.imageUrl == "") {
       } else {
-        // console.log("Update Link");
-        // console.log("Update Link: ", this.title, this.url);
-        this.title = "";
+
+        // console.log("Create Link", this.title, this.url);
+        let param 
+        if(this.title === this.select.columns.title){
+          param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+	imageUrl:this.imageUrl,
+	type:"tip"
+}
+        }else if(this.title !== this.select.columns.title){
+          param = {
+          hospitalName:this.hospitalName,
+	title:this.select.columns.title,
+  titleNew: this.title,
+	imageUrl:this.imageUrl,
+	type:"tip"
+}
+        }
+        
+        axios
+    .post("/adLibraryEdit", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Edit success", response.data);
+      this.title = "";
         this.imageUrl = "";
         this.editTipPopup = false;
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+       
       }
     },
     handleUpdateLink() {
       if (this.title === "" || this.url === "") {
       } else {
-        // console.log("Update Link");
-        // console.log("Update Link: ", this.title, this.url);
-        this.title = "";
+        let param 
+        if(this.title === this.select.columns.title){
+          param = {
+          hospitalName:this.hospitalName,
+	title:this.title,
+	url:this.url,
+	type:"link"
+}
+        }else if(this.title !== this.select.columns.title){
+          param = {
+          hospitalName:this.hospitalName,
+          title: this.select.columns.title,
+	titleNew:this.title,
+	url:this.url,
+	type:"link"
+}
+        }
+        
+        axios
+    .post("/adLibraryEdit", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+      
+      this.title = "";
         this.url = "";
         this.editLinkPopup = false;
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+     
       }
     },
-    Delete(question, selectTest) {
-      console.log("selectTest", selectTest);
-      const type = { type: question.columns.testName };
-      const typeJSON = JSON.stringify(type, null, 2);
-      console.log("test", typeJSON);
-
-      // axios
-      //   .delete("/questionsDel", {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     data: typeJSON, // Send the data directly in the request body
-      //   })
-      //   .then((response) => {
-      //     console.log("delete questions:", response);
-      //     window.location.reload();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });\
+    Delete(question, select) {
+      console.log("select", select);
+      let param = {
+        hospitalName:this.hospitalName,
+	title:select.columns.title,
+	type: this.menu
+      }
+      axios
+        .post("/adLibraryDelete",param ,{
+          headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+        })
+        .then((response) => {
+          console.log("delete questions:", response);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     showLink(link) {
       if (link.length > 30) {
@@ -1646,7 +1786,39 @@ export default {
       this.url = "";
       this.imageUrl = "";
     },
+    async dataEachMenu(){
+      
+  const param = {
+    hospitalName: this.hospitalName,
+    type: this.menu
+  };
+  // console.log(param)
+  await axios
+    .post("/adLibraryView", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      // console.log("response", response.data);
+      if(this.menu === 'carousel'){
+        carousel.value = response.data 
+      }else if(this.menu === 'tip'){
+        tip.value = response.data
+      }else{
+        link.value = response.data
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+    }
   },
+  async created() {
+    this.hospitalName = "Siriraj Hospital"
+   this.dataEachMenu()
+}
 };
 </script>
 <style scoped>

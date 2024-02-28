@@ -99,7 +99,21 @@
           >
             <v-chip
               color="blue"
-              @click="() => $router.push('/dashboard/testresult')"
+              @click="() => {
+                const selectedItem = historyInfo.find(test => item.columns.testName === test.testName && item.columns.date === test.date);
+                if (selectedItem) {
+                  this.$router.push({
+                    path: '/dashboard/testresult',
+                    query: {
+                      testName: selectedItem.testName,
+                      description: selectedItem.description,
+                      questions: JSON.stringify(selectedItem.question)}
+              
+              });
+          } else {
+              console.error('No matching item found');
+          }
+      }"
             >
               see result
             </v-chip>
@@ -137,8 +151,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import axios from "../axios.js";
+
 // onMounted(async () => {
 //   try {
 //     let url = "/question";
@@ -152,15 +165,23 @@ import axios from "../axios.js";
 //     console.error("Error fetching products:", error);
 //   }
 // });
+
+</script>
+<script>
+import { ref, computed, onMounted } from "vue";
+import axios from "../axios.js";
 let search = ref("");
 
 const filteredHistorys = computed(() => {
   const searchTerm = search.value.toLowerCase();
-  let info = historys.filter((item) =>
+  let info = historys.value.filter((item) =>
     item.testName.toLowerCase().includes(searchTerm)
   );
 
-  return sortHistorys(info);
+  return sortHistorys(info).map((item, index) => {
+    const displayIndex = (index + 1).toString().padStart(2, '0'); // Format index as '01', '02', etc.
+    return { ...item, id: displayIndex };
+  });
 });
 
 let sortDirection = ref("asc");
@@ -197,7 +218,7 @@ const headers = [
   { title: "Result", key: "result", align: "center", sortable: false },
   { title: "Date", key: "date", align: "center", sortable: false },
 ];
-const historys = [
+let historys = ref([
   {
     id: "01",
     testName: "2Q",
@@ -234,7 +255,7 @@ const historys = [
     result: "-",
     date: "Oct 18, 2023 13:00",
   },
-];
+])
 function getColor(result, test) {
   if (test === "PHQ9") {
     if (result < 7) {
@@ -278,17 +299,47 @@ function getResult(result, test) {
     }
   }
 }
-</script>
-<script>
+
+let historyInfo = ref([])
 export default {
   data() {
     return {
+      patientId: "",
       patientName: "",
       sortType: "",
     };
   },
   created() {
     this.patientName = this.$route.query.patientName;
+    this.patientId = this.$route.query.patientId;
+
+    let param = {
+      patientID: this.patientId
+}
+console.log(param)
+      axios
+    .post("/adAllTestHistory", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("All Test History", this.patientId,response.data);
+      historys.value = response.data.map((test,index) => ({
+        id: test.No,
+        testName: test.testName,
+        result: test.result,
+        date: test.date,
+      }));
+
+      historyInfo.value = response.data
+      
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
   },
   methods: {},
 };
