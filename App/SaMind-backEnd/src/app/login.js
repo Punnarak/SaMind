@@ -384,23 +384,111 @@ async function sendOTP(email, otp) {
   }
 }
 
+// router.post("/forgotPassword", async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Check if the email is valid
+//     if (!isValidEmail(email)) {
+//       return res.status(400).json({ message: "Invalid email address" });
+//     }
+
+//     // Hash the new password
+//     const hash = await bcrypt.hash(password, saltRounds);
+
+//     // Update user's password in the database
+//     await client.query(
+//       "UPDATE public.users SET password = $1 WHERE email = $2",
+//       [hash, email]
+//     );
+
+//     // Generate OTP
+//     const otpValue = generateOTP();
+
+//     // Save OTP to database
+//     await client.query("INSERT INTO otp_data (email, otp) VALUES ($1, $2)", [
+//       email,
+//       otpValue,
+//     ]);
+
+//     // Send OTP to the provided email
+//     await sendOTP(email, otpValue);
+
+//     res.json({ message: "Password updated successfully. OTP sent successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred" });
+//   }
+// });
+
+// router.post("/verifyOtpForgotPassword", async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     // Check if the OTP matches the one in the database
+//     const otpResult = await client.query(
+//       "SELECT * FROM otp_data WHERE email = $1 AND otp = $2",
+//       [email, otp]
+//     );
+
+//     if (otpResult.rows.length === 0) {
+//       return res.status(400).json({ message: "Invalid OTP" });
+//     }
+
+//     // Delete the OTP entry from the database after successful verification
+//     await client.query("DELETE FROM otp_data WHERE email = $1", [email]);
+
+//     res.status(200).json({ message: "OTP verified successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "An error occurred" });
+//   }
+// });
+
+// Forgot Password API
+// router.post("/forgotPassword", async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     // Check if the email is valid
+//     if (!isValidEmail(email)) {
+//       return res.status(400).json({ message: "Invalid email address" });
+//     }
+
+//     // Generate OTP
+//     const otpValue = generateOTP();
+
+//     // Save OTP to database
+//     await client.query("INSERT INTO otp_data (email, otp) VALUES ($1, $2)", [
+//       email,
+//       otpValue,
+//     ]);
+
+//     // Send OTP to the provided email
+//     await sendOTP(email, otpValue);
+
+//     res.json({ message: "OTP sent successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred" });
+//   }
+// });
+
 router.post("/forgotPassword", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email } = req.body;
 
     // Check if the email is valid
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: "Invalid email address" });
     }
 
-    // Hash the new password
-    const hash = await bcrypt.hash(password, saltRounds);
+    // Check if the email exists in the database
+    const user = await client.query("SELECT * FROM public.users WHERE email = $1", [email]);
 
-    // Update user's password in the database
-    await client.query(
-      "UPDATE public.users SET password = $1 WHERE email = $2",
-      [hash, email]
-    );
+    if (user.rows.length === 0) {
+      return res.status(404).json({ message: "Email not found" });
+    }
 
     // Generate OTP
     const otpValue = generateOTP();
@@ -414,15 +502,17 @@ router.post("/forgotPassword", async (req, res) => {
     // Send OTP to the provided email
     await sendOTP(email, otpValue);
 
-    res.json({ message: "Password updated successfully. OTP sent successfully" });
+    res.json({ message: "OTP sent successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred" });
   }
 });
 
+
+// Verify OTP API
 router.post("/verifyOtpForgotPassword", async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, newPassword } = req.body;
 
   try {
     // Check if the OTP matches the one in the database
@@ -438,7 +528,16 @@ router.post("/verifyOtpForgotPassword", async (req, res) => {
     // Delete the OTP entry from the database after successful verification
     await client.query("DELETE FROM otp_data WHERE email = $1", [email]);
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    // Hash the new password
+    const hash = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update user's password in the database
+    await client.query(
+      "UPDATE public.users SET password = $1 WHERE email = $2",
+      [hash, email]
+    );
+
+    res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred" });
@@ -728,8 +827,6 @@ router.post("/login", jsonParser, async function (req, res, next) {
     });
   }
 });
-
-
 
 router.post("/logout", auth, (req, res) => {
   return res
