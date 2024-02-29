@@ -23,11 +23,16 @@ router.get('/game_get_id', (req, res) => {
             hungry_bar: 100,
             last_visit: new Date(),
             stamina_bar: 100,
-            status: "state0"
+            status: "state0",
+            apple: 0,
+            fish: 0,
+            rice: 0,
+            meat: 0,
+            sleep: false,
           };
 
-          const insertQuery = `INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-          const insertParams = [patient_id, defaultValues.click_count, defaultValues.health_bar, defaultValues.hungry_bar, defaultValues.last_visit, defaultValues.stamina_bar, defaultValues.status];
+          const insertQuery = `INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, status, apple, fish, rice, meat) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`;
+          const insertParams = [patient_id, defaultValues.click_count, defaultValues.health_bar, defaultValues.hungry_bar, defaultValues.last_visit, defaultValues.stamina_bar, defaultValues.status, defaultValues.apple, defaultValues.fish, defaultValues.rice, defaultValues.meat, defaultValues.sleep];
 
           client.query(insertQuery, insertParams)
             .then(insertResult => {
@@ -63,25 +68,214 @@ router.get('/game_get_id', (req, res) => {
       });
 });
 
-router.put('/update_hungry_bar', (req, res) => {
-  const { patient_id, hungry_bar } = req.body;
+router.put('/update_health_bar30', (req, res) => {
+  const { patient_id } = req.body;
 
-  if (!patient_id || hungry_bar === undefined) {
-      return res.status(400).json({ error: 'Both patient_id and hungry_bar are required' });
+  if (!patient_id) {
+    return res.status(400).json({ error: 'patient_id is required' });
   }
 
-  client.query('UPDATE gamepatient SET hungry_bar = $1 WHERE patient_id = $2', [hungry_bar, patient_id])
-      .then(result => {
-          if (result.rowCount > 0) {
-              res.json({ message: 'Hungry bar updated successfully' });
-          } else {
-              res.status(404).json({ error: 'Patient not found' });
-          }
-      })
-      .catch(err => {
-          console.error('Error executing query:', err);
-          res.status(500).json({ error: 'An error occurred' });
-      });
+  client.query('UPDATE gamepatient SET health_bar = health_bar - 30 WHERE patient_id = $1', [patient_id])
+    .then(result => {
+      if (result.rowCount > 0) {
+        // Ensure health_bar doesn't go below 0
+        client.query('UPDATE gamepatient SET health_bar = GREATEST(health_bar, 0) WHERE patient_id = $1', [patient_id])
+          .then(() => {
+            res.json({ message: 'Health bar updated successfully' });
+          })
+          .catch(err => {
+            console.error('Error updating health bar:', err);
+            res.status(500).json({ error: 'An error occurred' });
+          });
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.put('/update_click_count', (req, res) => {
+  const { patient_id, click_count } = req.body;
+
+  if (!patient_id || !click_count) {
+      return res.status(400).json({ error: 'patient_id and click_count are required' });
+  }
+
+  client.query('SELECT click_count FROM gamepatient WHERE patient_id = $1', [patient_id])
+    .then(result => {
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        
+        const oldClickCount = parseFloat(result.rows[0].click_count);
+        const newClickCount = parseFloat(oldClickCount) + parseFloat(click_count);
+
+        client.query('UPDATE gamepatient SET click_count = $1 WHERE patient_id = $2', [newClickCount, patient_id])
+            .then(() => {
+                res.json({ message: 'Click count updated successfully' });
+            })
+            .catch(err => {
+                console.error('Error updating click count:', err);
+                res.status(500).json({ error: 'An error occurred while updating click count' });
+            });
+    })
+    .catch(err => {
+        console.error('Error retrieving old click count:', err);
+        res.status(500).json({ error: 'An error occurred while retrieving old click count' });
+    });
+});
+
+
+router.put('/update_patient_data', (req, res) => {
+  const { patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, status, apple, fish, rice, meat, sleep } = req.body;
+
+  // Check if patient_id is provided
+  if (!patient_id) {
+    return res.status(400).json({ error: 'patient_id is required' });
+  }
+
+  // Construct the SET clause for the SQL query based on the provided fields
+  let setClause = '';
+  let queryParams = [];
+  let paramIndex = 1;
+
+  if (click_count !== undefined) {
+    setClause += `click_count = $${paramIndex}, `;
+    queryParams.push(click_count);
+    paramIndex++;
+  }
+  if (health_bar !== undefined) {
+    setClause += `health_bar = $${paramIndex}, `;
+    queryParams.push(health_bar);
+    paramIndex++;
+  }
+  if (hungry_bar !== undefined) {
+    setClause += `hungry_bar = $${paramIndex}, `;
+    queryParams.push(hungry_bar);
+    paramIndex++;
+  }
+  if (last_visit !== undefined) {
+    setClause += `last_visit = $${paramIndex}, `;
+    queryParams.push(last_visit);
+    paramIndex++;
+  }
+  if (stamina_bar !== undefined) {
+    setClause += `stamina_bar = $${paramIndex}, `;
+    queryParams.push(stamina_bar);
+    paramIndex++;
+  }
+  if (status !== undefined) {
+    setClause += `status = $${paramIndex}, `;
+    queryParams.push(status);
+    paramIndex++;
+  }
+  if (apple !== undefined) {
+    setClause += `apple = $${paramIndex}, `;
+    queryParams.push(apple);
+    paramIndex++;
+  }
+  if (fish !== undefined) {
+    setClause += `fish = $${paramIndex}, `;
+    queryParams.push(fish);
+    paramIndex++;
+  }
+  if (rice !== undefined) {
+    setClause += `rice = $${paramIndex}, `;
+    queryParams.push(rice);
+    paramIndex++;
+  }
+  if (meat !== undefined) {
+    setClause += `meat = $${paramIndex}, `;
+    queryParams.push(meat);
+    paramIndex++;
+  }
+  if (sleep !== undefined) {
+    setClause += `sleep = $${paramIndex}, `;
+    queryParams.push(sleep);
+    paramIndex++;
+  }
+
+  // Remove the trailing comma and space
+  setClause = setClause.slice(0, -2);
+
+  // Construct the SQL query
+  const query = `UPDATE gamepatient SET ${setClause} WHERE patient_id = $${paramIndex}`;
+  queryParams.push(patient_id);
+
+  // Execute the query
+  client.query(query, queryParams)
+    .then(result => {
+      if (result.rowCount > 0) {
+        res.json({ message: 'Patient data updated successfully' });
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.put('/update_stamina_bar_de', (req, res) => {
+  const { patient_id, decrementAmount } = req.body;
+
+  if (!patient_id || !decrementAmount) {
+    return res.status(400).json({ error: 'patient_id and decrementAmount are required' });
+  }
+
+  client.query('UPDATE gamepatient SET stamina_bar = stamina_bar - $1 WHERE patient_id = $2', [decrementAmount, patient_id])
+    .then(result => {
+      if (result.rowCount > 0) {
+        // Ensure stamina_bar doesn't go below 0
+        client.query('UPDATE gamepatient SET stamina_bar = GREATEST(stamina_bar, 0) WHERE patient_id = $1', [patient_id])
+          .then(() => {
+            res.json({ message: 'Stamina bar updated successfully' });
+          })
+          .catch(err => {
+            console.error('Error updating stamina bar:', err);
+            res.status(500).json({ error: 'An error occurred' });
+          });
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+router.put('/update_hungry_bar_de', (req, res) => {
+  const { patient_id, decrementAmount } = req.body;
+
+  if (!patient_id || !decrementAmount) {
+    return res.status(400).json({ error: 'patient_id and decrementAmount are required' });
+  }
+
+  client.query('UPDATE gamepatient SET hungry_bar = hungry_bar - $1 WHERE patient_id = $2', [decrementAmount, patient_id])
+    .then(result => {
+      if (result.rowCount > 0) {
+        // Ensure hungry_bar doesn't go below 0
+        client.query('UPDATE gamepatient SET hungry_bar = GREATEST(hungry_bar, 0) WHERE patient_id = $1', [patient_id])
+          .then(() => {
+            res.json({ message: 'hungry bar updated successfully' });
+          })
+          .catch(err => {
+            console.error('Error updating hungry bar:', err);
+            res.status(500).json({ error: 'An error occurred' });
+          });
+      } else {
+        res.status(404).json({ error: 'Patient not found' });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
 });
   
   module.exports = router;

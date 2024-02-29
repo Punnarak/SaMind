@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
+import { useFocusEffect } from '@react-navigation/native';
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -53,59 +54,135 @@ const PopcatGame = ({ route }) => {
     setProgress2(Math.min(newProgress, 1));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log("id:", patientId);
-        const response = await axios.get("/game_get_id", {
-          params: { patient_id: patientId }
-        });
-        console.log("id:", patientId);
-        setGameData(response.data);
-        setIsLoading(false);
-        console.log("Fetched data:", response.data); // Logging the fetched data
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("/game_get_id", {
+        params: { patient_id: patientId }
+      });
+      setGameData(response.data);
+      setIsLoading(false);
+      if (response.data && response.data.length > 0) {
+        const sleepModeStatus = response.data[0].sleep;
+        setSleepMode(sleepModeStatus);
       }
-    };
-  
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [patientId]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  useEffect(() => {
+    if (gameData && gameData.length > 0) {
+      const parsedHealthBar = parseFloat(gameData[0].health_bar) / 100;
+      const parsedHungryBar = parseFloat(gameData[0].hungry_bar) / 100;
+      const parsedStaminaBar = parseFloat(gameData[0].stamina_bar) / 100;
+      const parsedClickCount = parseInt(gameData[0].click_count);
+      const parsedfish = parseInt(gameData[0].fish);
+      const parsedrice = parseInt(gameData[0].rice);
+      const parsedmeat = parseInt(gameData[0].meat);
+      const parsedapple = parseInt(gameData[0].apple);
+
+  
+      setProgress1(parsedHealthBar);
+      setProgress2(parsedHungryBar);
+      setProgress3(parsedStaminaBar);
+      setPopCount(parsedClickCount);
+      setFishCount(parsedfish);
+      setAppleCount(parsedapple);
+      setMeatCount(parsedmeat);
+      setRiceCount(parsedrice);
+    }
+  }, [gameData]);
+
+  useEffect(() => {
+    if (popCount < 50) {
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg11.png") : require("../assets/egg12.png"));
+    } else if (popCount >= 50 && popCount < 125) {
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg21.png") : require("../assets/egg22.png"));
+    } else if (popCount >= 125 && popCount < 200) {
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg31.png") : require("../assets/egg32.png"));
+    } else {
+      setImageSource(require("../assets/monster1.png"));
+    }
+  }, [popCount]);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress1((prevProgress) => {
-        if (popCount >= 20) {
-          return Math.max(0, prevProgress - 0.01);
-        } else {
-          return 1;
-        }
-      });
-      setProgress2((prevProgress) => {
-        if (popCount >= 20) {
-          return Math.max(0, prevProgress - 0.01);
-        } else {
-          return 1;
-        }
-      });
-      if (!sleepMode) {
-        setProgress3((prevProgress) => {
-          if (popCount >= 20) {
-            return Math.max(0, prevProgress - 0.01);
-          } else {
-            return 1;
-          }
-        });
-      } else {
+      // if (progress2 <= 0 && progress3 <= 0) {
+      //   setProgress1((prevProgress) => Math.max(0, prevProgress - 0.001));
+      // } else if (progress2 >= 0.5 && progress3 >= 0.5) {
+      //   setProgress1((prevProgress) => Math.min(1, prevProgress + 0.01));
+      // }
+
+      // setProgress2((prevProgress) => {
+      //   if (popCount >= 200) {
+      //     return Math.max(0, prevProgress - 0.001);
+      //   } else {
+      //     return 1;
+      //   }
+      // });
+      if (sleepMode) 
+      // {
+      //   setProgress3((prevProgress) => {
+      //     if (popCount >= 200) {
+      //       return Math.max(0, prevProgress - 0.0001);
+      //     } else {
+      //       return 1;
+      //     }
+      //   });
+      // } 
+      // else
+       {
         // Increase the stamina bar continuously when in sleep mode
-        setProgress3((prevProgress) => Math.min(1, prevProgress + 0.01));
+        setProgress3((prevProgress) => Math.min(1, prevProgress + 0.001));
       }
     }, 100);
 
     return () => clearInterval(interval);
   }, [popCount, sleepMode]);
 
+  
+  useEffect(() => {
+    // Function to update data when navigating away from the page
+    const updateGameData = async () => {
+      try {
+        const currentTime = new Date();
+        await axios.put("/update_patient_data", {
+          patient_id: patientId,
+          click_count: popCount,
+          health_bar: progress1*100,
+          hungry_bar: progress2*100,
+          last_visit: currentTime,
+          stamina_bar: progress3*100,
+          apple: appleCount,
+          fish: fishCount,
+          rice: riceCount,
+          meat: meatCount,
+          sleep : sleepMode,
+        });
+      } catch (error) {
+        console.error("Error updating data:", error);
+      }
+    };
+
+    // Call the update function when navigating away from the page
+    const unsubscribe = navigation.addListener("beforeRemove", () => {
+      updateGameData();
+    });
+
+    // Clean up the listener
+    return unsubscribe;
+  }, [navigation, patientId, popCount, progress1, progress2, progress3, appleCount, fishCount, riceCount, meatCount, sleepMode]);
 
   // useEffect(() => {
   //   const interval1 = setInterval(() => {
@@ -317,7 +394,7 @@ const PopcatGame = ({ route }) => {
         </TouchableWithoutFeedback>
         <Text style={styles.countText}>{popCount}</Text>
         <View style={styles.progressBars}>
-        <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>Health</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
@@ -386,64 +463,64 @@ const PopcatGame = ({ route }) => {
                   source={require("../assets/bedroom.jpg")}
                   style={{ resizeMode: "fit", flex: 1 }}
                 > */}
-                  <TouchableWithoutFeedback onPress={toggleModal}>
+                <TouchableWithoutFeedback onPress={toggleModal}>
                   <View style={styles.centeredView}>
-                  <View style={styles.modalViewRow}>
-                    <TouchableOpacity
-                      style={[
-                        styles.modalButton,
-                        {
-                          backgroundColor:
-                            appleCount <= 0 ? "#9e9e9e" : "#2196f3",
-                        },
-                      ]}
-                      onPress={() => handleFoodSelection("Apple")}
-                      disabled={appleCount <= 0}
-                    >
-                      <Text style={styles.modalButtonText}>Apple</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.modalButton,
-                        {
-                          backgroundColor:
-                            fishCount <= 0 ? "#9e9e9e" : "#2196f3",
-                        },
-                      ]}
-                      onPress={() => handleFoodSelection("Fish")}
-                      disabled={fishCount <= 0}
-                    >
-                      <Text style={styles.modalButtonText}>Fish</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.modalButton,
-                        {
-                          backgroundColor:
-                            riceCount <= 0 ? "#9e9e9e" : "#2196f3",
-                        },
-                      ]}
-                      onPress={() => handleFoodSelection("Rice")}
-                      disabled={riceCount <= 0}
-                    >
-                      <Text style={styles.modalButtonText}>Rice</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.modalButton,
-                        {
-                          backgroundColor:
-                            meatCount <= 0 ? "#9e9e9e" : "#2196f3",
-                        },
-                      ]}
-                      onPress={() => handleFoodSelection("Meat")}
-                      disabled={meatCount <= 0}
-                    >
-                      <Text style={styles.modalButtonText}>Meat</Text>
-                    </TouchableOpacity>
+                    <View style={styles.modalViewRow}>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              appleCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Apple")}
+                        disabled={appleCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Apple</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              fishCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Fish")}
+                        disabled={fishCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Fish</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              riceCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Rice")}
+                        disabled={riceCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Rice</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              meatCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Meat")}
+                        disabled={meatCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Meat</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-                  </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
                 {/* </ImageBackground> */}
               </View>
             </Modal>
@@ -452,20 +529,20 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: (windowWidth / 2) - 25,
-                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 || sleepMode || progress3 < 0.15 ? "#9e9e9e" : "#2196f3",
                 },
               ]}
-              onPress={popCount <= 0 ? null : () => navigation.navigate("Game4")}
-              disabled={popCount <= 0 || sleepMode}
+              onPress={popCount <= 0 ? null : () => navigation.navigate("Game4", {patientId})}
+              disabled={popCount <= 0 || sleepMode || progress3 < 0.15 || progress2 < 0.15 }
             >
               <Text style={styles.buttonText}>Play Game</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, {width: (windowWidth / 2) - 25}]}
-              onPress={() => navigation.navigate("Homescreen")}
-              disabled={sleepMode}
+              style={[styles.button, { width: (windowWidth / 2) - 25}]}
+              onPress={() => navigation.navigate("Homescreen", { patientId })}
+              // disabled={sleepMode}
             >
               <Text style={styles.buttonText}>Quit</Text>
             </TouchableOpacity>
@@ -474,11 +551,11 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: (windowWidth / 2) - 25,
-                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 || sleepMode || progress3 < 0.10 || progress2 < 0.10 ? "#9e9e9e" : "#2196f3",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => navigation.navigate("Phq9gametestscreen", { patientId })}
-              disabled={popCount <= 0 || sleepMode}
+              disabled={popCount <= 0 || sleepMode || progress3 < 0.10 || progress2 < 0.10}
             >
               <Text style={styles.buttonText}>Study</Text>
             </TouchableOpacity>
@@ -620,7 +697,7 @@ const styles = StyleSheet.create({
   modalBackground: {
     flex: 1,
   },
-  modalViewRow:{
+  modalViewRow: {
     margin: 20,
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderRadius: 20,

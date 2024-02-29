@@ -26,7 +26,7 @@
 
 //   const generateRandomColors = () => {
 //     const colorOptions = ["red", "blue", "green", "yellow", "pink"];
-  
+
 //     // Randomly select a different color index
 //     let differentColorIndex = Math.floor(Math.random() * colorOptions.length);
 
@@ -34,28 +34,28 @@
 //     while (differentColorIndex === correctColorIndex) {
 //       differentColorIndex = Math.floor(Math.random() * colorOptions.length);
 //     }
-  
+
 //     // Initialize the colors array with one instance of the different color and the rest with the same color
 //     const colorsArray = colorOptions.map((color, index) =>
 //       index === differentColorIndex
 //         ? colorOptions[differentColorIndex]
 //         : colorOptions[0] // You can change this to any other index if you want a different color
 //     );
-  
+
 //     // Shuffle the colors array to randomize the positions
 //     for (let i = colorsArray.length - 1; i > 0; i--) {
 //       const j = Math.floor(Math.random() * (i + 1));
 //       [colorsArray[i], colorsArray[j]] = [colorsArray[j], colorsArray[i]];
 //     }
-  
+
 //     // Set the correct color index to the index of the different color
 //     setCorrectColorIndex(differentColorIndex);
-  
+
 //     // Set the colors array in the state
 //     setColors(colorsArray);
 //   };
-  
-  
+
+
 
 //   const handleColorSelection = (selectedIndex) => {
 //     if (selectedIndex === correctColorIndex) {
@@ -65,7 +65,7 @@
 //     }
 //   };
 
-  
+
 
 //   const resetGame = () => {
 //     setTime(10);
@@ -128,9 +128,11 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "./axios.js";
 
-const NumberGame = () => {
+const NumberGame = ({ route }) => {
   const navigation = useNavigation();
+  const { patientId } = route.params || {};
   const [numbers, setNumbers] = useState([]);
   const [nextExpectedNumber, setNextExpectedNumber] = useState(1);
   const [clickedNumbers, setClickedNumbers] = useState([]);
@@ -157,6 +159,45 @@ const NumberGame = () => {
     return () => clearInterval(timerInterval);
   }, [gameOver]);
 
+
+  const updateHealthBar = async () => {
+    try {
+      const response = await axios.put('/update_health_bar30', { patient_id: patientId });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating health bar:', error);
+    }
+  };
+
+  const updateStaminaBar = async () => {
+    try {
+      const response = await axios.put('/update_stamina_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating health bar:', error);
+    }
+  };
+
+  const updateHungryBar = async () => {
+    try {
+      const response = await axios.put('/update_hungry_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating health bar:', error);
+    }
+  };
+
+
+  const updateScore = async () => {
+    try {
+      console.log(score);
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: score });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating score bar:', error);
+    }
+  };
+
   const generateRandomNumbers = () => {
     const numberOptions = Array.from({ length: 16 }, (_, index) => index + 1);
     shuffleArray(numberOptions);
@@ -166,7 +207,7 @@ const NumberGame = () => {
 
   const handleNumberSelection = (selectedNumberIndex) => {
     const selectedNumber = numbers[selectedNumberIndex];
-  
+
     if (!gameOver) {
       if (selectedNumber === nextExpectedNumber) {
         if (nextExpectedNumber === 16) {
@@ -182,17 +223,27 @@ const NumberGame = () => {
       } else {
         // Incorrect number clicked, game over
         calculateScore();
+        updateHealthBar();
+        setScore(0);
         setGameOver(true);
       }
     }
   };
-  
+
 
   const calculateScore = () => {
     // const usedTime = 15 - timeLeft;
     const currentScore = Math.max(0, timeLeft) * 10;
     setScore(gameOver ? currentScore : 0);
   };
+
+  const conclusion = () => {
+    if(nextExpectedNumber===16)
+    {
+      calculateScore();
+      updateScore();
+    }
+  }
 
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -215,37 +266,45 @@ const NumberGame = () => {
       source={require("../assets/room.jpg")}
       style={{ width: "100%", resizeMode: "cover", flex: 1 }}
     >
-    <View style={styles.container}>
-      {gameOver ? (
-        <View>
-          <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
-            {nextExpectedNumber === 16 ? `You Win! Score: ${score !== null ? score : 0}` : 'Game Over! Score: 0'}
-          </Text>
-          <Button title="Confirm" onPress={() => navigation.goBack()} />
-        </View>
-      ) : (
-        <View>
-          <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
-          <View style={styles.numberGrid}>
-            {numbers.map((number, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.numberBlock,
-                  { opacity: clickedNumbers.includes(number) ? 0 : 1 },
-                ]}
-                onPress={() => handleNumberSelection(index)}
-              >
-                <Text style={styles.numberText}>{number}</Text>
-              </TouchableOpacity>
-            ))}
+      <View style={styles.container}>
+        {gameOver ? (
+          <View>
+            <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
+              {nextExpectedNumber === 16 ? `You Win! Score: ${score !== null ? score : 0}` : 'Game Over! Score: 0'}
+            </Text>
+            <Button
+              title="Confirm"
+              onPress={() => {
+                conclusion();
+                updateStaminaBar();
+                updateHungryBar();
+                navigation.navigate("Gamescreen", { patientId });
+              }}
+            />
           </View>
-        </View>
-      )}
-    </View>
+        ) : (
+          <View>
+            <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
+            <View style={styles.numberGrid}>
+              {numbers.map((number, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.numberBlock,
+                    { opacity: clickedNumbers.includes(number) ? 0 : 1 },
+                  ]}
+                  onPress={() => handleNumberSelection(index)}
+                >
+                  <Text style={styles.numberText}>{number}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+      </View>
     </ImageBackground>
   );
-  
+
 };
 
 const styles = StyleSheet.create({
@@ -268,7 +327,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-  alignItems: "center", 
+    alignItems: "center",
   },
   numberBlock: {
     width: 80,
