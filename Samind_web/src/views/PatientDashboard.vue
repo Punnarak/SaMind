@@ -125,7 +125,7 @@
                 class="mt-5 ml-5"
                 style="
                   color: rgb(152, 151, 151);
-                  width: 226px;
+                  width: 256px;
                   height: 101px;
                   flex-shrink: 0;
                   border-radius: 10px;
@@ -254,7 +254,7 @@
                 class="mt-5 ml-5"
                 style="
                   color: rgb(152, 151, 151);
-                  width: 226px;
+                  width: 230px;
                   height: 101px;
                   flex-shrink: 0;
                   border-radius: 10px;
@@ -487,7 +487,7 @@ export default {
   color: #b6b9c2;
   font-feature-settings: "clig" off, "liga" off;
   font-family: "Poppins", sans-serif;
-  font-size: 16px;
+  font-size: 9px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
