@@ -32,8 +32,6 @@ router.post('/all_therapist', (req, res) => {
       });
 });
 
-
-
 router.post('/info_therapist', (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     if (!therapist_id) {
@@ -92,7 +90,7 @@ router.post('/update_info_therapist', async (req, res) => {
     }
 });
 
-  
+
   
 
 

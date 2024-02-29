@@ -516,18 +516,6 @@ router.post('/adAllTestHistory', async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
 router.post('/adTherapistAll', (req, res) => {
   const { hospitalName } = req.body;
 
@@ -1784,15 +1772,85 @@ function getMonthName(month) {
   }
 
 //function getHistoryTest
+// async function getHistoryTest(patientId) {
+//   const query = `
+//       SELECT score, type, date_time
+//       FROM test_score
+//       WHERE answer IS NULL
+//       ORDER BY date_time DESC
+//       LIMIT 2
+//     `;
+//   const queryParams = [];
+
+//   try {
+//     const result = await client.query(query, queryParams);
+
+//     if (result.rows.length === 0) {
+//       return { error: "No history test data found." };
+//     }
+
+//     const modifiedResult = {
+//       historyTest: {},
+//     };
+
+//     result.rows.forEach((row, index) => {
+//       const { type, date_time } = row;
+//       let resultText = "";
+
+//       if (type === "PHQ9") {
+//         const resultValue = parseInt(row.score, 10);
+//         if (resultValue < 7) {
+//           resultText =
+//             "ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก";
+//         } else if (resultValue >= 7 && resultValue <= 12) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับน้อย";
+//         } else if (resultValue >= 13 && resultValue <= 18) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับปานกลาง";
+//         } else if (resultValue >= 19) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับรุนแรง";
+//         }
+//       } else if (type === "2Q") {
+//         const resultValue = parseInt(row.score, 10);
+//         resultText =
+//           resultValue !== 0
+//             ? "ท่านมีแนวโน้มเป็นโรคซึมเศร้า"
+//             : "ท่านไม่มีแนวโน้มเป็นโรคซึมเศร้า";
+//       }
+
+//       const formattedDate = `${date_time.getDate()} ${getMonthName(
+//         date_time.getMonth()
+//       )} ${date_time.getFullYear()}`;
+
+//       modifiedResult.historyTest[`type${index + 1}`] = type;
+//       modifiedResult.historyTest[`result${index + 1}`] = resultText;
+//       modifiedResult.historyTest[`date${index + 1}`] = formattedDate;
+//     });
+
+//     // Include dateAvatar information
+//     if (result.rows.length > 0) {
+//       const dateAvatar = result.rows[0].date_time;
+//       modifiedResult.dateAvatar = `${dateAvatar.getDate()} ${getMonthName(
+//         dateAvatar.getMonth()
+//       )} ${dateAvatar.getFullYear()} at ${dateAvatar.getHours()}:${dateAvatar.getMinutes()}:${dateAvatar.getSeconds()}`;
+//     }
+
+//     return modifiedResult;
+//   } catch (err) {
+//     console.error("Error executing query:", err);
+//     return { error: "An error occurred while fetching history test data." };
+//   }
+// }
+
 async function getHistoryTest(patientId) {
   const query = `
       SELECT score, type, date_time
       FROM test_score
       WHERE answer IS NULL
+      AND patient_id = $1  -- Filter by patient_id
       ORDER BY date_time DESC
       LIMIT 2
     `;
-  const queryParams = [];
+  const queryParams = [patientId];
 
   try {
     const result = await client.query(query, queryParams);
@@ -1852,6 +1910,7 @@ async function getHistoryTest(patientId) {
     return { error: "An error occurred while fetching history test data." };
   }
 }
+
 
 //function getMood
 async function getAvatarMoodDetection(patientId) {
