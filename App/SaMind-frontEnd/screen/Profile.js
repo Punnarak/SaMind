@@ -17,8 +17,6 @@ import axios from "./axios.js";
 export default function Profile({ route }) {
   const { patientId, update } = route.params || {};
   const navigation = useNavigation();
-
-  const [flag, setFlag] = useState();
   //info
   const [data, setData] = useState({});
 
@@ -43,7 +41,17 @@ export default function Profile({ route }) {
 
     return onFocus;
   }, []);
-
+  const Logout = () => {
+    axios
+      .post("/logout")
+      .then((response) => {
+        console.log(response.data);
+        navigation.navigate("Loginscreen");
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+  };
   return (
     <View style={styles.container1}>
       <Ionicons
@@ -101,10 +109,7 @@ export default function Profile({ route }) {
           >
             <Text style={styles.text}>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.outb}
-            onPress={() => navigation.navigate("Loginscreen")}
-          >
+          <TouchableOpacity style={styles.outb} onPress={() => Logout()}>
             <Text style={styles.text}>Sign Out</Text>
           </TouchableOpacity>
         </View>
