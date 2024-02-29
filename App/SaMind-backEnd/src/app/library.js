@@ -1,6 +1,7 @@
 const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
+const auth = require('./auth.js').authorization;
 
 /**
  * @swagger
@@ -35,26 +36,91 @@ const router = express.Router();
  *             example:
  *               error: An error occurred
  */
-router.get('/library', (req, res) => {
-  const id = req.query.id; // Get the id parameter from the query
-  let query = 'SELECT * FROM library';
+// router.get('/library', (req, res) => {
+//   const id = req.query.id; // Get the id parameter from the query
+//   let query = 'SELECT * FROM library';
 
-  // Check if the id parameter is provided
-  if (id) {
-    query += ' WHERE id = $1';
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE id = $1';
+//   }
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/library', (req, res) => {
+//   const id = req.query.id; // Get the id parameter from the query
+//   let query = 'SELECT * FROM library';
+
+//   // Check if the id parameter is provided
+//   if (id) {
+//     query += ' WHERE id = $1';
+//   }
+
+//   const queryParams = id ? [id] : [];
+
+//   client.query(query, queryParams)
+//     .then(result => {
+//       res.json(result.rows);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/library', auth, (req, res) => {
+  const hospitalName = req.body.hospitalName; // Get the hospitalName from the request body
+  let query = `SELECT 
+                  library_id AS "libraryId", 
+                  name, 
+                  url, 
+                  hospital_name AS "hospitalName", 
+                  type, 
+                  image_url AS "imageUrl" 
+               FROM 
+                  library`;
+
+  // Check if the hospitalName is provided
+  if (hospitalName) {
+    query += ` WHERE hospital_name = $1`;
   }
 
-  const queryParams = id ? [id] : [];
+  const queryParams = hospitalName ? [hospitalName] : [];
 
   client.query(query, queryParams)
     .then(result => {
-      res.json(result.rows);
+      // Group the result by type
+      const groupedResult = result.rows.reduce((acc, cur) => {
+        acc[cur.type] = acc[cur.type] || [];
+        acc[cur.type].push(cur);
+        return acc;
+      }, {});
+
+      // Reformat the groupedResult to match the desired format
+      const formattedResult = {
+        carousel: groupedResult.carousel || [],
+        tip: groupedResult.tip || [],
+        link: groupedResult.link || []
+      };
+
+      res.json(formattedResult);
     })
     .catch(err => {
       console.error('Error executing query:', err);
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 /**
  * @swagger
@@ -98,7 +164,7 @@ router.get('/library', (req, res) => {
  *             example:
  *               error: An error occurred
  */
-router.post('/libraryAdd', (req, res) => {
+router.post('/libraryAdd', auth, (req, res) => {
   const { id, name, url} = req.body;
 
   if (!id || !name || !url) {

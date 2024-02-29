@@ -175,6 +175,906 @@ router.post('/therapistAddAppoint', (req, res) => {
         });
 });
 
+// router.post('/appointmentRequestView', (req, res) => {
+//     const type = req.body.type; // Get the type from the JSON body
+//     let query = 'SELECT no, question, options, test_name FROM questionnaire_new2';
+  
+//     // Check if the type is provided
+//     if (type) {
+//       query += ' WHERE test_name = $1';
+//     }
+  
+//     query += ' ORDER BY no'; // Order by the "no" column
+  
+//     const queryParams = type ? [type] : [];
+  
+//     client.query(query, queryParams)
+//       .then(result => {
+//         res.json(result.rows);
+//       })
+//       .catch(err => {
+//         console.error('Error executing query:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//       });
+// });
+
+// router.post('/appointmentRequestView', (req, res) => {
+//     const therapist_id = req.body.therapist_id;
+//     let query = `
+//         SELECT 
+//             to_char(a.date, 'Dy, DD Mon YYYY') AS date,
+//             to_char(a.time, 'HH24:MI') AS time,
+//             p.fname || ' ' || p.lname AS patientName
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//     const queryParams = [therapist_id];
+
+//     client.query(query, queryParams)
+//         .then(result => {
+//             res.json(result.rows);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/appointmentRequestView', (req, res) => {
+//     const therapist_id = req.body.therapist_id;
+//     let query = `
+//         SELECT 
+//             a.date,
+//             a.time,
+//             a.change_date,
+//             a.change_time,
+//             p.fname || ' ' || p.lname AS patientName
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//     const queryParams = [therapist_id];
+
+//     client.query(query, queryParams)
+//         .then(result => {
+//             const formattedResults = result.rows.map(row => {
+//                 const dateFrom = row.date ? new Date(row.date).toLocaleString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+//                 const timeFrom = row.time ? new Date(row.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
+//                 const dateTo = row.change_date ? new Date(row.change_date).toLocaleString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+//                 const timeTo = row.change_time ? new Date(row.change_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
+//                 return {
+//                     patientName: row.patientName,
+//                     dateFrom: dateFrom,
+//                     timeFrom: timeFrom,
+//                     dateTo: dateTo,
+//                     timeTo: timeTo
+//                 };
+//             });
+//             res.json(formattedResults);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/appointmentRequestView', (req, res) => {
+//     const therapist_id = req.body.therapist_id;
+//     let query = `
+//         SELECT 
+//             a.date,
+//             a.time,
+//             a.change_date,
+//             a.change_time,
+//             p.fname || ' ' || p.lname AS patientName
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//     const queryParams = [therapist_id];
+
+//     client.query(query, queryParams)
+//         .then(result => {
+//             const formattedResults = result.rows.map(row => {
+//                 const dateFrom = row.date ? formatDate(row.date) : '-';
+//                 const timeFrom = row.time ? formatTime(row.time) : '-';
+//                 const dateTo = row.change_date ? formatDate(row.change_date) : '-';
+//                 const timeTo = row.change_time ? formatTime(row.change_time) : '-';
+//                 return {
+//                     patientName: row.patientName,
+//                     dateFrom: dateFrom,
+//                     timeFrom: timeFrom,
+//                     dateTo: dateTo,
+//                     timeTo: timeTo
+//                 };
+//             });
+//             res.json(formattedResults);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// function formatDate(dateString) {
+//     const date = new Date(dateString);
+//     return new Intl.DateTimeFormat('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+// }
+
+// function formatTime(timeString) {
+//     // Check if the timeString is in the expected format
+//     const timeRegex = /^(\d{2}):(\d{2}):(\d{2})$/;
+//     if (!timeRegex.test(timeString)) {
+//         return '-'; // Return a placeholder value if the time format is invalid
+//     }
+
+//     // Split the time string into hours, minutes, and seconds
+//     const [hours, minutes, seconds] = timeString.split(':');
+
+//     // Concatenate hours and minutes
+//     const formattedTime = `${hours}:${minutes}`;
+
+//     return formattedTime;
+// }
+
+
+// router.post('/appointmentRequestView', (req, res) => {
+//     const therapist_id = req.body.therapist_id;
+//     let query = `
+//         SELECT 
+//             a.date,
+//             a.time,
+//             a.change_date,
+//             a.change_time,
+//             p.fname || ' ' || p.lname AS patientName
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//     const queryParams = [therapist_id];
+
+//     client.query(query, queryParams)
+//         .then(result => {
+//             const formattedResults = result.rows.map(row => {
+//                 const dateFrom = row.date ? formatDate(row.date) : '-';
+//                 const timeFrom = row.time ? formatTime(row.time) : '-';
+//                 const dateTo = row.change_date ? formatDate(row.change_date) : '-';
+//                 const timeTo = row.change_time ? formatTime(row.change_time) : '-';
+//                 return {
+//                     patientName: row.patientName, // Corrected field name here
+//                     dateFrom: dateFrom,
+//                     timeFrom: timeFrom,
+//                     dateTo: dateTo,
+//                     timeTo: timeTo
+//                 };
+//             });
+//             res.json(formattedResults);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// function formatDate(dateString) {
+//     const date = new Date(dateString);
+//     return new Intl.DateTimeFormat('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+// }
+
+// function formatTime(timeString) {
+//     // Check if the timeString is in the expected format
+//     const timeRegex = /^(\d{2}):(\d{2}):(\d{2})$/;
+//     if (!timeRegex.test(timeString)) {
+//         return '-'; // Return a placeholder value if the time format is invalid
+//     }
+
+//     // Split the time string into hours, minutes, and seconds
+//     const [hours, minutes, seconds] = timeString.split(':');
+
+//     // Concatenate hours and minutes
+//     const formattedTime = `${hours}:${minutes}`;
+
+//     return formattedTime;
+// }
+
+// this api it work
+// router.post('/appointmentRequestView', (req, res) => {
+//     const therapist_id = req.body.therapist_id;
+//     let query = `
+//         SELECT 
+//             a.date,
+//             a.time,
+//             a.change_date,
+//             a.change_time,
+//             p.fname,
+//             p.lname
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//     const queryParams = [therapist_id];
+
+//     client.query(query, queryParams)
+//         .then(result => {
+//             const formattedResults = result.rows.map(row => {
+//                 const dateFrom = row.date ? formatDate(row.date) : '-';
+//                 const timeFrom = row.time ? formatTime(row.time) : '-';
+//                 const dateTo = row.change_date ? formatDate(row.change_date) : '-';
+//                 const timeTo = row.change_time ? formatTime(row.change_time) : '-';
+//                 const patientName = row.fname + ' ' + row.lname; // Concatenate fname and lname to get the full name
+//                 return {
+//                     patientName: patientName,
+//                     dateFrom: dateFrom,
+//                     timeFrom: timeFrom,
+//                     dateTo: dateTo,
+//                     timeTo: timeTo
+//                 };
+//             });
+//             res.json(formattedResults);
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+router.post('/appointmentRequestView', (req, res) => {
+    const therapist_id = req.body.therapist_id;
+    let query = `
+        SELECT 
+            a.date,
+            a.time,
+            a.change_date,
+            a.change_time,
+            p.fname,
+            p.lname,
+            a.patient_id
+        FROM 
+            appointment_new2 a
+        JOIN 
+            patient p ON a.patient_id = p.patient_id
+        WHERE 
+            a.therapist_id = $1
+            AND a.confirm = 'W'
+        ORDER BY 
+            a.date, a.time`;
+
+    const queryParams = [therapist_id];
+
+    client.query(query, queryParams)
+        .then(result => {
+            const formattedResults = result.rows.map(row => {
+                const dateFrom = row.date ? formatDate(row.date) : '-';
+                const timeFrom = row.time ? formatTime(row.time) : '-';
+                const dateTo = row.change_date ? formatDate(row.change_date) : '-';
+                const timeTo = row.change_time ? formatTime(row.change_time) : '-';
+                const patientName = row.fname + ' ' + row.lname; // Concatenate fname and lname to get the full name
+                return {
+                    patientID: row.patient_id,
+                    patientName: patientName,
+                    dateFrom: dateFrom,
+                    timeFrom: timeFrom,
+                    dateTo: dateTo,
+                    timeTo: timeTo
+                };
+            });
+            res.json(formattedResults);
+        })
+        .catch(err => {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'An error occurred' });
+        });
+});
+
+
+// function formatDate(dateString) {
+//     const date = new Date(dateString);
+//     return new Intl.DateTimeFormat('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+// }
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+
+function formatTime(timeString) {
+    // Check if the timeString is in the expected format
+    const timeRegex = /^(\d{2}):(\d{2}):(\d{2})$/;
+    if (!timeRegex.test(timeString)) {
+        return '-'; // Return a placeholder value if the time format is invalid
+    }
+
+    // Split the time string into hours, minutes, and seconds
+    const [hours, minutes, seconds] = timeString.split(':');
+
+    // Concatenate hours and minutes
+    const formattedTime = `${hours}:${minutes}`;
+
+    return formattedTime;
+}
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     const type = req.body.type; // Get the type from the JSON body
+//     let query = 'SELECT no, question, options, test_name FROM questionnaire_new2';
+  
+//     // Check if the type is provided
+//     if (type) {
+//       query += ' WHERE test_name = $1';
+//     }
+  
+//     query += ' ORDER BY no'; // Order by the "no" column
+  
+//     const queryParams = type ? [type] : [];
+  
+//     client.query(query, queryParams)
+//       .then(result => {
+//         res.json(result.rows);
+//       })
+//       .catch(err => {
+//         console.error('Error executing query:', err);
+//         res.status(500).json({ error: 'An error occurred' });
+//       });
+// });
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom || !confirm) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, timeFrom, and confirm are required' });
+//     }
+
+//     // Convert dateFrom and timeFrom to match database format
+//     const formattedDateFrom = new Date(dateFrom).toISOString().split('T')[0];
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query based on confirm status
+//     let query;
+//     let queryParams;
+//     if (confirm === 'Y') {
+//         // Update appointment when confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET date = $1, 
+//                      time = $2, 
+//                      confirm = $3, 
+//                      change_date = $4, 
+//                      change_time = $5 
+//                  WHERE patient_id = $6 AND date = $7 AND time = $8`;
+//         queryParams = [formattedDateFrom, formattedTimeFrom, confirm, dateTo, timeTo, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else if (confirm === 'N') {
+//         // Store data when not confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET confirm = $1 
+//                  WHERE patient_id = $2 AND date = $3 AND time = $4`;
+//         queryParams = [confirm, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else {
+//         return res.status(400).json({ error: 'Invalid confirmation status' });
+//     }
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             res.json({ message: 'Appointment updated successfully' });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom || !confirm) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, timeFrom, and confirm are required' });
+//     }
+
+//     // Convert dateFrom and timeFrom to match database format
+//     const formattedDateFrom = new Date(dateFrom).toISOString().split('T')[0];
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query based on confirm status
+//     let query;
+//     let queryParams;
+//     if (confirm === 'Y') {
+//         // Update appointment when confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET date = $1, 
+//                      time = $2, 
+//                      confirm = $3, 
+//                      change_date = $4, 
+//                      change_time = $5 
+//                  WHERE (patient_id = $6 AND date = $7 AND time = $8) OR (confirm = 'W')`;
+//         queryParams = [formattedDateFrom, formattedTimeFrom, confirm, dateTo, timeTo, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else if (confirm === 'N') {
+//         // Store data when not confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET confirm = $1 
+//                  WHERE patient_id = $2 AND date = $3 AND time = $4`;
+//         queryParams = [confirm, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else {
+//         return res.status(400).json({ error: 'Invalid confirmation status' });
+//     }
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             res.json({ message: 'Appointment updated successfully' });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom || !confirm) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, timeFrom, and confirm are required' });
+//     }
+
+//     // Convert dateFrom and timeFrom to match database format
+//     const formattedDateFrom = new Date(dateFrom).toISOString().split('T')[0];
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query based on confirm status
+//     let query;
+//     let queryParams;
+//     if (confirm === 'Y') {
+//         // Update appointment when confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET confirm = $1, 
+//                      change_date = $2, 
+//                      change_time = $3 
+//                  WHERE patient_id = $4 AND date = $5 AND time = $6`;
+//         queryParams = [confirm, formattedDateFrom, formattedTimeFrom, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else if (confirm === 'N') {
+//         // Store data when not confirmed
+//         query = `UPDATE public.appointment_new2 
+//                  SET confirm = $1 
+//                  WHERE patient_id = $2 AND date = $3 AND time = $4`;
+//         queryParams = [confirm, patientID, formattedDateFrom, formattedTimeFrom];
+//     } else {
+//         return res.status(400).json({ error: 'Invalid confirmation status' });
+//     }
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             res.json({ message: 'Appointment updated successfully' });
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, and timeFrom are required' });
+//     }
+
+//     // Convert dateFrom and timeFrom to match database format
+//     const formattedDateFrom = new Date(dateFrom).toISOString().split('T')[0];
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query to update data only when confirm is 'W' in the database
+//     const query = `UPDATE public.appointment_new2 
+//                    SET confirm = $1, 
+//                        change_date = $2, 
+//                        change_time = $3 
+//                    WHERE confirm = 'W' AND patient_id = $4 AND date = $5 AND time = $6`;
+//     const queryParams = [confirm, formattedDateFrom, formattedTimeFrom, patientID, formattedDateFrom, formattedTimeFrom];
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             // Check if any row was updated
+//             if (result.rowCount > 0) {
+//                 res.json({ message: 'Appointment updated successfully' });
+//             } else {
+//                 res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+//             }
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// const months = {
+//     Jan: '01',
+//     Feb: '02',
+//     Mar: '03',
+//     Apr: '04',
+//     May: '05',
+//     Jun: '06',
+//     Jul: '07',
+//     Aug: '08',
+//     Sep: '09',
+//     Oct: '10',
+//     Nov: '11',
+//     Dec: '12'
+// };
+
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, and timeFrom are required' });
+//     }
+
+//     // Split the dateFrom string and extract day, month, and year
+//     const dateParts = dateFrom.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+//     if (dateParts.length !== 4) {
+//         return res.status(400).json({ error: 'Invalid date format' });
+//     }
+//     const day = dateParts[2]; // Day is the third element
+//     const month = months[dateParts[1]]; // Month is the second element, mapped to MM format
+//     const year = dateParts[3]; // Year is the fourth element
+
+//     // Format date and time to match database format
+//     const formattedDateFrom = `${year}-${month}-${day}`;
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query to update data only when confirm is 'W' in the database
+//     const query = `UPDATE public.appointment_new2 
+//                    SET confirm = $1, 
+//                        change_date = $2, 
+//                        change_time = $3 
+//                    WHERE confirm = 'W' AND patient_id = $4 AND date = $5 AND time = $6`;
+//     const queryParams = [confirm, formattedDateFrom, formattedTimeFrom, patientID, formattedDateFrom, formattedTimeFrom];
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             // Check if any row was updated
+//             if (result.rowCount > 0) {
+//                 res.json({ message: 'Appointment updated successfully' });
+//             } else {
+//                 res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+//             }
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// const months = {
+//     Jan: '01',
+//     Feb: '02',
+//     Mar: '03',
+//     Apr: '04',
+//     May: '05',
+//     Jun: '06',
+//     Jul: '07',
+//     Aug: '08',
+//     Sep: '09',
+//     Oct: '10',
+//     Nov: '11',
+//     Dec: '12'
+// };
+
+// //This api it work when confirm but change_date and change_time is not finish.
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, and timeFrom are required' });
+//     }
+
+//     // Split the dateFrom string and extract day, month, and year
+//     const dateParts = dateFrom.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+//     if (dateParts.length !== 4) {
+//         return res.status(400).json({ error: 'Invalid date format' });
+//     }
+//     const day = dateParts[2]; // Day is the third element
+//     const month = months[dateParts[1]]; // Month is the second element, mapped to MM format
+//     const year = dateParts[3]; // Year is the fourth element
+
+//     // Format date and time to match database format
+//     const formattedDateFrom = `${year}-${month}-${day}`;
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Construct SQL query to update data only when confirm is 'W' in the database
+//     const query = `UPDATE public.appointment_new2 
+//                    SET confirm = $1
+//                    WHERE confirm = 'W' AND patient_id = $2 AND date = $3 AND time = $4`;
+//     const queryParams = [confirm, patientID, formattedDateFrom, formattedTimeFrom];
+
+//     // Execute the query
+//     client.query(query, queryParams)
+//         .then(result => {
+//             // Check if any row was updated
+//             if (result.rowCount > 0) {
+//                 res.json({ message: 'Appointment updated successfully' });
+//             } else {
+//                 res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+//             }
+//         })
+//         .catch(err => {
+//             console.error('Error executing query:', err);
+//             res.status(500).json({ error: 'An error occurred' });
+//         });
+// });
+
+// const months = {
+//     Jan: '01',
+//     Feb: '02',
+//     Mar: '03',
+//     Apr: '04',
+//     May: '05',
+//     Jun: '06',
+//     Jul: '07',
+//     Aug: '08',
+//     Sep: '09',
+//     Oct: '10',
+//     Nov: '11',
+//     Dec: '12'
+// };
+
+// //This api can update data at column "confirm" and can check "change_date" and "change_time"
+// router.post('/appointmentRequestConfirm', (req, res) => {
+//     // Directly extract appointment data from the request body
+//     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+//     // Check if appointmentData is provided
+//     if (!patientID || !dateFrom || !timeFrom) {
+//         return res.status(400).json({ error: 'Patient ID, dateFrom, and timeFrom are required' });
+//     }
+
+//     // Split the dateFrom string and extract day, month, and year
+//     const datePartsFrom = dateFrom.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+//     if (datePartsFrom.length !== 4) {
+//         return res.status(400).json({ error: 'Invalid date format for dateFrom' });
+//     }
+//     const dayFrom = datePartsFrom[2]; // Day is the third element
+//     const monthFrom = months[datePartsFrom[1]]; // Month is the second element, mapped to MM format
+//     const yearFrom = datePartsFrom[3]; // Year is the fourth element
+
+//     // Format date and time to match database format for dateFrom
+//     const formattedDateFrom = `${yearFrom}-${monthFrom}-${dayFrom}`;
+//     const formattedTimeFrom = `${timeFrom}:00`;
+
+//     // Split the dateTo string and extract day, month, and year
+//     const datePartsTo = dateTo.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+//     if (datePartsTo.length !== 4) {
+//         return res.status(400).json({ error: 'Invalid date format for dateTo' });
+//     }
+//     const dayTo = datePartsTo[2]; // Day is the third element
+//     const monthTo = months[datePartsTo[1]]; // Month is the second element, mapped to MM format
+//     const yearTo = datePartsTo[3]; // Year is the fourth element
+
+//     // Format date and time to match database format for dateTo
+//     const formattedDateTo = `${yearTo}-${monthTo}-${dayTo}`;
+//     const formattedTimeTo = `${timeTo}:00`;
+
+//     // Check if the confirmation status is 'W' and dateTo and timeTo match change_date and change_time
+//     if (confirm === 'Y') {
+//         const query = `UPDATE public.appointment_new2 
+//                        SET confirm = 'Y', 
+//                            date = $1,
+//                            time = $2
+//                        WHERE confirm = 'W' AND patient_id = $3 AND date = $4 AND time = $5 AND change_date = $6 AND change_time = $7`;
+//         const queryParams = [formattedDateTo, formattedTimeTo, patientID, formattedDateFrom, formattedTimeFrom, formattedDateTo, formattedTimeTo];
+
+//         // Execute the query
+//         client.query(query, queryParams)
+//             .then(result => {
+//                 // Check if any row was updated
+//                 if (result.rowCount > 0) {
+//                     res.json({ message: 'Appointment updated successfully' });
+//                 } else {
+//                     res.status(404).json({ error: 'No appointment found with confirm status "W" and matching dateTo and timeTo' });
+//                 }
+//             })
+//             .catch(err => {
+//                 console.error('Error executing query:', err);
+//                 res.status(500).json({ error: 'An error occurred' });
+//             });
+//     } else if (confirm === 'N') {
+//         // If the confirmation status is 'N', update confirm directly
+//         const query = `UPDATE public.appointment_new2 
+//                        SET confirm = 'N'
+//                        WHERE confirm = 'W' AND patient_id = $1 AND date = $2 AND time = $3`;
+//         const queryParams = [patientID, formattedDateFrom, formattedTimeFrom];
+
+//         // Execute the query
+//         client.query(query, queryParams)
+//             .then(result => {
+//                 // Check if any row was updated
+//                 if (result.rowCount > 0) {
+//                     res.json({ message: 'Appointment updated successfully' });
+//                 } else {
+//                     res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+//                 }
+//             })
+//             .catch(err => {
+//                 console.error('Error executing query:', err);
+//                 res.status(500).json({ error: 'An error occurred' });
+//             });
+//     } else {
+//         // If confirm is not 'W' or 'N', return error
+//         res.status(400).json({ error: 'Invalid confirmation status. Confirmation status must be either "W" or "N".' });
+//     }
+// });
+
+const months = {
+    Jan: '01',
+    Feb: '02',
+    Mar: '03',
+    Apr: '04',
+    May: '05',
+    Jun: '06',
+    Jul: '07',
+    Aug: '08',
+    Sep: '09',
+    Oct: '10',
+    Nov: '11',
+    Dec: '12'
+};
+
+router.post('/appointmentRequestConfirm', (req, res) => {
+    // Directly extract appointment data from the request body
+    const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
+
+    // Check if appointmentData is provided
+    if (!patientID || !dateFrom || !timeFrom || !confirm) {
+        return res.status(400).json({ error: 'Patient ID, dateFrom, timeFrom, and confirm are required' });
+    }
+
+    // Split the dateFrom string and extract day, month, and year
+    const datePartsFrom = dateFrom.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+    if (datePartsFrom.length !== 4) {
+        return res.status(400).json({ error: 'Invalid date format for dateFrom' });
+    }
+    const dayFrom = datePartsFrom[2]; // Day is the third element
+    const monthFrom = months[datePartsFrom[1]]; // Month is the second element, mapped to MM format
+    const yearFrom = datePartsFrom[3]; // Year is the fourth element
+
+    // Format date and time to match database format for dateFrom
+    const formattedDateFrom = `${yearFrom}-${monthFrom}-${dayFrom}`;
+    const formattedTimeFrom = `${timeFrom}:00`;
+
+    if (dateTo !== '-' && timeTo !== '-') {
+        // This is the second type of request with both dateTo and timeTo provided
+        // Split the dateTo string and extract day, month, and year
+        const datePartsTo = dateTo.split(/[\s,]+/).filter(part => !!part); // Split by space or comma and remove empty parts
+        if (datePartsTo.length !== 4) {
+            return res.status(400).json({ error: 'Invalid date format for dateTo' });
+        }
+        const dayTo = datePartsTo[2]; // Day is the third element
+        const monthTo = months[datePartsTo[1]]; // Month is the second element, mapped to MM format
+        const yearTo = datePartsTo[3]; // Year is the fourth element
+
+        // Format date and time to match database format for dateTo
+        const formattedDateTo = `${yearTo}-${monthTo}-${dayTo}`;
+        const formattedTimeTo = `${timeTo}:00`;
+
+        // Check if the confirmation status is 'Y' and dateTo and timeTo match change_date and change_time
+        if (confirm === 'Y') {
+            const query = `UPDATE public.appointment_new2 
+                           SET confirm = 'Y', 
+                               date = $1,
+                               time = $2
+                           WHERE confirm = 'W' AND patient_id = $3 AND date = $4 AND time = $5 AND change_date = $6 AND change_time = $7`;
+            const queryParams = [formattedDateTo, formattedTimeTo, patientID, formattedDateFrom, formattedTimeFrom, formattedDateTo, formattedTimeTo];
+
+            // Execute the query
+            client.query(query, queryParams)
+                .then(result => {
+                    // Check if any row was updated
+                    if (result.rowCount > 0) {
+                        res.json({ message: 'Appointment updated successfully' });
+                    } else {
+                        res.status(404).json({ error: 'No appointment found with confirm status "W" and matching dateTo and timeTo' });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'An error occurred' });
+                });
+        } else if (confirm === 'N') {
+            // If the confirmation status is 'N', update confirm directly
+            const query = `UPDATE public.appointment_new2 
+                           SET confirm = 'N'
+                           WHERE confirm = 'W' AND patient_id = $1 AND date = $2 AND time = $3`;
+            const queryParams = [patientID, formattedDateFrom, formattedTimeFrom];
+
+            // Execute the query
+            client.query(query, queryParams)
+                .then(result => {
+                    // Check if any row was updated
+                    if (result.rowCount > 0) {
+                        res.json({ message: 'Appointment updated successfully' });
+                    } else {
+                        res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'An error occurred' });
+                });
+        } else {
+            // If confirm is not 'W' or 'N', return error
+            res.status(400).json({ error: 'Invalid confirmation status. Confirmation status must be either "W" or "N".' });
+        }
+    } else {
+        // This is the first type of request without dateTo and timeTo provided
+        // Construct SQL query to update data only when confirm is 'W' in the database
+        const query = `UPDATE public.appointment_new2 
+                       SET confirm = $1
+                       WHERE confirm = 'W' AND patient_id = $2 AND date = $3 AND time = $4`;
+        const queryParams = [confirm, patientID, formattedDateFrom, formattedTimeFrom];
+
+        // Execute the query
+        client.query(query, queryParams)
+            .then(result => {
+                // Check if any row was updated
+                if (result.rowCount > 0) {
+                    res.json({ message: 'Appointment updated successfully' });
+                } else {
+                    res.status(404).json({ error: 'No appointment found with confirm status "W"' });
+                }
+            })
+            .catch(err => {
+                console.error('Error executing query:', err);
+                res.status(500).json({ error: 'An error occurred' });
+            });
+    }
+});
+
+
+
+
+
 
 
 

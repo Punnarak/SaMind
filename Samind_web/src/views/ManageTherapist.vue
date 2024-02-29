@@ -138,7 +138,7 @@
             <div class="modal-body" align="start" style="left: 100px">
               <slot name="body">
                 <div style="display: flex; flex-direction: row">
-                  <div class="TherapistId">
+                  <!-- <div class="TherapistId">
                     <label class="text title">Therapist ID</label>
                     <v-col style="margin-top: -10px; margin-left: -10px">
                       <v-text-field
@@ -146,6 +146,7 @@
                         density="comfortable"
                         rounded="lg"
                         variant="outlined"
+                        disabled="true"
                         placeholder="Enter Therapist ID"
                         style="width: 150px; height: 45px; flex-shrink: 0"
                         v-model="therapistId"
@@ -153,7 +154,7 @@
                       >
                       </v-text-field>
                     </v-col>
-                  </div>
+                  </div> -->
                   <div class="FirstName">
                     <label class="text title">First Name</label>
                     <v-col style="margin-top: -10px; margin-left: -10px">
@@ -163,7 +164,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Therapist Firstname"
-                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        style="width: 332px; height: 45px; flex-shrink: 0"
                         v-model="firstName"
                         :rules="firstNameValidation"
                       >
@@ -185,7 +186,7 @@
                         rounded="lg"
                         variant="outlined"
                         placeholder="Enter Therapist Lastname"
-                        style="width: 250px; height: 45px; flex-shrink: 0"
+                        style="width: 332px; height: 45px; flex-shrink: 0"
                         v-model="lastName"
                         :rules="lastNameValidation"
                       >
@@ -295,6 +296,7 @@
                         density="comfortable"
                         rounded="lg"
                         variant="outlined"
+                        disabled="true"
                         placeholder="Enter Therapist ID"
                         style="width: 150px; height: 45px; flex-shrink: 0"
                         v-model="therapistId"
@@ -421,9 +423,32 @@
 </template>
 
 <script setup>
+const page = ref(1);
+const itemsPerPage = ref(10);
+
+const headers = [
+  {
+    title: "No.",
+    align: "center",
+    sortable: false,
+    key: "no",
+  },
+  {
+    title: "Therapist ID",
+    key: "therapistId",
+    align: "start",
+    sortable: false,
+  },
+  { title: "Therapist Name", key: "name", sortable: false },
+  { title: "Email", key: "email", align: "start", sortable: false },
+  { title: "Action", key: "action", align: "center", sortable: false },
+];
+</script>
+<script>
+// let checkedNames = ref([]);
 import { ref, computed, onMounted } from "vue";
 import axios from "../axios.js";
-
+let search = ref("");
 let therapists = ref(
   // []
   [
@@ -465,32 +490,6 @@ let therapists = ref(
     },
   ]
 );
-onMounted(async () => {
-  const param = {
-    therapist_id: 5555,
-  };
-  await axios
-    .post("/patientList", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      therapists.value = response.data.map((patient, index) => ({
-        no: patient.no,
-        therapistId: patient.therapistId,
-        name: patient.name,
-        email: patient.email,
-      }));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-});
-
-let search = ref("");
 
 const filteredPatients = computed(() => {
   const searchTerm = search.value.toLowerCase();
@@ -499,37 +498,16 @@ const filteredPatients = computed(() => {
   );
 });
 
-const page = ref(1);
-const itemsPerPage = ref(10);
 
-const headers = [
-  {
-    title: "No.",
-    align: "center",
-    sortable: false,
-    key: "no",
-  },
-  {
-    title: "Therapist ID",
-    key: "therapistId",
-    align: "start",
-    sortable: false,
-  },
-  { title: "Therapist Name", key: "name", sortable: false },
-  { title: "Email", key: "email", align: "start", sortable: false },
-  { title: "Action", key: "action", align: "center", sortable: false },
-];
-</script>
-<script>
-let checkedNames = ref([]);
 
-import axios from "../axios.js";
+
 export default {
   props: {
     deletePopup: Boolean,
   },
   data() {
     return {
+      hospitalName: "",
       selectedDuplicateTest: null,
       selectTherapist: [],
       createPopup: false,
@@ -595,7 +573,6 @@ export default {
   methods: {
     handleCreateAccount() {
       if (
-        this.therapistId === "" ||
         this.firstName === "" ||
         this.lastName === "" ||
         this.email === "" ||
@@ -603,9 +580,25 @@ export default {
         this.password === ""
       ) {
       } else {
-        console.log(
+        let param = {
+	fname: this.firstName.includes("Dr.") ? this.firstName : "Dr." + this.firstName,
+	lname:this.lastName,
+	phone:this.phone,
+	hospitalName:this.hospitalName,
+	email:this.email,
+	password:this.password
+}
+        axios
+    .post("/adCreateTherapist", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+      console.log(
           "Create Therapist Account",
-          this.therapistId,
           this.firstName,
           this.lastName,
           this.email,
@@ -618,15 +611,21 @@ export default {
         this.password = "";
         this.checkEmail = false;
         this.createPopup = false;
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+       
       }
     },
     handleEditAccount(therapist) {
+      
       let name = therapist.name.split(" ");
       this.therapistId = therapist.therapistId;
       this.firstName = name[0];
       this.lastName = name[1];
-      this.email = "pun@gmail.com";
-      this.password = "1";
+      this.email = therapist.email;
       this.checkEmail = true;
       console.log(
         "Edit Therapist Account",
@@ -646,7 +645,34 @@ export default {
         this.checkEmail === false
       ) {
       } else {
-        console.log(
+        let param
+        if(this.password != ""){
+  param = {
+	therapistID:this.therapistId,
+	fname:this.firstName,
+	lname:this.lastName,
+	email:this.email,
+	password:this.password
+}
+        }else{
+           param = {
+	therapistID:this.therapistId,
+	fname:this.firstName,
+	lname:this.lastName,
+	email:this.email,
+}
+        }
+       
+axios
+    .post("/adTherapistEdit", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Create success", response.data);
+      console.log(
           "Update Therapist Account",
           this.therapistId,
           this.firstName,
@@ -661,28 +687,34 @@ export default {
         this.password = "";
         this.checkEmail = false;
         this.editPopup = false;
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+   
       }
     },
-    Delete(question, selectTherapist) {
-      console.log("selectTherapist", selectTherapist);
-      const type = { type: selectTherapist.columns.name };
-      const typeJSON = JSON.stringify(type, null, 2);
-      console.log("test", typeJSON);
-
-      // axios
-      //   .delete("/questionsDel", {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     data: typeJSON, // Send the data directly in the request body
-      //   })
-      //   .then((response) => {
-      //     console.log("delete questions:", response);
-      //     window.location.reload();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });\
+    Delete(therapist, selectTherapist) {
+      console.log(therapist)
+      let param = {
+        therapistID: selectTherapist.columns.therapistId
+}
+console.log(param)
+      axios
+    .post("/adTherapistDelete", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Delete success", therapist,response.data);
+      window.location.reload();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
     },
     clear() {
       this.therapistId = "";
@@ -692,7 +724,36 @@ export default {
       this.password = "";
     },
   },
+  async created (){
+  this.hospitalName = "Siriraj Hospital"
+  const param = {
+    hospitalName:this.hospitalName
+  };
+  await axios
+    .post("/adTherapistView", param, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("therapist", response.data);
+      therapists.value = response.data.map((therapists, index) => ({
+        no: therapists.No,
+        therapistId: therapists.therapistID,
+        name: therapists.therapistName,
+        email: therapists.email,
+      }));
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
 };
+
+
+
+
 </script>
 <style scoped>
 :deep(.v-pagination__list) {
