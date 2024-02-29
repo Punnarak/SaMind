@@ -18,6 +18,7 @@ const windowWidth = Dimensions.get("window").width;
 
 const PopcatGame = ({ route }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  // const patientId = 333
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
@@ -55,9 +56,11 @@ const PopcatGame = ({ route }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("id:", patientId);
         const response = await axios.get("/game_get_id", {
-          params: { patientId: patientId }
+          params: { patient_id: patientId }
         });
+        console.log("id:", patientId);
         setGameData(response.data);
         setIsLoading(false);
         console.log("Fetched data:", response.data); // Logging the fetched data
