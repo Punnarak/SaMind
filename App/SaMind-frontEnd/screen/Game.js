@@ -294,6 +294,9 @@ const PopcatGame = ({ route }) => {
     setMeatCount(3);
     setRiceCount(3);
     setPopCount(0);
+    setProgress1(1);
+    setProgress2(1);
+    setProgress3(1);
     setImageSource(require("../assets/egg1.png"));
   };
 

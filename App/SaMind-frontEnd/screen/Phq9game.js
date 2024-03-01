@@ -21,6 +21,34 @@ export default function Notificationgame({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
 
+  const updateHungryBar = async () => {
+    try {
+      const response = await axios.put('/update_hungry_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating health bar:', error);
+    }
+  };
+
+  const updateStaminaBar = async () => {
+    try {
+      const response = await axios.put('/update_stamina_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating health bar:', error);
+    }
+  };
+
+
+  const updateScore = async () => {
+    try {
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 50 });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      console.error('Error updating score bar:', error);
+    }
+  };
+
   const [selectedOptions, setSelectedOptions] = useState({});
   const [modal, setModal] = useState(false);
   const [check, setCheck] = useState(true); //กรณีคนตอบไม่หมดแล้วส่ง เอาไว้เช็ค
@@ -154,7 +182,10 @@ export default function Notificationgame({ route }) {
   const toggleConfirm = () => {
     setModal(!modal);
     setScore(0);
-    navigation.goBack();
+    updateStaminaBar();
+    updateHungryBar();
+    updateScore();
+    navigation.navigate("Gamescreen", { patientId });
   };
 
   const handleOptionSelect = (questionId, option) => {
