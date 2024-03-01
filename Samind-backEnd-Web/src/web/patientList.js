@@ -179,4 +179,35 @@ function getHighestMood(moodData) {
   }
 }
 
+
+router.post('/patientGame', async (req, res) => {
+  const patientId = req.body.patient_id;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ error: 'Patient ID is required.' });
+    }
+
+    const query = 'SELECT goodword, timeplay FROM gamedoctor WHERE patient_id = $1';
+    const queryParams = [patientId];
+
+    const result = await client.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+      return res.json({ error: 'No data found for the patient.' });
+    }
+
+    const data = {
+      patientId,
+      goodword: result.rows[0].goodword,
+      timeplay: result.rows[0].timeplay
+    };
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
 module.exports = router;
