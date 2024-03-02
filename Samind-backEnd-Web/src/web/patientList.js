@@ -188,8 +188,10 @@ router.post('/patientGame', async (req, res) => {
       return res.status(400).json({ error: 'Patient ID is required.' });
     }
 
+    const cleanedPatientId = parseInt(patientId.replace('PID', ''));
+    console.log('test:', cleanedPatientId);
     const query = 'SELECT goodword, timeplay FROM gamedoctor WHERE patient_id = $1';
-    const queryParams = [patientId];
+    const queryParams = [cleanedPatientId];
 
     const result = await client.query(query, queryParams);
 
@@ -219,8 +221,9 @@ router.post('/lastVisitGame', async (req, res) => {
     }
 
     // Query to fetch last_visit from gamepatient table
+    const cleanedPatientId = parseInt(patientId.replace('PID', ''));
     const patientQuery = 'SELECT last_visit FROM gamepatient WHERE patient_id = $1';
-    const patientQueryParams = [patientId];
+    const patientQueryParams = [cleanedPatientId];
 
     const patientResult = await client.query(patientQuery, patientQueryParams);
 
@@ -231,15 +234,17 @@ router.post('/lastVisitGame', async (req, res) => {
     // Extracting last_visit timestamp
     const lastVisitTimestamp = patientResult.rows[0].last_visit;
 
+    const lastVisitDate = new Date(lastVisitTimestamp);
+    lastVisitDate.setHours(lastVisitDate.getHours() + 7);
     // Formatting last_visit timestamp to desired format for date
-    const formattedDate = new Date(lastVisitTimestamp).toLocaleString('en-US', {
+    const formattedDate = new Date(lastVisitDate).toLocaleString('en-US', {
       day: '2-digit',
       month: 'long',
       year: 'numeric'
     });
 
     // Formatting last_visit timestamp to desired format for time
-    const formattedTime = new Date(lastVisitTimestamp).toLocaleString('en-US', {
+    const formattedTime = new Date(lastVisitDate).toLocaleString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
