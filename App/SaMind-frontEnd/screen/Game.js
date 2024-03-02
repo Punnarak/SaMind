@@ -376,6 +376,7 @@ const PopcatGame = ({ route }) => {
     setProgress1(1);
     setProgress2(1);
     setProgress3(1);
+    setSleepMode(false);
     setImageSource(require("../assets/egg1.png"));
   };
 

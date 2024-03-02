@@ -210,4 +210,51 @@ router.post('/patientGame', async (req, res) => {
   }
 });
 
+router.post('/lastVisitGame', async (req, res) => {
+  const patientId = req.body.patient_id;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ error: 'Patient ID is required.' });
+    }
+
+    // Query to fetch last_visit from gamepatient table
+    const patientQuery = 'SELECT last_visit FROM gamepatient WHERE patient_id = $1';
+    const patientQueryParams = [patientId];
+
+    const patientResult = await client.query(patientQuery, patientQueryParams);
+
+    if (patientResult.rows.length === 0) {
+      return res.json({ error: 'No data found for the patient.' });
+    }
+
+    // Extracting last_visit timestamp
+    const lastVisitTimestamp = patientResult.rows[0].last_visit;
+
+    // Formatting last_visit timestamp to desired format for date
+    const formattedDate = new Date(lastVisitTimestamp).toLocaleString('en-US', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    // Formatting last_visit timestamp to desired format for time
+    const formattedTime = new Date(lastVisitTimestamp).toLocaleString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+
+    const data = {
+      lastVisitDate: formattedDate, // Include formatted last visit date in response
+      lastVisitTime: formattedTime // Include formatted last visit time in response
+    };
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
 module.exports = router;

@@ -277,12 +277,25 @@
                 "
               >
                 <v-col>
-                  <label
-                    class="moodresult ml-8"
-                    style="font-weight: bold; font-size: 24px"
-                    >{{ playLastdate }}</label
-                  >
-                  <br /> </v-col></v-chip></v-col
+                  <div style="text-align: center">
+                    <label
+                      style="font-weight: bold; font-size: 24px; color: black"
+                      >{{ playLastdate }}</label
+                    >
+                    <br />
+                    <label
+                      style="
+                        font-style: normal;
+                        font-weight: 600;
+                        font-size: 16px;
+                        color: #b6b9c2;
+                        display: inline-block;
+                      "
+                      >{{ playLasttime }}</label
+                    >
+                  </div>
+                </v-col></v-chip
+              ></v-col
             ><v-col cols="26" sm="6" md="4">
               <label class="title mr-16" style="font-weight: bold"
                 >Total number of plays
@@ -359,7 +372,7 @@
                     class="moodresult ml-8"
                     style="font-weight: bold; font-size: 24px"
                   >
-                    {{ percentageGoodword}}%
+                    {{ percentageGoodword }}%
                   </label>
                   <br />
                   <!-- <label class="testdate ml-7">{{ detectDate }}</label> -->
@@ -379,7 +392,6 @@ function getColor(mood) {
   else if (mood > 200) return "orange";
   else return "green";
 }
-
 </script>
 <script>
 export default {
@@ -405,6 +417,7 @@ export default {
       detectDate: "8 July 2022",
 
       playLastdate: "8 July 2022",
+      playLasttime: "08:00:52",
       percentageGoodword: 0,
       timestoplay: 0,
     };
@@ -418,19 +431,36 @@ export default {
     console.log("this.patientInfo", this.$route.query);
     console.log("this.patientID", this.patientId);
     this.fetchAdditionalData();
+    this.fetchLastVisit();
   },
   methods: {
     async fetchAdditionalData() {
-    try {
-      const response = await axios.post('/patientGame', { patient_id: this.patientId });
-      const { goodword, timeplay } = response.data;
-      this.percentageGoodword = goodword;
+      try {
+        const response = await axios.post("/patientGame", {
+          patient_id: this.patientId,
+        });
+        const { goodword, timeplay } = response.data;
+        this.percentageGoodword = goodword;
         this.timestoplay = timeplay;
-      console.log("this.gw", this.goodword);
-    } catch (error) {
-      console.error('Error fetching additional data:', error);
-    }
-  }
+        console.log("this.gw", this.goodword);
+      } catch (error) {
+        console.error("Error fetching additional data:", error);
+      }
+    },
+    async fetchLastVisit() {
+      try {
+        const response = await axios.post("/lastVisitGame", {
+          patient_id: this.patientId,
+        });
+        const { lastVisitDate, lastVisitTime } = response.data; // Extracting date and time separately
+        this.playLastdate = lastVisitDate; // Assigning the date part
+        this.playLasttime = lastVisitTime; // Assigning the time part
+        console.log("Last Visit Date:", this.playLastdate);
+        console.log("Last Visit Time:", this.playLasttime);
+      } catch (error) {
+        console.error("Error fetching last visit data:", error);
+      }
+    },
   },
 };
 </script>
