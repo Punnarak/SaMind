@@ -190,7 +190,7 @@ router.post("/register-with-otp", jsonParser, async (req, res) => {
       await client.query("BEGIN");
 
       // Generate the next value for users_id
-      const generateUserIdQuery = 'SELECT NEXTVAL(\'users_id_seq\') AS users_id';
+      const generateUserIdQuery = "SELECT NEXTVAL('users_id_seq') AS users_id";
       const userIdResult = await client.query(generateUserIdQuery);
       const users_id = userIdResult.rows[0].users_id;
 
@@ -198,7 +198,7 @@ router.post("/register-with-otp", jsonParser, async (req, res) => {
         text: "INSERT INTO users (users_id, email, password, patient_id, verify_user) VALUES ($1, $2, $3, $4, $5)",
         values: [users_id, email, hash, patient_id, "N"],
       };
-      
+
       await client.query(registrationQuery);
 
       await client.query("INSERT INTO otp_data (email, otp) VALUES ($1, $2)", [
@@ -234,7 +234,6 @@ router.post("/register-with-otp", jsonParser, async (req, res) => {
     res.status(500).json({ message: "An error occurred" });
   }
 });
-
 
 const verifyOtp = async (req, res) => {
   const { id, email, otp } = req.body;
@@ -484,7 +483,10 @@ router.post("/forgotPassword", async (req, res) => {
     }
 
     // Check if the email exists in the database
-    const user = await client.query("SELECT * FROM public.users WHERE email = $1", [email]);
+    const user = await client.query(
+      "SELECT * FROM public.users WHERE email = $1",
+      [email]
+    );
 
     if (user.rows.length === 0) {
       return res.status(404).json({ message: "Email not found" });
@@ -508,7 +510,6 @@ router.post("/forgotPassword", async (req, res) => {
     res.status(500).json({ error: "An error occurred" });
   }
 });
-
 
 // Verify OTP API
 router.post("/verifyOtpForgotPassword", async (req, res) => {
@@ -543,9 +544,6 @@ router.post("/verifyOtpForgotPassword", async (req, res) => {
     res.status(500).json({ message: "An error occurred" });
   }
 });
-
-
-
 
 function authenticate(req, res, next) {
   // ตรวจสอบการยืนยันตัวตนที่นี่
@@ -797,7 +795,10 @@ router.post("/login", jsonParser, async function (req, res, next) {
     const hashedPassword = result.rows[0].password;
 
     if (!hashedPassword) {
-      return res.json({ status: "error", message: "Password is not set for the user" });
+      return res.json({
+        status: "error",
+        message: "Password is not set for the user",
+      });
     }
 
     // Use bcrypt.compare to check if the provided password matches the hashed password
@@ -805,9 +806,13 @@ router.post("/login", jsonParser, async function (req, res, next) {
 
     if (isLogin) {
       const { users_id, email, patient_id, hospital_name } = result.rows[0];
-      const token = jwt.sign({ users_id, email, patient_id, hospital_name }, secret, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { users_id, email, patient_id, hospital_name },
+        secret,
+        {
+          expiresIn: "1h",
+        }
+      );
 
       return res
         .cookie("access_token", token, {
@@ -815,7 +820,11 @@ router.post("/login", jsonParser, async function (req, res, next) {
           secure: process.env.NODE_ENV === "production",
         })
         .status(200)
-        .json({ status: "ok", message: "Login success", user: { users_id, email, patient_id, hospital_name } });
+        .json({
+          status: "ok",
+          message: "Login success",
+          user: { users_id, email, patient_id, hospital_name },
+        });
     } else {
       return res.json({ status: "error", message: "Login failed" });
     }
@@ -825,6 +834,29 @@ router.post("/login", jsonParser, async function (req, res, next) {
       status: "error",
       message: "An error occurred during login",
     });
+  }
+});
+
+router.post("/refreshToken", (req, res) => {
+  const refreshToken = req.cookies["access_token"];
+  if (!refreshToken) {
+    return res.status(401).send("Access Denied. No refresh token provided.");
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, secret);
+    const accessToken = jwt.sign({ user: decoded.user }, secret, {
+      expiresIn: "1h",
+    });
+
+    res
+      .cookie("access_token", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      })
+      .send(decoded.user);
+  } catch (error) {
+    return res.status(400).send("Invalid refresh token.");
   }
 });
 
