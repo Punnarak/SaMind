@@ -837,6 +837,29 @@ router.post("/login", jsonParser, async function (req, res, next) {
   }
 });
 
+// router.post("/refreshToken", (req, res) => {
+//   const refreshToken = req.cookies["access_token"];
+//   if (!refreshToken) {
+//     return res.status(401).send("Access Denied. No refresh token provided.");
+//   }
+
+//   try {
+//     const decoded = jwt.verify(refreshToken, secret);
+//     const accessToken = jwt.sign({ user: decoded.user }, secret, {
+//       expiresIn: "1h",
+//     });
+
+//     res
+//       .cookie("access_token", accessToken, {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === "production",
+//       })
+//       .send(decoded.user);
+//   } catch (error) {
+//     return res.status(400).send("Invalid refresh token.");
+//   }
+// });
+
 router.post("/refreshToken", (req, res) => {
   const refreshToken = req.cookies["access_token"];
   if (!refreshToken) {
@@ -845,9 +868,18 @@ router.post("/refreshToken", (req, res) => {
 
   try {
     const decoded = jwt.verify(refreshToken, secret);
-    const accessToken = jwt.sign({ user: decoded.user }, secret, {
-      expiresIn: "1h",
-    });
+    const accessToken = jwt.sign(
+      {
+        users_id: decoded.users_id,
+        email: decoded.email,
+        patient_id: decoded.patient_id,
+        hospital_name: decoded.hospital_name,
+      },
+      secret,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res
       .cookie("access_token", accessToken, {
