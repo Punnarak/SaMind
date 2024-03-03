@@ -72,6 +72,34 @@ export default function Home({ route }) {
     return onFocus;
   }, []);
 
+  const navigateToGamescreen = async () => {
+    try {
+      // Make a request to your API to update timeplay
+      console.log("storage", patientId);
+      const response = await axios.put('/update_timeplay', { patient_id: patientId });
+  
+      if (response.status === 200) {
+        console.log('Timeplay updated successfully');
+        // Now that timeplay is updated, get click count
+        const clickCountResponse = await axios.get('/get_click_count', { params: { patient_id: patientId } });
+        
+        // Extract click count from the response
+        const clickCount = clickCountResponse.data.click_count;
+  
+        console.log('Click count:', clickCount);
+  
+        // Now navigate to the Gamescreen with patientId and clickCount
+        navigation.navigate("Gamescreen", { patientId, clickCount });
+      } else {
+        console.error('Failed to update timeplay:', response.status);
+        // Handle error accordingly
+      }
+    } catch (error) {
+      console.error('Error updating timeplay:', error);
+      // Handle error accordingly
+    }
+  };
+
   const handleMenuPress = (menu) => {
     setSelectedMenu(menu);
     console.log(menu);
@@ -304,7 +332,7 @@ export default function Home({ route }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Gamescreen", { patientId })}
+              onPress={() => navigateToGamescreen()}
             >
               <Text style={styles.Textb}>GAME</Text>
               <I

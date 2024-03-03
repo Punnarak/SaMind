@@ -16,13 +16,20 @@ import axios from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
 
+import Voice from "@react-native-community/voice";
+
 const windowWidth = Dimensions.get("window").width;
 
 const PopcatGame = ({ route }) => {
-  const [recording, setRecording] = React.useState();
-  const [recordings, setRecordings] = React.useState([]);
+  const [recording, setRecording] = useState();
+  const [recordings, setRecordings] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [transcription, setTranscription] = useState("");
 
-  async function startRecording() {
+  // Start recording when button is pressed
+  const handleStartRecording = async () => {
+    setIsRecording(true);
     try {
       const perm = await Audio.requestPermissionsAsync();
       if (perm.status === "granted") {
@@ -34,24 +41,59 @@ const PopcatGame = ({ route }) => {
           Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
         );
         setRecording(recording);
+        await recording.startAsync();
       }
-    } catch (err) {}
-  }
+    } catch (err) {
+      // console.error("Failed to start recording: ", err);
+    }
+  };
 
-  async function stopRecording() {
-    setRecording(undefined);
+  // Stop recording when button is released
+  const handleStopRecording = async () => {
+    setIsRecording(false);
+    // Check if recording is defined
+    if (recording) {
+      try {
+        await recording.stopAndUnloadAsync();
+        const { sound, status } = await recording.createNewLoadedSoundAsync();
+        const allRecordings = [...recordings];
+        allRecordings.push({
+          sound: sound,
+          duration: getDurationFormatted(status.durationMillis),
+          file: recording.getURI(),
+        });
+        setRecordings(allRecordings);
 
-    await recording.stopAndUnloadAsync();
-    let allRecordings = [...recordings];
-    const { sound, status } = await recording.createNewLoadedSoundAsync();
-    allRecordings.push({
-      sound: sound,
-      duration: getDurationFormatted(status.durationMillis),
-      file: recording.getURI(),
-    });
+        // Voice.start("en-US");
+      } catch (err) {
+        clearRecordings();
+        console.error("Failed to stop recording: ", err);
+      }
+    } else {
+      console.error("Recording is not started.");
+    }
+    clearRecordings();
+  };
 
-    setRecordings(allRecordings);
-  }
+  // useEffect(() => {
+  //   Voice.onSpeechResults = (e) => {
+  //     setTranscription(e.value[0]); // Set the transcription in the state
+  //   };
+
+  //   return () => {
+  //     Voice.destroy().then(Voice.removeAllListeners);
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    // Check if there's a new recording added to the recordings array
+    // If so, automatically play the last recorded sound
+    if (recordings.length > 0) {
+      const lastRecording = recordings[recordings.length - 1];
+      lastRecording.sound.replayAsync();
+      clearRecordings();
+    }
+  }, [recordings]);
 
   function getDurationFormatted(milliseconds) {
     const minutes = milliseconds / 1000 / 60;
@@ -61,23 +103,26 @@ const PopcatGame = ({ route }) => {
       : `${Math.floor(minutes)}:${seconds}`;
   }
 
-  function getRecordingLines() {
-    return recordings.map((recordingLine, index) => {
-      return (
-        <View key={index} style={styles.row}>
-          <Text style={styles.fill}>
-            Recording #{index + 1} | {recordingLine.duration}
-          </Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => recordingLine.sound.replayAsync()}
-          >
-            <Text style={styles.buttonText}>Play</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    });
-  }
+  // function getRecordingLines() {
+  //   return recordings.map((recordingLine, index) => {
+  //     return (
+  //       <View key={index} style={styles.row}>
+  //         <Text style={styles.fill}>
+  //           Recording #{index + 1} | {recordingLine.duration}
+  //         </Text>
+  //         <TouchableOpacity
+  //           style={styles.button}
+  //           onPress={() => {
+  //             recordingLine.sound.replayAsync();
+  //             clearRecordings();
+  //           }}
+  //         >
+  //           {/* <Text style={styles.buttonText}>Play</Text> */}
+  //         </TouchableOpacity>
+  //       </View>
+  //     );
+  //   });
+  // }
 
   function clearRecordings() {
     setRecordings([]);
@@ -85,9 +130,14 @@ const PopcatGame = ({ route }) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
-  const { patientId } = route.params || {};
+  const { patientId, clickCount } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
+
+  useEffect(() => {
+    setPopCount(clickCount);
+  }, []);
+
   const [imageSource, setImageSource] = useState(
     require("../assets/egg1.png") // Initial image
   );
@@ -186,9 +236,13 @@ const PopcatGame = ({ route }) => {
           ? require("../assets/egg31.png")
           : require("../assets/egg32.png")
       );
-    } else {
-      setImageSource(require("../assets/monster1.png"));
+    } else if (popCount >= 200 && popCount < 500) {
+      setImageSource(require("../assets/monster/pigidle.gif"));
     }
+      else if (popCount >= 500 && popCount < 100) {
+      setImageSource(require("../assets/monster/penguinidle.gif"));
+    } else
+    setImageSource(require("../assets/monster/penguinidle.gif"));
   }, [popCount]);
 
   useEffect(() => {
@@ -247,6 +301,8 @@ const PopcatGame = ({ route }) => {
         console.error("Error updating data:", error);
       }
     };
+
+    updateGameData();
 
     // Call the update function when navigating away from the page
     const unsubscribe = navigation.addListener("beforeRemove", () => {
@@ -349,9 +405,14 @@ const PopcatGame = ({ route }) => {
           ? require("../assets/egg31.png")
           : require("../assets/egg32.png")
       );
-    } else {
-      setImageSource(require("../assets/monster1.png"));
+    } 
+    else if (popCount >= 200 && popCount < 500) {
+      setImageSource(require("../assets/monster/pigidle.gif"));
     }
+      else if (popCount >= 500 && popCount < 1000) {
+      setImageSource(require("../assets/monster/penguinidle.gif"));
+    } else
+    setImageSource(require("../assets/monster/dogidle.gif"));
   };
 
   const handlePressOut = () => {
@@ -361,9 +422,13 @@ const PopcatGame = ({ route }) => {
       setImageSource(require("../assets/egg2.png"));
     } else if (popCount >= 125 && popCount < 200) {
       setImageSource(require("../assets/egg3.png"));
-    } else {
-      setImageSource(require("../assets/monster.png"));
+    } else if (popCount >= 200 && popCount < 500) {
+      setImageSource(require("../assets/monster/pigidle.gif"));
     }
+      else if (popCount >= 500 && popCount < 1000) {
+      setImageSource(require("../assets/monster/penguinfight.gif"));
+    } else
+    {setImageSource(require("../assets/monster/dogfight.gif"));}
     setPopCount((prevCount) => prevCount + 1);
   };
 
@@ -466,7 +531,7 @@ const PopcatGame = ({ route }) => {
       <View style={styles.container}>
         {sleepMode && (
           <View style={styles.sleepModeOverlay}>
-            <Text style={styles.sleepModeText}>Sleep Mode</Text>
+            {/* <Text style={styles.sleepModeText}>Sleep Mode</Text> */}
           </View>
         )}
         <TouchableWithoutFeedback
@@ -479,25 +544,16 @@ const PopcatGame = ({ route }) => {
         <View style={styles.container}>
           <TouchableOpacity
             style={styles.button}
-            onPress={recording ? stopRecording : startRecording}
+            onPressIn={handleStartRecording}
+            onPressOut={handleStopRecording}
           >
             <Text style={styles.buttonText}>
-              {recording ? "Stop Recording" : "Start Recording"}
+              {isRecording ? "Recording..." : "Hold to Record"}
             </Text>
           </TouchableOpacity>
-
+          <Text style={styles.transcriptionText}>{transcription}</Text>
           {/* Display recording lines */}
-          {getRecordingLines()}
-
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { display: recordings.length > 0 ? "flex" : "none" },
-            ]}
-            onPress={clearRecordings}
-          >
-            <Text style={styles.buttonText}>Clear Recordings</Text>
-          </TouchableOpacity>
+          {/* {getRecordingLines()} */}
         </View>
         <View style={styles.progressBars}>
           <View
@@ -607,58 +663,72 @@ const PopcatGame = ({ route }) => {
                 <TouchableWithoutFeedback onPress={toggleModal}>
                   <View style={styles.centeredView}>
                     <View style={styles.modalViewRow}>
-                      <TouchableOpacity
-                        style={[
-                          styles.modalButton,
-                          {
-                            backgroundColor:
-                              appleCount <= 0 ? "#9e9e9e" : "#2196f3",
-                          },
-                        ]}
-                        onPress={() => handleFoodSelection("Apple")}
-                        disabled={appleCount <= 0}
-                      >
-                        <Text style={styles.modalButtonText}>Apple</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.modalButton,
-                          {
-                            backgroundColor:
-                              fishCount <= 0 ? "#9e9e9e" : "#2196f3",
-                          },
-                        ]}
-                        onPress={() => handleFoodSelection("Fish")}
-                        disabled={fishCount <= 0}
-                      >
-                        <Text style={styles.modalButtonText}>Fish</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.modalButton,
-                          {
-                            backgroundColor:
-                              riceCount <= 0 ? "#9e9e9e" : "#2196f3",
-                          },
-                        ]}
-                        onPress={() => handleFoodSelection("Rice")}
-                        disabled={riceCount <= 0}
-                      >
-                        <Text style={styles.modalButtonText}>Rice</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.modalButton,
-                          {
-                            backgroundColor:
-                              meatCount <= 0 ? "#9e9e9e" : "#2196f3",
-                          },
-                        ]}
-                        onPress={() => handleFoodSelection("Meat")}
-                        disabled={meatCount <= 0}
-                      >
-                        <Text style={styles.modalButtonText}>Meat</Text>
-                      </TouchableOpacity>
+                      <View style={styles.foodOptionsRow}>
+                        {/* First Row */}
+                        <View style={[styles.row, {marginRight:30, marginBottom:20}]}>
+                          <TouchableOpacity
+                            style={[
+                              styles.modalButton,
+                              {
+                                backgroundColor:
+                                  appleCount <= 0 ? "#9e9e9e" : "#2196f3",
+                              },
+                            ]}
+                            onPress={() => handleFoodSelection("Apple")}
+                            disabled={appleCount <= 0}
+                          >
+                            <Text style={styles.modalButtonText}>Apple</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[
+                              styles.modalButton,
+                              {
+                                backgroundColor:
+                                  fishCount <= 0 ? "#9e9e9e" : "#2196f3",
+                              },
+                            ]}
+                            onPress={() => handleFoodSelection("Fish")}
+                            disabled={fishCount <= 0}
+                          >
+                            <Text style={styles.modalButtonText}>Fish</Text>
+                          </TouchableOpacity>
+                        </View>
+                        {/* Second Row */}
+                        <View style={[styles.row, {marginLeft:30}]}>
+                          <TouchableOpacity
+                            style={[
+                              styles.modalButton,
+                              {
+                                backgroundColor:
+                                  riceCount <= 0 ? "#9e9e9e" : "#2196f3",
+                              },
+                            ]}
+                            onPress={() => handleFoodSelection("Rice")}
+                            disabled={riceCount <= 0}
+                          >
+                            <Text style={styles.modalButtonText}>Rice</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[
+                              styles.modalButton,
+                              {
+                                backgroundColor:
+                                  meatCount <= 0 ? "#9e9e9e" : "#2196f3",
+                              },
+                            ]}
+                            onPress={() => handleFoodSelection("Meat")}
+                            disabled={meatCount <= 0}
+                          >
+                            <Text style={styles.modalButtonText}>Meat</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <View style={styles.bottomRightTextContainer}>
+                        <Text style={styles.bottomRightText}>
+                          *if you don't have any food, please try some good
+                          things to talk with the monster.
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </TouchableWithoutFeedback>
@@ -848,7 +918,7 @@ const styles = StyleSheet.create({
   },
   foodOptionsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
     flexWrap: "wrap",
   },
@@ -877,6 +947,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+    width: "90%"
+  },
+  bottomRightTextContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    width: 300, // Adjust the width as needed
+  },
+  bottomRightText: {
+    color: "red",
+    fontStyle: "italic",
+    fontSize: 12, // Adjust the font size here
+    textAlign: "right", // Align the text to the right
   },
 });
 

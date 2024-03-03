@@ -31,7 +31,7 @@ router.get('/game_get_id', (req, res) => {
             sleep: false,
           };
 
-          const insertQuery = `INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, status, apple, fish, rice, meat) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`;
+          const insertQuery = `INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, status, apple, fish, rice, meat, sleep) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`;
           const insertParams = [patient_id, defaultValues.click_count, defaultValues.health_bar, defaultValues.hungry_bar, defaultValues.last_visit, defaultValues.stamina_bar, defaultValues.status, defaultValues.apple, defaultValues.fish, defaultValues.rice, defaultValues.meat, defaultValues.sleep];
 
           client.query(insertQuery, insertParams)
@@ -277,6 +277,72 @@ router.put('/update_hungry_bar_de', (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
+router.put('/update_timeplay', (req, res) => {
+  const { patient_id } = req.body;
+
+  if (!patient_id) {
+    return res.status(400).json({ error: 'patient_id is required' });
+  }
+
+  // Check if patient exists
+  client.query('SELECT timeplay FROM gamedoctor WHERE patient_id = $1', [patient_id])
+    .then(result => {
+      if (result.rows.length === 0) {
+        // If patient not found, insert a new row
+        client.query('INSERT INTO gamedoctor (patient_id, goodword, timeplay) VALUES ($1, $2, $3)', [patient_id, 0, 1])
+          .then(() => {
+            res.json({ message: 'New patient created with timeplay 1' });
+          })
+          .catch(err => {
+            console.error('Error creating new patient:', err);
+            res.status(500).json({ error: 'An error occurred while creating new patient' });
+          });
+      } else {
+        // If patient found, update timeplay
+        const oldTimePlay = parseInt(result.rows[0].timeplay);
+        const newTimePlay = oldTimePlay + 1;
+
+        client.query('UPDATE gamedoctor SET timeplay = $1 WHERE patient_id = $2', [newTimePlay, patient_id])
+          .then(() => {
+            res.json({ message: 'Time play updated successfully' });
+          })
+          .catch(err => {
+            console.error('Error updating time play:', err);
+            res.status(500).json({ error: 'An error occurred while updating time play' });
+          });
+      }
+    })
+    .catch(err => {
+      console.error('Error retrieving old time play:', err);
+      res.status(500).json({ error: 'An error occurred while retrieving old time play' });
+    });
+});
+
+router.get('/get_click_count', (req, res) => {
+  const { patient_id } = req.query;
+
+  if (!patient_id) {
+    return res.status(400).json({ error: 'patient_id is required' });
+  }
+
+  const query = 'SELECT click_count FROM gamepatient WHERE patient_id = $1';
+  const queryParams = [patient_id];
+
+  client.query(query, queryParams)
+    .then(result => {
+      let clickCount = 0;
+      if (result.rows.length > 0) {
+        clickCount = result.rows[0].click_count;
+      }
+      res.json({ click_count: clickCount });
+    })
+    .catch(err => {
+      console.error('Error retrieving click count:', err);
+      res.status(500).json({ error: 'An error occurred while retrieving click count' });
+    });
+});
+
   
   module.exports = router;
   
