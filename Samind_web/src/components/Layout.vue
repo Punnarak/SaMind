@@ -206,17 +206,20 @@ export default {
   },
   data() {
     return {
+      therapistId: "",
       role: "",
       firstName: "",
       lastName: "",
     };
   },
-  created() {
-    this.role = "admin";
+  async created() {
+    this.therapistId = localStorage.getItem("id");
+    this.role = localStorage.getItem("role");
     const param = {
       therapist_id: 5555,
     };
-    axios
+    console.log(param);
+    await axios
       .post("/info_therapist", param, {
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +228,6 @@ export default {
       })
       .then((response) => {
         console.log("name", response.data);
-        //this.role = response.data.role;
         this.firstName = response.data.fname;
         this.lastName = response.data.lname;
       })
