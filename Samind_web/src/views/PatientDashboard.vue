@@ -267,7 +267,7 @@
               >
               <br />
               <v-chip
-                class="mt-5 ml-5"
+                class="mt-5 ml-5 text-center"
                 style="
                   color: rgb(152, 151, 151);
                   width: 226px;
@@ -276,7 +276,7 @@
                   border-radius: 10px;
                 "
               >
-                <v-col>
+                <v-col class="text-center">
                   <div style="text-align: center">
                     <label
                       style="font-weight: bold; font-size: 24px; color: black"
@@ -462,19 +462,26 @@ export default {
     }
   },
   async fetchLastVisit() {
-    try {
-      const response = await axios.post("/lastVisitGame", {
-        patient_id: this.patientId,
-      });
-      const { lastVisitDate, lastVisitTime } = response.data; // Extracting date and time separately
+  try {
+    const response = await axios.post("/lastVisitGame", {
+      patient_id: this.patientId,
+    });
+    const { lastVisitDate, lastVisitTime } = response.data;
+
+    if (lastVisitDate === null || lastVisitTime === null || lastVisitDate === undefined || lastVisitTime === undefined) {
+      this.playLastdate = "Didn't play";
+      this.playLasttime = "this game";
+    } else {
       this.playLastdate = lastVisitDate; // Assigning the date part
       this.playLasttime = lastVisitTime; // Assigning the time part
-      console.log("Last Visit Date:", this.playLastdate);
-      console.log("Last Visit Time:", this.playLasttime);
-    } catch (error) {
-      console.error("Error fetching last visit data:", error);
     }
-  },
+
+    console.log("Last Visit Date:", this.playLastdate);
+    console.log("Last Visit Time:", this.playLasttime);
+  } catch (error) {
+    console.error("Error fetching last visit data:", error);
+  }
+},
 },
 };
 </script>

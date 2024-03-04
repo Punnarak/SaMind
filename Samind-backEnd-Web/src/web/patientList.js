@@ -228,7 +228,7 @@ router.post('/lastVisitGame', async (req, res) => {
     const patientResult = await client.query(patientQuery, patientQueryParams);
 
     if (patientResult.rows.length === 0) {
-      return res.json({ error: 'No data found for the patient.' });
+      return res.json({ error: 'The patient didn\'t play the game.' }); // Modified response message
     }
 
     // Extracting last_visit timestamp
@@ -262,6 +262,7 @@ router.post('/lastVisitGame', async (req, res) => {
   }
 });
 
+
 router.post('/checkgamepatient', async (req, res) => {
   const patientId = req.body.patient_id;
 
@@ -286,18 +287,18 @@ router.post('/checkgamepatient', async (req, res) => {
     }
 
     // Check if the patient exists in the gamepatient table
-    query = 'SELECT * FROM gamepatient WHERE patient_id = $1';
-    queryParams = [cleanedPatientId];
+    // query = 'SELECT * FROM gamepatient WHERE patient_id = $1';
+    // queryParams = [cleanedPatientId];
 
-    result = await client.query(query, queryParams);
+    // result = await client.query(query, queryParams);
 
-    if (result.rows.length === 0) {
-      // If patient does not exist, create a new row with default values
-      query = 'INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, apple, fish, rice, meat, sleep) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
-      const currentTime = new Date();
-      queryParams = [cleanedPatientId, 0, 100, 100, currentTime, 100, 3, 3, 3, 3, false];
-      await client.query(query, queryParams);
-    }
+    // if (result.rows.length === 0) {
+    //   // If patient does not exist, create a new row with default values
+    //   query = 'INSERT INTO gamepatient (patient_id, status, click_count, health_bar, hungry_bar, last_visit, stamina_bar, apple, fish, rice, meat, sleep) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)';
+    //   const currentTime = new Date();
+    //   queryParams = [cleanedPatientId,"state0", 0, 100, 100, currentTime, 100, 3, 3, 3, 3, false];
+    //   await client.query(query, queryParams);
+    // }
 
     res.json({ message: 'Patient game data checked/created successfully.' });
   } catch (err) {
