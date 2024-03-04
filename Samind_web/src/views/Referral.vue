@@ -121,37 +121,37 @@ export default {
   },
   created() {
     const param = {
-    therapist_id: 5555,
-  };
+      therapist_id: localStorage.getItem("id"),
+    };
     axios
-    .post("/patientList", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      this.patientOptions = response.data.map(patient => patient.name);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .post("/patientList", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.patientOptions = response.data.map((patient) => patient.name);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
 
     axios
-    .post("/all_therapist", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      this.doctorOptions = response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .post("/all_therapist", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.doctorOptions = response.data;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
   computed: {},
   methods: {},

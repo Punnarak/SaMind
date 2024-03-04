@@ -80,7 +80,7 @@ let therapists = ref(
 );
 onMounted(async () => {
   const param = {
-    therapist_id: 5555,
+    therapist_id: localStorage.getItem("id"),
   };
   await axios
     .post("/patientList", param, {
@@ -306,6 +306,21 @@ export default {
         },
       });
     },
+  },
+  created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
 };
 </script>

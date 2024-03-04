@@ -83,6 +83,8 @@ import axios from "../axios.js";
 export default {
   data() {
     return {
+      role: "",
+      therapistId: "",
       email: "",
       checkEmail: false,
       emailRules: [
@@ -133,8 +135,16 @@ export default {
           })
           .then((response) => {
             if (response.data.status !== "error") {
+              console.log(response.data.user.role);
+              localStorage.setItem("id", response.data.user.therapist_id);
+              localStorage.setItem("role", response.data.user.role);
               this.$router.push("/dashboard/patient");
-              console.log("Login success", response.data);
+              console.log(
+                "Login success",
+                response.data.user.role,
+                localStorage.getItem("id"),
+                localStorage.getItem("role")
+              );
             }
           })
           .catch((error) => {

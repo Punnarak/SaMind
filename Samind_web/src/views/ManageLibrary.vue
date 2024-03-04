@@ -3,9 +3,11 @@
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> LIBRARY </v-col>
       <v-col class="calendar-type" cols="4" align="center">
-        <button @click="menu = 'carousel', this.dataEachMenu()">CAROUSEL</button>
-        <button @click="menu = 'tip', this.dataEachMenu()">TIP</button>
-        <button @click="menu = 'link', this.dataEachMenu()">LINK</button>
+        <button @click="(menu = 'carousel'), this.dataEachMenu()">
+          CAROUSEL
+        </button>
+        <button @click="(menu = 'tip'), this.dataEachMenu()">TIP</button>
+        <button @click="(menu = 'link'), this.dataEachMenu()">LINK</button>
       </v-col>
     </v-row>
     <v-col class="px-10" v-if="menu == 'carousel'">
@@ -627,7 +629,7 @@
             color="blue"
             size="30px"
             style="margin-right: 20px"
-            @click="handleEditLink(item.columns),(select = item)"
+            @click="handleEditLink(item.columns), (select = item)"
           />
           <v-btn
             icon="mdi-delete"
@@ -1505,31 +1507,30 @@ export default {
       } else {
         // console.log("Create Link", this.title, this.url);
         let param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-	url:this.url,
-	imageUrl:this.imageUrl,
-	type:"carousel"
-}
+          hospitalName: this.hospitalName,
+          title: this.title,
+          url: this.url,
+          imageUrl: this.imageUrl,
+          type: "carousel",
+        };
         axios
-    .post("/adLibraryCreate", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-        this.createCarouselPopup = false;
-        this.title = "";
-        this.url = "";
-        this.imageUrl = "";
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-
+          .post("/adLibraryCreate", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+            this.createCarouselPopup = false;
+            this.title = "";
+            this.url = "";
+            this.imageUrl = "";
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     handleCreateTip() {
@@ -1537,29 +1538,28 @@ export default {
       } else {
         // console.log("Create Link", this.title, this.url);
         let param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-	imageUrl:this.imageUrl,
-	type:"tip"
-}
+          hospitalName: this.hospitalName,
+          title: this.title,
+          imageUrl: this.imageUrl,
+          type: "tip",
+        };
         axios
-    .post("/adLibraryCreate", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-      this.createTipPopup = false;
-        this.title = "";
-        this.imageUrl = "";
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-      
+          .post("/adLibraryCreate", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+            this.createTipPopup = false;
+            this.title = "";
+            this.imageUrl = "";
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     handleCreateLink() {
@@ -1567,32 +1567,30 @@ export default {
       } else {
         // console.log("Create Link", this.title, this.url);
         let param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-	url:this.url,
-	type:"link"
-}
+          hospitalName: this.hospitalName,
+          title: this.title,
+          url: this.url,
+          type: "link",
+        };
         axios
-    .post("/adLibraryCreate", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-      
-      this.createLinkPopup = false;
-      this.title = "";
-      this.url = "";
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-        
+          .post("/adLibraryCreate", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+
+            this.createLinkPopup = false;
+            this.title = "";
+            this.url = "";
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
-     
     },
     handleEditCarousel(carousel) {
       this.editCarouselPopup = true;
@@ -1606,7 +1604,6 @@ export default {
       this.editTipPopup = true;
       this.title = tip.title;
       this.imageUrl = tip.imageUrl;
-     
     },
     handleEditLink(link) {
       this.editLinkPopup = true;
@@ -1616,148 +1613,143 @@ export default {
       // console.log("Edit Link", this.title, this.url);
     },
     handleUpdateCarousel() {
-      let param
+      let param;
       if (this.title === "" || this.url === "" || this.imageUrl == "") {
       } else {
-        if(this.title === this.select.columns.title){
-           param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-  url: this.url,
-	imageUrl:this.imageUrl,
-	type:"carousel"
-}
-        }else if(this.title !== this.select.columns.title){
-           param = {
-          hospitalName:this.hospitalName,
-	title:this.select.columns.title,
-  titleNew: this.title,
-  url: this.url,
-	imageUrl:this.imageUrl,
-	type:"carousel"
-}
+        if (this.title === this.select.columns.title) {
+          param = {
+            hospitalName: this.hospitalName,
+            title: this.title,
+            url: this.url,
+            imageUrl: this.imageUrl,
+            type: "carousel",
+          };
+        } else if (this.title !== this.select.columns.title) {
+          param = {
+            hospitalName: this.hospitalName,
+            title: this.select.columns.title,
+            titleNew: this.title,
+            url: this.url,
+            imageUrl: this.imageUrl,
+            type: "carousel",
+          };
         }
-        
+
         axios
-    .post("/adLibraryEdit", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Edit success", response.data);
-      this.title = "";
-        this.url = "";
-        this.imageUrl = "";
-        this.editCarouselPopup = false;
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-       
-     
+          .post("/adLibraryEdit", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Edit success", response.data);
+            this.title = "";
+            this.url = "";
+            this.imageUrl = "";
+            this.editCarouselPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     handleUpdateTip() {
       if (this.title === "" || this.imageUrl == "") {
       } else {
-
         // console.log("Create Link", this.title, this.url);
-        let param 
-        if(this.title === this.select.columns.title){
+        let param;
+        if (this.title === this.select.columns.title) {
           param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-	imageUrl:this.imageUrl,
-	type:"tip"
-}
-        }else if(this.title !== this.select.columns.title){
+            hospitalName: this.hospitalName,
+            title: this.title,
+            imageUrl: this.imageUrl,
+            type: "tip",
+          };
+        } else if (this.title !== this.select.columns.title) {
           param = {
-          hospitalName:this.hospitalName,
-	title:this.select.columns.title,
-  titleNew: this.title,
-	imageUrl:this.imageUrl,
-	type:"tip"
-}
+            hospitalName: this.hospitalName,
+            title: this.select.columns.title,
+            titleNew: this.title,
+            imageUrl: this.imageUrl,
+            type: "tip",
+          };
         }
-        
+
         axios
-    .post("/adLibraryEdit", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Edit success", response.data);
-      this.title = "";
-        this.imageUrl = "";
-        this.editTipPopup = false;
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-       
+          .post("/adLibraryEdit", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Edit success", response.data);
+            this.title = "";
+            this.imageUrl = "";
+            this.editTipPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     handleUpdateLink() {
       if (this.title === "" || this.url === "") {
       } else {
-        let param 
-        if(this.title === this.select.columns.title){
+        let param;
+        if (this.title === this.select.columns.title) {
           param = {
-          hospitalName:this.hospitalName,
-	title:this.title,
-	url:this.url,
-	type:"link"
-}
-        }else if(this.title !== this.select.columns.title){
+            hospitalName: this.hospitalName,
+            title: this.title,
+            url: this.url,
+            type: "link",
+          };
+        } else if (this.title !== this.select.columns.title) {
           param = {
-          hospitalName:this.hospitalName,
-          title: this.select.columns.title,
-	titleNew:this.title,
-	url:this.url,
-	type:"link"
-}
+            hospitalName: this.hospitalName,
+            title: this.select.columns.title,
+            titleNew: this.title,
+            url: this.url,
+            type: "link",
+          };
         }
-        
+
         axios
-    .post("/adLibraryEdit", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-      
-      this.title = "";
-        this.url = "";
-        this.editLinkPopup = false;
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-     
+          .post("/adLibraryEdit", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+
+            this.title = "";
+            this.url = "";
+            this.editLinkPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     Delete(question, select) {
       console.log("select", select);
       let param = {
-        hospitalName:this.hospitalName,
-	title:select.columns.title,
-	type: this.menu
-      }
+        hospitalName: this.hospitalName,
+        title: select.columns.title,
+        type: this.menu,
+      };
       axios
-        .post("/adLibraryDelete",param ,{
+        .post("/adLibraryDelete", param, {
           headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
         })
         .then((response) => {
           console.log("delete questions:", response);
@@ -1786,39 +1778,51 @@ export default {
       this.url = "";
       this.imageUrl = "";
     },
-    async dataEachMenu(){
-      
-  const param = {
-    hospitalName: this.hospitalName,
-    type: this.menu
-  };
-  // console.log(param)
-  await axios
-    .post("/adLibraryView", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      // console.log("response", response.data);
-      if(this.menu === 'carousel'){
-        carousel.value = response.data 
-      }else if(this.menu === 'tip'){
-        tip.value = response.data
-      }else{
-        link.value = response.data
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-    }
+    async dataEachMenu() {
+      const param = {
+        hospitalName: this.hospitalName,
+        type: this.menu,
+      };
+      // console.log(param)
+      await axios
+        .post("/adLibraryView", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          // console.log("response", response.data);
+          if (this.menu === "carousel") {
+            carousel.value = response.data;
+          } else if (this.menu === "tip") {
+            tip.value = response.data;
+          } else {
+            link.value = response.data;
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
   },
   async created() {
-    this.hospitalName = "Siriraj Hospital"
-   this.dataEachMenu()
-}
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    this.hospitalName = "Siriraj Hospital";
+    this.dataEachMenu();
+  },
 };
 </script>
 <style scoped>

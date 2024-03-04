@@ -909,7 +909,7 @@ export default {
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         date: `${day}-${month}-${year}`,
       };
       console.log(param);
@@ -964,7 +964,7 @@ export default {
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         date: `${day}-${month}-${year}`,
       };
       console.log(param);
@@ -996,7 +996,7 @@ export default {
       const year = this.currentDate.getFullYear();
       console.log("currentDay", this.currentDate);
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         date: `${day}-${month}-${year}`,
       };
       console.log(param);
@@ -1152,7 +1152,7 @@ export default {
     //Calendar Month
     async fetchEvents() {
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
       };
       await axios
         .post("/calendar_view", param, {
@@ -1398,7 +1398,7 @@ export default {
       );
 
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         date: `${year}-${month + 1}-${day}`,
       };
 
@@ -1579,9 +1579,22 @@ export default {
   },
 
   async created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     await this.fetchEvents();
     let param = {
-      therapist_id: 5555,
+      therapist_id: localStorage.getItem("id"),
     };
     console.log(param);
     axios

@@ -206,56 +206,70 @@ export default {
     };
   },
   created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    this.newPassword = "";
     const param = {
-    therapist_id: 5555,
-  };
-   axios
-    .post("/info_therapist", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("name", response.data);
-      this.firstName = response.data.fname
-      this.lastName = response.data.lname
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      therapist_id: localStorage.getItem("id"),
+    };
+    axios
+      .post("/info_therapist", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("name", response.data);
+        this.firstName = response.data.fname;
+        this.lastName = response.data.lname;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
   computed: {},
   methods: {
-    save(){
-     let param = {
-        therapist_id: 5555,
-        fname : this.firstName,
-        lname : this.lastName,
-        password: this.newPassword
-      }
+    save() {
+      let param = {
+        therapist_id: localStorage.getItem("id"),
+        fname: this.firstName,
+        lname: this.lastName,
+        password: this.newPassword,
+      };
       console.log("param", param);
       axios
-    .post("/update_info_therapist", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("name", response.data);
-     this.savePopup = true
-
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+        .post("/update_info_therapist", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("name", response.data);
+          this.savePopup = true;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     closePopup() {
       this.savePopup = false;
       window.location.reload(); // Refresh the page
     },
-    togglePasswordVisibility() { // ยังไม่ได้ใช้
+    togglePasswordVisibility() {
+      // ยังไม่ได้ใช้
       this.showPassword = !this.showPassword;
       this.$refs.passwordField.focus();
       const length = this.newPassword.length;

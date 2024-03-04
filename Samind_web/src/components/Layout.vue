@@ -177,13 +177,7 @@
           <v-icon>mdi-square-edit-outline</v-icon>
           <span class="pl-2">Edit account</span>
         </v-list-item>
-        <v-list-item
-          @click="
-            this.$router.push({
-              path: `/`,
-            })
-          "
-        >
+        <v-list-item @click="signOut()">
           <v-icon>mdi-logout-variant</v-icon>
           <span class="pl-2">Sign out</span>
         </v-list-item>
@@ -212,17 +206,20 @@ export default {
   },
   data() {
     return {
+      therapistId: "",
       role: "",
       firstName: "",
       lastName: "",
     };
   },
-  created() {
-    this.role = "admin";
+  async created() {
+    this.therapistId = localStorage.getItem("id");
+    this.role = localStorage.getItem("role");
     const param = {
-      therapist_id: 5555,
+      therapist_id: this.therapistId,
     };
-    axios
+    console.log(param);
+    await axios
       .post("/info_therapist", param, {
         headers: {
           "Content-Type": "application/json",
@@ -231,13 +228,30 @@ export default {
       })
       .then((response) => {
         console.log("name", response.data);
-        //this.role = response.data.role;
         this.firstName = response.data.fname;
         this.lastName = response.data.lname;
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+  },
+  methods: {
+    signOut() {
+      axios
+        .post("/logout", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("logout", response.data);
+          this.$router.push("/");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
   },
 };
 </script>

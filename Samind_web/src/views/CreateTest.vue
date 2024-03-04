@@ -173,6 +173,19 @@ export default {
     };
   },
   mounted() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     this.mockTestData();
   },
 
@@ -188,7 +201,7 @@ export default {
 
         let test = ref([]);
         const param = {
-          therapistId: 5555,
+          therapistId: localStorage.getItem("id"),
           type: this.testName,
         };
         axios
@@ -200,7 +213,7 @@ export default {
           })
           .then((response) => {
             console.log("response in else", response.data);
-            this.testDescription = response.data[0].description
+            this.testDescription = response.data[0].description;
             test.value = response.data;
           })
           .catch((error) => {
@@ -241,10 +254,10 @@ export default {
       // Convert testData to JSON string
       // const testDataJSON = JSON.stringify(testData, null, 2);
       const param = {
-        therapist_id : 5555,
-        description : this.testDescription,
-        questions
-      }
+        therapist_id: localStorage.getItem("id"),
+        description: this.testDescription,
+        questions,
+      };
       console.log("questions (JSON):", JSON.stringify(param, null, 2));
 
       // Add additional logic for handling the created test data if needed
