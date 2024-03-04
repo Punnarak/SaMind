@@ -2,6 +2,55 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 
+// const { SpeechClient } = require('@google-cloud/speech');
+// const { Storage } = require('@google-cloud/storage');
+// const fs = require('fs');
+
+// // Load service account credentials
+// const credentials = JSON.parse(fs.readFileSync('./sa_speech.json'));
+
+// // Initialize Google Cloud Speech-to-Text client with service account credentials
+// const speechClient = new SpeechClient({
+//   credentials: credentials,
+// });
+
+// router.post('/transcribe_audio', async (req, res) => {
+//   try {
+//     // Check if audio file is included in the request
+//     if (!req.files || !req.files.audio) {
+//       return res.status(400).json({ error: 'No audio file provided' });
+//     }
+
+//     const audioFile = req.files.audio;
+
+//     // Configure the request
+//     const request = {
+//       audio: {
+//         content: audioFile.data,
+//       },
+//       config: {
+//         encoding: 'LINEAR16',
+//         sampleRateHertz: 16000, // Adjust as needed
+//         languageCode: 'th-TH', // Adjust language code as needed
+//       },
+//     };
+
+//     // Detects speech in the audio file
+//     const [response] = await speechClient.recognize(request);
+//     const transcription = response.results
+//       .map(result => result.alternatives[0].transcript)
+//       .join('\n');
+
+//     return res.json({ transcription });
+//   } catch (error) {
+//     console.error('Error transcribing audio:', error);
+//     return res.status(500).json({ error: 'An error occurred while transcribing audio' });
+//   }
+// });
+
+
+
+
 router.get('/game_get_id', (req, res) => {
   const patient_id = req.query.patient_id;
   let query = 'SELECT * FROM gamepatient';

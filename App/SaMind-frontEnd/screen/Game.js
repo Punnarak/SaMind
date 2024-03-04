@@ -7,16 +7,18 @@ import {
   Image,
   TouchableWithoutFeedback,
   Dimensions,
-  ProgressBarAndroid,
+  // ProgressBarAndroid,
   ImageBackground,
   Modal,
 } from "react-native";
+import ProgressBar from 'react-native-progress/Bar'
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
 
-import Voice from "@react-native-community/voice";
+import Voice from '@react-native-community/voice';
+// import { readFile } from 'react-native-fs';
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -570,11 +572,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Health
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress1}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="red"
               progressBarStyle={{ height: 20 }}
             />
@@ -593,11 +595,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Hungry
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress2}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="orange"
               progressBarStyle={{ height: 20 }}
             />
@@ -614,11 +616,11 @@ const PopcatGame = ({ route }) => {
             }}
           >
             <Text style={styles.progressBarLabel}>Stamina</Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress3}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="grey"
               progressBarStyle={{ height: 20 }}
             />
