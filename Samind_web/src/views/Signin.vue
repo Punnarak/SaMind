@@ -64,7 +64,7 @@
                   block
                   size="x-large"
                   variant="flat"
-                  @click="() => $router.push('/dashboard/patient')"
+                  @click="handleLogin()"
                 >
                   Sign in
                 </v-btn>
@@ -79,10 +79,12 @@
 </template>
 
 <script>
+import axios from "../axios.js";
 export default {
   data() {
     return {
       email: "",
+      checkEmail: false,
       emailRules: [
         (value) => {
           if (!value) {
@@ -90,6 +92,7 @@ export default {
           } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
             return "Invalid email address. Please enter a valid email.";
           } else {
+            this.checkEmail = true;
             return true;
           }
         },
@@ -106,7 +109,40 @@ export default {
       ],
     };
   },
-  methods: {},
+  methods: {
+    handleLogin() {
+      console.log(this.email, this.password);
+      if (
+        this.email === "" ||
+        this.password === "" ||
+        this.checkEmail === false
+      ) {
+      } else {
+        console.log("Login Account", this.email, this.password);
+        let param = {
+          email: this.email,
+          password: this.password,
+        };
+        console.log("param", param);
+        axios
+          .post("/login", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            if (response.data.status !== "error") {
+              this.$router.push("/dashboard/patient");
+              console.log("Login success", response.data);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    },
+  },
 };
 </script>
 
