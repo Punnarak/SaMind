@@ -328,5 +328,86 @@ function getHighestMood(moodData) {
 }
 
 
+router.post('/patientGame', async (req, res) => {
+  const patientId = req.body.patient_id;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ error: 'Patient ID is required.' });
+    }
+
+    const cleanedPatientId = parseInt(patientId.replace('PID', ''));
+    console.log('test:', cleanedPatientId);
+    const query = 'SELECT goodword, timeplay FROM gamedoctor WHERE patient_id = $1';
+    const queryParams = [cleanedPatientId];
+
+    const result = await client.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+      return res.json({ error: 'No data found for the patient.' });
+    }
+
+    const data = {
+      patientId,
+      goodword: result.rows[0].goodword,
+      timeplay: result.rows[0].timeplay
+    };
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+router.post('/lastVisitGame', async (req, res) => {
+  const patientId = req.body.patient_id;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ error: 'Patient ID is required.' });
+    }
+
+    // Query to fetch last_visit from gamepatient table
+    const cleanedPatientId = parseInt(patientId.replace('PID', ''));
+    const patientQuery = 'SELECT last_visit FROM gamepatient WHERE patient_id = $1';
+    const patientQueryParams = [cleanedPatientId];
+
+    const patientResult = await client.query(patientQuery, patientQueryParams);
+
+    if (patientResult.rows.length === 0) {
+      return res.json({ error: 'No data found for the patient.' });
+    }
+
+    // Extracting last_visit timestamp
+    const lastVisitTimestamp = patientResult.rows[0].last_visit;
+
+    const lastVisitDate = new Date(lastVisitTimestamp);
+    lastVisitDate.setHours(lastVisitDate.getHours() + 7);
+    // Formatting last_visit timestamp to desired format for date
+    const formattedDate = new Date(lastVisitDate).toLocaleString('en-US', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    // Formatting last_visit timestamp to desired format for time
+    const formattedTime = new Date(lastVisitDate).toLocaleString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+
+    const data = {
+      lastVisitDate: formattedDate, // Include formatted last visit date in response
+      lastVisitTime: formattedTime // Include formatted last visit time in response
+    };
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
 
 module.exports = router;

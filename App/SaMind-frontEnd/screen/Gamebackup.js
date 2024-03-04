@@ -13,131 +13,19 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
-import { useFocusEffect } from "@react-navigation/native";
-import { Audio } from "expo-av";
-
-import Voice from "@react-native-community/voice";
+import { useFocusEffect } from '@react-navigation/native';
+import Voice from '@react-native-voice/voice';
 
 const windowWidth = Dimensions.get("window").width;
 
 const PopcatGame = ({ route }) => {
-  const [recording, setRecording] = useState();
-  const [recordings, setRecordings] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [transcription, setTranscription] = useState("");
-
-  // Start recording when button is pressed
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        setRecording(recording);
-        await recording.startAsync();
-      }
-    } catch (err) {
-      // console.error("Failed to start recording: ", err);
-    }
-  };
-
-  // Stop recording when button is released
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    // Check if recording is defined
-    if (recording) {
-      try {
-        await recording.stopAndUnloadAsync();
-        const { sound, status } = await recording.createNewLoadedSoundAsync();
-        const allRecordings = [...recordings];
-        allRecordings.push({
-          sound: sound,
-          duration: getDurationFormatted(status.durationMillis),
-          file: recording.getURI(),
-        });
-        setRecordings(allRecordings);
-
-        // Voice.start("en-US");
-      } catch (err) {
-        clearRecordings();
-        console.error("Failed to stop recording: ", err);
-      }
-    } else {
-      console.error("Recording is not started.");
-    }
-    clearRecordings();
-  };
-
-  // useEffect(() => {
-  //   Voice.onSpeechResults = (e) => {
-  //     setTranscription(e.value[0]); // Set the transcription in the state
-  //   };
-
-  //   return () => {
-  //     Voice.destroy().then(Voice.removeAllListeners);
-  //   };
-  // }, []);
-
-  useEffect(() => {
-    // Check if there's a new recording added to the recordings array
-    // If so, automatically play the last recorded sound
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      lastRecording.sound.replayAsync();
-      clearRecordings();
-    }
-  }, [recordings]);
-
-  function getDurationFormatted(milliseconds) {
-    const minutes = milliseconds / 1000 / 60;
-    const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-    return seconds < 10
-      ? `${Math.floor(minutes)}:0${seconds}`
-      : `${Math.floor(minutes)}:${seconds}`;
-  }
-
-  // function getRecordingLines() {
-  //   return recordings.map((recordingLine, index) => {
-  //     return (
-  //       <View key={index} style={styles.row}>
-  //         <Text style={styles.fill}>
-  //           Recording #{index + 1} | {recordingLine.duration}
-  //         </Text>
-  //         <TouchableOpacity
-  //           style={styles.button}
-  //           onPress={() => {
-  //             recordingLine.sound.replayAsync();
-  //             clearRecordings();
-  //           }}
-  //         >
-  //           {/* <Text style={styles.buttonText}>Play</Text> */}
-  //         </TouchableOpacity>
-  //       </View>
-  //     );
-  //   });
-  // }
-
-  function clearRecordings() {
-    setRecordings([]);
-  }
-
+  const [isListening, setIsListening] = useState(false);
+  const [spokenText, setSpokenText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
-  const { patientId,clickCount } = route.params || {};
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
-
-  useEffect(() => {
-    setPopCount(clickCount);
-  }, []);
-
   const [imageSource, setImageSource] = useState(
     require("../assets/egg1.png") // Initial image
   );
@@ -151,6 +39,7 @@ const PopcatGame = ({ route }) => {
   const [fishCount, setFishCount] = useState(3);
   const [riceCount, setRiceCount] = useState(3);
   const [meatCount, setMeatCount] = useState(3);
+
 
   const [gameData, setGameData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,7 +60,7 @@ const PopcatGame = ({ route }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get("/game_get_id", {
-        params: { patient_id: patientId },
+        params: { patient_id: patientId }
       });
       setGameData(response.data);
       setIsLoading(false);
@@ -182,6 +71,63 @@ const PopcatGame = ({ route }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
       setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Initialize speech recognition
+    Voice.onSpeechResults = onSpeechResults;
+
+    return () => {
+      // Cleanup speech recognition
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const startListening = async () => {
+    if(Voice) { // Check if Voice object is available
+      try {
+        await Voice.start('th-TH');
+        setIsListening(true);
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+      }
+    } else {
+      console.error('Voice object is not available.');
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      await Voice.stop();
+      setIsListening(false);
+    } catch (error) {
+      console.error('Error stopping speech recognition:', error);
+    }
+  };
+
+  const onSpeechResults = (event) => {
+    // Get the recognized text
+    const text = event.value[0];
+    console.log('Recognized text:', text);
+    setSpokenText(text);
+
+    // Send the recognized text to the sentiment analysis API
+    sendToMoodTracker(text);
+  };
+
+  const sendToMoodTracker = async (text) => {
+    try {
+      const response = await axios.post("https://api-inference.huggingface.co/models/woranit/samind-sentiment", { "inputs": text }, {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json"
+        }
+      });
+      const result = await response.json();
+      console.log('Mood:', result);
+    } catch (error) {
+      console.error('Error tracking mood:', error);
     }
   };
 
@@ -206,7 +152,6 @@ const PopcatGame = ({ route }) => {
       const parsedmeat = parseInt(gameData[0].meat);
       const parsedapple = parseInt(gameData[0].apple);
 
-      console.log(parsedClickCount);
 
       setProgress1(parsedHealthBar);
       setProgress2(parsedHungryBar);
@@ -221,30 +166,14 @@ const PopcatGame = ({ route }) => {
 
   useEffect(() => {
     if (popCount < 50) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg11.png")
-          : require("../assets/egg12.png")
-      );
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg11.png") : require("../assets/egg12.png"));
     } else if (popCount >= 50 && popCount < 125) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg21.png")
-          : require("../assets/egg22.png")
-      );
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg21.png") : require("../assets/egg22.png"));
     } else if (popCount >= 125 && popCount < 200) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg31.png")
-          : require("../assets/egg32.png")
-      );
-    } else if (popCount >= 200 && popCount < 500) {
-      setImageSource(require("../assets/monster/pigidle.gif"));
+      setImageSource(popCount % 2 === 1 ? require("../assets/egg31.png") : require("../assets/egg32.png"));
+    } else {
+      setImageSource(require("../assets/monster1.png"));
     }
-      else if (popCount >= 500 && popCount < 100) {
-      setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/penguinidle.gif"));
   }, [popCount]);
 
   useEffect(() => {
@@ -262,17 +191,18 @@ const PopcatGame = ({ route }) => {
       //     return 1;
       //   }
       // });
-      if (sleepMode) {
-        // {
-        //   setProgress3((prevProgress) => {
-        //     if (popCount >= 200) {
-        //       return Math.max(0, prevProgress - 0.0001);
-        //     } else {
-        //       return 1;
-        //     }
-        //   });
-        // }
-        // else
+      if (sleepMode)
+      // {
+      //   setProgress3((prevProgress) => {
+      //     if (popCount >= 200) {
+      //       return Math.max(0, prevProgress - 0.0001);
+      //     } else {
+      //       return 1;
+      //     }
+      //   });
+      // } 
+      // else
+      {
         // Increase the stamina bar continuously when in sleep mode
         setProgress3((prevProgress) => Math.min(1, prevProgress + 0.001));
       }
@@ -280,6 +210,7 @@ const PopcatGame = ({ route }) => {
 
     return () => clearInterval(interval);
   }, [popCount, sleepMode]);
+
 
   useEffect(() => {
     // Function to update data when navigating away from the page
@@ -304,8 +235,6 @@ const PopcatGame = ({ route }) => {
       }
     };
 
-    updateGameData();
-
     // Call the update function when navigating away from the page
     const unsubscribe = navigation.addListener("beforeRemove", () => {
       updateGameData();
@@ -313,19 +242,7 @@ const PopcatGame = ({ route }) => {
 
     // Clean up the listener
     return unsubscribe;
-  }, [
-    navigation,
-    patientId,
-    popCount,
-    progress1,
-    progress2,
-    progress3,
-    appleCount,
-    fishCount,
-    riceCount,
-    meatCount,
-    sleepMode,
-  ]);
+  }, [navigation, patientId, popCount, progress1, progress2, progress3, appleCount, fishCount, riceCount, meatCount, sleepMode]);
 
   // useEffect(() => {
   //   const interval1 = setInterval(() => {
@@ -395,42 +312,39 @@ const PopcatGame = ({ route }) => {
           ? require("../assets/egg11.png")
           : require("../assets/egg12.png")
       );
-    } else if (popCount >= 50 && popCount < 125) {
+    }
+    else if (popCount >= 50 && popCount < 125) {
       setImageSource(
         popCount % 2 === 1
           ? require("../assets/egg21.png")
           : require("../assets/egg22.png")
       );
-    } else if (popCount >= 125 && popCount < 200) {
+    }
+    else if (popCount >= 125 && popCount < 200) {
       setImageSource(
         popCount % 2 === 1
           ? require("../assets/egg31.png")
           : require("../assets/egg32.png")
       );
-    } 
-    else if (popCount >= 200 && popCount < 500) {
-      setImageSource(require("../assets/monster/pigidle.gif"));
     }
-      else if (popCount >= 500 && popCount < 1000) {
-      setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/dogidle.gif"));
+    else {
+      setImageSource(require("../assets/monster1.png"));
+    }
   };
 
   const handlePressOut = () => {
     if (popCount < 50) {
       setImageSource(require("../assets/egg1.png"));
-    } else if (popCount >= 50 && popCount < 125) {
-      setImageSource(require("../assets/egg2.png"));
-    } else if (popCount >= 125 && popCount < 200) {
-      setImageSource(require("../assets/egg3.png"));
-    } else if (popCount >= 200 && popCount < 500) {
-      setImageSource(require("../assets/monster/pigidle.gif"));
     }
-      else if (popCount >= 500 && popCount < 1000) {
-      setImageSource(require("../assets/monster/penguinfight.gif"));
-    } else
-    {setImageSource(require("../assets/monster/dogfight.gif"));}
+    else if (popCount >= 50 && popCount < 125) {
+      setImageSource(require("../assets/egg2.png"));
+    }
+    else if (popCount >= 125 && popCount < 200) {
+      setImageSource(require("../assets/egg3.png"));
+    }
+    else {
+      setImageSource(require("../assets/monster.png"));
+    }
     setPopCount((prevCount) => prevCount + 1);
   };
 
@@ -443,7 +357,6 @@ const PopcatGame = ({ route }) => {
     setProgress1(1);
     setProgress2(1);
     setProgress3(1);
-    setSleepMode(false);
     setImageSource(require("../assets/egg1.png"));
   };
 
@@ -533,7 +446,7 @@ const PopcatGame = ({ route }) => {
       <View style={styles.container}>
         {sleepMode && (
           <View style={styles.sleepModeOverlay}>
-            {/* <Text style={styles.sleepModeText}>Sleep Mode</Text> */}
+            <Text style={styles.sleepModeText}>Sleep Mode</Text>
           </View>
         )}
         <TouchableWithoutFeedback
@@ -543,58 +456,36 @@ const PopcatGame = ({ route }) => {
           <Image source={imageSource} style={styles.popcatImage} />
         </TouchableWithoutFeedback>
         <Text style={styles.countText}>{popCount}</Text>
-        <View style={styles.container}>
+        <View style={styles.buttonsContainer}>
           <TouchableOpacity
-            style={styles.button}
-            onPressIn={handleStartRecording}
-            onPressOut={handleStopRecording}
+            style={[styles.button, { width: (windowWidth / 2) - 25 }]}
+            onPress={startListening}
+            disabled={isListening}
           >
-            <Text style={styles.buttonText}>
-              {isRecording ? "Recording..." : "Hold to Record"}
-            </Text>
+            <Text style={styles.buttonText}>Start Listening</Text>
           </TouchableOpacity>
-          <Text style={styles.transcriptionText}>{transcription}</Text>
-          {/* Display recording lines */}
-          {/* {getRecordingLines()} */}
+          <TouchableOpacity
+            style={[styles.button, { width: (windowWidth / 2) - 25 }]}
+            onPress={stopListening}
+            disabled={!isListening}
+          >
+            <Text style={styles.buttonText}>Stop Listening</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.progressBars}>
-          <View
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 10,
-              marginLeft: "5%",
-              marginRight: "5%",
-              paddingHorizontal: 10,
-            }}
-          >
-            <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
-              Health
-            </Text>
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
+            <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>Health</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
               progress={progress1}
               indeterminate={false}
-              style={{ flex: 1 }}
+              style={{ flex: 1, }}
               color="red"
               progressBarStyle={{ height: 20 }}
             />
           </View>
-          <View
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 10,
-              marginLeft: "5%",
-              marginRight: "5%",
-              paddingHorizontal: 10,
-            }}
-          >
-            <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
-              Hungry
-            </Text>
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
+            <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>Hungry</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
               progress={progress2}
@@ -604,17 +495,7 @@ const PopcatGame = ({ route }) => {
               progressBarStyle={{ height: 20 }}
             />
           </View>
-          <View
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 10,
-              marginLeft: "5%",
-              marginRight: "5%",
-              paddingHorizontal: 10,
-            }}
-          >
+          <View style={{ backgroundColor: "rgba(255, 255, 255, 0.5)", flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginLeft: '5%', marginRight: '5%', paddingHorizontal: 10 }}>
             <Text style={styles.progressBarLabel}>Stamina</Text>
             <ProgressBarAndroid
               styleAttr="Horizontal"
@@ -629,7 +510,7 @@ const PopcatGame = ({ route }) => {
         <View style={styles.buttonsContainer}>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, { width: windowWidth / 2 - 25 }]}
+              style={[styles.button, { width: (windowWidth / 2) - 25 }]}
               onPress={restartGame}
               disabled={sleepMode}
             >
@@ -639,9 +520,8 @@ const PopcatGame = ({ route }) => {
               style={[
                 styles.button,
                 {
-                  width: windowWidth / 2 - 25,
-                  backgroundColor:
-                    popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
+                  width: (windowWidth / 2) - 25,
+                  backgroundColor: popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => handleEatingButtonPress()}
@@ -665,72 +545,58 @@ const PopcatGame = ({ route }) => {
                 <TouchableWithoutFeedback onPress={toggleModal}>
                   <View style={styles.centeredView}>
                     <View style={styles.modalViewRow}>
-                      <View style={styles.foodOptionsRow}>
-                        {/* First Row */}
-                        <View style={[styles.row, {marginRight:30, marginBottom:20}]}>
-                          <TouchableOpacity
-                            style={[
-                              styles.modalButton,
-                              {
-                                backgroundColor:
-                                  appleCount <= 0 ? "#9e9e9e" : "#2196f3",
-                              },
-                            ]}
-                            onPress={() => handleFoodSelection("Apple")}
-                            disabled={appleCount <= 0}
-                          >
-                            <Text style={styles.modalButtonText}>Apple</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[
-                              styles.modalButton,
-                              {
-                                backgroundColor:
-                                  fishCount <= 0 ? "#9e9e9e" : "#2196f3",
-                              },
-                            ]}
-                            onPress={() => handleFoodSelection("Fish")}
-                            disabled={fishCount <= 0}
-                          >
-                            <Text style={styles.modalButtonText}>Fish</Text>
-                          </TouchableOpacity>
-                        </View>
-                        {/* Second Row */}
-                        <View style={[styles.row, {marginLeft:30}]}>
-                          <TouchableOpacity
-                            style={[
-                              styles.modalButton,
-                              {
-                                backgroundColor:
-                                  riceCount <= 0 ? "#9e9e9e" : "#2196f3",
-                              },
-                            ]}
-                            onPress={() => handleFoodSelection("Rice")}
-                            disabled={riceCount <= 0}
-                          >
-                            <Text style={styles.modalButtonText}>Rice</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[
-                              styles.modalButton,
-                              {
-                                backgroundColor:
-                                  meatCount <= 0 ? "#9e9e9e" : "#2196f3",
-                              },
-                            ]}
-                            onPress={() => handleFoodSelection("Meat")}
-                            disabled={meatCount <= 0}
-                          >
-                            <Text style={styles.modalButtonText}>Meat</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                      <View style={styles.bottomRightTextContainer}>
-                        <Text style={styles.bottomRightText}>
-                          *if you don't have any food, please try some good
-                          things to talk with the monster.
-                        </Text>
-                      </View>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              appleCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Apple")}
+                        disabled={appleCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Apple</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              fishCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Fish")}
+                        disabled={fishCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Fish</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              riceCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Rice")}
+                        disabled={riceCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Rice</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.modalButton,
+                          {
+                            backgroundColor:
+                              meatCount <= 0 ? "#9e9e9e" : "#2196f3",
+                          },
+                        ]}
+                        onPress={() => handleFoodSelection("Meat")}
+                        disabled={meatCount <= 0}
+                      >
+                        <Text style={styles.modalButtonText}>Meat</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </TouchableWithoutFeedback>
@@ -741,33 +607,21 @@ const PopcatGame = ({ route }) => {
               style={[
                 styles.button,
                 {
-                  width: windowWidth / 2 - 25,
-                  backgroundColor:
-                    popCount < 200 || sleepMode || progress3 < 0.15
-                      ? "#9e9e9e"
-                      : "#2196f3",
+                  width: (windowWidth / 2) - 25,
+                  backgroundColor: popCount < 200 || sleepMode || progress3 < 0.15 ? "#9e9e9e" : "#2196f3",
                 },
               ]}
-              onPress={
-                popCount <= 0
-                  ? null
-                  : () => navigation.navigate("Game4", { patientId })
-              }
-              disabled={
-                popCount <= 0 ||
-                sleepMode ||
-                progress3 < 0.15 ||
-                progress2 < 0.15
-              }
+              onPress={popCount <= 0 ? null : () => navigation.navigate("Game4", { patientId })}
+              disabled={popCount <= 0 || sleepMode || progress3 < 0.15 || progress2 < 0.15}
             >
               <Text style={styles.buttonText}>Play Game</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, { width: windowWidth / 2 - 25 }]}
+              style={[styles.button, { width: (windowWidth / 2) - 25 }]}
               onPress={() => navigation.navigate("Homescreen", { patientId })}
-              // disabled={sleepMode}
+            // disabled={sleepMode}
             >
               <Text style={styles.buttonText}>Quit</Text>
             </TouchableOpacity>
@@ -775,25 +629,12 @@ const PopcatGame = ({ route }) => {
               style={[
                 styles.button,
                 {
-                  width: windowWidth / 2 - 25,
-                  backgroundColor:
-                    popCount < 200 ||
-                    sleepMode ||
-                    progress3 < 0.1 ||
-                    progress2 < 0.1
-                      ? "#9e9e9e"
-                      : "#2196f3",
+                  width: (windowWidth / 2) - 25,
+                  backgroundColor: popCount < 200 || sleepMode || progress3 < 0.10 || progress2 < 0.10 ? "#9e9e9e" : "#2196f3",
                 },
               ]}
-              onPress={
-                popCount <= 0
-                  ? null
-                  : () =>
-                      navigation.navigate("Phq9gametestscreen", { patientId })
-              }
-              disabled={
-                popCount <= 0 || sleepMode || progress3 < 0.1 || progress2 < 0.1
-              }
+              onPress={popCount <= 0 ? null : () => navigation.navigate("Phq9gametestscreen", { patientId })}
+              disabled={popCount <= 0 || sleepMode || progress3 < 0.10 || progress2 < 0.10}
             >
               <Text style={styles.buttonText}>Study</Text>
             </TouchableOpacity>
@@ -801,7 +642,7 @@ const PopcatGame = ({ route }) => {
               style={[
                 styles.button,
                 {
-                  width: windowWidth / 2 - 25,
+                  width: (windowWidth / 2) - 25,
                   backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3",
                 },
               ]}
@@ -919,10 +760,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   foodOptionsRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   modalButton: {
     backgroundColor: "#2196f3",
@@ -946,23 +787,10 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    width: "90%"
-  },
-  bottomRightTextContainer: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    width: 300, // Adjust the width as needed
-  },
-  bottomRightText: {
-    color: "red",
-    fontStyle: "italic",
-    fontSize: 12, // Adjust the font size here
-    textAlign: "right", // Align the text to the right
-  },
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  }
 });
 
 export default PopcatGame;
