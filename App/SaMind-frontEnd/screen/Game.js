@@ -130,7 +130,7 @@ const PopcatGame = ({ route }) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
-  const { patientId, clickCount } = route.params || {};
+  const { patientId,clickCount } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
 
@@ -205,6 +205,8 @@ const PopcatGame = ({ route }) => {
       const parsedrice = parseInt(gameData[0].rice);
       const parsedmeat = parseInt(gameData[0].meat);
       const parsedapple = parseInt(gameData[0].apple);
+
+      console.log(parsedClickCount);
 
       setProgress1(parsedHealthBar);
       setProgress2(parsedHungryBar);
