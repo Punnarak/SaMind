@@ -177,13 +177,7 @@
           <v-icon>mdi-square-edit-outline</v-icon>
           <span class="pl-2">Edit account</span>
         </v-list-item>
-        <v-list-item
-          @click="
-            this.$router.push({
-              path: `/`,
-            })
-          "
-        >
+        <v-list-item @click="signOut()">
           <v-icon>mdi-logout-variant</v-icon>
           <span class="pl-2">Sign out</span>
         </v-list-item>
@@ -238,6 +232,24 @@ export default {
       .catch((error) => {
         console.error("Error:", error);
       });
+  },
+  methods: {
+    signOut() {
+      axios
+        .post("/logout", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("logout", response.data);
+          this.$router.push("/");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
   },
 };
 </script>
