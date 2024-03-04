@@ -216,7 +216,7 @@ export default {
     this.therapistId = localStorage.getItem("id");
     this.role = localStorage.getItem("role");
     const param = {
-      therapist_id: 5555,
+      therapist_id: this.therapistId,
     };
     console.log(param);
     await axios
