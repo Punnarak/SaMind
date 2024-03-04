@@ -14,6 +14,95 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+
+import { Audio } from "expo-av";
+
+const [recording, setRecording] = useState();
+const [recordings, setRecordings] = useState([]);
+const [isRecording, setIsRecording] = useState(false);
+
+
+const handleStartRecording = async () => {
+  setIsRecording(true);
+  try {
+    const perm = await Audio.requestPermissionsAsync();
+    if (perm.status === "granted") {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      setRecording(recording);
+      await recording.startAsync();
+    }
+  } catch (err) {
+    // console.error("Failed to start recording: ", err);
+  }
+};
+
+// Stop recording when button is released
+const handleStopRecording = async () => {
+  setIsRecording(false);
+  // Check if recording is defined
+  if (recording) {
+    try {
+      await recording.stopAndUnloadAsync();
+      const { sound, status } = await recording.createNewLoadedSoundAsync();
+      const allRecordings = [...recordings];
+      allRecordings.push({
+        sound: sound,
+        duration: getDurationFormatted(status.durationMillis),
+        file: recording.getURI(),
+      });
+      setRecordings(allRecordings);
+
+      // Voice.start("en-US");
+    } catch (err) {
+      clearRecordings();
+      console.error("Failed to stop recording: ", err);
+    }
+  } else {
+    console.error("Recording is not started.");
+  }
+  clearRecordings();
+};
+
+
+useEffect(() => {
+  // Check if there's a new recording added to the recordings array
+  // If so, automatically play the last recorded sound
+  if (recordings.length > 0) {
+    const lastRecording = recordings[recordings.length - 1];
+    lastRecording.sound.replayAsync();
+    clearRecordings();
+  }
+}, [recordings]);
+
+function getDurationFormatted(milliseconds) {
+  const minutes = milliseconds / 1000 / 60;
+  const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
+  return seconds < 10
+    ? `${Math.floor(minutes)}:0${seconds}`
+    : `${Math.floor(minutes)}:${seconds}`;
+}
+
+function clearRecordings() {
+  setRecordings([]);
+}
+
+const [isModalVisible, setIsModalVisible] = useState(false);
+// const patientId = 333
+const { patientId, clickCount } = route.params || {};
+const navigation = useNavigation();
+const [popCount, setPopCount] = useState(0);
+
+useEffect(() => {
+  setPopCount(clickCount);
+}, []);
+
+
 // import * as Speech from "expo-speech";
 // import Voice from "react-native-voice";
 // import {
@@ -94,7 +183,7 @@ export default function Notification() {
   //   setRecognizedText(e.value[0]);
   // };
 
-  handleLogin = async () => {};
+  handleLogin = async () => { };
   useEffect(() => {
     console.log("Avatar Screen");
   }, []);
@@ -182,6 +271,21 @@ export default function Notification() {
           flex: 1,
         }}
       />
+
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.button}
+          onPressIn={handleStartRecording}
+          onPressOut={handleStopRecording}
+        >
+          <Text style={styles.buttonText}>
+            {isRecording ? "Recording..." : "Hold to Record"}
+          </Text>
+        </TouchableOpacity>
+        {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
+        {/* Display recording lines */}
+        {/* {getRecordingLines()} */}
+      </View>
 
       {/* speech to text ---> expo speech api */}
       {/* <View>
