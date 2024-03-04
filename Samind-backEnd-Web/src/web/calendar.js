@@ -2,14 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
-
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
-// const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
+const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
-router.post('/calendar_view', (req, res) => {
+router.post('/calendar_view', auth, (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     if (!therapist_id) {
         return res.status(400).json({ error: 'Therapist ID is required' });
@@ -48,7 +45,7 @@ router.post('/calendar_view', (req, res) => {
         });
 });
 
-router.post('/calendarDay', (req, res) => {
+router.post('/calendarDay', auth, (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     let date = req.body.date; // Access date from request body
 
@@ -129,10 +126,5 @@ function addOneHour(time) {
     const newHours = (hours + 1) % 24; // Add one hour, mod 24 to handle overflow
     return `${newHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
-
-
-
-  
-
 
 module.exports = router;

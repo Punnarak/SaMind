@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const secret = require("./auth.js").secret;
+const auth = require("./auth.js").authorization;
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
+
 
 router.use(bodyParser.json());
 
@@ -32,7 +34,7 @@ router.use(bodyParser.json());
 //     });
 // });
 
-router.post('/adCreateTherapist', async (req, res) => {
+router.post('/adCreateTherapist', auth, async (req, res) => {
   const { fname, lname, phone, hospitalName, email, password } = req.body;
   
   try {
@@ -102,7 +104,7 @@ router.post('/adCreateTherapist', async (req, res) => {
 //       });
 // });
 
-router.post('/adTherapistView', (req, res) => {
+router.post('/adTherapistView', auth, (req, res) => {
     const hospitalName = req.body.hospitalName;
     let query = `SELECT therapist_id, fname, lname, email FROM therapist WHERE hospital_name = $1 AND admin = 'N'`; // Added condition for admin column
     const queryParams = [hospitalName];
@@ -177,7 +179,7 @@ router.post('/adTherapistView', (req, res) => {
 //   });
 // });
 
-router.post('/adTherapistEdit', (req, res) => {
+router.post('/adTherapistEdit', auth, (req, res) => {
   const { therapistID, fname, lname, email, password } = req.body;
 
   // Extract numeric ID from therapistID
@@ -274,7 +276,7 @@ function updateTherapist(therapistID, fname, lname, email, password, res) {
 //     });
 // });
 
-router.post('/adTherapistDelete', (req, res) => {
+router.post('/adTherapistDelete', auth, (req, res) => {
   const { therapistID } = req.body;
   const numericTherapistID = therapistID.replace(/\D/g, '');
   

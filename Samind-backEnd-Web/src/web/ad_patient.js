@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const secret = require("./auth.js").secret;
+const auth = require("./auth.js").authorization;
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
+
 
 router.use(bodyParser.json());
 
@@ -428,7 +430,7 @@ router.use(bodyParser.json());
 //   }
 // });
 
-router.post('/adAllTestHistory', async (req, res) => {
+router.post('/adAllTestHistory', auth, async (req, res) => {
   try {
     const { patientID } = req.body;
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -516,7 +518,7 @@ router.post('/adAllTestHistory', async (req, res) => {
   }
 });
 
-router.post('/adTherapistAll', (req, res) => {
+router.post('/adTherapistAll', auth, (req, res) => {
   const { hospitalName } = req.body;
 
   let query = 'SELECT fname, lname FROM therapist WHERE admin = $1 AND hospital_name = $2';
@@ -637,7 +639,7 @@ router.post('/adTherapistAll', (req, res) => {
 //   }
 // });
 
-router.post('/adCreatePatient', async (req, res) => {
+router.post('/adCreatePatient', auth, async (req, res) => {
   try {
     const {
       fname,
@@ -1218,7 +1220,7 @@ router.post('/adCreatePatient', async (req, res) => {
 //       });
 // });
 
-router.post('/adPatientView', (req, res) => {
+router.post('/adPatientView', auth, (req, res) => {
   const hospitalName = req.body.hospitalName;
 
   // Query to get patient details along with therapist's name, gender, email, born, and phone
@@ -1555,7 +1557,7 @@ router.post('/adPatientView', (req, res) => {
 //   }
 // });
 
-router.post('/adPersonalData', async (req, res) => {
+router.post('/adPersonalData', auth, async (req, res) => {
     const { patientID } = req.body;
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -2121,7 +2123,7 @@ function formatDate(timestamp) {
 //     }
 // });
 
-router.post('/adEditPersonalData', async (req, res) => {
+router.post('/adEditPersonalData', auth, async (req, res) => {
   const { patientID, fname, lname, phone, email, password, therapistName, gender } = req.body;
 
   // Extract numeric part of patientID
@@ -2197,8 +2199,6 @@ router.post('/adEditPersonalData', async (req, res) => {
 });
 
 
-
-
 // router.post('/viewPersonalData', (req, res) => {
 //   const { patientID } = req.body;
 //   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -2270,7 +2270,7 @@ router.post('/adEditPersonalData', async (req, res) => {
 //     });
 // });
 
-router.post('/adViewPersonalData', (req, res) => {
+router.post('/adViewPersonalData', auth, (req, res) => {
   const { patientID } = req.body;
   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
   const formattedPatientID = `PID${numericPatientID}`;
@@ -2331,7 +2331,7 @@ router.post('/adViewPersonalData', (req, res) => {
 //       });
 //   });
 
-router.post('/adDeletePatient', (req, res) => {
+router.post('/adDeletePatient', auth, (req, res) => {
   const { patientID } = req.body;
   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -2380,9 +2380,6 @@ router.post('/adDeletePatient', (req, res) => {
     });
   });
 });
-
-
-
 
 
 module.exports = router;

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
@@ -118,7 +119,7 @@ router.use(bodyParser.json());
 //         });
 // });
 
-router.post('/therapistAddAppoint', (req, res) => {
+router.post('/therapistAddAppoint', auth, (req, res) => {
     let { therapistId, patientId, date, startTime, note } = req.body;
 
     if (!therapistId || !patientId || !date || !startTime) {
@@ -449,7 +450,7 @@ router.post('/therapistAddAppoint', (req, res) => {
 //         });
 // });
 
-router.post('/appointmentRequestView', (req, res) => {
+router.post('/appointmentRequestView', auth, (req, res) => {
     const therapist_id = req.body.therapist_id;
     let query = `
         SELECT 
@@ -961,7 +962,7 @@ const months = {
     Dec: '12'
 };
 
-router.post('/appointmentRequestConfirm', (req, res) => {
+router.post('/appointmentRequestConfirm', auth, (req, res) => {
     // Directly extract appointment data from the request body
     const { patientID, patientName, dateFrom, timeFrom, dateTo, timeTo, confirm } = req.body;
 
@@ -1070,12 +1071,6 @@ router.post('/appointmentRequestConfirm', (req, res) => {
             });
     }
 });
-
-
-
-
-
-
 
 
 module.exports = router;

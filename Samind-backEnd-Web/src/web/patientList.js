@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
@@ -201,7 +202,7 @@ router.use(bodyParser.json());
 //   }
 // }
 
-router.post('/patientList', async (req, res) => {
+router.post('/patientList', auth, async (req, res) => {
   const therapistId = req.body.therapist_id;
 
   try {
