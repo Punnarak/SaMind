@@ -291,6 +291,129 @@
             ></v-row
           >
         </v-list-item>
+
+        <v-list-item>
+          <v-row>
+            <v-col cols="6" sm="5" md="4">
+              <label class="title ml-3" style="font-weight: bold"
+                >Latest Game Played</label
+              >
+              <br />
+              <v-chip
+                class="mt-5 ml-5"
+                style="
+                  color: rgb(152, 151, 151);
+                  width: 226px;
+                  height: 101px;
+                  flex-shrink: 0;
+                  border-radius: 10px;
+                "
+              >
+                <v-col>
+                  <div style="text-align: center">
+                    <label
+                      style="font-weight: bold; font-size: 24px; color: black"
+                      >{{ playLastdate }}</label
+                    >
+                    <br />
+                    <label
+                      style="
+                        font-style: normal;
+                        font-weight: 600;
+                        font-size: 16px;
+                        color: #b6b9c2;
+                        display: inline-block;
+                      "
+                      >{{ playLasttime }}</label
+                    >
+                  </div>
+                </v-col></v-chip
+              ></v-col
+            ><v-col cols="26" sm="6" md="4">
+              <label class="title mr-16" style="font-weight: bold"
+                >Total number of plays
+              </label>
+              <span class="mr-16 ml-16"></span>
+
+              <!-- <label
+                class="hyper mr-16"
+                style="font-weight: bold"
+                @click="
+                  this.$router.push({
+                    path: 'patienttesthistory',
+                    query: {
+                      patientName: patientName,
+                      patientId: patientId
+                    },
+                  })
+                "
+                >See All
+              </label> -->
+
+              <v-chip
+                class="mt-5 ml-5"
+                style="
+                  color: rgb(152, 151, 151);
+                  width: 310px;
+                  height: 101px;
+                  flex-shrink: 0;
+                  border-radius: 10px;
+                "
+              >
+                <v-col>
+                  <label
+                    class="moodresult ml-8"
+                    style="font-weight: bold; font-size: 24px"
+                    >{{ timestoplay }} time(s)</label
+                  >
+                  <br />
+                </v-col> </v-chip></v-col
+            ><v-col cols="6" sm="6" md="4">
+              <label class="title mr-16" style="font-weight: bold"
+                >Percent of Good Word
+              </label>
+              <v-chip
+                class="mt-5 ml-5"
+                style="
+                  color: rgb(152, 151, 151);
+                  width: 226px;
+                  height: 101px;
+                  flex-shrink: 0;
+                  border-radius: 10px;
+                "
+              >
+                <!-- <v-row>
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/hicon.png"
+                    style="
+                      position: absolute;
+                      width: 50px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/ybg.png"
+                    style="width: 55px"
+                  />
+                </v-row> -->
+                <v-row>
+                  <label
+                    class="moodresult ml-8"
+                    style="font-weight: bold; font-size: 24px"
+                  >
+                    {{ percentageGoodword }}%
+                  </label>
+                  <br />
+                  <!-- <label class="testdate ml-7">{{ detectDate }}</label> -->
+                </v-row></v-chip
+              ></v-col
+            ></v-row
+          >
+        </v-list-item>
       </v-list>
     </v-card>
   </v-col>
@@ -349,6 +472,11 @@ export default {
       scoretest2: ["PHQ9", "ไม่มีภาวะซึมเศร้า", "8 July 2022"],
       moodDetect: "Happy",
       detectDate: "8 July 2022",
+
+      playLastdate: "8 July 2022",
+      playLasttime: "08:00:52",
+      percentageGoodword: 0,
+      timestoplay: 0,
     };
   },
   created() {
@@ -357,6 +485,8 @@ export default {
     this.patientId = this.$route.query.patientId;
     this.age = this.$route.query.age;
     this.mood = this.$route.query.mood;
+    this.fetchAdditionalData();
+    this.fetchLastVisit();
     let param = {
       patientID: this.patientId,
     };
@@ -431,6 +561,33 @@ export default {
         } else if (result.includes("ไม่มี")) {
           return "ไม่มีภาวะซึมเศร้า";
         }
+      }
+    },
+    async fetchAdditionalData() {
+      try {
+        const response = await axios.post("/patientGame", {
+          patient_id: this.patientId,
+        });
+        const { goodword, timeplay } = response.data;
+        this.percentageGoodword = goodword;
+        this.timestoplay = timeplay;
+        console.log("this.gw", this.goodword);
+      } catch (error) {
+        console.error("Error fetching additional data:", error);
+      }
+    },
+    async fetchLastVisit() {
+      try {
+        const response = await axios.post("/lastVisitGame", {
+          patient_id: this.patientId,
+        });
+        const { lastVisitDate, lastVisitTime } = response.data; // Extracting date and time separately
+        this.playLastdate = lastVisitDate; // Assigning the date part
+        this.playLasttime = lastVisitTime; // Assigning the time part
+        console.log("Last Visit Date:", this.playLastdate);
+        console.log("Last Visit Time:", this.playLasttime);
+      } catch (error) {
+        console.error("Error fetching last visit data:", error);
       }
     },
   },
