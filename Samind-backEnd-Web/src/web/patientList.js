@@ -262,4 +262,48 @@ router.post('/lastVisitGame', async (req, res) => {
   }
 });
 
+router.post('/checkgamepatient', async (req, res) => {
+  const patientId = req.body.patient_id;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ error: 'Patient ID is required.' });
+    }
+
+    const cleanedPatientId = parseInt(patientId.replace('PID', ''));
+
+    // Check if the patient exists in the gamedoctor table
+    let query = 'SELECT * FROM gamedoctor WHERE patient_id = $1';
+    let queryParams = [cleanedPatientId];
+
+    let result = await client.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+      // If patient does not exist, create a new row with default values
+      query = 'INSERT INTO gamedoctor (patient_id, goodword, timeplay) VALUES ($1, $2, $3)';
+      queryParams = [cleanedPatientId, 0, 0];
+      await client.query(query, queryParams);
+    }
+
+    // Check if the patient exists in the gamepatient table
+    query = 'SELECT * FROM gamepatient WHERE patient_id = $1';
+    queryParams = [cleanedPatientId];
+
+    result = await client.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+      // If patient does not exist, create a new row with default values
+      query = 'INSERT INTO gamepatient (patient_id, click_count, health_bar, hungry_bar, last_visit, stamina_bar, apple, fish, rice, meat, sleep) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
+      const currentTime = new Date();
+      queryParams = [cleanedPatientId, 0, 100, 100, currentTime, 100, 3, 3, 3, 3, false];
+      await client.query(query, queryParams);
+    }
+
+    res.json({ message: 'Patient game data checked/created successfully.' });
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
 module.exports = router;

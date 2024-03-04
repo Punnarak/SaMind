@@ -430,38 +430,52 @@ export default {
     this.mood = this.$route.query.mood;
     console.log("this.patientInfo", this.$route.query);
     console.log("this.patientID", this.patientId);
-    this.fetchAdditionalData();
-    this.fetchLastVisit();
+    // this.fetchAdditionalData();
+    // this.fetchLastVisit();
+    this.checkOrCreateGameData();
   },
   methods: {
-    async fetchAdditionalData() {
-      try {
-        const response = await axios.post("/patientGame", {
-          patient_id: this.patientId,
-        });
-        const { goodword, timeplay } = response.data;
-        this.percentageGoodword = goodword;
-        this.timestoplay = timeplay;
-        console.log("this.gw", this.goodword);
-      } catch (error) {
-        console.error("Error fetching additional data:", error);
-      }
-    },
-    async fetchLastVisit() {
-      try {
-        const response = await axios.post("/lastVisitGame", {
-          patient_id: this.patientId,
-        });
-        const { lastVisitDate, lastVisitTime } = response.data; // Extracting date and time separately
-        this.playLastdate = lastVisitDate; // Assigning the date part
-        this.playLasttime = lastVisitTime; // Assigning the time part
-        console.log("Last Visit Date:", this.playLastdate);
-        console.log("Last Visit Time:", this.playLasttime);
-      } catch (error) {
-        console.error("Error fetching last visit data:", error);
-      }
-    },
+  async checkOrCreateGameData() {
+    try {
+      await axios.post("/checkgamepatient", {
+        patient_id: this.patientId,
+      });
+      console.log("Game data checked/created successfully.");
+      // Now, fetch additional data and last visit data
+      this.fetchAdditionalData();
+      this.fetchLastVisit();
+    } catch (error) {
+      console.error("Error checking/creating game data:", error);
+    }
   },
+  async fetchAdditionalData() {
+    try {
+      const response = await axios.post("/patientGame", {
+        patient_id: this.patientId,
+      });
+      const { goodword, timeplay } = response.data;
+      this.percentageGoodword = goodword;
+      this.timestoplay = timeplay;
+      console.log("this.gw", this.goodword);
+    } catch (error) {
+      console.error("Error fetching additional data:", error);
+    }
+  },
+  async fetchLastVisit() {
+    try {
+      const response = await axios.post("/lastVisitGame", {
+        patient_id: this.patientId,
+      });
+      const { lastVisitDate, lastVisitTime } = response.data; // Extracting date and time separately
+      this.playLastdate = lastVisitDate; // Assigning the date part
+      this.playLasttime = lastVisitTime; // Assigning the time part
+      console.log("Last Visit Date:", this.playLastdate);
+      console.log("Last Visit Time:", this.playLasttime);
+    } catch (error) {
+      console.error("Error fetching last visit data:", error);
+    }
+  },
+},
 };
 </script>
 
