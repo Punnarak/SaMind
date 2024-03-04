@@ -1579,6 +1579,19 @@ export default {
   },
 
   async created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     await this.fetchEvents();
     let param = {
       therapist_id: 5555,

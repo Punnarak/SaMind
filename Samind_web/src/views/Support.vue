@@ -307,6 +307,21 @@ export default {
       });
     },
   },
+  created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  },
 };
 </script>
 <style scoped>

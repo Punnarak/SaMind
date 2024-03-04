@@ -498,9 +498,6 @@ const filteredPatients = computed(() => {
   );
 });
 
-
-
-
 export default {
   props: {
     deletePopup: Boolean,
@@ -581,46 +578,46 @@ export default {
       ) {
       } else {
         let param = {
-	fname: this.firstName.includes("Dr.") ? this.firstName : "Dr." + this.firstName,
-	lname:this.lastName,
-	phone:this.phone,
-	hospitalName:this.hospitalName,
-	email:this.email,
-	password:this.password
-}
+          fname: this.firstName.includes("Dr.")
+            ? this.firstName
+            : "Dr." + this.firstName,
+          lname: this.lastName,
+          phone: this.phone,
+          hospitalName: this.hospitalName,
+          email: this.email,
+          password: this.password,
+        };
         axios
-    .post("/adCreateTherapist", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-      console.log(
-          "Create Therapist Account",
-          this.firstName,
-          this.lastName,
-          this.email,
-          this.password
-        );
-        this.therapistId = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
-        this.password = "";
-        this.checkEmail = false;
-        this.createPopup = false;
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-       
+          .post("/adCreateTherapist", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+            console.log(
+              "Create Therapist Account",
+              this.firstName,
+              this.lastName,
+              this.email,
+              this.password
+            );
+            this.therapistId = "";
+            this.firstName = "";
+            this.lastName = "";
+            this.email = "";
+            this.password = "";
+            this.checkEmail = false;
+            this.createPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     handleEditAccount(therapist) {
-      
       let name = therapist.name.split(" ");
       this.therapistId = therapist.therapistId;
       this.firstName = name[0];
@@ -645,76 +642,75 @@ export default {
         this.checkEmail === false
       ) {
       } else {
-        let param
-        if(this.password != ""){
-  param = {
-	therapistID:this.therapistId,
-	fname:this.firstName,
-	lname:this.lastName,
-	email:this.email,
-	password:this.password
-}
-        }else{
-           param = {
-	therapistID:this.therapistId,
-	fname:this.firstName,
-	lname:this.lastName,
-	email:this.email,
-}
+        let param;
+        if (this.password != "") {
+          param = {
+            therapistID: this.therapistId,
+            fname: this.firstName,
+            lname: this.lastName,
+            email: this.email,
+            password: this.password,
+          };
+        } else {
+          param = {
+            therapistID: this.therapistId,
+            fname: this.firstName,
+            lname: this.lastName,
+            email: this.email,
+          };
         }
-       
-axios
-    .post("/adTherapistEdit", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-      console.log(
-          "Update Therapist Account",
-          this.therapistId,
-          this.firstName,
-          this.lastName,
-          this.email,
-          this.password
-        );
-        this.therapistId = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
-        this.password = "";
-        this.checkEmail = false;
-        this.editPopup = false;
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-   
+
+        axios
+          .post("/adTherapistEdit", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+            console.log(
+              "Update Therapist Account",
+              this.therapistId,
+              this.firstName,
+              this.lastName,
+              this.email,
+              this.password
+            );
+            this.therapistId = "";
+            this.firstName = "";
+            this.lastName = "";
+            this.email = "";
+            this.password = "";
+            this.checkEmail = false;
+            this.editPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     Delete(therapist, selectTherapist) {
-      console.log(therapist)
+      console.log(therapist);
       let param = {
-        therapistID: selectTherapist.columns.therapistId
-}
-console.log(param)
+        therapistID: selectTherapist.columns.therapistId,
+      };
+      console.log(param);
       axios
-    .post("/adTherapistDelete", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Delete success", therapist,response.data);
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+        .post("/adTherapistDelete", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("Delete success", therapist, response.data);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     clear() {
       this.therapistId = "";
@@ -724,36 +720,45 @@ console.log(param)
       this.password = "";
     },
   },
-  async created (){
-  this.hospitalName = "Siriraj Hospital"
-  const param = {
-    hospitalName:this.hospitalName
-  };
-  await axios
-    .post("/adTherapistView", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("therapist", response.data);
-      therapists.value = response.data.map((therapists, index) => ({
-        no: therapists.No,
-        therapistId: therapists.therapistID,
-        name: therapists.therapistName,
-        email: therapists.email,
-      }));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
+  async created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    this.hospitalName = "Siriraj Hospital";
+    const param = {
+      hospitalName: this.hospitalName,
+    };
+    await axios
+      .post("/adTherapistView", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("therapist", response.data);
+        therapists.value = response.data.map((therapists, index) => ({
+          no: therapists.No,
+          therapistId: therapists.therapistID,
+          name: therapists.therapistName,
+          email: therapists.email,
+        }));
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  },
 };
-
-
-
-
 </script>
 <style scoped>
 :deep(.v-pagination__list) {

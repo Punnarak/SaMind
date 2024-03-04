@@ -93,6 +93,19 @@ import axios from "../axios.js";
 
 let patients = ref([]);
 onMounted(async () => {
+  axios
+    .post("/refreshToken", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("refresh Token", response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   const param = {
     therapist_id: 5555,
   };

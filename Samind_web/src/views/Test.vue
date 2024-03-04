@@ -658,8 +658,8 @@ export default {
           testName: this.selectTest.columns.testname,
           patientId: checkedNames.value,
           detail: this.detail,
-          dueDate: this.dueDate
-        }
+          dueDate: this.dueDate,
+        };
         axios
           .post("/therapistSendTest", param, {
             headers: {
@@ -719,6 +719,21 @@ export default {
         });
       });
     },
+  },
+  created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
 };
 </script>
