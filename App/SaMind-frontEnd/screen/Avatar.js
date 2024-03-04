@@ -170,7 +170,7 @@ export default function Notification() {
   //   setRecognizedText(e.value[0]);
   // };
 
-  handleLogin = async () => {};
+  handleLogin = async () => { };
   useEffect(() => {
     console.log("Avatar Screen");
   }, []);
