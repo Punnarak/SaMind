@@ -333,6 +333,9 @@ export default function Home({ route }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigateToGamescreen()}
+              // onPress={() =>
+              //   navigation.navigate("Gamescreen", { patientId })
+              // }
             >
               <Text style={styles.Textb}>GAME</Text>
               <I

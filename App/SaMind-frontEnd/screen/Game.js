@@ -15,9 +15,9 @@ import ProgressBar from 'react-native-progress/Bar'
 import { useNavigation } from "@react-navigation/native";
 import axios from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
-import { Audio } from "expo-av";
+// import { Audio } from "expo-av";
 
-import Voice from '@react-native-community/voice';
+// import Voice from '@react-native-community/voice';
 // import { readFile } from 'react-native-fs';
 
 const windowWidth = Dimensions.get("window").width;
@@ -29,53 +29,53 @@ const PopcatGame = ({ route }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [transcription, setTranscription] = useState("");
 
-  // Start recording when button is pressed
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        setRecording(recording);
-        await recording.startAsync();
-      }
-    } catch (err) {
-      // console.error("Failed to start recording: ", err);
-    }
-  };
+  // // Start recording when button is pressed
+  // const handleStartRecording = async () => {
+  //   setIsRecording(true);
+  //   try {
+  //     const perm = await Audio.requestPermissionsAsync();
+  //     if (perm.status === "granted") {
+  //       await Audio.setAudioModeAsync({
+  //         allowsRecordingIOS: true,
+  //         playsInSilentModeIOS: true,
+  //       });
+  //       const { recording } = await Audio.Recording.createAsync(
+  //         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+  //       );
+  //       setRecording(recording);
+  //       await recording.startAsync();
+  //     }
+  //   } catch (err) {
+  //     // console.error("Failed to start recording: ", err);
+  //   }
+  // };
 
-  // Stop recording when button is released
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    // Check if recording is defined
-    if (recording) {
-      try {
-        await recording.stopAndUnloadAsync();
-        const { sound, status } = await recording.createNewLoadedSoundAsync();
-        const allRecordings = [...recordings];
-        allRecordings.push({
-          sound: sound,
-          duration: getDurationFormatted(status.durationMillis),
-          file: recording.getURI(),
-        });
-        setRecordings(allRecordings);
+  // // Stop recording when button is released
+  // const handleStopRecording = async () => {
+  //   setIsRecording(false);
+  //   // Check if recording is defined
+  //   if (recording) {
+  //     try {
+  //       await recording.stopAndUnloadAsync();
+  //       const { sound, status } = await recording.createNewLoadedSoundAsync();
+  //       const allRecordings = [...recordings];
+  //       allRecordings.push({
+  //         sound: sound,
+  //         duration: getDurationFormatted(status.durationMillis),
+  //         file: recording.getURI(),
+  //       });
+  //       setRecordings(allRecordings);
 
-        // Voice.start("en-US");
-      } catch (err) {
-        clearRecordings();
-        console.error("Failed to stop recording: ", err);
-      }
-    } else {
-      console.error("Recording is not started.");
-    }
-    clearRecordings();
-  };
+  //       // Voice.start("en-US");
+  //     } catch (err) {
+  //       clearRecordings();
+  //       console.error("Failed to stop recording: ", err);
+  //     }
+  //   } else {
+  //     console.error("Recording is not started.");
+  //   }
+  //   clearRecordings();
+  // };
 
   // useEffect(() => {
   //   Voice.onSpeechResults = (e) => {
@@ -87,23 +87,23 @@ const PopcatGame = ({ route }) => {
   //   };
   // }, []);
 
-  useEffect(() => {
-    // Check if there's a new recording added to the recordings array
-    // If so, automatically play the last recorded sound
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      lastRecording.sound.replayAsync();
-      clearRecordings();
-    }
-  }, [recordings]);
+  // useEffect(() => {
+  //   // Check if there's a new recording added to the recordings array
+  //   // If so, automatically play the last recorded sound
+  //   if (recordings.length > 0) {
+  //     const lastRecording = recordings[recordings.length - 1];
+  //     lastRecording.sound.replayAsync();
+  //     clearRecordings();
+  //   }
+  // }, [recordings]);
 
-  function getDurationFormatted(milliseconds) {
-    const minutes = milliseconds / 1000 / 60;
-    const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-    return seconds < 10
-      ? `${Math.floor(minutes)}:0${seconds}`
-      : `${Math.floor(minutes)}:${seconds}`;
-  }
+  // function getDurationFormatted(milliseconds) {
+  //   const minutes = milliseconds / 1000 / 60;
+  //   const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
+  //   return seconds < 10
+  //     ? `${Math.floor(minutes)}:0${seconds}`
+  //     : `${Math.floor(minutes)}:${seconds}`;
+  // }
 
   // function getRecordingLines() {
   //   return recordings.map((recordingLine, index) => {
@@ -126,13 +126,14 @@ const PopcatGame = ({ route }) => {
   //   });
   // }
 
-  function clearRecordings() {
-    setRecordings([]);
-  }
+  // function clearRecordings() {
+  //   setRecordings([]);
+  // }
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
   const { patientId, clickCount } = route.params || {};
+  // const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
 
@@ -543,7 +544,7 @@ const PopcatGame = ({ route }) => {
           <Image source={imageSource} style={styles.popcatImage} />
         </TouchableWithoutFeedback>
         <Text style={styles.countText}>{popCount}</Text>
-        <View style={styles.container}>
+        {/* <View style={styles.container}>
           <TouchableOpacity
             style={styles.button}
             onPressIn={handleStartRecording}
@@ -553,10 +554,11 @@ const PopcatGame = ({ route }) => {
               {isRecording ? "Recording..." : "Hold to Record"}
             </Text>
           </TouchableOpacity>
-          <Text style={styles.transcriptionText}>{transcription}</Text>
+          <Text style={styles.transcriptionText}>{transcription}</Text> */}
           {/* Display recording lines */}
           {/* {getRecordingLines()} */}
-        </View>
+        {/* </View> */}
+
         <View style={styles.progressBars}>
           <View
             style={{
