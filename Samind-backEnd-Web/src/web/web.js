@@ -5,6 +5,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 
 web.use(cors());
+// web.use(cors({
+//   origin: 'https://cbfb-49-229-129-109.ngrok-free.app', // Allow requests from this origin
+//   credentials: true // Allow credentials like cookies, authorization headers, etc.
+// }));
+
 web.use(bodyParser.json());
 web.use(bodyParser.urlencoded({ extended: true }));
 web.use(cookieParser());
