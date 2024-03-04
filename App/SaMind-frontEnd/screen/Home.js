@@ -37,8 +37,8 @@ export default function Home({ route }) {
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
   const fetchData = async () => {
-    const patient = await AsyncStorage.getItem("patientId");
-    console.log("storage", patient);
+    // const patient = await AsyncStorage.getItem("patientId");
+    // console.log("storage", patient);
     try {
       const response = await axios.post("/check_mood_per_day_get", {
         patient_id: patientId,
@@ -66,6 +66,7 @@ export default function Home({ route }) {
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
       fetchData();
+      console.log("mood", selectedMenu);
     });
 
     return onFocus;
@@ -325,7 +326,10 @@ export default function Home({ route }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() =>
-                navigation.navigate("Libraryscreen", { hospitalName })
+                navigation.navigate("Libraryscreen", {
+                  patientId,
+                  hospitalName,
+                })
               }
             >
               <Text style={styles.Textb}>LIBRARY</Text>
@@ -356,21 +360,14 @@ export default function Home({ route }) {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={
-              () =>
-                // Navigate to the Notification screen and pass the data as a param
-                navigation.navigate("Notiscreen", { patientId })
-              // navigation.navigate("Notiscreen", {
-              //   data: notiData,
-              // })
-            }
+            onPress={() => navigation.navigate("Notiscreen", { patientId })}
           />
           <Feather
             name="smile"
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Avatarscreen")}
+            onPress={() => navigation.navigate("Avatarscreen", { patientId })}
           />
         </View>
       </View>

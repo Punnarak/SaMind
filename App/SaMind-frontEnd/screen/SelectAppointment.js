@@ -41,7 +41,7 @@ export default function Login({ route }) {
   const [showdate, setshowdate] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const { date, month, year,patientId } = route.params || {};
+  const { date, month, year, patientId } = route.params || {};
   const [timeValue, setTimeValue] = useState();
   const time = [
     { id: 1, name: "0:00-1:00 ", value: "0:00" },
@@ -103,24 +103,22 @@ export default function Login({ route }) {
     { id: 3, name: "C", value: "C" },
   ];
 
-  
   const toggleUnderstand = () => {
     setConfirmModal(!confirmModal);
     setSubmit(!submit);
-   
-    navigation.navigate("Appointmentscreen",{patientId});
+
+    navigation.navigate("Appointmentscreen", { patientId });
   };
   const toggleSubmit = () => {
     setConfirmModal(!confirmModal);
-    const dateApi = date + "-"+ (month + 1) + "-"+ year 
+    const dateApi = date + "-" + (month + 1) + "-" + year;
     const param = {
       therapistName: doctorName,
-      patientId: 123,
-      patientName:name,
+      patientId: patientId,
+      patientName: name,
       date: dateApi,
       time: selectedValue,
       patientPhone: tel,
-
     };
     console.log(param);
     axios
@@ -140,7 +138,7 @@ export default function Login({ route }) {
     if (selectedValue) {
       setTimeError("");
       const dateString = year + "-" + (month + 1) + "-" + date;
-  
+
       const dateFormat = "YYYY-MM-DD";
       const fulldate = moment(dateString, dateFormat).toDate();
       const day = fulldate.getDay();
@@ -184,7 +182,6 @@ export default function Login({ route }) {
         datestring + " " + Days[day] + " " + months[month] + " " + year
       );
       setSubmit(!submit);
-     
     } else {
       setTimeError("*");
     }
@@ -223,22 +220,22 @@ export default function Login({ route }) {
     );
   };
   useEffect(() => {
-    console.log("Select Appointment Screen",patientId);
-      const param = {
-        patientId: patientId,
-      };
-      axios
-        .post("/appointConfig", param)
-        .then((response) => {
-          console.log("in");
-          setName(response.data.patientName);
-          setDoctorName(response.data.therapistName)
-          setTel(response.data.patientPhone)
-          console.log("data:", response.data);
-        })
-        .catch((error) => {
-          console.error("Axios error:", error);
-        });
+    console.log("Select Appointment Screen", patientId);
+    const param = {
+      patientId: patientId,
+    };
+    axios
+      .post("/appointConfig", param)
+      .then((response) => {
+        console.log("in");
+        setName(response.data.patientName);
+        setDoctorName(response.data.therapistName);
+        setTel(response.data.patientPhone);
+        console.log("data:", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
   }, []);
 
   return (

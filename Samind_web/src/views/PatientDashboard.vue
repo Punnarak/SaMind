@@ -108,9 +108,7 @@
                 <v-icon left size="10px" style="margin-right: 10px"
                   >mdi-circle</v-icon
                 >
-                {{
-                  mood > 400 ? "negative" : mood > 200 ? "neutral" : "positive"
-                }}
+                {{ mood }}
               </v-chip>
             </v-col>
           </v-row>
@@ -118,7 +116,7 @@
 
         <v-list-item>
           <v-row>
-            <v-col cols="6" sm="5" md="4">
+            <v-col v-if="moodResult != 'Unknown'" cols="6" sm="5" md="4">
               <label class="title ml-3" style="font-weight: bold"
                 >Latest Dairy Test</label
               >
@@ -127,7 +125,7 @@
                 class="mt-5 ml-5"
                 style="
                   color: rgb(152, 151, 151);
-                  width: 226px;
+                  width: 256px;
                   height: 101px;
                   flex-shrink: 0;
                   border-radius: 10px;
@@ -158,16 +156,17 @@
                     >{{ moodResult }}</label
                   >
                   <br />
-                  <label class="testdate ml-3">{{ testDate }}</label>
+                  <label class="testdate ml-2">{{ testDate }}</label>
                 </v-col></v-chip
               ></v-col
-            ><v-col cols="26" sm="6" md="4">
+            ><v-col v-if="this.scoretest1" cols="26" sm="6" md="4">
               <label class="title mr-16" style="font-weight: bold"
                 >Score Test
               </label>
               <span class="mr-16 ml-16"></span>
 
               <label
+                v-if="this.scoretest1"
                 class="hyper mr-16"
                 style="font-weight: bold"
                 @click="
@@ -175,7 +174,7 @@
                     path: 'patienttesthistory',
                     query: {
                       patientName: patientName,
-                      patientId: patientId
+                      patientId: patientId,
                     },
                   })
                 "
@@ -192,28 +191,62 @@
                   border-radius: 10px;
                 "
               >
-                <v-list class="scoretest" style="background-color: transparent">
-                  <v-list-item>
-                    <v-row style="background-color: rgba(228, 228, 228, 0.4)">
+                <v-list
+                  class="scoretest"
+                  style="
+                    background-color: transparent;
+                    width: 320px;
+                    margin-left: -10px;
+                  "
+                >
+                  <v-list-item v-if="this.scoretest1">
+                    <v-row
+                      style="
+                        background-color: rgba(228, 228, 228, 0.4);
+                        width: 310px;
+                      "
+                    >
                       <v-col class="testname">{{ scoretest1[0] }}</v-col>
-                      <v-col class="result">{{ scoretest1[1] }}</v-col>
-                      <v-col class="date">{{ scoretest1[2] }}</v-col>
+                      <v-col
+                        class="result"
+                        :style="{
+                          color: getColorResult(scoretest1[1], scoretest1[0]),
+                        }"
+                        style="margin-left: -16px"
+                        >{{ scoretest1[1] }}</v-col
+                      >
+                      <v-col class="date"
+                        ><label>{{ scoretest1[2] }}</label></v-col
+                      >
                     </v-row>
                   </v-list-item>
                   <v-divider
                     inset
                     style="color: rgb(255, 255, 255)"
                   ></v-divider>
-                  <v-list-item>
-                    <v-row>
+
+                  <v-list-item v-if="this.scoretest2">
+                    <v-row
+                      style="
+                        background-color: rgba(228, 228, 228, 0.4);
+                        width: 310px;
+                      "
+                    >
                       <v-col class="testname">{{ scoretest2[0] }}</v-col>
-                      <v-col class="result">{{ scoretest2[1] }}</v-col>
+                      <v-col
+                        :style="{
+                          color: getColorResult(scoretest2[1], scoretest2[0]),
+                        }"
+                        class="result"
+                        style="margin-left: -16px"
+                        >{{ scoretest2[1] }}</v-col
+                      >
                       <v-col class="date">{{ scoretest2[2] }}</v-col>
                     </v-row>
                   </v-list-item></v-list
                 ></v-chip
               ></v-col
-            ><v-col cols="6" sm="6" md="4">
+            ><v-col v-if="moodDetect != '-'" cols="6" sm="6" md="4">
               <label class="title mr-16" style="font-weight: bold"
                 >Mood Detection with Samind
               </label>
@@ -221,7 +254,7 @@
                 class="mt-5 ml-5"
                 style="
                   color: rgb(152, 151, 151);
-                  width: 226px;
+                  width: 230px;
                   height: 101px;
                   flex-shrink: 0;
                   border-radius: 10px;
@@ -252,7 +285,7 @@
                     >{{ moodDetect }}</label
                   >
                   <br />
-                  <label class="testdate ml-7">{{ detectDate }}</label>
+                  <label class="testdate ml-5">{{ detectDate }}</label>
                 </v-row></v-chip
               ></v-col
             ></v-row
@@ -263,10 +296,35 @@
   </v-col>
 </template>
 <script setup>
+import axios from "../axios.js";
 function getColor(mood) {
-  if (mood > 400) return "red";
-  else if (mood > 200) return "orange";
-  else return "green";
+  if (mood === "negative") return "red";
+  else if (mood === "neutral") return "orange";
+  else if (mood === "positive") return "green";
+  else return "lightgray";
+}
+function getColorResult(result, test) {
+  if (test === "PHQ9") {
+    if (result.includes("ปานกลาง")) {
+      return "#FF914D";
+    } else if (result.includes("น้อยมาก")) {
+      return "#FFDE59";
+    } else if (result.includes("น้อย")) {
+      return "#11dd66";
+    } else if (result.includes("มาก")) {
+      return "#FF5757";
+    } else if (result.includes("ไม่มี")) {
+      return "#11dd66";
+    }
+  }
+
+  if (test === "2Q") {
+    if (result != 0) {
+      return "#11dd66";
+    } else if (result == 0) {
+      return "#FFDE59";
+    }
+  }
 }
 </script>
 <script>
@@ -294,14 +352,88 @@ export default {
     };
   },
   created() {
+    console.log("this.patientInfo", this.$route.query);
     this.patientName = this.$route.query.name;
     this.patientId = this.$route.query.patientId;
     this.age = this.$route.query.age;
-    // this.gender = this.$route.query.gender;
     this.mood = this.$route.query.mood;
-    console.log("this.patientInfo", this.$route.query);
+    let param = {
+      patientID: this.patientId,
+    };
+    axios
+      .post("/adPersonalData", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.born = response.data.born;
+        this.startTreatement = response.data.start;
+        this.lastAppointment = response.data.lastAppointment;
+        this.nextAppointment = response.data.nextAppointment;
+        this.tel = response.data.tel;
+        this.email = response.data.email;
+        this.mood = response.data.mood;
+        this.moodResult = response.data.avgMood;
+        this.testDate = response.data.dateBetween;
+        if (response.data && response.data.hasOwnProperty("historyTest")) {
+          if (
+            response.data.historyTest &&
+            response.data.historyTest.hasOwnProperty("type1")
+          ) {
+            let result1 = this.getResult(
+              response.data.historyTest.type1,
+              response.data.historyTest.result1
+            );
+            this.scoretest1 = [
+              response.data.historyTest.type1,
+              result1,
+              response.data.historyTest.date1,
+            ];
+          }
+
+          if (
+            response.data.historyTest &&
+            response.data.historyTest.hasOwnProperty("type2")
+          ) {
+            let result2 = this.getResult(
+              response.data.historyTest.type2,
+              response.data.historyTest.result2
+            );
+            this.scoretest2 = [
+              response.data.historyTest.type2,
+              result2,
+              response.data.historyTest.date2,
+            ];
+          }
+        } else {
+          this.scoretest1 = null;
+          this.scoretest2 = null;
+        }
+        this.moodDetect = response.data.avatarMood;
+        this.detectDate = response.data.dateAvatarMoodDetec;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
-  methods: {},
+  methods: {
+    getResult(type, result) {
+      if (type == "PHQ9" || type == "2Q") {
+        if (result.includes("ปานกลาง")) {
+          return "ระดับปานกลาง";
+        } else if (result.includes("น้อยมาก")) {
+          return "ระดับน้อยมาก";
+        } else if (result.includes("น้อย")) {
+          return "ระดับน้อย";
+        } else if (result.includes("ไม่มี")) {
+          return "ไม่มีภาวะซึมเศร้า";
+        }
+      }
+    },
+  },
 };
 </script>
 
@@ -355,7 +487,7 @@ export default {
   color: #b6b9c2;
   font-feature-settings: "clig" off, "liga" off;
   font-family: "Poppins", sans-serif;
-  font-size: 16px;
+  font-size: 9px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
@@ -370,7 +502,6 @@ export default {
 }
 
 .result {
-  color: #00bf63;
   font-family: "Poppins", sans-serif;
   font-size: 13px;
   font-style: normal;

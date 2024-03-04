@@ -34,7 +34,9 @@
               ? "negative"
               : item.columns.mood === "neutral"
               ? "neutral"
-              : "positive"
+              : item.columns.mood === "positive"
+              ? "positive"
+              : "-"
           }}
         </v-chip>
       </template>
@@ -248,7 +250,8 @@ const headers = [
 function getColor(mood) {
   if (mood === "negative") return "red";
   else if (mood === "neutral") return "orange";
-  else return "green";
+  else if (mood === "positive") return "green";
+  else return "lightgray";
 }
 </script>
 

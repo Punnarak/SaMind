@@ -18,7 +18,9 @@ export default function Dashboard({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
-  const [moodCard, setMoodCard] = useState("happy");
+  const [moodCard, setMoodCard] = useState("no");
+  const [color1, setColor1] = useState("green");
+  const [color2, setColor2] = useState("green");
   useEffect(() => {
     console.log("Dashboard Screen", patientId);
     const param = {
@@ -27,10 +29,24 @@ export default function Dashboard({ route }) {
     axios
       .post("/dashboard_api", param)
       .then((response) => {
-        console.log("in");
         setData(response.data);
         console.log("data:", response.data);
         setMood(response.data.avgMood);
+        if (response.data.hasOwnProperty("historyTest")) {
+          if (response.data.hasOwnProperty.hasOwnProperty("type1")) {
+            handleColor1(
+              response.data.historyTest.type1,
+              response.data.historyTest.result1
+            );
+          }
+
+          if (response.data.historyTest.hasOwnProperty("type2")) {
+            handleColor2(
+              response.data.historyTest.type2,
+              response.data.historyTest.result2
+            );
+          }
+        }
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -51,9 +67,44 @@ export default function Dashboard({ route }) {
       setMoodCard("happy");
     } else if (mood == 5) {
       setMoodCard("cheerful");
+    } else if (mood == 0 || mood === null || mood === undefined) {
+      setMoodCard("no");
     }
   };
-
+  const handleColor1 = (type, result) => {
+    if (type === "2Q") {
+      if (result.includes("ไม่มีแนวโน้ม")) {
+        setColor1("green");
+      } else if (result == 0) {
+        setColor1("red");
+      }
+    }
+    if (type === "PHQ9") {
+      if (
+        result.includes(
+          "ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก"
+        )
+      ) {
+        setColor1("#11dd66");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับน้อย")) {
+        setColor1("#FFDE59");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับปานกลาง")) {
+        setColor1("#FF914D");
+      } else if (result.includes("ท่านมีอาการซึมเศร้าในระดับรุนแรง")) {
+        setColor1("#FF5757");
+      }
+    }
+  };
+  const handleColor2 = (type, result) => {
+    if (type === "2Q") {
+      if (result.includes("ไม่มีแนวโน้ม")) {
+        setColor2("green");
+      } else if (result == 0) {
+        setColor2("red");
+      }
+    }
+    console.log(result);
+  };
   return (
     <ImageBackground
       source={require("../assets/Game.png")}
@@ -638,9 +689,42 @@ export default function Dashboard({ route }) {
           </View>
         </View>
       )}
+      {moodCard == "no" && (
+        <View style={styles.no}>
+          <View
+            style={{
+              flexDirection: "column",
+              marginTop: "18%",
+              marginLeft: "35%",
+              zIndex: 7,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 11,
+                color: "rgba(37, 39, 28, 1)",
 
+                fontWeight: "700",
+                ...Platform.select({
+                  android: { marginTop: "2%", left: 9 },
+                  ios: { marginTop: "4%" },
+                }),
+              }}
+            >
+              No Average Mood
+            </Text>
+          </View>
+        </View>
+      )}
       <View style={styles.container2}>
-        <View style={styles.qbox}>
+        <View
+          style={
+            data.historyTest && data.historyTest.hasOwnProperty("result2")
+              ? [styles.qbox, { paddingBottom: "3%" }]
+              : styles.qbox
+          }
+        >
           <View style={styles.box}>
             <Text style={styles.wel}>Test History</Text>
           </View>
@@ -651,39 +735,80 @@ export default function Dashboard({ route }) {
               marginTop: "4%",
             }}
           >
+            {data.historyTest && data.historyTest.result1 !== null ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // marginTop: "4%",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "column",
+                    // alignItems: "center",
+                    marginTop: "1%",
+                  }}
+                >
+                  <Text style={styles.q}>
+                    {data.historyTest && data.historyTest.type1 !== null
+                      ? data.historyTest.type1
+                      : null}
+                  </Text>
+                  <Text style={styles.d}>
+                    ทดสอบเมื่อวันที่{" "}
+                    {data.historyTest && data.historyTest.date1 !== null
+                      ? data.historyTest.date1
+                      : null}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: color1,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {data.historyTest && data.historyTest.result1 !== null
+                    ? data.historyTest.result1
+                    : null}
+                </Text>
+              </View>
+            ) : (
+              <Text
+                style={{
+                  textAlign: "center",
+                  justifyContent: "center",
+                  ...Platform.select({
+                    android: { marginTop: "4%", marginLeft: "41%" },
+                    ios: { marginTop: "4%", marginLeft: "41%" },
+                  }),
+                }}
+              >
+                No Data
+              </Text>
+            )}
+          </View>
+          {data.historyTest && data.historyTest.hasOwnProperty("result2") ? (
             <View
               style={{
-                flexDirection: "column",
-                // alignItems: "center",
-                marginTop: "1%",
+                marginTop: "3%",
+                paddingHorizontal: "3%",
+                height: 1,
+                backgroundColor: "#F9E5DB",
               }}
-            >
-              <Text style={styles.q}>
-                {data.historyTest && data.historyTest.type1 !== null
-                  ? data.historyTest.type1
-                  : null}
-              </Text>
-              <Text style={styles.d}>
-                ทดสอบเมื่อวันที่{" "}
-                {data.historyTest && data.historyTest.date1 !== null
-                  ? data.historyTest.date1
-                  : null}
-              </Text>
-            </View>
-            <Text style={styles.r}>
-              {data.historyTest && data.historyTest.result1 !== null
-                ? data.historyTest.result1
-                : null}
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: "3%",
-              paddingHorizontal: "3%",
-              height: 1,
-              backgroundColor: "#F9E5DB",
-            }}
-          />
+            />
+          ) : (
+            <View
+              style={{
+                marginTop: "3%",
+                paddingHorizontal: "3%",
+                height: 1,
+                backgroundColor: "#FFF7F3",
+              }}
+            />
+          )}
           <View
             style={{
               flexDirection: "row",
@@ -691,30 +816,47 @@ export default function Dashboard({ route }) {
               marginTop: "4%",
             }}
           >
-            <View
-              style={{
-                flexDirection: "column",
-                // alignItems: "center",
-                marginTop: "1%",
-              }}
-            >
-              <Text style={styles.q}>
-                {data.historyTest && data.historyTest.type2 !== null
-                  ? data.historyTest.type2
-                  : null}
-              </Text>
-              <Text style={styles.d}>
-                ทดสอบเมื่อวันที่{" "}
-                {data.historyTest && data.historyTest.date2 !== null
-                  ? data.historyTest.date2
-                  : null}
-              </Text>
-            </View>
-            <Text style={styles.r2}>
-              {data.historyTest && data.historyTest.result2 !== null
-                ? data.historyTest.result2
-                : null}
-            </Text>
+            {data.historyTest && data.historyTest.hasOwnProperty("result2") ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // marginTop: "4%",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "column",
+                    // alignItems: "center",
+                    marginTop: "1%",
+                  }}
+                >
+                  <Text style={styles.q}>
+                    {data.historyTest && data.historyTest.type2 !== null
+                      ? data.historyTest.type2
+                      : null}
+                  </Text>
+                  <Text style={styles.d}>
+                    ทดสอบเมื่อวันที่{" "}
+                    {data.historyTest && data.historyTest.date2 !== null
+                      ? data.historyTest.date2
+                      : null}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: color2,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {data.historyTest && data.historyTest.result2 !== null
+                    ? data.historyTest.result2
+                    : null}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
         <Text style={styles.title}>
@@ -875,7 +1017,9 @@ export default function Dashboard({ route }) {
           </View>
           <Text style={styles.moodDate}>
             Last talk:
-            {data.dateAvatar !== null ? data.dateAvatar : "No last talk"}
+            {data.avatarMoodDetec && data.dateAvatar !== null
+              ? data.dateAvatar
+              : "No last talk"}
           </Text>
         </View>
 
@@ -1014,7 +1158,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF7F3",
     borderColor: "#FFF7F3",
     borderRadius: 15,
-    paddingVertical: "3%",
+    paddingTop: "3%",
     width: "99.8%",
   },
   wel: {
@@ -1046,10 +1190,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   title: {
-    marginBottom: "4%",
     fontSize: 11,
     color: "black",
     fontWeight: "bold",
+    ...Platform.select({
+      android: {
+        marginBottom: "2%",
+      },
+      ios: { marginBottom: "4%" },
+    }),
   },
   moodavgbox: {
     marginBottom: "1%",
@@ -1185,5 +1334,17 @@ const styles = StyleSheet.create({
   },
   picul: {
     marginLeft: "9%",
+  },
+  no: {
+    width: "80%",
+    // width: 312,
+    height: "17%",
+    // height: 144,
+    borderWidth: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: 16,
+    marginTop: "3%",
+    marginBottom: "7%",
   },
 });

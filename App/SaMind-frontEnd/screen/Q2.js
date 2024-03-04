@@ -92,13 +92,13 @@ export default function Q2({ route }) {
       type: "2Q",
       patient_id: patientId,
     };
+    console.log(param);
     axios
       .post("/score_question_post", param)
       .then((response) => {
         console.log("submit success", response.data);
       })
       .catch((error) => {
-        // Handle any errors here
         console.error("Axios error:", error);
       });
     setModal(!modal);

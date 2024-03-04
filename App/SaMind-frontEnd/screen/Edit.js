@@ -251,7 +251,13 @@ export default function EditProfile({ route }) {
           onChangeText={(text) => {
             setConPassword(text);
 
-            setConPasswordError(text.trim() === "" ? "*" : " ");
+            setConPasswordError(
+              text.trim() === ""
+                ? "*"
+                : text.trim() !== password
+                ? "Not matching"
+                : ""
+            );
           }}
         />
         {isIOS ? null : (
@@ -282,9 +288,9 @@ export default function EditProfile({ route }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.outb}
-            onPress={() => navigation.navigate("Loginscreen")}
+            onPress={() => navigation.navigate("Profilescreen")}
           >
-            <Text style={styles.text}>Sign Out</Text>
+            <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -420,7 +426,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
-    paddingHorizontal: 54,
+    paddingHorizontal: 63,
     borderRadius: 25,
     backgroundColor: "#C6E3FF",
   },

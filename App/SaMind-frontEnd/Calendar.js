@@ -19,7 +19,7 @@ class MyCalendar extends React.Component {
   ];
 
   _onPress = (item, textColor) => {
-    console.log("textColor in calendar component",textColor)
+    console.log("textColor in calendar component", textColor);
     if (
       this.state.highlightedDates.find(
         (date) =>
@@ -35,7 +35,6 @@ class MyCalendar extends React.Component {
         this.state.activeDate.getMonth(),
         this.state.activeDate.getFullYear(),
         textColor
-        
       );
     } else {
       console.log(
@@ -151,7 +150,7 @@ class MyCalendar extends React.Component {
 
         if (rowIndex === 0) {
           textColor = "black"; // กำหนดสีดำสำหรับวันที่ในเดือนปัจจุบันในแถวแรก (header row)
-        } else if (rowIndex === 1 && item <= 31 && item >= 25) {
+        } else if (rowIndex === 1 && item <= 31 && item >= 24) {
           textColor = "lightgray"; // กำหนดสีเทาสำหรับวันที่ไม่ใช่ของเดือนปัจจุบันในแถวแรก
         } else if (
           (rowIndex === 5 && item < 31 && item < 20) ||
@@ -167,7 +166,7 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex === 1 &&
-          item <25
+          item < 24
         ) {
           textColor = "#f00";
         } else if (
@@ -178,10 +177,9 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex >= 2 &&
-          rowIndex <= 5 
-          &&
-          // item > 24 
-          item > 3&&
+          rowIndex <= 5 &&
+          // item > 24
+          item > 3 &&
           item <= 31
         ) {
           textColor = "#f00";
@@ -193,9 +191,11 @@ class MyCalendar extends React.Component {
               date.getFullYear() === this.state.activeDate.getFullYear()
           ) &&
           rowIndex === 6 &&
-          item < 31
+          item <= 31 &&
+          item > 24
         ) {
           // textColor = 'blue'
+          textColor = "#f00";
         }
 
         if (

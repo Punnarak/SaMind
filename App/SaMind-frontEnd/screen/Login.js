@@ -25,8 +25,8 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [patientId, setPatientId] = useState(123);
-  const [hospitalName, setHospitalName] = useState("siriraj-Hospital");
+  const [patientId, setPatientId] = useState();
+  const [hospitalName, setHospitalName] = useState("");
   //validate
   const [checkEmail, setCheckEmail] = useState(false);
   const [emailError, setEmailError] = useState(" ");
@@ -34,7 +34,19 @@ export default function Login() {
 
   useEffect(() => {
     console.log("Login Screen");
+
+    const onFocus = navigation.addListener("focus", () => {
+      console.log("Screen is focused");
+      setHospitalName("");
+      setPatientId();
+    });
+
+    return onFocus;
   }, []);
+  useEffect(() => {
+    console.log("Account", patientId, hospitalName);
+    gonext();
+  }, [patientId, hospitalName]);
 
   useEffect(() => {
     if (email != "") {
@@ -56,7 +68,9 @@ export default function Login() {
       console.error("Error storing token:", error);
     }
   };
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
+    setPatientId();
+    setHospitalName("");
     setEmailError(" ");
     setPasswordError(" ");
 
@@ -73,23 +87,30 @@ export default function Login() {
         password: password,
       };
       console.log("param", param);
-      axios
+      await axios
         .post("/login", param)
         .then((response) => {
           console.log("response", response.data);
-          console.log("Login Complete");
+
           setPatientId(response.data.user.patient_id);
           setHospitalName(response.data.user.hospital_name);
-          // storePatientId(response.data.user.patient_id);
         })
         .catch((error) => {
-          // Handle any errors here
-          console.error("Axios error:", error);
+          setEmailError("user not found");
         });
+    }
+  };
 
-      if (patientId !== undefined && hospitalName !== undefined) {
-        navigation.navigate("Homescreen", { patientId, hospitalName });
-      }
+  const gonext = () => {
+    console.log("param", patientId, hospitalName);
+    if (
+      patientId !== undefined &&
+      hospitalName !== undefined &&
+      hospitalName !== ""
+    ) {
+      setEmailError("");
+      console.log("Login Complete");
+      navigation.navigate("Homescreen", { patientId, hospitalName });
     }
   };
   const validateEmail = () => {
