@@ -218,7 +218,7 @@ export default {
 
         let test = ref([]);
         const param = {
-          therapistId: 5555,
+          therapistId: localStorage.getItem("id"),
           type: this.testName,
         };
         axios
@@ -271,7 +271,7 @@ export default {
       // Convert testData to JSON string
       // const testDataJSON = JSON.stringify(testData, null, 2);
       const param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         description: this.description,
         oldType: this.oldType,
         questions,

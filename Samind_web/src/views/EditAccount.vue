@@ -221,7 +221,7 @@ export default {
       });
     this.newPassword = "";
     const param = {
-      therapist_id: 5555,
+      therapist_id: localStorage.getItem("id"),
     };
     axios
       .post("/info_therapist", param, {
@@ -243,7 +243,7 @@ export default {
   methods: {
     save() {
       let param = {
-        therapist_id: 5555,
+        therapist_id: localStorage.getItem("id"),
         fname: this.firstName,
         lname: this.lastName,
         password: this.newPassword,

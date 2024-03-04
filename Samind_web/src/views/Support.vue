@@ -80,7 +80,7 @@ let therapists = ref(
 );
 onMounted(async () => {
   const param = {
-    therapist_id: 5555,
+    therapist_id: localStorage.getItem("id"),
   };
   await axios
     .post("/patientList", param, {

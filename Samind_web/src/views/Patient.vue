@@ -107,7 +107,7 @@ onMounted(async () => {
       console.error("Error:", error);
     });
   const param = {
-    therapist_id: 5555,
+    therapist_id: localStorage.getItem("id"),
   };
   await axios
     .post("/patientList", param, {
