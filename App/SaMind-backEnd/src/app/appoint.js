@@ -200,6 +200,45 @@ router.post('/appointShowTime', (req, res) => {
     });
 });
 
+router.post('/appointShowTimeChange', (req, res) => {
+  const date = req.body.date; // Assuming date is sent in the request body
+  const startHour = 8; // Start hour for available appointments
+  const endHour = 16; // End hour for available appointments
+
+  // Query to retrieve existing appointments for the specified date and confirm column containing "W" or "Y"
+  const query = 'SELECT "time", "change_time" FROM public.appointment_new2 WHERE (date = $1 AND confirm IN ($2, $3)) OR (change_date = $4 AND change_time IS NOT NULL)';
+  const queryParams = [date, "W", "Y", date];
+
+  client.query(query, queryParams)
+    .then(result => {
+      // Extract existing appointment times
+      const existingTimes = result.rows.map(row => row.change_time || row.time);
+
+      // Generate available appointment times
+      const availableTimes = [];
+      for (let hour = startHour; hour < endHour; hour++) {
+        const time = `${hour.toString().padStart(2, '0')}:00`;
+        // Check if the time is available and not already in existing appointments
+        if (time !== '12:00' && !existingTimes.find(existingTime => existingTime.startsWith(time))) {
+          availableTimes.push(time);
+        }
+      }
+
+      // Check if all appointment slots are full
+      const isFull = availableTimes.length === 0;
+
+      // Send response based on availability
+      if (isFull) {
+        res.json({ time: "Time is full" });
+      } else {
+        res.json({ time: availableTimes });
+      }
+    })
+    .catch(err => {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
 
 // select appointmet
 // router.post('/appointSelect', (req, res) => {
