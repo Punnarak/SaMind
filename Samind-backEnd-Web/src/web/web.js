@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 
 // web.use(cors());
 web.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from this origin
+  origin: ['http://localhost:5173', 'http://10.226.162.66:5173'], // Allow requests from this origin
   credentials: true // Allow credentials like cookies, authorization headers, etc.
 }));
 

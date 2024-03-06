@@ -18,6 +18,8 @@ const auth = require("./auth.js").authorization;
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 
+const cookie = require('cookie');
+
 const transporter = nodemailer.createTransport({
   // requireTLS: true,
   host: "smtp.gmail.com.",
@@ -81,6 +83,7 @@ function isValidEmail(email) {
 //   }
 // });
 
+// api can use in firefox
 router.post("/login", jsonParser, async function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
@@ -129,6 +132,56 @@ router.post("/login", jsonParser, async function (req, res, next) {
     });
   }
 });
+
+// router.post("/login", jsonParser, async function (req, res, next) {
+//   const email = req.body.email;
+//   const password = req.body.password;
+
+//   const query = {
+//     text: "SELECT * FROM therapist WHERE email = $1",
+//     values: [email],
+//   };
+
+//   try {
+//     const result = await client.query(query);
+
+//     if (result.rows.length === 0) {
+//       return res.json({ status: "error", message: "No user found" });
+//     }
+
+//     const therapist = result.rows[0];
+//     const hashedPassword = therapist.password;
+
+//     // Use bcrypt.compare to check if the provided password matches the hashed password
+//     const isLogin = await bcrypt.compare(password, hashedPassword);
+
+//     if (isLogin) {
+//       const { therapist_id, fname, lname, phone, email, hospital_name, admin } = therapist;
+//       const role = admin === 'Y' ? 'admin' : 'therapist'; // Check admin column for role
+
+//       const token = jwt.sign({ therapist_id, email }, secret, {
+//         expiresIn: "1h",
+//       });
+
+//       // Set SameSite=None and Secure attributes for the cookie
+//       res.setHeader('Set-Cookie', cookie.serialize('access_token', token, {
+//         httpOnly: true,
+//         secure: true, // Set this to true if you are using HTTPS
+//         sameSite: 'None', // Set SameSite=None
+//       }));
+
+//       return res.status(200).json({ status: "ok", message: "Login success", user: { therapist_id, fname, lname, phone, email, hospital_name, role } });
+//     } else {
+//       return res.json({ status: "error", message: "Login failed" });
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     return res.json({
+//       status: "error",
+//       message: "An error occurred during login",
+//     });
+//   }
+// });
 
 // router.post("/refreshToken", (req, res) => {
 //   const refreshToken = req.cookies["access_token"];

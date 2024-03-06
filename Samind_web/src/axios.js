@@ -1,7 +1,22 @@
 import axios from "axios";
 const HTTP = axios.create({
-  // baseURL: "https://dfc4-2001-fb1-15-30ce-cc3a-8c0d-162c-cc5b.ngrok-free.app",
-  baseURL: "http://10.226.164.199:4301",
+  baseURL: "http://10.226.162.66:4301",
   withCredentials: true,
 });
 export default HTTP;
+
+// import axios from "axios";
+
+// const HTTP = axios.create({
+//   baseURL: "http://10.226.162.66:4301",
+//   withCredentials: true, // Send cookies with requests
+// });
+
+// // Configure Axios interceptors to automatically store and send cookies
+// HTTP.interceptors.request.use((config) => {
+//   // Modify config to include credentials
+//   config.withCredentials = true;
+//   return config;
+// });
+
+// export default HTTP;
