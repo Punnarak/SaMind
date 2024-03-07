@@ -19,7 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
 import moment from "moment";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Login({ route }) {
   const navigation = useNavigation();
@@ -43,7 +44,7 @@ export default function Login({ route }) {
 
   const { date, month, year, patientId } = route.params || {};
   const [timeValue, setTimeValue] = useState();
-  const time = [
+  const [time, setTime] = useState([
     { id: 1, name: "0:00-1:00 ", value: "0:00" },
     { id: 2, name: "0:30-1:30 ", value: "0:30" },
     { id: 3, name: "1:00-2:00 ", value: "1:00" },
@@ -91,7 +92,7 @@ export default function Login({ route }) {
     { id: 45, name: "22:00-23:00 ", value: "22:00" },
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
-  ];
+  ])
 
   const DrName = [
     { id: 1, name: "A", value: "A" },
@@ -221,6 +222,19 @@ export default function Login({ route }) {
   };
   useEffect(() => {
     console.log("Select Appointment Screen", patientId);
+    let param2 = {
+      date: year + "-" + (month + 1) + "-" + date
+    }
+    console.log(param2)
+    axios
+      .post("/appointShowTime", param2)
+      .then((response) => {
+        console.log("data:", response.data);
+        setTime(response.data)
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
     const param = {
       patientId: patientId,
     };

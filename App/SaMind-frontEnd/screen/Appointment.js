@@ -16,7 +16,8 @@ import moment from "moment";
 import Modal from "react-native-modal";
 import "moment-timezone";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import DateTimePicker from "@react-native-community/datetimepicker";
 const isAndroid = Platform.OS === "android";
 export default function Calendar({ route }) {
@@ -36,7 +37,7 @@ export default function Calendar({ route }) {
   const [newAppString, setNewAppString] = useState("");
   //   const [isCalendarVisible, setCalendarVisible] = useState(true);
   const { patientId } = route.params || {};
-  const time = [
+  const [time, setTime] = useState([
     { id: 1, name: "00:00-01:00 ", value: "00:00" },
     { id: 2, name: "00:30-01:30 ", value: "00:30" },
     { id: 3, name: "01:00-02:00 ", value: "01:00" },
@@ -84,8 +85,28 @@ export default function Calendar({ route }) {
     { id: 45, name: "22:00-23:00 ", value: "22:00" },
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
-  ];
+  ])
   console.log("Calendar Screen", patientId);
+
+  const queryTime = () => {
+    if(newAppString !== ''){
+    d = newAppString.split("-")
+    let param = {
+      date:d[2]+"-"+d[1]+"-"+d[0]
+    }
+    console.log(param)
+    axios
+      .post("/appointShowTimeChange", param)
+      .then((response) => {
+        console.log("data:", response.data);
+        setTime(response.data)
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+    }
+  };
+
   const renderLink = ({ item }) => {
     return (
       <Text style={styles.link} onPress={() => handleItemPress(item)}>
@@ -108,7 +129,9 @@ export default function Calendar({ route }) {
       setTimeError("");
     }
   }, [selectedValue]);
-
+  useEffect(() => {
+   queryTime()
+  }, [newAppString]);
   useEffect(() => {
     console.log("Appointment Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
@@ -388,6 +411,7 @@ export default function Calendar({ route }) {
                           paddingVertical: verticalScale(6),
                         }}
                         value={newAppString}
+                        // onChange={queryTime()}
                       />
                       <Ionicons
                         name="calendar-outline"
