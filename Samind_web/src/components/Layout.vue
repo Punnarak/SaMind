@@ -218,7 +218,7 @@ export default {
     };
   },
   created() {
-    this.role = "admin";
+    this.role = "therapist";
     const param = {
       therapist_id: 5555,
     };
@@ -231,7 +231,7 @@ export default {
       })
       .then((response) => {
         console.log("name", response.data);
-        //this.role = response.data.role;
+        this.role = response.data.role;
         this.firstName = response.data.fname;
         this.lastName = response.data.lname;
       })
