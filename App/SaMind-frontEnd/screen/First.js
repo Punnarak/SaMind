@@ -13,9 +13,6 @@ const First = () => {
   const navigation = useNavigation();
   const [index, setIndex] = React.useState(0);
   const isCarousel = React.useRef(null);
-
-  const patientId="1";
-  const hospitalName="eee";
   
   useEffect(() => {
     console.log("First Screen");
@@ -56,7 +53,7 @@ const First = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("Homescreen", { patientId, hospitalName })}
+        onPress={() => navigation.navigate("Loginscreen")}
       >
         <Text style={styles.text}>Get started</Text>
       </TouchableOpacity>

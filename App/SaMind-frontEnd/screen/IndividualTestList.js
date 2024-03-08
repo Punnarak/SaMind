@@ -11,7 +11,8 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 // import assignData from "../upcomingData";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function IndividualTestList({ route }) {
   const { patientId } = route.params || {};
@@ -20,6 +21,17 @@ export default function IndividualTestList({ route }) {
 
   useEffect(() => {
     console.log("Individual Test List Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     const param = {
       patient_id: patientId,
     };
@@ -35,6 +47,7 @@ export default function IndividualTestList({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
+      return onFocus
   }, []);
 
   return (

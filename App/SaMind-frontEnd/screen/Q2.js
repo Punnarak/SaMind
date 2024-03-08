@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import RadioItem from "../RadioItem"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Q2({ route }) {
   const { patientId } = route.params || {};
@@ -42,6 +43,22 @@ export default function Q2({ route }) {
 
     // Add more questions as needed
   ];
+  useEffect(() => {
+    console.log("Q2 Test Screen",patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+    return onFocus
+  }, []);
+
   const toggleUnderstand = () => {
     setModal(!modal);
   };
@@ -104,9 +121,6 @@ export default function Q2({ route }) {
     setModal(!modal);
   };
 
-  useEffect(() => {
-    console.log("Q2 Test Screen");
-  }, []);
   return (
     <View style={styles.container2}>
       <ImageBackground

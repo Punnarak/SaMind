@@ -87,7 +87,7 @@ export default function Calendar({ route }) {
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ])
   console.log("Calendar Screen", patientId);
-
+  
   const queryTime = () => {
     if(newAppString !== ''){
     d = newAppString.split("-")
@@ -136,6 +136,14 @@ export default function Calendar({ route }) {
     console.log("Appointment Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
       const param = {
         patient_id: patientId,
       };

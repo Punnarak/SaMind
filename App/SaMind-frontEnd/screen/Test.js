@@ -10,7 +10,8 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Notification({ route }) {
   const { patientId } = route.params || {};
@@ -19,6 +20,18 @@ export default function Notification({ route }) {
 
   useEffect(() => {
     console.log("Test Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+    return onFocus
   }, []);
   const param = {
     patient_id: patientId,

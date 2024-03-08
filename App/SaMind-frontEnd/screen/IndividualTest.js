@@ -15,7 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import RadioItem from "../RadioItem.js"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics.js";
 import Modal from "react-native-modal";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Notification({ route }) {
   const { patientId, item } = route.params || {};
@@ -29,6 +30,17 @@ export default function Notification({ route }) {
   let questions = [];
   useEffect(() => {
     console.log("Individaul Test Screen", patientId, item.testName);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     const param = {
       patient_id: patientId,
       test_name: item.testName,
@@ -45,6 +57,7 @@ export default function Notification({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
+      return onFocus
   }, []);
   questions = data;
   // const questions =

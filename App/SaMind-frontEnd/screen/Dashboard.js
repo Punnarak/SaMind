@@ -11,7 +11,8 @@ import {
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 // export default function Dashboard() {
 export default function Dashboard({ route }) {
@@ -23,6 +24,17 @@ export default function Dashboard({ route }) {
   const [color2, setColor2] = useState("green");
   useEffect(() => {
     console.log("Dashboard Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     const param = {
       patient_id: patientId,
     };
@@ -51,6 +63,7 @@ export default function Dashboard({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
+      return onFocus
   }, []);
 
   const setMood = (mood) => {

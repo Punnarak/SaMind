@@ -222,6 +222,19 @@ export default function Login({ route }) {
   };
   useEffect(() => {
     console.log("Select Appointment Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+
+
     let param2 = {
       date: year + "-" + (month + 1) + "-" + date
     }
@@ -250,6 +263,7 @@ export default function Login({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
+      return onFocus;
   }, []);
 
   return (

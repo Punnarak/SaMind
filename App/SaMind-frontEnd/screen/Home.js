@@ -13,7 +13,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import data from "../notiData";
@@ -36,6 +37,7 @@ export default function Home({ route }) {
   const [fName, setFName] = useState("Punya");
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
+
   const fetchData = async () => {
     // const patient = await AsyncStorage.getItem("patientId");
     // console.log("storage", patient);
@@ -64,6 +66,14 @@ export default function Home({ route }) {
   useEffect(() => {
     console.log("Home Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
       console.log("Screen is focused");
       fetchData();
       console.log("mood", selectedMenu);
@@ -137,6 +147,7 @@ export default function Home({ route }) {
       setCheckIn(false);
     }
   };
+
   return (
     <View style={styles.container1}>
       <View
