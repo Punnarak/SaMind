@@ -14,7 +14,7 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-
+import { axios, axiospython } from "./axios.js";
 // import { Audio } from "expo-av";
 
 // const [recording, setRecording] = useState();
@@ -186,6 +186,18 @@ export default function Notification() {
   handleLogin = async () => { };
   useEffect(() => {
     console.log("Avatar Screen");
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+    return onFocus
   }, []);
 
   const toggleModal = () => {
@@ -275,12 +287,12 @@ export default function Notification() {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.button}
-          onPressIn={handleStartRecording}
-          onPressOut={handleStopRecording}
+          // onPressIn={handleStartRecording}
+          // onPressOut={handleStopRecording}
         >
-          <Text style={styles.buttonText}>
+          {/* <Text style={styles.buttonText}>
             {isRecording ? "Recording..." : "Hold to Record"}
-          </Text>
+          </Text> */}
         </TouchableOpacity>
         {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
         {/* Display recording lines */}
