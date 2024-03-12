@@ -157,7 +157,6 @@
 </template>
 
 <script>
-
 import axios from "../axios.js";
 
 export default {
@@ -206,7 +205,7 @@ export default {
     this.bookday = this.$route.query.bookday; // Set it to an empty string if not provided
     console.log("this.bookday", this.bookday);
     const param = {
-      therapist_id: 5555,
+      therapist_id: localStorage.getItem("id"),
     };
     axios
       .post("/patientList", param, {
@@ -217,7 +216,7 @@ export default {
       })
       .then((response) => {
         console.log("response", response.data);
-        this.options = response.data.map(patient => patient.name);
+        this.options = response.data.map((patient) => patient.name);
         this.patients = response.data;
       })
       .catch((error) => {
@@ -240,13 +239,15 @@ export default {
 
   methods: {
     async addAppointment() {
-      const foundPatient = this.patients.find(patient => patient.name === this.selectedPatient);
+      const foundPatient = this.patients.find(
+        (patient) => patient.name === this.selectedPatient
+      );
       const param = {
-        therapistId: 5555,
+        therapistId: localStorage.getItem("id"),
         patientId: foundPatient.patientId,
         date: this.bookday,
         startTime: this.selectedStartTime,
-        note: this.note  
+        note: this.note,
       };
       await axios
         .post("/therapistAddAppoint", param, {
@@ -255,11 +256,10 @@ export default {
             Accept: "application/json",
           },
         })
-        .then(async(response) => {
+        .then(async (response) => {
           console.log("response", response.data);
           this.addingAppointment = true;
           // Simulate an asynchronous operation (e.g., an HTTP request)
-          
 
           // Reset the loading state and provide feedback to the user
           this.addingAppointment = false;
@@ -273,7 +273,6 @@ export default {
           this.addingAppointment = false;
           // this.$toast.error("Failed to add appointment"); // Use your preferred error handling and feedback mechanism
         });
-
     },
     async simulateAsyncOperation() {
       // Simulate an asynchronous operation

@@ -536,7 +536,10 @@ export default {
     },
     Delete(question, selectTest) {
       console.log("selectTest", selectTest);
-      const type = { therapistId: 5555, type: selectTest.columns.testname };
+      const type = {
+        therapistId: localStorage.getItem("id"),
+        type: selectTest.columns.testname,
+      };
       const typeJSON = JSON.stringify(type, null, 2);
       console.log("test", typeJSON);
 
@@ -654,12 +657,12 @@ export default {
       ) {
       } else {
         let param = {
-          therapistId: "5555",
+          therapistId: localStorage.getItem("id"),
           testName: this.selectTest.columns.testname,
           patientId: checkedNames.value,
           detail: this.detail,
-          dueDate: this.dueDate
-        }
+          dueDate: this.dueDate,
+        };
         axios
           .post("/therapistSendTest", param, {
             headers: {
@@ -720,6 +723,21 @@ export default {
       });
     },
   },
+  created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  },
 };
 </script>
 <script setup>
@@ -766,7 +784,7 @@ onMounted(async () => {
   //   },
   // ];
   const param = {
-    therapist_id: 5555,
+    therapist_id: localStorage.getItem("id"),
   };
   await axios
     .post("/allTest", param, {

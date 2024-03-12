@@ -38,7 +38,6 @@
       class="elevation-1"
       style="border-radius: 10px"
     >
-
       <template v-slot:item.mood="{ item }">
         <v-chip :color="getColor(item.columns.mood)">
           <v-icon left size="10px" style="margin-right: 10px"
@@ -49,7 +48,9 @@
               ? "negative"
               : item.columns.mood === "neutral"
               ? "neutral"
-              : item.columns.mood === "positive" ? 'positive' : '-'
+              : item.columns.mood === "positive"
+              ? "positive"
+              : "-"
           }}
         </v-chip>
       </template>
@@ -110,14 +111,16 @@
                     <button
                       class="modal-default-button"
                       style="color: red"
-                      @click="Delete(item, selectPatient), (deletePopup = false)"
+                      @click="
+                        Delete(item, selectPatient), (deletePopup = false)
+                      "
                     >
                       Delete
                     </button>
                     <button
                       class="modal-default-button mr-5"
                       style="color: #00bf63"
-                      @click=" (deletePopup = false)"
+                      @click="deletePopup = false"
                     >
                       Cancel
                     </button>
@@ -602,12 +605,11 @@
 // import { ref, computed, onMounted } from "vue";
 // import axios from "../axios.js";
 
-
 function getColor(mood) {
   if (mood === "negative") return "red";
   else if (mood === "neutral") return "orange";
-  else if(mood === 'positive') return "green";
-  else return "lightgray"
+  else if (mood === "positive") return "green";
+  else return "lightgray";
 }
 </script>
 <script>
@@ -693,52 +695,64 @@ export default {
   props: {
     deletePopup: Boolean,
   },
-  async created(){
-  this.hospitalName = "Siriraj Hospital";
-  const param = {
-    hospitalName: this.hospitalName
-  };
-  await axios
-    .post("/adPatientView", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      patients.value = response.data.map((patient, index) => ({
-        no: patient.No,
-        patientId: patient.patientID,
-        name: patient.patientName,
-        age: patient.age,
-        mood: patient.mood,
-        therapist: patient.therapistName,
-        gender: patient.gender,
-        email: patient.email,
-        phone: patient.phone
-      }));
-
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    }); 
+  async created() {
+    axios
+      .post("/refreshToken", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("refresh Token", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    this.hospitalName = "Siriraj Hospital";
+    const param = {
+      hospitalName: this.hospitalName,
+    };
+    await axios
+      .post("/adPatientView", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        patients.value = response.data.map((patient, index) => ({
+          no: patient.No,
+          patientId: patient.patientID,
+          name: patient.patientName,
+          age: patient.age,
+          mood: patient.mood,
+          therapist: patient.therapistName,
+          gender: patient.gender,
+          email: patient.email,
+          phone: patient.phone,
+        }));
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
 
     await axios
-    .post("/adTherapistAll", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("response", response.data);
-      this.options = response.data.therapistAll
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    }); 
-    },
+      .post("/adTherapistAll", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data);
+        this.options = response.data.therapistAll;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  },
   data() {
     return {
       hospitalName: "",
@@ -868,7 +882,8 @@ export default {
         this.gender === "" ||
         this.firstName === "" ||
         this.lastName === "" ||
-        this.phone === "" || this.phone === undefined ||
+        this.phone === "" ||
+        this.phone === undefined ||
         this.email === "" ||
         this.checkEmail === false ||
         this.password === "" ||
@@ -894,23 +909,23 @@ export default {
           born: this.born,
           email: this.email,
           password: this.password,
-          therapistName: this.selectTherapist
-        }
-console.log('param',param)
-axios
-    .post("/adCreatePatient", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Create success", response.data);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-        this.gender = ''
+          therapistName: this.selectTherapist,
+        };
+        console.log("param", param);
+        axios
+          .post("/adCreatePatient", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Create success", response.data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+        this.gender = "";
         this.patientId = "";
         this.firstName = "";
         this.lastName = "";
@@ -927,19 +942,31 @@ axios
     },
     handleEditAccount(patient) {
       console.log("patientInfo For Edit", patient);
-      this.patientId = patients.value.find(item => item.patientId === patient.patientId).patientId
-      this.gender = patients.value.find(item => item.patientId === patient.patientId).gender
-      let name = patients.value.find(item => item.patientId === patient.patientId).name.split(" ");
+      this.patientId = patients.value.find(
+        (item) => item.patientId === patient.patientId
+      ).patientId;
+      this.gender = patients.value.find(
+        (item) => item.patientId === patient.patientId
+      ).gender;
+      let name = patients.value
+        .find((item) => item.patientId === patient.patientId)
+        .name.split(" ");
 
       this.firstName = name[0];
       this.lastName = name[1];
-      this.phone = patients.value.find(item => item.patientId === patient.patientId).phone;
-      this.email = patients.value.find(item => item.patientId === patient.patientId).email;
+      this.phone = patients.value.find(
+        (item) => item.patientId === patient.patientId
+      ).phone;
+      this.email = patients.value.find(
+        (item) => item.patientId === patient.patientId
+      ).email;
       this.password = "";
       this.checkEmail = true;
-      this.selectTherapist = patients.value.find(item => item.patientId === patient.patientId).therapist;
+      this.selectTherapist = patients.value.find(
+        (item) => item.patientId === patient.patientId
+      ).therapist;
       this.born = "12/02/2001";
-    
+
       console.log(
         "Edit Patient Account",
         this.patientId,
@@ -956,101 +983,101 @@ axios
         this.firstName === "" ||
         this.lastName === "" ||
         this.email === "" ||
-        this.phone === "" || this.phone === undefined ||
+        this.phone === "" ||
+        this.phone === undefined ||
         this.checkEmail === false ||
         this.selectTherapist === "" ||
         this.born === "" ||
         this.checkBirthDate === false
       ) {
       } else {
-        let param 
-        if(this.password !== ""){
+        let param;
+        if (this.password !== "") {
           param = {
-patientID: this.patientId,
-fname: this.firstName,
-lname: this.lastName,
-phone: this.phone,
-gender: this.gender,
-born: this.born,
-email: this.email,
-password: this.password,
-therapistName: this.selectTherapist
-}
-        }else{
+            patientID: this.patientId,
+            fname: this.firstName,
+            lname: this.lastName,
+            phone: this.phone,
+            gender: this.gender,
+            born: this.born,
+            email: this.email,
+            password: this.password,
+            therapistName: this.selectTherapist,
+          };
+        } else {
           param = {
-patientID: this.patientId,
-fname: this.firstName,
-lname: this.lastName,
-phone: this.phone,
-gender: this.gender,
-born: this.born,
-email: this.email,
-therapistName: this.selectTherapist
-}
-
+            patientID: this.patientId,
+            fname: this.firstName,
+            lname: this.lastName,
+            phone: this.phone,
+            gender: this.gender,
+            born: this.born,
+            email: this.email,
+            therapistName: this.selectTherapist,
+          };
         }
-        console.log('param',param)
-axios
-    .post("/adEditPersonalData", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Update success", response.data);
-      console.log(
-          "Update Patient Account",
-          this.patientId,
-          this.firstName,
-          this.lastName,
-          this.phone,
-          this.email,
-          this.password
-        );
-        this.patientId = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
-        this.password = "";
-        this.phone = "";
-        this.born = "";
-        this.gender = "";
-        this.selectTherapist = ""
-        this.checkBirthDate = false;
-        this.checkEmail = false;
-        this.editPopup = false;
-        window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+        console.log("param", param);
+        axios
+          .post("/adEditPersonalData", param, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("Update success", response.data);
+            console.log(
+              "Update Patient Account",
+              this.patientId,
+              this.firstName,
+              this.lastName,
+              this.phone,
+              this.email,
+              this.password
+            );
+            this.patientId = "";
+            this.firstName = "";
+            this.lastName = "";
+            this.email = "";
+            this.password = "";
+            this.phone = "";
+            this.born = "";
+            this.gender = "";
+            this.selectTherapist = "";
+            this.checkBirthDate = false;
+            this.checkEmail = false;
+            this.editPopup = false;
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     },
     Delete(patient, selectPatient) {
-      console.log(patient)
+      console.log(patient);
       let param = {
-	patientID: selectPatient.columns.patientId
-}
-console.log(param)
+        patientID: selectPatient.columns.patientId,
+      };
+      console.log(param);
       axios
-    .post("/adDeletePatient", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("Delete success", patient,response.data);
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+        .post("/adDeletePatient", param, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("Delete success", patient, response.data);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     clear() {
-      this.gender = '';
-      this.born = '';
+      this.gender = "";
+      this.born = "";
       this.patientId = "";
       this.firstName = "";
       this.lastName = "";
