@@ -2,6 +2,7 @@ const client = require('./connection.js')
 const express = require('express');
 const router = express.Router();
 
+
 router.get('/game_get_id', (req, res) => {
   const patient_id = req.query.patient_id;
   let query = 'SELECT * FROM gamepatient';
@@ -290,7 +291,7 @@ router.put('/update_timeplay', (req, res) => {
     .then(result => {
       if (result.rows.length === 0) {
         // If patient not found, insert a new row
-        client.query('INSERT INTO gamedoctor (patient_id, goodword, timeplay) VALUES ($1, $2, $3)', [patient_id, 0, 1])
+        client.query('INSERT INTO gamedoctor (patient_id, goodword, timeplay, sad, normal, happy) VALUES ($1, $2, $3, $4, $5, $6)', [patient_id, 0, 1, 0, 0, 0])
           .then(() => {
             res.json({ message: 'New patient created with timeplay 1' });
           })
@@ -342,6 +343,99 @@ router.get('/get_click_count', (req, res) => {
       res.status(500).json({ error: 'An error occurred while retrieving click count' });
     });
 });
+
+router.put('/update_patient_label', (req, res) => {
+  const { patient_id, max_label } = req.body;
+
+  if (!patient_id || !max_label) {
+    return res.status(400).json({ error: 'patient_id and max_label are required' });
+  }
+  console.log(max_label)
+  let columnToUpdate;
+  switch(max_label) {
+    case 'LABEL_0':
+      columnToUpdate = 'sad';
+      break;
+    case 'LABEL_1':
+      columnToUpdate = 'normal';
+      break;
+    case 'LABEL_2':
+      columnToUpdate = 'happy';
+      break;
+    default:
+      return res.status(400).json({ error: 'Invalid max_label value' });
+  }
+
+  // Check if patient exists
+  client.query('SELECT * FROM gamedoctor WHERE patient_id = $1', [patient_id])
+    .then(result => {
+      if (result.rows.length === 0) {
+        // If patient not found, insert a new row
+        client.query('INSERT INTO gamedoctor (patient_id, goodword, timeplay, sad, normal, happy) VALUES ($1, $2, $3, $4, $5, $6)', [patient_id, 0, 1, 0, 0, 0])
+          .then(() => {
+            // Now update the corresponding label column
+            client.query(`UPDATE gamedoctor SET ${columnToUpdate} = 1 WHERE patient_id = $1`, [patient_id])
+              .then(() => {
+                // After updating the label count, calculate the new value for goodword
+                calculateAndUpdateGoodword(patient_id, res);
+              })
+              .catch(err => {
+                console.error(`Error updating ${max_label} count:`, err);
+                res.status(500).json({ error: 'An error occurred while updating max_label count' });
+              });
+          })
+          .catch(err => {
+            console.error('Error creating new patient:', err);
+            res.status(500).json({ error: 'An error occurred while creating new patient' });
+          });
+      } else {
+        // If patient found, update the corresponding label column
+        const oldValue = parseInt(result.rows[0][columnToUpdate]);
+        const newValue = oldValue + 1;
+
+        client.query(`UPDATE gamedoctor SET ${columnToUpdate} = $1 WHERE patient_id = $2`, [newValue, patient_id])
+          .then(() => {
+            // After updating the label count, calculate the new value for goodword
+            calculateAndUpdateGoodword(patient_id, res);
+          })
+          .catch(err => {
+            console.error(`Error updating ${max_label} count:`, err);
+            res.status(500).json({ error: 'An error occurred while updating max_label count' });
+          });
+      }
+    })
+    .catch(err => {
+      console.error('Error retrieving old max_label count:', err);
+      res.status(500).json({ error: 'An error occurred while retrieving old max_label count' });
+    });
+});
+
+// Function to calculate and update goodword value
+function calculateAndUpdateGoodword(patient_id, res) {
+  client.query('SELECT sad, normal, happy FROM gamedoctor WHERE patient_id = $1', [patient_id])
+    .then(result => {
+      const { sad, normal, happy } = result.rows[0];
+      const total =parseFloat(sad) + parseFloat(normal) + parseFloat(happy);
+      console.log(total)
+      const goodword = total === 0 ? 0 : ((parseFloat(happy) / parseFloat(total)) * 100).toFixed(2);
+
+      // Update the goodword column
+      client.query('UPDATE gamedoctor SET goodword = $1 WHERE patient_id = $2', [goodword, patient_id])
+        .then(() => {
+          res.json({ message: 'Goodword updated successfully' });
+        })
+        .catch(err => {
+          console.error('Error updating goodword:', err);
+          res.status(500).json({ error: 'An error occurred while updating goodword' });
+        });
+        console.log("goodword : ", goodword);
+    })
+    .catch(err => {
+      console.error('Error retrieving label counts for goodword calculation:', err);
+      res.status(500).json({ error: 'An error occurred while retrieving label counts' });
+    });
+}
+
 
   
   module.exports = router;

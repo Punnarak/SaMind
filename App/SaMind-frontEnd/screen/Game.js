@@ -7,18 +7,47 @@ import {
   Image,
   TouchableWithoutFeedback,
   Dimensions,
-  ProgressBarAndroid,
+  // ProgressBarAndroid,
   ImageBackground,
   Modal,
 } from "react-native";
+import ProgressBar from "react-native-progress/Bar";
 import { useNavigation } from "@react-navigation/native";
-import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
 
 import Voice from "@react-native-community/voice";
+// import { readFile } from 'react-native-fs';
 
 const windowWidth = Dimensions.get("window").width;
+
+async function query(data) {
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/woranit/samind-sentiment",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error querying model:", error);
+    return null;
+  }
+}
+
 
 const PopcatGame = ({ route }) => {
   const [recording, setRecording] = useState();
@@ -27,116 +56,34 @@ const PopcatGame = ({ route }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [transcription, setTranscription] = useState("");
 
-  // Start recording when button is pressed
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        setRecording(recording);
-        await recording.startAsync();
-      }
-    } catch (err) {
-      // console.error("Failed to start recording: ", err);
-    }
-  };
-
-  // Stop recording when button is released
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    // Check if recording is defined
-    if (recording) {
-      try {
-        await recording.stopAndUnloadAsync();
-        const { sound, status } = await recording.createNewLoadedSoundAsync();
-        const allRecordings = [...recordings];
-        allRecordings.push({
-          sound: sound,
-          duration: getDurationFormatted(status.durationMillis),
-          file: recording.getURI(),
-        });
-        setRecordings(allRecordings);
-
-        // Voice.start("en-US");
-      } catch (err) {
-        clearRecordings();
-        console.error("Failed to stop recording: ", err);
-      }
-    } else {
-      console.error("Recording is not started.");
-    }
-    clearRecordings();
-  };
-
-  // useEffect(() => {
-  //   Voice.onSpeechResults = (e) => {
-  //     setTranscription(e.value[0]); // Set the transcription in the state
-  //   };
-
-  //   return () => {
-  //     Voice.destroy().then(Voice.removeAllListeners);
-  //   };
-  // }, []);
-
-  useEffect(() => {
-    // Check if there's a new recording added to the recordings array
-    // If so, automatically play the last recorded sound
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      lastRecording.sound.replayAsync();
-      clearRecordings();
-    }
-  }, [recordings]);
-
-  function getDurationFormatted(milliseconds) {
-    const minutes = milliseconds / 1000 / 60;
-    const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-    return seconds < 10
-      ? `${Math.floor(minutes)}:0${seconds}`
-      : `${Math.floor(minutes)}:${seconds}`;
-  }
-
-  // function getRecordingLines() {
-  //   return recordings.map((recordingLine, index) => {
-  //     return (
-  //       <View key={index} style={styles.row}>
-  //         <Text style={styles.fill}>
-  //           Recording #{index + 1} | {recordingLine.duration}
-  //         </Text>
-  //         <TouchableOpacity
-  //           style={styles.button}
-  //           onPress={() => {
-  //             recordingLine.sound.replayAsync();
-  //             clearRecordings();
-  //           }}
-  //         >
-  //           {/* <Text style={styles.buttonText}>Play</Text> */}
-  //         </TouchableOpacity>
-  //       </View>
-  //     );
-  //   });
-  // }
-
-  function clearRecordings() {
-    setRecordings([]);
-  }
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
-  const { patientId,clickCount } = route.params || {};
-  const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
+  const { patientId, clickCount } = route.params || {};
+  // const { patientId } = route.params || {};
+  const navigation = useNavigation();
 
   useEffect(() => {
     setPopCount(clickCount);
-  }, []);
+  }, [clickCount]);
+  
+  const updateLabel = async (patientId, maxLabel) => {
+    try {
+      // Make a request to your API to update the patient's label
+      const response = await axios.put('/update_patient_label', { patient_id: patientId, max_label: maxLabel });
+    
+      if (response.status === 200) {
+        console.log('Label updated successfully');
+        // Now that label is updated, perform further actions if needed
+      } else {
+        console.error('Failed to update label:', response.status);
+        // Handle error accordingly
+      }
+    } catch (error) {
+      console.error('Error updating label:', error);
+      // Handle error accordingly
+    }
+  };
 
   const [imageSource, setImageSource] = useState(
     require("../assets/egg1.png") // Initial image
@@ -154,6 +101,100 @@ const PopcatGame = ({ route }) => {
 
   const [gameData, setGameData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [sentiment, setSentiment] = useState(null);
+
+  const handleVoiceRecording = async () => {
+    try {
+      if (!isRecording) {
+        setIsRecording(true);
+        const newRecording = new Audio.Recording();
+        await newRecording.prepareToRecordAsync(
+          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+        );
+        await newRecording.startAsync();
+        setRecording(newRecording);
+      } else {
+        setIsRecording(false);
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        // Send the recorded audio URI to the Flask server for transcription
+        await sendAudioForTranscription(uri);
+        console.log("Recorded audio URI:", uri);
+      }
+    } catch (error) {
+      console.error("Error handling voice recording:", error);
+    }
+  };
+
+  const sendAudioForTranscription = async (uri) => {
+    try {
+      const localFilePath = uri.replace("file://", "");
+      const response = await axiospython.post("/speech-to-text", {
+        path: localFilePath,
+      });
+      console.log("Transcription response:", response.data);
+
+      const maxEmotion = await performSentimentAnalysis(
+        response.data.transcription
+      );
+      console.log("Emotion with the highest score:", maxEmotion);
+      setSentiment(maxEmotion);
+      // Handle the transcription response here
+    } catch (error) {
+      console.error("Error sending audio for transcription:", error);
+    }
+  };
+
+  async function performSentimentAnalysis(text) {
+    try {
+      console.log(text)
+      const sentimentResult = await query({ inputs: text });
+      console.log('try', sentimentResult)
+      let maxScore = -1;
+      let maxLabel = null;
+      sentimentResult[0].forEach((result) => {
+        if (result.score > maxScore) {
+          maxScore = result.score;
+          maxLabel = result.label;
+        }
+      });
+
+      const labelMeanings = {
+        LABEL_0: "sad",
+        LABEL_1: "normal",
+        LABEL_2: "happy",
+      };
+
+      console.log(labelMeanings[maxLabel]);
+      await updateLabel(patientId, maxLabel);
+
+      if (maxLabel === "LABEL_2") {
+        const randomFood = Math.floor(Math.random() * 4); // Generate a random number between 0 and 3
+        switch (randomFood) {
+          case 0:
+            setAppleCount((prevCount) => prevCount + 1);
+            break;
+          case 1:
+            setMeatCount((prevCount) => prevCount + 1);
+            break;
+          case 2:
+            setRiceCount((prevCount) => prevCount + 1);
+            break;
+          case 3:
+            setFishCount((prevCount) => prevCount + 1);
+            break;
+          default:
+            break;
+        }
+      }
+      
+      return labelMeanings[maxLabel];
+    } catch (error) {
+      console.error("Failed to perform sentiment analysis:", error);
+      return null;
+    }
+  }
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -206,8 +247,6 @@ const PopcatGame = ({ route }) => {
       const parsedmeat = parseInt(gameData[0].meat);
       const parsedapple = parseInt(gameData[0].apple);
 
-      console.log(parsedClickCount);
-
       setProgress1(parsedHealthBar);
       setProgress2(parsedHungryBar);
       setProgress3(parsedStaminaBar);
@@ -240,11 +279,9 @@ const PopcatGame = ({ route }) => {
       );
     } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 100) {
+    } else if (popCount >= 500 && popCount < 100) {
       setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/penguinidle.gif"));
+    } else setImageSource(require("../assets/monster/penguinidle.gif"));
   }, [popCount]);
 
   useEffect(() => {
@@ -407,14 +444,11 @@ const PopcatGame = ({ route }) => {
           ? require("../assets/egg31.png")
           : require("../assets/egg32.png")
       );
-    } 
-    else if (popCount >= 200 && popCount < 500) {
+    } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 1000) {
+    } else if (popCount >= 500 && popCount < 1000) {
       setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/dogidle.gif"));
+    } else setImageSource(require("../assets/monster/dogidle.gif"));
   };
 
   const handlePressOut = () => {
@@ -426,11 +460,11 @@ const PopcatGame = ({ route }) => {
       setImageSource(require("../assets/egg3.png"));
     } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 1000) {
+    } else if (popCount >= 500 && popCount < 1000) {
       setImageSource(require("../assets/monster/penguinfight.gif"));
-    } else
-    {setImageSource(require("../assets/monster/dogfight.gif"));}
+    } else {
+      setImageSource(require("../assets/monster/dogfight.gif"));
+    }
     setPopCount((prevCount) => prevCount + 1);
   };
 
@@ -543,20 +577,20 @@ const PopcatGame = ({ route }) => {
           <Image source={imageSource} style={styles.popcatImage} />
         </TouchableWithoutFeedback>
         <Text style={styles.countText}>{popCount}</Text>
-        <View style={styles.container}>
-          <TouchableOpacity
-            style={styles.button}
-            onPressIn={handleStartRecording}
-            onPressOut={handleStopRecording}
-          >
-            <Text style={styles.buttonText}>
-              {isRecording ? "Recording..." : "Hold to Record"}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.transcriptionText}>{transcription}</Text>
-          {/* Display recording lines */}
-          {/* {getRecordingLines()} */}
-        </View>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            {
+              width: windowWidth / 2 - 25,
+              backgroundColor: isRecording ? "#ff0000" : "#2196f3",
+            },
+          ]}
+          onPress={handleVoiceRecording}
+        >
+          <Text style={styles.buttonText}>
+            {isRecording ? "Stop" : "Record"}
+          </Text>
+        </TouchableOpacity>
         <View style={styles.progressBars}>
           <View
             style={{
@@ -572,11 +606,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Health
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress1}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="red"
               progressBarStyle={{ height: 20 }}
             />
@@ -595,11 +629,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Hungry
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress2}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="orange"
               progressBarStyle={{ height: 20 }}
             />
@@ -616,11 +650,11 @@ const PopcatGame = ({ route }) => {
             }}
           >
             <Text style={styles.progressBarLabel}>Stamina</Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress3}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="grey"
               progressBarStyle={{ height: 20 }}
             />
@@ -667,7 +701,12 @@ const PopcatGame = ({ route }) => {
                     <View style={styles.modalViewRow}>
                       <View style={styles.foodOptionsRow}>
                         {/* First Row */}
-                        <View style={[styles.row, {marginRight:30, marginBottom:20}]}>
+                        <View
+                          style={[
+                            styles.row,
+                            { marginRight: 30, marginBottom: 20 },
+                          ]}
+                        >
                           <TouchableOpacity
                             style={[
                               styles.modalButton,
@@ -696,7 +735,7 @@ const PopcatGame = ({ route }) => {
                           </TouchableOpacity>
                         </View>
                         {/* Second Row */}
-                        <View style={[styles.row, {marginLeft:30}]}>
+                        <View style={[styles.row, { marginLeft: 30 }]}>
                           <TouchableOpacity
                             style={[
                               styles.modalButton,
@@ -806,7 +845,7 @@ const PopcatGame = ({ route }) => {
                 },
               ]}
               onPress={handleGame4Press}
-              disabled={popCount <= 0}
+              disabled={popCount < 200}
             >
               <Text style={styles.buttonText}>Sleep</Text>
             </TouchableOpacity>
@@ -949,7 +988,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    width: "90%"
+    width: "90%",
   },
   bottomRightTextContainer: {
     position: "absolute",

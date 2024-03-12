@@ -18,7 +18,8 @@ import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Forgotpassword() {
   const navigation = useNavigation();

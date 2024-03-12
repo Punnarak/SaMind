@@ -128,7 +128,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 const NumberGame = ({ route }) => {
   const navigation = useNavigation();

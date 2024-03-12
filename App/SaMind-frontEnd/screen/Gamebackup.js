@@ -12,7 +12,8 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import { useFocusEffect } from '@react-navigation/native';
 import Voice from '@react-native-voice/voice';
 
