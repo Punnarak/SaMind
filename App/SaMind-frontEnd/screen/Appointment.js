@@ -29,6 +29,8 @@ export default function Calendar({ route }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newAppointment, setNewAppointment] = useState(new Date());
   const [timeError, setTimeError] = useState(false);
+  const [dateError, setDateError] = useState('');
+
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [selectedTimeLabel, setSelectedTimeLabel] = useState(null);
@@ -86,6 +88,7 @@ export default function Calendar({ route }) {
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ])
+  const [disabled, setDisabled] = useState(false)
   console.log("Calendar Screen", patientId);
   
   const queryTime = () => {
@@ -95,12 +98,20 @@ export default function Calendar({ route }) {
       patientID: patientId,
       date:d[2]+"-"+d[1]+"-"+d[0]
     }
-    console.log(param)
+    setSelectedTimeLabel(null)
+    console.log(newAppString,param)
     axios
       .post("/appointShowTimeChange", param)
       .then((response) => {
         console.log("data:", response.data);
-        setTime(response.data)
+        if(response.data == '-'){
+          setSelectedTimeLabel('time not available')
+          setDisabled(true)
+        }else{
+          setTime(response.data)
+          setDisabled(false)
+        }
+       
       })
       .catch((error) => {
         console.error("Axios error:", error);
@@ -131,7 +142,13 @@ export default function Calendar({ route }) {
     }
   }, [selectedValue]);
   useEffect(() => {
-   queryTime()
+   queryTime()  
+   setDateError("")
+   if( newAppString && (newAppString != null || newAppString != '')){
+    setDisabled(false)
+   }else{
+    setDisabled(true)
+   }
   }, [newAppString]);
   useEffect(() => {
     console.log("Appointment Screen", patientId);
@@ -262,6 +279,8 @@ export default function Calendar({ route }) {
     setNewAppointment(new Date());
     setSelectedValue(null);
     setIsPickerVisible(false);
+    setNewAppString("")
+    setSelectedTimeLabel("")
   };
 
   const toggleModal2 = () => {
@@ -269,7 +288,13 @@ export default function Calendar({ route }) {
   };
 
   const submit = () => {
-    if (selectedValue != null) {
+    console.log("selectvalue",selectedValue)
+    if(newAppString && (newAppString != null || newAppString != '')){
+      setDateError("")
+    }else{
+      setDateError("*")
+    }
+    if (selectedValue && (selectedValue != null || selectedValue != '' || selectedValue != ' ')) {
       console.log("confirm state", !confirm);
       setConfirm(!confirm);
       setWaitDocToCon(!waitDocToCon);
@@ -298,7 +323,7 @@ export default function Calendar({ route }) {
             newAppointment,
             selectedValue
           );
-          setNewAppointment("")
+          setNewAppointment(new Date())
           setNewAppString("")
           setSelectedValue("")
           setSelectedTimeLabel("")
@@ -409,7 +434,8 @@ export default function Calendar({ route }) {
                         flexDirection: "row",
                         alignItems: "center",
                       }}
-                    >
+                    > 
+                    <Text style={styles.errorDate}>{dateError}</Text>
                       <TextInput
                         placeholder="Select Date"
                         editable={false}
@@ -466,7 +492,8 @@ export default function Calendar({ route }) {
                         flexDirection: "row",
                         alignItems: "center",
                       }}
-                    >
+                    > 
+                    
                       <Ionicons
                         name="calendar-outline"
                         size={25}
@@ -491,6 +518,7 @@ export default function Calendar({ route }) {
                           borderRadius: 10,
                         }}
                       />
+                      <Text style={styles.errorDate}>{dateError}</Text>
                     </View>
                   )}
                 </View>
@@ -539,7 +567,7 @@ export default function Calendar({ route }) {
                     value={selectedTimeLabel ? selectedTimeLabel : ""}
                   />
                 </View>
-                <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker}>
+                <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker} disabled={disabled}>
                   <Ionicons
                     name="chevron-back-outline"
                     style={{
@@ -831,6 +859,19 @@ const styles = StyleSheet.create({
     zIndex: 15,
   },
   errorText: {
+    position: "absolute",
+    ...Platform.select({
+      android: {},
+      ios: {},
+    }),
+    fontSize: moderateScale(25),
+    fontWeight: "bold",
+    marginTop: verticalScale(0),
+    alignSelf: "flex-start",
+    right: horizontalScale(-15),
+    color: "red",
+    zIndex: 1,
+  },errorDate: {
     position: "absolute",
     ...Platform.select({
       android: {},
