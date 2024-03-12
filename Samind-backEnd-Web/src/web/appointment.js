@@ -1247,7 +1247,7 @@ router.post("/appointmentRequestConfirm", auth, (req, res) => {
 //     });
 // });
 
-router.post('/appointShowTime', (req, res) => {
+router.post('/appointShowTime', auth, (req, res) => {
   const therapistID = req.body.therapistID; // Get therapistID from the request body
   const date = req.body.date; // Assuming date is sent in the request body
   const startHour = 8; // Start hour for available appointments

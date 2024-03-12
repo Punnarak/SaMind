@@ -283,7 +283,7 @@ router.post('/appointConfig', auth, (req, res) => {
 //     });
 // });
 
-router.post('/appointShowTime', (req, res) => {
+router.post('/appointShowTime', auth, (req, res) => {
   const patientID = req.body.patientID;
   const date = req.body.date; // Assuming date is sent in the request body
   const startHour = 8; // Start hour for available appointments
@@ -688,7 +688,7 @@ router.post('/appointShowTime', (req, res) => {
 //     });
 // });
 
-router.post('/appointShowTimeChange', (req, res) => {
+router.post('/appointShowTimeChange', auth, (req, res) => {
   const patientID = req.body.patientID;
   const date = req.body.date; // Assuming date is sent in the request body
   const startHour = 8; // Start hour for available appointments
