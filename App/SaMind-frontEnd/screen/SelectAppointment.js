@@ -236,6 +236,7 @@ export default function Login({ route }) {
 
 
     let param2 = {
+      patientID: patientId,
       date: year + "-" + (month + 1) + "-" + date
     }
     console.log(param2)

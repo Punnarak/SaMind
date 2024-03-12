@@ -92,6 +92,7 @@ export default function Calendar({ route }) {
     if(newAppString !== ''){
     d = newAppString.split("-")
     let param = {
+      patientID: patientId,
       date:d[2]+"-"+d[1]+"-"+d[0]
     }
     console.log(param)
@@ -297,6 +298,11 @@ export default function Calendar({ route }) {
             newAppointment,
             selectedValue
           );
+          setNewAppointment("")
+          setNewAppString("")
+          setSelectedValue("")
+          setSelectedTimeLabel("")
+          
         })
         .catch((error) => {
           // Handle any errors here
