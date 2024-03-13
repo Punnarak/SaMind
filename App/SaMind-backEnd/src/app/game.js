@@ -283,6 +283,7 @@ router.put('/update_timeplay', (req, res) => {
   const { patient_id } = req.body;
 
   if (!patient_id) {
+    console.log(patient_id)
     return res.status(400).json({ error: 'patient_id is required' });
   }
 

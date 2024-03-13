@@ -16,9 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { axios, axiospython } from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
-
-import Voice from "@react-native-community/voice";
-// import { readFile } from 'react-native-fs';
+import * as FileSystem from 'expo-file-system';
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -37,7 +35,9 @@ async function query(data) {
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
     }
 
     const result = await response.json();
@@ -48,14 +48,7 @@ async function query(data) {
   }
 }
 
-
 const PopcatGame = ({ route }) => {
-  const [recording, setRecording] = useState();
-  const [recordings, setRecordings] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [transcription, setTranscription] = useState("");
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const patientId = 333
   const [popCount, setPopCount] = useState(0);
@@ -66,21 +59,24 @@ const PopcatGame = ({ route }) => {
   useEffect(() => {
     setPopCount(clickCount);
   }, [clickCount]);
-  
+
   const updateLabel = async (patientId, maxLabel) => {
     try {
       // Make a request to your API to update the patient's label
-      const response = await axios.put('/update_patient_label', { patient_id: patientId, max_label: maxLabel });
-    
+      const response = await axios.put("/update_patient_label", {
+        patient_id: patientId,
+        max_label: maxLabel,
+      });
+
       if (response.status === 200) {
-        console.log('Label updated successfully');
+        console.log("Label updated successfully emotion is ", maxLabel);
         // Now that label is updated, perform further actions if needed
       } else {
-        console.error('Failed to update label:', response.status);
+        console.error("Failed to update label:", response.status);
         // Handle error accordingly
       }
     } catch (error) {
-      console.error('Error updating label:', error);
+      console.error("Error updating label:", error);
       // Handle error accordingly
     }
   };
@@ -88,7 +84,7 @@ const PopcatGame = ({ route }) => {
   const [imageSource, setImageSource] = useState(
     require("../assets/egg1.png") // Initial image
   );
-  const [swipeDirection, setSwipeDirection] = useState(null);
+
   const [progress1, setProgress1] = useState(1);
   const [progress2, setProgress2] = useState(1);
   const [progress3, setProgress3] = useState(1);
@@ -104,53 +100,123 @@ const PopcatGame = ({ route }) => {
 
   const [sentiment, setSentiment] = useState(null);
 
-  const handleVoiceRecording = async () => {
+  const [recording, setRecording] = useState(null);
+  const [recordingStatus, setRecordingStatus] = useState("idle");
+  const [audioPermission, setAudioPermission] = useState(null);
+  const [transcript, setTranscript] = useState("");
+
+  useEffect(() => {
+    // Get recording permission upon first render
+    async function getPermission() {
+      try {
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission Granted: " + permission.granted);
+        setAudioPermission(permission.granted);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // Call function to get recording permission
+    getPermission();
+    // Cleanup upon unmounting
+    return () => {
+      if (recording) {
+        stopRecording();
+      }
+    };
+  }, []);
+
+  async function startRecording() {
     try {
-      if (!isRecording) {
-        setIsRecording(true);
-        const newRecording = new Audio.Recording();
-        await newRecording.prepareToRecordAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        await newRecording.startAsync();
-        setRecording(newRecording);
-      } else {
-        setIsRecording(false);
+      // Needed for iOS
+      if (audioPermission) {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+      }
+
+      const newRecording = new Audio.Recording();
+      console.log("Starting Recording");
+      await newRecording.prepareToRecordAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      await newRecording.startAsync();
+      setRecording(newRecording);
+      setRecordingStatus("recording");
+    } catch (error) {
+      console.error("Failed to start recording", error);
+    }
+  }
+
+  async function stopRecording() {
+    try {
+      if (recordingStatus === "recording") {
+        console.log("Stopping Recording");
         await recording.stopAndUnloadAsync();
-        const uri = recording.getURI();
-        // Send the recorded audio URI to the Flask server for transcription
-        await sendAudioForTranscription(uri);
-        console.log("Recorded audio URI:", uri);
+        const recordingUri = recording.getURI();
+        console.log("Recording URI:", recordingUri);
+        // Call speech to text API after recording stops
+        await convertSpeechToText(recordingUri);
+        // Reset states
+        setRecording(null);
+        setRecordingStatus("stopped");
       }
     } catch (error) {
-      console.error("Error handling voice recording:", error);
+      console.error("Failed to stop recording", error);
     }
-  };
+  }
 
-  const sendAudioForTranscription = async (uri) => {
+  async function convertSpeechToText(audioPath) {
     try {
-      const localFilePath = uri.replace("file://", "");
-      const response = await axiospython.post("/speech-to-text", {
-        path: localFilePath,
-      });
-      console.log("Transcription response:", response.data);
+      const fileType = "audio/3gpp";
+      console.log("Audio file path:", audioPath);
+      const formData = {
+        file: audioPath,
+      };
+      console.log("param", formData);
 
-      const maxEmotion = await performSentimentAnalysis(
-        response.data.transcription
-      );
-      console.log("Emotion with the highest score:", maxEmotion);
-      setSentiment(maxEmotion);
-      // Handle the transcription response here
+      let response = "";
+      let responseText = "";
+      try {
+        response = await FileSystem.uploadAsync(
+          "http://192.168.1.101:4343/speech",
+          audioPath,
+          {
+            httpMethod: "POST",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: "file", // Must match the field expected by your server
+          }
+        );
+        console.log("Upload result:", response);
+      } catch (e) {
+        console.error("Upload error:", e);
+      }
+      console.log("response", response.body);
+      setTranscript(response.body);
+      // console.log("word : ", transcript);
+      responseText = await performSentimentAnalysis(response.body);
     } catch (error) {
-      console.error("Error sending audio for transcription:", error);
+      console.error("Failed to convert speech to text:", error);
+      Alert.alert("Error", "Failed to convert speech to text");
     }
-  };
+  }
+
+  async function handleRecordButtonPress() {
+    if (recording) {
+      await stopRecording(recording.getURI());
+      // console.log(appleCount,meatCount,riceCount,fishCount);
+    } else {
+      await startRecording();
+    }
+  }
 
   async function performSentimentAnalysis(text) {
     try {
-      console.log(text)
+      console.log("inputtext",text);
       const sentimentResult = await query({ inputs: text });
-      console.log('try', sentimentResult)
+      console.log("try", sentimentResult);
       let maxScore = -1;
       let maxLabel = null;
       sentimentResult[0].forEach((result) => {
@@ -188,7 +254,7 @@ const PopcatGame = ({ route }) => {
             break;
         }
       }
-      
+
       return labelMeanings[maxLabel];
     } catch (error) {
       console.error("Failed to perform sentiment analysis:", error);
@@ -582,14 +648,12 @@ const PopcatGame = ({ route }) => {
             styles.button,
             {
               width: windowWidth / 2 - 25,
-              backgroundColor: isRecording ? "#ff0000" : "#2196f3",
+              backgroundColor: recording ? "#ff0000" : "#2196f3",
             },
           ]}
-          onPress={handleVoiceRecording}
+          onPress={handleRecordButtonPress}
         >
-          <Text style={styles.buttonText}>
-            {isRecording ? "Stop" : "Record"}
-          </Text>
+          <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
         </TouchableOpacity>
         <View style={styles.progressBars}>
           <View

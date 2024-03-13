@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  Dimensions
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -15,101 +16,39 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython } from "./axios.js";
-// import { Audio } from "expo-av";
+import { Audio } from "expo-av";
+import * as FileSystem from 'expo-file-system';
 
-// const [recording, setRecording] = useState();
-// const [recordings, setRecordings] = useState([]);
-// const [isRecording, setIsRecording] = useState(false);
+const windowWidth = Dimensions.get("window").width;
 
+async function query(data) {
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/woranit/samind-sentiment",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
 
-// const handleStartRecording = async () => {
-//   setIsRecording(true);
-//   try {
-//     const perm = await Audio.requestPermissionsAsync();
-//     if (perm.status === "granted") {
-//       await Audio.setAudioModeAsync({
-//         allowsRecordingIOS: true,
-//         playsInSilentModeIOS: true,
-//       });
-//       const { recording } = await Audio.Recording.createAsync(
-//         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-//       );
-//       setRecording(recording);
-//       await recording.startAsync();
-//     }
-//   } catch (err) {
-//     // console.error("Failed to start recording: ", err);
-//   }
-// };
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
+    }
 
-// // Stop recording when button is released
-// const handleStopRecording = async () => {
-//   setIsRecording(false);
-//   // Check if recording is defined
-//   if (recording) {
-//     try {
-//       await recording.stopAndUnloadAsync();
-//       const { sound, status } = await recording.createNewLoadedSoundAsync();
-//       const allRecordings = [...recordings];
-//       allRecordings.push({
-//         sound: sound,
-//         duration: getDurationFormatted(status.durationMillis),
-//         file: recording.getURI(),
-//       });
-//       setRecordings(allRecordings);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error querying model:", error);
+    return null;
+  }
+}
 
-//       // Voice.start("en-US");
-//     } catch (err) {
-//       clearRecordings();
-//       console.error("Failed to stop recording: ", err);
-//     }
-//   } else {
-//     console.error("Recording is not started.");
-//   }
-//   clearRecordings();
-// };
-
-
-// useEffect(() => {
-//   // Check if there's a new recording added to the recordings array
-//   // If so, automatically play the last recorded sound
-//   if (recordings.length > 0) {
-//     const lastRecording = recordings[recordings.length - 1];
-//     lastRecording.sound.replayAsync();
-//     clearRecordings();
-//   }
-// }, [recordings]);
-
-// function getDurationFormatted(milliseconds) {
-//   const minutes = milliseconds / 1000 / 60;
-//   const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-//   return seconds < 10
-//     ? `${Math.floor(minutes)}:0${seconds}`
-//     : `${Math.floor(minutes)}:${seconds}`;
-// }
-
-// function clearRecordings() {
-//   setRecordings([]);
-// }
-
-// const [isModalVisible, setIsModalVisible] = useState(false);
-// // const patientId = 333
-// const { patientId, clickCount } = route.params || {};
-// const navigation = useNavigation();
-// const [popCount, setPopCount] = useState(0);
-
-// useEffect(() => {
-//   setPopCount(clickCount);
-// }, []);
-
-
-// import * as Speech from "expo-speech";
-// import Voice from "react-native-voice";
-// import {
-//   requestPermissionsAsync,
-//   startSpeechToTextAsync,
-//   stopSpeechToTextAsync,
-// } from "expo-speech";
 
 export default function Notification() {
   const navigation = useNavigation();
@@ -118,13 +57,173 @@ export default function Notification() {
   //text to speech
   const [textToSpeak, setTextToSpeak] = useState("");
 
-  //speech to text expo speech reg
-  // const [recognizedText, setRecognizedText] = useState("");
-  // const [isListening, setIsListening] = useState(false);
+
 
   //speech to text expo speech api
   const [isListening, setIsListening] = useState(false);
   const [transcription, setTranscription] = useState("");
+
+  const [recording, setRecording] = useState(null);
+  const [recordingStatus, setRecordingStatus] = useState("idle");
+  const [audioPermission, setAudioPermission] = useState(null);
+  const [transcript, setTranscript] = useState("");
+
+  useEffect(() => {
+    // Get recording permission upon first render
+    async function getPermission() {
+      try {
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission Granted: " + permission.granted);
+        setAudioPermission(permission.granted);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // Call function to get recording permission
+    getPermission();
+    // Cleanup upon unmounting
+    return () => {
+      if (recording) {
+        stopRecording();
+      }
+    };
+  }, []);
+
+  async function startRecording() {
+    try {
+      // Needed for iOS
+      if (audioPermission) {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+      }
+
+      const newRecording = new Audio.Recording();
+      console.log("Starting Recording");
+      await newRecording.prepareToRecordAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      await newRecording.startAsync();
+      setRecording(newRecording);
+      setRecordingStatus("recording");
+    } catch (error) {
+      console.error("Failed to start recording", error);
+    }
+  }
+
+  async function stopRecording() {
+    try {
+      if (recordingStatus === "recording") {
+        console.log("Stopping Recording");
+        await recording.stopAndUnloadAsync();
+        const recordingUri = recording.getURI();
+        console.log("Recording URI:", recordingUri);
+        // Call speech to text API after recording stops
+        await convertSpeechToText(recordingUri);
+        // Reset states
+        setRecording(null);
+        setRecordingStatus("stopped");
+      }
+    } catch (error) {
+      console.error("Failed to stop recording", error);
+    }
+  }
+
+  async function convertSpeechToText(audioPath) {
+    try {
+      const fileType = "audio/3gpp";
+      console.log("Audio file path:", audioPath);
+      const formData = {
+        file: audioPath,
+      };
+      console.log("param", formData);
+
+      let response = "";
+      let responseText = "";
+      try {
+        response = await FileSystem.uploadAsync(
+          "http://192.168.1.101:4343/speech",
+          audioPath,
+          {
+            httpMethod: "POST",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: "file", // Must match the field expected by your server
+          }
+        );
+        console.log("Upload result:", response);
+      } catch (e) {
+        console.error("Upload error:", e);
+      }
+      console.log("response", response.body);
+      setTranscript(response.body);
+      // console.log("word : ", transcript);
+      responseText = await performSentimentAnalysis(response.body);
+    } catch (error) {
+      console.error("Failed to convert speech to text:", error);
+      Alert.alert("Error", "Failed to convert speech to text");
+    }
+  }
+
+  async function handleRecordButtonPress() {
+    if (recording) {
+      await stopRecording(recording.getURI());
+      // console.log(appleCount,meatCount,riceCount,fishCount);
+    } else {
+      await startRecording();
+    }
+  }
+
+  async function performSentimentAnalysis(text) {
+    try {
+      console.log("inputtext",text);
+      const sentimentResult = await query({ inputs: text });
+      console.log("try", sentimentResult);
+      let maxScore = -1;
+      let maxLabel = null;
+      sentimentResult[0].forEach((result) => {
+        if (result.score > maxScore) {
+          maxScore = result.score;
+          maxLabel = result.label;
+        }
+      });
+
+      const labelMeanings = {
+        LABEL_0: "sad",
+        LABEL_1: "normal",
+        LABEL_2: "happy",
+      };
+
+      console.log(labelMeanings[maxLabel]);
+      // await updateLabel(patientId, maxLabel);
+
+      if (maxLabel === "LABEL_2") {
+        const randomFood = Math.floor(Math.random() * 4); // Generate a random number between 0 and 3
+        switch (randomFood) {
+          case 0:
+            setAppleCount((prevCount) => prevCount + 1);
+            break;
+          case 1:
+            setMeatCount((prevCount) => prevCount + 1);
+            break;
+          case 2:
+            setRiceCount((prevCount) => prevCount + 1);
+            break;
+          case 3:
+            setFishCount((prevCount) => prevCount + 1);
+            break;
+          default:
+            break;
+        }
+      }
+
+      return labelMeanings[maxLabel];
+    } catch (error) {
+      console.error("Failed to perform sentiment analysis:", error);
+      return null;
+    }
+  }
   //text to speech
   const speak = () => {
     if (textToSpeak) {
@@ -133,33 +232,33 @@ export default function Notification() {
   };
 
   //speech to text ----> expo speech api
-  const handleStartListening = async () => {
-    try {
-      await requestPermissionsAsync(); // Request microphone permissions
-      await startSpeechToTextAsync({
-        language: "en-US", // Specify the language for speech recognition
-      });
-      setIsListening(true);
-    } catch (error) {
-      console.error("Error starting speech recognition:", error);
-    }
-  };
+  // const handleStartListening = async () => {
+  //   try {
+  //     await requestPermissionsAsync(); // Request microphone permissions
+  //     await startSpeechToTextAsync({
+  //       language: "en-US", // Specify the language for speech recognition
+  //     });
+  //     setIsListening(true);
+  //   } catch (error) {
+  //     console.error("Error starting speech recognition:", error);
+  //   }
+  // };
 
-  const handleStopListening = async () => {
-    try {
-      const result = await stopSpeechToTextAsync();
-      setTranscription(result);
-      setIsListening(false);
-    } catch (error) {
-      console.error("Error stopping speech recognition:", error);
-    }
-  };
+  // const handleStopListening = async () => {
+  //   try {
+  //     const result = await stopSpeechToTextAsync();
+  //     setTranscription(result);
+  //     setIsListening(false);
+  //   } catch (error) {
+  //     console.error("Error stopping speech recognition:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    return () => {
-      stopSpeechToTextAsync(); // Stop speech recognition when the component unmounts
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     stopSpeechToTextAsync(); // Stop speech recognition when the component unmounts
+  //   };
+  // }, []);
   // speech to text ----> react native cli
   // const startSpeechToText = async () => {
   //   try {
@@ -284,6 +383,19 @@ export default function Notification() {
         }}
       />
 
+<TouchableOpacity
+          style={[
+            styles.button,
+            {
+              width: windowWidth / 2 - 25,
+              backgroundColor: recording ? "#ff0000" : "#2196f3",
+            },
+          ]}
+          onPress={handleRecordButtonPress}
+        >
+          <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
+        </TouchableOpacity>
+
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.button}
@@ -360,5 +472,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
+  },
+  button: {
+    backgroundColor: "#2196f3",
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
   },
 });
