@@ -110,6 +110,22 @@ export default function Home({ route }) {
     }
   };
 
+  const navigateToAvatarscreen = async () => {
+    try {
+      const response = await axios.post('/talk_with_avatar', { patient_id: patientId });
+      if (response.status === 201) {
+        const { patient_id, mood_detection_id } = response.data.data;
+        console.log( patient_id, mood_detection_id)
+        // navigation.navigate("Avatarscreen")
+        navigation.navigate("Avatarscreen", { patient_id, mood_detection_id });
+      } else {
+        console.error('Failed to insert data into avatar table:', response.status);
+      }
+    } catch (error) {
+      console.error('Error inserting data into avatar table:', error);
+    }
+  };
+
   const handleMenuPress = (menu) => {
     setSelectedMenu(menu);
     console.log(menu);
@@ -406,7 +422,7 @@ export default function Home({ route }) {
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Avatarscreen", { patientId })}
+            onPress={() => navigateToAvatarscreen()}
           />
         </View>
       </View>

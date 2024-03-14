@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
-  Dimensions
+  Dimensions,
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython } from "./axios.js";
 import { Audio } from "expo-av";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -49,15 +49,12 @@ async function query(data) {
   }
 }
 
-
-export default function Notification() {
+export default function Notification({ route }) {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [isButtonVisible, setButtonVisible] = useState(false);
   //text to speech
   const [textToSpeak, setTextToSpeak] = useState("");
-
-
 
   //speech to text expo speech api
   const [isListening, setIsListening] = useState(false);
@@ -67,6 +64,9 @@ export default function Notification() {
   const [recordingStatus, setRecordingStatus] = useState("idle");
   const [audioPermission, setAudioPermission] = useState(null);
   const [transcript, setTranscript] = useState("");
+
+  const { patient_id, mood_detection_id } = route.params || {};
+  console.log(patient_id, mood_detection_id);
 
   useEffect(() => {
     // Get recording permission upon first render
@@ -177,7 +177,7 @@ export default function Notification() {
 
   async function performSentimentAnalysis(text) {
     try {
-      console.log("inputtext",text);
+      console.log("inputtext", text);
       const sentimentResult = await query({ inputs: text });
       console.log("try", sentimentResult);
       let maxScore = -1;
@@ -191,31 +191,22 @@ export default function Notification() {
 
       const labelMeanings = {
         LABEL_0: "sad",
-        LABEL_1: "normal",
-        LABEL_2: "happy",
+        LABEL_1: "happy",
+        LABEL_2: "normal",
       };
 
       console.log(labelMeanings[maxLabel]);
       // await updateLabel(patientId, maxLabel);
-
-      if (maxLabel === "LABEL_2") {
-        const randomFood = Math.floor(Math.random() * 4); // Generate a random number between 0 and 3
-        switch (randomFood) {
-          case 0:
-            setAppleCount((prevCount) => prevCount + 1);
-            break;
-          case 1:
-            setMeatCount((prevCount) => prevCount + 1);
-            break;
-          case 2:
-            setRiceCount((prevCount) => prevCount + 1);
-            break;
-          case 3:
-            setFishCount((prevCount) => prevCount + 1);
-            break;
-          default:
-            break;
-        }
+      console.log(maxLabel,mood_detection_id);
+      try {
+        const updateMoodResponse = await axios.put("/update_mood", {
+          maxLabel: maxLabel,
+          mood_detection_id: mood_detection_id,
+        });
+        console.log("Update mood response:", updateMoodResponse.data);
+      } catch (error) {
+        console.error("Failed to update mood:", error);
+        // Handle error accordingly
       }
 
       return labelMeanings[maxLabel];
@@ -282,21 +273,21 @@ export default function Notification() {
   //   setRecognizedText(e.value[0]);
   // };
 
-  handleLogin = async () => { };
+  handleLogin = async () => {};
   useEffect(() => {
     console.log("Avatar Screen");
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
-    return onFocus
+    return onFocus;
   }, []);
 
   const toggleModal = () => {
@@ -383,18 +374,18 @@ export default function Notification() {
         }}
       />
 
-<TouchableOpacity
-          style={[
-            styles.button,
-            {
-              width: windowWidth / 2 - 25,
-              backgroundColor: recording ? "#ff0000" : "#2196f3",
-            },
-          ]}
-          onPress={handleRecordButtonPress}
-        >
-          <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          {
+            width: windowWidth / 2 - 25,
+            backgroundColor: recording ? "#ff0000" : "#2196f3",
+          },
+        ]}
+        onPress={handleRecordButtonPress}
+      >
+        <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
+      </TouchableOpacity>
 
       <View style={styles.container}>
         <TouchableOpacity

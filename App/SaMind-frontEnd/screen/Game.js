@@ -228,14 +228,14 @@ const PopcatGame = ({ route }) => {
 
       const labelMeanings = {
         LABEL_0: "sad",
-        LABEL_1: "normal",
-        LABEL_2: "happy",
+        LABEL_1: "happy",
+        LABEL_2: "normal",
       };
 
       console.log(labelMeanings[maxLabel]);
       await updateLabel(patientId, maxLabel);
 
-      if (maxLabel === "LABEL_2") {
+      if (maxLabel === "LABEL_1") {
         const randomFood = Math.floor(Math.random() * 4); // Generate a random number between 0 and 3
         switch (randomFood) {
           case 0:

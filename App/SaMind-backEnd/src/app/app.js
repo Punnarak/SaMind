@@ -23,10 +23,12 @@ const appoint = require('./appoint.js');
 const notification = require('./notification.js');
 const game = require('./game.js');
 const stt = require('./stt.js');
+const avatar = require('./avatar.js');
 
 
 // Use the API file
-app.use(stt)
+app.use(avatar);
+app.use(stt);
 app.use(login);
 app.use(register);
 app.use(authen);

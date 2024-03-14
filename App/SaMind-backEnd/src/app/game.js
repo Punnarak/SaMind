@@ -358,10 +358,10 @@ router.put('/update_patient_label', (req, res) => {
       columnToUpdate = 'sad';
       break;
     case 'LABEL_1':
-      columnToUpdate = 'normal';
+      columnToUpdate = 'happy';
       break;
     case 'LABEL_2':
-      columnToUpdate = 'happy';
+      columnToUpdate = 'normal';
       break;
     default:
       return res.status(400).json({ error: 'Invalid max_label value' });
@@ -415,7 +415,7 @@ router.put('/update_patient_label', (req, res) => {
 function calculateAndUpdateGoodword(patient_id, res) {
   client.query('SELECT sad, normal, happy FROM gamedoctor WHERE patient_id = $1', [patient_id])
     .then(result => {
-      const { sad, normal, happy } = result.rows[0];
+      const { sad, happy, normal } = result.rows[0];
       const total =parseFloat(sad) + parseFloat(normal) + parseFloat(happy);
       console.log(total)
       const goodword = total === 0 ? 0 : ((parseFloat(happy) / parseFloat(total)) * 100).toFixed(2);
