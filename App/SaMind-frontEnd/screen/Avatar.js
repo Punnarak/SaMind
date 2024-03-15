@@ -18,6 +18,7 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython } from "./axios.js";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
+import * as Speech from 'expo-speech';
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -48,6 +49,48 @@ async function query(data) {
     return null;
   }
 }
+let result = ''
+async function answer(data) {
+  try {
+    const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่  อนและผู้ช่วยตอบคำถาม จงตอบคำถามอย่างถูกต้องและมีประโยชน์ที่สุด <</SYS>>${data}[/INST]`;
+    console.log(prompt)
+    const response = await fetch(
+      "https://short-rings-train.loca.lt/completion",
+      {
+        headers: {
+          // Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+          "bypass-tunnel-reminder": "1" // Adding bypass-tunnel-reminder header
+        },
+        method: "POST",
+        body: JSON.stringify({
+          prompt: prompt,
+          n_predict: 30,
+          temperature: 0.8,
+          top_k: 40
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
+    }
+
+    result = await response.json();
+    console.log(result.content);
+    
+    return result.content;
+  } catch (error) {
+    console.error("Error answer model:", error);
+    return null;
+  }
+}
+
+
+
+
 
 export default function Notification({ route }) {
   const navigation = useNavigation();
@@ -109,6 +152,8 @@ export default function Notification({ route }) {
       setRecording(newRecording);
       setRecordingStatus("recording");
     } catch (error) {
+      setRecording(null);
+      setRecordingStatus("stopped");
       console.error("Failed to start recording", error);
     }
   }
@@ -142,6 +187,7 @@ export default function Notification({ route }) {
 
       let response = "";
       let responseText = "";
+      let responseAnswer = "";
       try {
         response = await FileSystem.uploadAsync(
           "http://192.168.1.101:4343/speech",
@@ -160,6 +206,12 @@ export default function Notification({ route }) {
       setTranscript(response.body);
       // console.log("word : ", transcript);
       responseText = await performSentimentAnalysis(response.body);
+      responseAnswer = await answer(response.body);
+      console.log(responseAnswer);
+      Speech.speak(responseAnswer, { language: "th" });
+      // setTextToSpeak(response.body)
+      // speak()
+
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
       Alert.alert("Error", "Failed to convert speech to text");
@@ -216,12 +268,21 @@ export default function Notification({ route }) {
     }
   }
   //text to speech
-  const speak = () => {
+  const speak = (text) => {
+    console.log("ss",textToSpeak)
     if (textToSpeak) {
       Speech.speak(textToSpeak, { language: "th" });
     }
   };
 
+  useEffect(() => {
+    if(textToSpeak){
+      console.log("text: ",textToSpeak)
+    setTextToSpeak(result.content)
+    speak()
+    }
+    
+  }, [textToSpeak]);
   //speech to text ----> expo speech api
   // const handleStartListening = async () => {
   //   try {
@@ -420,14 +481,14 @@ export default function Notification({ route }) {
       </View> */}
 
       {/* text to speech */}
-      {/* <View>
-        <TextInput
-          placeholder="Enter text to speak"
-          value={textToSpeak}
-          onChangeText={(text) => setTextToSpeak(text)}
-        />
-        <Button title="Speak" onPress={speak} />
-      </View> */}
+      <View>
+      {/* <TextInput
+        placeholder="Enter text to speak"
+        value={textToSpeak}
+        onChangeText={(text) => setTextToSpeak(text)}
+      /> */}
+      <Button title="Speak" onPress={speak} />
+    </View>
     </View>
   );
 }

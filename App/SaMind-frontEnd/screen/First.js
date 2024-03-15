@@ -14,7 +14,7 @@ const First = () => {
   const [index, setIndex] = React.useState(0);
   const isCarousel = React.useRef(null);
 
-  // const patientId = 9;
+  // const patientId = 2;
   // const hospitalName = "aaa";
 
   
