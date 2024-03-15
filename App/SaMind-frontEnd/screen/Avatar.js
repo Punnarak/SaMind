@@ -55,7 +55,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่  อนและผู้ช่วยตอบคำถาม จงตอบคำถามอย่างถูกต้องและมีประโยชน์ที่สุด <</SYS>>${data}[/INST]`;
     console.log(prompt)
     const response = await fetch(
-      "https://short-rings-train.loca.lt/completion",
+      "https://620c-2001-fb1-17-16cd-38ec-b7f4-677f-9e6b.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
@@ -110,6 +110,11 @@ export default function Notification({ route }) {
 
   const { patient_id, mood_detection_id } = route.params || {};
   console.log(patient_id, mood_detection_id);
+
+  // useEffect(() => {
+  //   speak("สวัสดีจ้า ยินดีต้อนรับ");
+  // },);
+
 
   useEffect(() => {
     // Get recording permission upon first render
@@ -208,9 +213,9 @@ export default function Notification({ route }) {
       responseText = await performSentimentAnalysis(response.body);
       responseAnswer = await answer(response.body);
       console.log(responseAnswer);
-      Speech.speak(responseAnswer, { language: "th" });
-      // setTextToSpeak(response.body)
-      // speak()
+      // Speech.speak(responseAnswer, { language: "th" });
+      setTextToSpeak(responseAnswer)
+      speak(responseAnswer)
 
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
@@ -269,20 +274,20 @@ export default function Notification({ route }) {
   }
   //text to speech
   const speak = (text) => {
-    console.log("ss",textToSpeak)
-    if (textToSpeak) {
-      Speech.speak(textToSpeak, { language: "th" });
+    console.log("ss",text)
+    if (text) {
+    Speech.speak(text, { language: "th" });
     }
   };
 
-  useEffect(() => {
-    if(textToSpeak){
-      console.log("text: ",textToSpeak)
-    setTextToSpeak(result.content)
-    speak()
-    }
+  // useEffect(() => {
+  //   if(textToSpeak){
+  //     console.log("text: ",textToSpeak)
+  //   setTextToSpeak(result.content)
+  //   speak()
+  //   }
     
-  }, [textToSpeak]);
+  // }, [textToSpeak]);
   //speech to text ----> expo speech api
   // const handleStartListening = async () => {
   //   try {
@@ -448,20 +453,20 @@ export default function Notification({ route }) {
         <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
       </TouchableOpacity>
 
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <TouchableOpacity
-          style={styles.button}
-          // onPressIn={handleStartRecording}
+          style={styles.button} */}
+          {/* // onPressIn={handleStartRecording}
           // onPressOut={handleStopRecording}
-        >
+        > */}
           {/* <Text style={styles.buttonText}>
             {isRecording ? "Recording..." : "Hold to Record"}
           </Text> */}
-        </TouchableOpacity>
+        {/* </TouchableOpacity> */}
         {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
         {/* Display recording lines */}
         {/* {getRecordingLines()} */}
-      </View>
+      {/* </View> */}
 
       {/* speech to text ---> expo speech api */}
       {/* <View>
@@ -481,14 +486,14 @@ export default function Notification({ route }) {
       </View> */}
 
       {/* text to speech */}
-      <View>
+      {/* <View> */}
       {/* <TextInput
         placeholder="Enter text to speak"
         value={textToSpeak}
         onChangeText={(text) => setTextToSpeak(text)}
       /> */}
-      <Button title="Speak" onPress={speak} />
-    </View>
+      {/* <Button title="Speak" onPress={speak} />
+    </View> */}
     </View>
   );
 }
