@@ -15,11 +15,18 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import { axios, axiospython } from "./axios.js";
+import { axios, axiospython, path } from "./axios.js";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as Speech from 'expo-speech';
-
+import waveAvatar from '../assets/wave.gif'
+import standbyAvatar from '../assets/standby.gif'
+import happy1Avatar from '../assets/happy1.gif'
+import happy2Avatar from '../assets/happy2.gif'
+import negative1Avatar from '../assets/negative1.gif'
+import negative2Avatar from '../assets/negative2.gif'
+import neutral1Avatar from '../assets/neutral1.gif'
+import neutral2Avatar from '../assets/neutral2.gif'
 const windowWidth = Dimensions.get("window").width;
 
 async function query(data) {
@@ -55,7 +62,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่  อนและผู้ช่วยตอบคำถาม จงตอบคำถามอย่างถูกต้องและมีประโยชน์ที่สุด <</SYS>>${data}[/INST]`;
     console.log(prompt)
     const response = await fetch(
-      "https://620c-2001-fb1-17-16cd-38ec-b7f4-677f-9e6b.ngrok-free.app/completion",
+      "https://040f-2001-fb1-17-16cd-1987-7975-9bbf-8e80.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
@@ -65,8 +72,8 @@ async function answer(data) {
         method: "POST",
         body: JSON.stringify({
           prompt: prompt,
-          n_predict: 30,
-          temperature: 0.8,
+          n_predict: 80,
+          temperature: 0.32,
           top_k: 40
         }),
       }
@@ -87,35 +94,94 @@ async function answer(data) {
     return null;
   }
 }
-
-
-
-
-
 export default function Notification({ route }) {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [isButtonVisible, setButtonVisible] = useState(false);
-  //text to speech
-  const [textToSpeak, setTextToSpeak] = useState("");
-
-  //speech to text expo speech api
-  const [isListening, setIsListening] = useState(false);
-  const [transcription, setTranscription] = useState("");
 
   const [recording, setRecording] = useState(null);
   const [recordingStatus, setRecordingStatus] = useState("idle");
   const [audioPermission, setAudioPermission] = useState(null);
   const [transcript, setTranscript] = useState("");
 
+  const [avatar, setAvatar] = useState('wave')
+  const positiveMax = 2
+  const neutralMax = 2
+  const negativeMax = 2
   const { patient_id, mood_detection_id } = route.params || {};
   console.log(patient_id, mood_detection_id);
 
-  // useEffect(() => {
-  //   speak("สวัสดีจ้า ยินดีต้อนรับ");
-  // },);
+  let avatarSource; 
+  const changeAvatar = () => {
+    console.log("change",avatar)
+    setTimeout(() => {
+      setAvatar('standby');
+     }, 6000); 
+  }
+  switch (avatar) {
+    case 'wave':
+      console.log("wave avatar")
+      avatarSource = waveAvatar;
+      changeAvatar()
+      break;
+    case 'happy':
+      console.log("happy avatar")
+      let positive = [happy1Avatar, happy2Avatar]
+      let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
+      avatarSource = happyAvatar
+      changeAvatar()
+      break;
+    case 'sad':
+      console.log("sad avatar")
+      let negative = [negative1Avatar, negative2Avatar]
+      let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
+      avatarSource = negativeAvatar
+      changeAvatar()
+      break;
+    case 'normal':
+      console.log("normal avatar")
+      let neutral = [neutral1Avatar, neutral2Avatar]
+      let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
+      avatarSource = neutralAvatar
+      changeAvatar()
+      break;
+    default:
+      avatarSource = standbyAvatar;
+  }
 
 
+  useEffect(() => { 
+    switch (avatar) {
+      case 'wave':
+        console.log("waveeffect avatar")
+        avatarSource = waveAvatar;
+        changeAvatar()
+        break;
+      case 'happy':
+        console.log("happyeffect avatar")
+        let positive = [happy1Avatar, happy2Avatar]
+        let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
+        avatarSource = happyAvatar
+        changeAvatar()
+        break;
+      case 'sad':
+        console.log("sadeffect avatar")
+        let negative = [negative1Avatar, negative2Avatar]
+        let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
+        avatarSource = negativeAvatar
+        changeAvatar()
+        break;
+      case 'normal':
+        console.log("normaleffect avatar")
+        let neutral = [neutral1Avatar, neutral2Avatar]
+        let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
+        avatarSource = neutralAvatar
+        changeAvatar()
+        break;
+      default:
+        avatarSource = standbyAvatar;
+    }
+  }, [avatar]);
   useEffect(() => {
     // Get recording permission upon first render
     async function getPermission() {
@@ -137,6 +203,7 @@ export default function Notification({ route }) {
       }
     };
   }, []);
+
 
   async function startRecording() {
     try {
@@ -195,7 +262,7 @@ export default function Notification({ route }) {
       let responseAnswer = "";
       try {
         response = await FileSystem.uploadAsync(
-          "http://192.168.1.101:4343/speech",
+          path + "/speech",
           audioPath,
           {
             httpMethod: "POST",
@@ -214,8 +281,9 @@ export default function Notification({ route }) {
       responseAnswer = await answer(response.body);
       console.log(responseAnswer);
       // Speech.speak(responseAnswer, { language: "th" });
-      setTextToSpeak(responseAnswer)
+      // setTextToSpeak(responseAnswer)
       speak(responseAnswer)
+      setAvatar(responseText)
 
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
@@ -251,8 +319,9 @@ export default function Notification({ route }) {
         LABEL_1: "happy",
         LABEL_2: "normal",
       };
-
+      
       console.log(labelMeanings[maxLabel]);
+     
       // await updateLabel(patientId, maxLabel);
       console.log(maxLabel,mood_detection_id);
       try {
@@ -260,6 +329,8 @@ export default function Notification({ route }) {
           maxLabel: maxLabel,
           mood_detection_id: mood_detection_id,
         });
+
+
         console.log("Update mood response:", updateMoodResponse.data);
       } catch (error) {
         console.error("Failed to update mood:", error);
@@ -280,69 +351,15 @@ export default function Notification({ route }) {
     }
   };
 
-  // useEffect(() => {
-  //   if(textToSpeak){
-  //     console.log("text: ",textToSpeak)
-  //   setTextToSpeak(result.content)
-  //   speak()
-  //   }
-    
-  // }, [textToSpeak]);
-  //speech to text ----> expo speech api
-  // const handleStartListening = async () => {
-  //   try {
-  //     await requestPermissionsAsync(); // Request microphone permissions
-  //     await startSpeechToTextAsync({
-  //       language: "en-US", // Specify the language for speech recognition
-  //     });
-  //     setIsListening(true);
-  //   } catch (error) {
-  //     console.error("Error starting speech recognition:", error);
-  //   }
-  // };
-
-  // const handleStopListening = async () => {
-  //   try {
-  //     const result = await stopSpeechToTextAsync();
-  //     setTranscription(result);
-  //     setIsListening(false);
-  //   } catch (error) {
-  //     console.error("Error stopping speech recognition:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   return () => {
-  //     stopSpeechToTextAsync(); // Stop speech recognition when the component unmounts
-  //   };
-  // }, []);
-  // speech to text ----> react native cli
-  // const startSpeechToText = async () => {
-  //   try {
-  //     setIsListening(true);
-  //     await Voice.start("en-US");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  // const stopSpeechToText = async () => {
-  //   try {
-  //     setIsListening(false);
-  //     await Voice.stop();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  // Voice.onSpeechResults = (e) => {
-  //   setRecognizedText(e.value[0]);
-  // };
-
   handleLogin = async () => {};
   useEffect(() => {
     console.log("Avatar Screen");
-    const onFocus = navigation.addListener("focus", () => {
+    const onFocus = navigation.addListener("focus", async () => {
+     speak("สวัสดีจ้า ยินดีต้อนรับ");
+     setTimeout(() => {
+     setAvatar("standby");
+    }, 6000); 
+      
       axios
         .post("/refreshToken")
         .then((response) => {
@@ -428,7 +445,7 @@ export default function Notification({ route }) {
       </Modal>
 
       <Image
-        source={require("../assets/a1.gif")}
+        source={avatarSource}
         style={{
           width: horizontalScale(337),
           // width: 350,
@@ -452,48 +469,6 @@ export default function Notification({ route }) {
       >
         <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
       </TouchableOpacity>
-
-      {/* <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.button} */}
-          {/* // onPressIn={handleStartRecording}
-          // onPressOut={handleStopRecording}
-        > */}
-          {/* <Text style={styles.buttonText}>
-            {isRecording ? "Recording..." : "Hold to Record"}
-          </Text> */}
-        {/* </TouchableOpacity> */}
-        {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
-        {/* Display recording lines */}
-        {/* {getRecordingLines()} */}
-      {/* </View> */}
-
-      {/* speech to text ---> expo speech api */}
-      {/* <View>
-        <Button
-          title={isListening ? "Stop Listening" : "Start Listening"}
-          onPress={isListening ? handleStopListening : handleStartListening}
-        />
-        <Text>{transcription}</Text>
-      </View> */}
-      {/* speech to text ---> react native cli*/}
-      {/* <View>
-        <Button
-          title={isListening ? "Stop Listening" : "Start Listening"}
-          onPress={isListening ? stopSpeechToText : startSpeechToText}
-        />
-        <Text>{recognizedText}</Text>
-      </View> */}
-
-      {/* text to speech */}
-      {/* <View> */}
-      {/* <TextInput
-        placeholder="Enter text to speak"
-        value={textToSpeak}
-        onChangeText={(text) => setTextToSpeak(text)}
-      /> */}
-      {/* <Button title="Speak" onPress={speak} />
-    </View> */}
     </View>
   );
 }
