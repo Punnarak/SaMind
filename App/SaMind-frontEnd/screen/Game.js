@@ -16,7 +16,11 @@ import { useNavigation } from "@react-navigation/native";
 import { axios, axiospython } from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
+import { Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import Svg, { Rect, Path } from "react-native-svg";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -50,11 +54,19 @@ async function query(data) {
 
 const PopcatGame = ({ route }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isInfoVisible, setIsInfoVisible] = useState(false);
   // const patientId = 333
   const [popCount, setPopCount] = useState(0);
   const { patientId, clickCount } = route.params || {};
   // const { patientId } = route.params || {};
   const navigation = useNavigation();
+  const [isButtonVisible, setButtonVisible] = useState(false);
+  const [isLoadingSound, setIsLoadingSound] = useState(false);
+
+  const loadingData = () => {
+    setIsLoadingSound(!isLoadingSound);
+    // console.log("kao ", isLoadingSound)
+  };
 
   useEffect(() => {
     setPopCount(clickCount);
@@ -157,6 +169,8 @@ const PopcatGame = ({ route }) => {
         await recording.stopAndUnloadAsync();
         const recordingUri = recording.getURI();
         console.log("Recording URI:", recordingUri);
+        await loadingData();
+        console.log("kao ", isLoadingSound)
         // Call speech to text API after recording stops
         await convertSpeechToText(recordingUri);
         // Reset states
@@ -214,7 +228,7 @@ const PopcatGame = ({ route }) => {
 
   async function performSentimentAnalysis(text) {
     try {
-      console.log("inputtext",text);
+      console.log("inputtext", text);
       const sentimentResult = await query({ inputs: text });
       console.log("try", sentimentResult);
       let maxScore = -1;
@@ -254,9 +268,10 @@ const PopcatGame = ({ route }) => {
             break;
         }
       }
-
+      setIsLoadingSound(false)
       return labelMeanings[maxLabel];
     } catch (error) {
+      setIsLoadingSound(false)
       console.error("Failed to perform sentiment analysis:", error);
       return null;
     }
@@ -264,6 +279,12 @@ const PopcatGame = ({ route }) => {
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  const toggleInfo = () => {
+    setIsInfoVisible(!isInfoVisible);
+    setButtonVisible(!isButtonVisible);
+    console.log(isInfoVisible);
   };
 
   const handleEatingButtonPress = () => {
@@ -630,6 +651,69 @@ const PopcatGame = ({ route }) => {
       style={{ width: "100%", resizeMode: "cover", flex: 1 }}
     >
       {/* <View style={styles.backgroundContainer}> */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: 20,
+          marginTop: 54,
+        }}
+      >
+        <Ionicons
+          name="chevron-back-outline"
+          size={30}
+          color="#3987FD"
+          onPress={() => navigation.goBack()}
+        />
+        <Feather name={"info"} size={25} color="#569AFF" onPress={toggleInfo} />
+      </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isInfoVisible}
+        onRequestClose={() => {
+          toggleInfo();
+        }}
+      >
+        <View style={styles.modalBackground}>
+          {/* <ImageBackground
+                  source={require("../assets/bedroom.jpg")}
+                  style={{ resizeMode: "fit", flex: 1 }}
+                > */}
+          <TouchableWithoutFeedback onPress={toggleInfo}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalViewRow}>
+                <Text
+                  style={{
+                    fontSize: moderateScale(16),
+                    // fontSize: 16,
+                    marginTop: 35,
+                    color: "#569AFF",
+                    fontWeight: "bold",
+                    marginBottom: 45,
+                  }}
+                >
+                  How To Play
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: moderateScale(14),
+                    // fontSize: 17,
+                    textAlign: "center",
+                  }}
+                >
+                  คลิ๊กเพื่อฟักไข่ {"\n"} ให้อาหารน้อง เล่นเกม และเรียนกับน้อง{" "}
+                  {"\n"} พูดให้กำลังใจน้อง {"\n"} ไปเลี้ยงน้องกัน
+                </Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+          {/* </ImageBackground> */}
+        </View>
+      </Modal>
       <View style={styles.container}>
         {sleepMode && (
           <View style={styles.sleepModeOverlay}>
@@ -644,17 +728,55 @@ const PopcatGame = ({ route }) => {
         </TouchableWithoutFeedback>
        {/*  <Text style={styles.countText}>{popCount}</Text> */}
         <TouchableOpacity
-          style={[
-            styles.button,
-            {
-              width: windowWidth / 2 - 25,
-              backgroundColor: recording ? "#ff0000" : "#2196f3",
-            },
-          ]}
-          onPress={handleRecordButtonPress}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 6,
+          paddingHorizontal: 12,
+          gap: 8,
+          height: 40,
+          width: 150,
+          backgroundColor: isLoadingSound ? "#888888" : "#1b1b1cde",
+          borderRadius: 20,
+          cursor: "pointer",
+          flexDirection: "row",
+          marginBottom: 20,
+        }}
+        onPress={handleRecordButtonPress}
+        disabled={isLoadingSound}
+      >
+        <Feather
+          name="mic"
+          size={20}
+          color={isLoadingSound ? "#000000" : recording ? "#FF342B" : "#000000"}
+        />
+        <Svg
+          width="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#FF342B"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
-        </TouchableOpacity>
+          <Rect y="3" x="9" width="6" height="11" rx="3" />
+          <Path d="M12 18V21" />
+          <Path d="M8 21H16" />
+          <Path d="M19 11C19 14.866 15.865 18 12 18C8.134 18 5 14.866 5 11" />
+        </Svg>
+        <Text
+          style={{
+            lineHeight: 20,
+            fontSize: 17,
+            color: isLoadingSound ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
+            fontFamily: "sans-serif",
+            letterSpacing: 1,
+          }}
+        >
+          {isLoadingSound ? "Waiting" : recording ? "Recording" : "Record"}
+        </Text>
+      </TouchableOpacity>
         <View style={styles.progressBars}>
           <View
             style={{
@@ -933,7 +1055,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   popcatImage: {
-    marginTop: 150,
+    marginTop: 20,
     width: 200,
     height: 200,
     marginBottom: 20,
@@ -1027,14 +1149,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
   },
-  modalButton: {
-    backgroundColor: "#2196f3",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    elevation: 2,
-    marginBottom: 10,
-  },
+  // modalButton: {
+  //   backgroundColor: "#2196f3",
+  //   borderRadius: 20,
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 20,
+  //   elevation: 2,
+  //   marginBottom: 10,
+  // },
   modalBackground: {
     flex: 1,
   },
@@ -1065,6 +1187,56 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontSize: 12, // Adjust the font size here
     textAlign: "right", // Align the text to the right
+  },
+  Modal: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderColor: "#3987FD",
+    borderWidth: 5,
+    borderRadius: 8,
+    marginHorizontal: horizontalScale(16.5),
+    // marginHorizontal: "5%",
+  },
+  buttonInfo: {
+    marginTop: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    backgroundColor: "#569AFF",
+    width: horizontalScale(177),
+    // width: "60%",
+    marginBottom: 15,
+  },
+
+  buttonGame: {
+    position: 'relative',
+    width: 150,
+    borderWidth: 0,
+    borderRadius: 5,
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    transitionDuration: '0.2s',
+    opacity: 0.8,
+    letterSpacing: 1,
+    shadowColor: '#c0392b',
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 8,
+  },
+  buttonTextGame: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

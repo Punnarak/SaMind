@@ -126,7 +126,7 @@
 
 
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground, Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
@@ -140,25 +140,34 @@ const NumberGame = ({ route }) => {
   const [gameOver, setGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10);
   const [score, setScore] = useState(null);
+  const [startGame, setStartGame] = useState(false); // State to track whether the game has started
+  const [showModal, setShowModal] = useState(true); // State to control the visibility of the popup modal
 
   useEffect(() => {
-    generateRandomNumbers();
+    if (startGame) {
+      generateRandomNumbers();
 
-    const timerInterval = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime > 0 && !gameOver) {
-          return prevTime - 1;
-        } else {
-          clearInterval(timerInterval);
-          calculateScore();
-          setGameOver(true);
-          return 0;
-        }
-      });
-    }, 1000);
+      const timerInterval = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime > 0 && !gameOver) {
+            return prevTime - 1;
+          } else {
+            clearInterval(timerInterval);
+            calculateScore();
+            setGameOver(true);
+            return 0;
+          }
+        });
+      }, 1000);
 
-    return () => clearInterval(timerInterval);
-  }, [gameOver]);
+      return () => clearInterval(timerInterval);
+    }
+  }, [startGame, gameOver]);
+
+  const startNewGame = () => {
+    setStartGame(true);
+    setShowModal(false); // Hide the modal when the game starts
+  };
 
 
   const updateHealthBar = async () => {
@@ -268,6 +277,21 @@ const NumberGame = ({ route }) => {
       style={{ width: "100%", resizeMode: "cover", flex: 1 }}
     >
       <View style={styles.container}>
+      <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => {
+            setShowModal(false);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Press the number 1-16 in order to WIN the game</Text>
+              <Button title="Start" onPress={startNewGame} />
+            </View>
+          </View>
+        </Modal>
         {gameOver ? (
           <View>
             <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
@@ -341,6 +365,23 @@ const styles = StyleSheet.create({
   numberText: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
+    textAlign: "center",
   },
 });
 
