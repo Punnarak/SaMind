@@ -642,7 +642,7 @@ const PopcatGame = ({ route }) => {
         >
           <Image source={imageSource} style={styles.popcatImage} />
         </TouchableWithoutFeedback>
-        <Text style={styles.countText}>{popCount}</Text>
+       {/*  <Text style={styles.countText}>{popCount}</Text> */}
         <TouchableOpacity
           style={[
             styles.button,
