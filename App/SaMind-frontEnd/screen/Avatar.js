@@ -18,7 +18,8 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython } from "./axios.js";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-import * as Speech from 'expo-speech';
+import * as Speech from "expo-speech";
+import Svg, { Rect, Path } from "react-native-svg";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -49,25 +50,25 @@ async function query(data) {
     return null;
   }
 }
-let result = ''
+let result = "";
 async function answer(data) {
   try {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่  อนและผู้ช่วยตอบคำถาม จงตอบคำถามอย่างถูกต้องและมีประโยชน์ที่สุด <</SYS>>${data}[/INST]`;
-    console.log(prompt)
+    console.log(prompt);
     const response = await fetch(
       "https://620c-2001-fb1-17-16cd-38ec-b7f4-677f-9e6b.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
           "Content-Type": "application/json",
-          "bypass-tunnel-reminder": "1" // Adding bypass-tunnel-reminder header
+          "bypass-tunnel-reminder": "1", // Adding bypass-tunnel-reminder header
         },
         method: "POST",
         body: JSON.stringify({
           prompt: prompt,
           n_predict: 30,
           temperature: 0.8,
-          top_k: 40
+          top_k: 40,
         }),
       }
     );
@@ -80,17 +81,13 @@ async function answer(data) {
 
     result = await response.json();
     console.log(result.content);
-    
+
     return result.content;
   } catch (error) {
     console.error("Error answer model:", error);
     return null;
   }
 }
-
-
-
-
 
 export default function Notification({ route }) {
   const navigation = useNavigation();
@@ -109,12 +106,14 @@ export default function Notification({ route }) {
   const [transcript, setTranscript] = useState("");
 
   const { patient_id, mood_detection_id } = route.params || {};
+
+  const [isLoading, setIsLoading] = useState(false);
+
   console.log(patient_id, mood_detection_id);
 
   // useEffect(() => {
   //   speak("สวัสดีจ้า ยินดีต้อนรับ");
   // },);
-
 
   useEffect(() => {
     // Get recording permission upon first render
@@ -163,11 +162,17 @@ export default function Notification({ route }) {
     }
   }
 
+  const loadingData = () => {
+    setIsLoading(!isLoading);
+    console.log(isLoading)
+  };
+
   async function stopRecording() {
     try {
       if (recordingStatus === "recording") {
         console.log("Stopping Recording");
         await recording.stopAndUnloadAsync();
+        await loadingData();
         const recordingUri = recording.getURI();
         console.log("Recording URI:", recordingUri);
         // Call speech to text API after recording stops
@@ -214,9 +219,9 @@ export default function Notification({ route }) {
       responseAnswer = await answer(response.body);
       console.log(responseAnswer);
       // Speech.speak(responseAnswer, { language: "th" });
-      setTextToSpeak(responseAnswer)
-      speak(responseAnswer)
-
+      setTextToSpeak(responseAnswer);
+      speak(responseAnswer);
+      setIsLoading(false);                                                           
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
       Alert.alert("Error", "Failed to convert speech to text");
@@ -254,7 +259,7 @@ export default function Notification({ route }) {
 
       console.log(labelMeanings[maxLabel]);
       // await updateLabel(patientId, maxLabel);
-      console.log(maxLabel,mood_detection_id);
+      console.log(maxLabel, mood_detection_id);
       try {
         const updateMoodResponse = await axios.put("/update_mood", {
           maxLabel: maxLabel,
@@ -274,9 +279,9 @@ export default function Notification({ route }) {
   }
   //text to speech
   const speak = (text) => {
-    console.log("ss",text)
+    console.log("ss", text);
     if (text) {
-    Speech.speak(text, { language: "th" });
+      Speech.speak(text, { language: "th" });
     }
   };
 
@@ -286,7 +291,7 @@ export default function Notification({ route }) {
   //   setTextToSpeak(result.content)
   //   speak()
   //   }
-    
+
   // }, [textToSpeak]);
   //speech to text ----> expo speech api
   // const handleStartListening = async () => {
@@ -441,31 +446,69 @@ export default function Notification({ route }) {
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          {
-            width: windowWidth / 2 - 25,
-            backgroundColor: recording ? "#ff0000" : "#2196f3",
-          },
-        ]}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 6,
+          paddingHorizontal: 12,
+          gap: 8,
+          height: 40,
+          width: 150,
+          backgroundColor: isLoading ? "#888888" : "#1b1b1cde",
+          borderRadius: 20,
+          cursor: "pointer",
+          flexDirection: "row",
+          marginBottom: 20,
+        }}
         onPress={handleRecordButtonPress}
+        disabled={isLoading}
       >
-        <Text style={styles.buttonText}>{recording ? "Stop" : "Record"}</Text>
+        <Feather
+          name="mic"
+          size={20}
+          color={isLoading ? "#000000" : recording ? "#FF342B" : "#000000"}
+        />
+        <Svg
+          width="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#FF342B"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <Rect y="3" x="9" width="6" height="11" rx="3" />
+          <Path d="M12 18V21" />
+          <Path d="M8 21H16" />
+          <Path d="M19 11C19 14.866 15.865 18 12 18C8.134 18 5 14.866 5 11" />
+        </Svg>
+        <Text
+          style={{
+            lineHeight: 20,
+            fontSize: 17,
+            color: isLoading ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
+            fontFamily: "sans-serif",
+            letterSpacing: 1,
+          }}
+        >
+          {isLoading ? "Waiting" : recording ? "Recording" : "Record"}
+        </Text>
       </TouchableOpacity>
 
       {/* <View style={styles.container}>
         <TouchableOpacity
           style={styles.button} */}
-          {/* // onPressIn={handleStartRecording}
+      {/* // onPressIn={handleStartRecording}
           // onPressOut={handleStopRecording}
         > */}
-          {/* <Text style={styles.buttonText}>
+      {/* <Text style={styles.buttonText}>
             {isRecording ? "Recording..." : "Hold to Record"}
           </Text> */}
-        {/* </TouchableOpacity> */}
-        {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
-        {/* Display recording lines */}
-        {/* {getRecordingLines()} */}
+      {/* </TouchableOpacity> */}
+      {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
+      {/* Display recording lines */}
+      {/* {getRecordingLines()} */}
       {/* </View> */}
 
       {/* speech to text ---> expo speech api */}
