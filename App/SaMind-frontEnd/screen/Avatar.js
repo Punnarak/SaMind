@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
   Dimensions,
+  Platform
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -28,7 +29,7 @@ import negative2Avatar from '../assets/negative2.gif'
 import neutral1Avatar from '../assets/neutral1.gif'
 import neutral2Avatar from '../assets/neutral2.gif'
 import Svg, { Rect, Path } from "react-native-svg";
-
+const isAndroid = Platform.OS === "android";
 const windowWidth = Dimensions.get("window").width;
 
 async function query(data) {
@@ -50,7 +51,7 @@ async function query(data) {
         `Failed to fetch data: ${response.status} ${response.statusText}`
       );
     }
-
+    console.log("query response", response)
     const result = await response.json();
     return result;
   } catch (error) {
@@ -64,7 +65,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่  อนและผู้ช่วยตอบคำถาม จงตอบคำถามอย่างถูกต้องและมีประโยชน์ที่สุด <</SYS>>${data}[/INST]`;
     console.log(prompt);
     const response = await fetch(
-      "https://040f-2001-fb1-17-16cd-1987-7975-9bbf-8e80.ngrok-free.app/completion",
+      "https://e31a-2001-fb1-17-16cd-1987-7975-9bbf-8e80.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
@@ -96,9 +97,22 @@ async function answer(data) {
     return null;
   }
 }
+async function setSpeaker() {
+  console.log("speaker!!!!!!!!")
+  try {
+      await Audio.setAudioOutputModeAsync({
+        allowsRecordingIOS: false,
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+        playsInSilentModeIOS: true,
+      });
+  } catch (error) {
+      console.log('เกิดข้อผิดพลาดในการตั้งค่าลำโพง:', error);
+  }
+}
+
 export default function Notification({ route }) {
   const navigation = useNavigation();
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(true);
   const [isButtonVisible, setButtonVisible] = useState(false);
 
   const [recording, setRecording] = useState(null);
@@ -293,6 +307,8 @@ export default function Notification({ route }) {
       console.log(responseAnswer);
       // Speech.speak(responseAnswer, { language: "th" });
       // setTextToSpeak(responseAnswer)
+    
+      // setSpeaker()
       speak(responseAnswer)
       setAvatar(responseText)
       setIsLoading(false);  
@@ -358,14 +374,17 @@ export default function Notification({ route }) {
   const speak = (text) => {
     console.log("ss", text);
     if (text) {
-      Speech.speak(text, { language: "th" });
+      Speech.speak(text, { language: "th-TH" });
     }
   };
 
-  handleLogin = async () => {};
+  useEffect(() => {
+setSpeaker()
+  }, []); 
   useEffect(() => {
     console.log("Avatar Screen");
     const onFocus = navigation.addListener("focus", async () => {
+    //  setSpeaker();
      speak("สวัสดีจ้า ยินดีต้อนรับ");
      setTimeout(() => {
      setAvatar("standby");
@@ -435,6 +454,7 @@ export default function Notification({ route }) {
           >
             How To Talk with Sa-Mind
           </Text>
+          {isAndroid ?
           <Text
             style={{
               fontSize: moderateScale(16.69),
@@ -442,9 +462,25 @@ export default function Notification({ route }) {
               textAlign: "center",
             }}
           >
-            วิธีใช้งาน{"\n"}สามารถเริ่มพูดคุยได้โดยการพูด{"\n"}WakeWord
-            รอน้องตอบ{"\n"} แล้วคุยกับน้องได้เลย !!!
+            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อ {'\n'}พูดคุยกับน้องสมาย 
+            รอน้องตอบ และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
           </Text>
+          : (
+            <View>
+            <Text
+            style={{
+              fontSize: moderateScale(16.69),
+              // fontSize: 17,
+              textAlign: "center",
+            }}
+          >
+            วิธีใช้งาน{"\n"}เปิด control center กดที่ไอคอน<Svg width={35} height={25} fill="#d6d6d6" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#d6d6d6" stroke-width="0.00024000000000000003">
+        <Path d="M11.9082.1836c-2.8774.0227-5.7566 1.0743-8.045 3.1719-4.8816 4.4748-5.1662 12.0812-.6913 16.9629.2034.244.4473.4473.6914.6914.122.0813.2861.083.4082-.0391l.5293-.6113c.122-.122.122-.3252 0-.4473C.5293 15.9661.2438 9.254 4.2305 4.9824 8.2172.711 14.8887.4274 19.1602 4.4141c4.2714 3.9867 4.555 10.6562.5683 14.9277-.2034.2034-.365.4076-.5683.5703-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.1204.4472.039 4.8817-4.5155 5.1663-12.0811.6914-16.9628-2.3989-2.5934-5.6588-3.889-8.9199-3.8633zm.3867 3.5176C10.0982 3.63 7.8715 4.3932 6.1426 6c-3.4579 3.2138-3.661 8.6242-.4473 12.082.122.122.2435.2842.4063.4063.122.122.3252.122.4472 0l.5293-.6094c.122-.122.122-.3252 0-.4473-1.4238-1.3424-2.2773-3.2547-2.2773-5.248 0-3.946 3.2122-7.1602 7.1582-7.1602 3.946 0 7.1601 3.2532 7.1601 7.1993 0 1.9526-.8144 3.8665-2.2382 5.209-.122.122-.122.3252 0 .4472l.5293.6094c.122.122.3252.163.4472.041 3.4579-3.2545 3.622-8.6652.4082-12.123-1.6069-1.729-3.774-2.634-5.9707-2.7051zm-.2656 3.3164c-1.3221-.0204-2.654.4662-3.6914 1.4629-2.0747 1.9933-2.1145 5.2475-.1211 7.3222l.121.123c.1221.1221.3253.1221.4474 0l.5293-.6112c.122-.122.122-.3253 0-.4473-.6916-.6916-1.0977-1.6666-1.0977-2.6836a3.732 3.732 0 013.7422-3.7422 3.732 3.732 0 013.7422 3.7422c0 1.017-.4064 1.9513-1.1387 2.6836-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.122.4473 0 2.034-1.9934 2.1164-5.2476.123-7.3223-.9967-1.0373-2.3107-1.5656-3.6328-1.586zm.0059 7.7441c-.1373-.005-.2803.0448-.4024.1465l-.039.041-7.1602 8.0547c-.1627.2034-.1624.488.041.6914.0814.0814.2019.123.2832.123h14.3613c.2441 0 .4883-.2035.4883-.4882 0-.122-.0397-.2448-.121-.3262l-7.0801-8.0547c-.1018-.122-.2338-.1824-.3711-.1875Z" />
+      </Svg>และเปลี่ยนเป็น speaker กดปุ่ม  Record เพื่อ {'\n'}พูดคุยกับน้องสมาย 
+            รอน้องตอบ และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
+       </Text>
+            </View>
+          )}
           <TouchableOpacity
             style={styles.buttonInfo}
             onPress={toggleModal}
@@ -511,7 +547,6 @@ export default function Notification({ route }) {
             lineHeight: 20,
             fontSize: 17,
             color: isLoading ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
-            fontFamily: "sans-serif",
             letterSpacing: 1,
           }}
         >
