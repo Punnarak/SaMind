@@ -21,6 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Svg, { Rect, Path } from "react-native-svg";
+import { Icon } from 'react-native-elements';
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -861,12 +862,13 @@ const PopcatGame = ({ route }) => {
                 {
                   width: windowWidth / 2 - 25,
                   backgroundColor:
-                    popCount < 200 || sleepMode ? "#9e9e9e" : "#2196f3",
+                    popCount < 200 || sleepMode ? "#9e9e9e" : "#ff8000",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => handleEatingButtonPress()}
               disabled={popCount <= 0 || sleepMode}
             >
+              <Icon name="cutlery" type="font-awesome" color="#fff" size={20} marginRight={10} />
               <Text style={styles.buttonText}>Eating</Text>
             </TouchableOpacity>
             <Modal
@@ -970,7 +972,7 @@ const PopcatGame = ({ route }) => {
                   backgroundColor:
                     popCount < 200 || sleepMode || progress3 < 0.15
                       ? "#9e9e9e"
-                      : "#2196f3",
+                      : "#009999",
                 },
               ]}
               onPress={
@@ -985,6 +987,7 @@ const PopcatGame = ({ route }) => {
                 progress2 < 0.15
               }
             >
+              <Icon name="gamepad" type="font-awesome" color="#fff" size={20} marginRight={10} />
               <Text style={styles.buttonText}>Play Game</Text>
             </TouchableOpacity>
           </View>
@@ -1007,7 +1010,7 @@ const PopcatGame = ({ route }) => {
                     progress3 < 0.1 ||
                     progress2 < 0.1
                       ? "#9e9e9e"
-                      : "#2196f3",
+                      : "#cc00cc",
                 },
               ]}
               onPress={
@@ -1020,6 +1023,7 @@ const PopcatGame = ({ route }) => {
                 popCount <= 0 || sleepMode || progress3 < 0.1 || progress2 < 0.1
               }
             >
+              <Icon name="book" type="font-awesome" color="#fff" size={20} marginRight={10}  />
               <Text style={styles.buttonText}>Study</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -1027,12 +1031,13 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: windowWidth / 2 - 25,
-                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#2196f3",
+                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#4c0099",
                 },
               ]}
               onPress={handleGame4Press}
               disabled={popCount < 200}
             >
+              <Icon name="bed" type="font-awesome" color="#fff" size={20}  marginRight={10} />
               <Text style={styles.buttonText}>Sleep</Text>
             </TouchableOpacity>
           </View>
@@ -1082,6 +1087,9 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 5,
     borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: "white",
