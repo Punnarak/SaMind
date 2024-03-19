@@ -119,7 +119,8 @@ export default function Notification({ route }) {
   const [recordingStatus, setRecordingStatus] = useState("idle");
   const [audioPermission, setAudioPermission] = useState(null);
   const [transcript, setTranscript] = useState("");
-
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [first, setFirst] = useState(true);
   const [avatar, setAvatar] = useState('wave')
   const positiveMax = 2
   const neutralMax = 2
@@ -135,7 +136,7 @@ export default function Notification({ route }) {
     console.log("change",avatar)
     setTimeout(() => {
       setAvatar('standby');
-     }, 6000); 
+     }, 16000); 
   }
   switch (avatar) {
     case 'wave':
@@ -223,7 +224,6 @@ export default function Notification({ route }) {
     };
   }, []);
 
-
   async function startRecording() {
     try {
       // Needed for iOS
@@ -302,7 +302,10 @@ export default function Notification({ route }) {
       console.log("response", response.body);
       setTranscript(response.body);
       // console.log("word : ", transcript);
-      responseText = await performSentimentAnalysis(response.body);
+
+      if(response.body != "\"\""){
+        // console.log("empty",response.body)
+        responseText = await performSentimentAnalysis(response.body);
       responseAnswer = await answer(response.body);
       console.log(responseAnswer);
       // Speech.speak(responseAnswer, { language: "th" });
@@ -311,6 +314,7 @@ export default function Notification({ route }) {
       // setSpeaker()
       speak(responseAnswer)
       setAvatar(responseText)
+      }
       setIsLoading(false);  
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
@@ -371,13 +375,14 @@ export default function Notification({ route }) {
     }
   }
   //text to speech
-  const speak = (text) => {
+  const speak = async (text) => {
     console.log("ss", text);
     if (text) {
-      Speech.speak(text, { language: "th-TH" });
+       Speech.speak(text, { language: "th-TH" });
     }
+    
   };
-
+  
   useEffect(() => {
 setSpeaker()
   }, []); 
@@ -389,6 +394,7 @@ setSpeaker()
      setTimeout(() => {
      setAvatar("standby");
     }, 6000); 
+    setFirst(false)
       
       axios
         .post("/refreshToken")
@@ -462,8 +468,8 @@ setSpeaker()
               textAlign: "center",
             }}
           >
-            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อ {'\n'}พูดคุยกับน้องสมาย 
-            รอน้องตอบ และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
+            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อพูดคุยกับน้องสมาย {'\n'}
+            รอน้องตอบ และเพลิดเพลินไปกับ{'\n'}การคุยกับน้องได้เลย !!!
           </Text>
           : (
             <View>
