@@ -2,14 +2,16 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const secret = require("./auth.js").secret;
+const auth = require("./auth.js").authorization;
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
+
 
 router.use(bodyParser.json());
 
-router.post('/all_therapist', (req, res) => {
+router.post('/all_therapist', auth, (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     if (!therapist_id) {
       return res.status(400).json({ error: 'Therapist ID is required' });
@@ -32,9 +34,7 @@ router.post('/all_therapist', (req, res) => {
       });
 });
 
-
-
-router.post('/info_therapist', (req, res) => {
+router.post('/info_therapist', auth, (req, res) => {
     const therapist_id = req.body.therapist_id; // Access therapist_id from request body
     if (!therapist_id) {
       return res.status(400).json({ error: 'Therapist ID is required' });
@@ -56,7 +56,7 @@ router.post('/info_therapist', (req, res) => {
       });
 });
   
-router.post('/update_info_therapist', async (req, res) => {
+router.post('/update_info_therapist', auth, async (req, res) => {
     const { therapist_id, fname, lname, password } = req.body; // Access therapist_id, fname, lname, password from request body
     console.log(therapist_id, fname, lname, password)
     if (!therapist_id) {
@@ -91,10 +91,5 @@ router.post('/update_info_therapist', async (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     }
 });
-
-  
-  
-
-
 
 module.exports = router;

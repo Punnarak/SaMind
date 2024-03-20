@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
-router.post('/adLibraryView', (req, res) => {
+router.post('/adLibraryView', auth, (req, res) => {
   const { hospitalName, type } = req.body;
 
   // Construct the SQL query to fetch data from the library table
@@ -173,7 +174,7 @@ router.post('/adLibraryView', (req, res) => {
 //     });
 // });
 
-router.post('/adLibraryEdit', (req, res) => {
+router.post('/adLibraryEdit', auth, (req, res) => {
   const { hospitalName, title, titleNew, url, imageUrl, type } = req.body;
 
   // Determine the name to use based on whether titleNew is provided
@@ -276,7 +277,7 @@ router.post('/adLibraryEdit', (req, res) => {
 //     });
 // });
 
-router.post('/adLibraryDelete', (req, res) => {
+router.post('/adLibraryDelete', auth, (req, res) => {
   const { hospitalName, type, title } = req.body;
 
   if (!hospitalName || !type || !title) {
@@ -347,7 +348,7 @@ router.post('/adLibraryDelete', (req, res) => {
 //     });
 // });
 
-router.post('/adLibraryCreate', (req, res) => {
+router.post('/adLibraryCreate', auth, (req, res) => {
   const { hospitalName, title, url, imageUrl, type } = req.body;
 
   if (!hospitalName || !title || !type) {
@@ -382,7 +383,7 @@ router.post('/adLibraryCreate', (req, res) => {
 
 
 // Link
-router.post('/adLinkView', (req, res) => {
+router.post('/adLinkView', auth, (req, res) => {
   const { title } = req.body;
 
   if (!title) {

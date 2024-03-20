@@ -5,7 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Calendar({ route }) {
   const { patientId } = route.params || {};
@@ -14,6 +15,18 @@ export default function Calendar({ route }) {
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
   useEffect(() => {
     console.log("Calendar Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+    return onFocus;
   }, []);
 
   useEffect(() => {

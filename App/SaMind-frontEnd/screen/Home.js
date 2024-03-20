@@ -13,7 +13,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import data from "../notiData";
@@ -36,6 +37,7 @@ export default function Home({ route }) {
   const [fName, setFName] = useState("Punya");
   // const [notiData, setNotiData] = useState(data);
   const iconSize = isAndroid ? 48 : 57;
+
   const fetchData = async () => {
     // const patient = await AsyncStorage.getItem("patientId");
     // console.log("storage", patient);
@@ -64,6 +66,14 @@ export default function Home({ route }) {
   useEffect(() => {
     console.log("Home Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
       console.log("Screen is focused");
       fetchData();
       console.log("mood", selectedMenu);
@@ -97,6 +107,22 @@ export default function Home({ route }) {
     } catch (error) {
       console.error('Error updating timeplay:', error);
       // Handle error accordingly
+    }
+  };
+
+  const navigateToAvatarscreen = async () => {
+    try {
+      const response = await axios.post('/talk_with_avatar', { patient_id: patientId });
+      if (response.status === 201) {
+        const { patient_id, mood_detection_id } = response.data.data;
+        console.log( patient_id, mood_detection_id)
+        // navigation.navigate("Avatarscreen")
+        navigation.navigate("Avatarscreen", { patient_id, mood_detection_id });
+      } else {
+        console.error('Failed to insert data into avatar table:', response.status);
+      }
+    } catch (error) {
+      console.error('Error inserting data into avatar table:', error);
     }
   };
 
@@ -137,6 +163,7 @@ export default function Home({ route }) {
       setCheckIn(false);
     }
   };
+
   return (
     <View style={styles.container1}>
       <View
@@ -395,7 +422,7 @@ export default function Home({ route }) {
             style={styles.picur}
             size={25}
             color="#222222"
-            onPress={() => navigation.navigate("Avatarscreen", { patientId })}
+            onPress={() => navigateToAvatarscreen()}
           />
         </View>
       </View>

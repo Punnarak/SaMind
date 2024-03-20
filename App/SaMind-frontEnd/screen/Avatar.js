@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  Dimensions,
+  Platform
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -14,178 +16,397 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import { axios, axiospython, path } from "./axios.js";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import * as Speech from 'expo-speech';
+import waveAvatar from '../assets/wave.gif'
+import standbyAvatar from '../assets/standby.gif'
+import happy1Avatar from '../assets/happy1.gif'
+import happy2Avatar from '../assets/happy2.gif'
+import negative1Avatar from '../assets/negative1.gif'
+import negative2Avatar from '../assets/negative2.gif'
+import neutral1Avatar from '../assets/neutral1.gif'
+import neutral2Avatar from '../assets/neutral2.gif'
+import Svg, { Rect, Path } from "react-native-svg";
+const isAndroid = Platform.OS === "android";
+const windowWidth = Dimensions.get("window").width;
 
-// import { Audio } from "expo-av";
+async function query(data) {
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/woranit/samind-sentiment",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
 
-// const [recording, setRecording] = useState();
-// const [recordings, setRecordings] = useState([]);
-// const [isRecording, setIsRecording] = useState(false);
-
-
-// const handleStartRecording = async () => {
-//   setIsRecording(true);
-//   try {
-//     const perm = await Audio.requestPermissionsAsync();
-//     if (perm.status === "granted") {
-//       await Audio.setAudioModeAsync({
-//         allowsRecordingIOS: true,
-//         playsInSilentModeIOS: true,
-//       });
-//       const { recording } = await Audio.Recording.createAsync(
-//         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-//       );
-//       setRecording(recording);
-//       await recording.startAsync();
-//     }
-//   } catch (err) {
-//     // console.error("Failed to start recording: ", err);
-//   }
-// };
-
-// // Stop recording when button is released
-// const handleStopRecording = async () => {
-//   setIsRecording(false);
-//   // Check if recording is defined
-//   if (recording) {
-//     try {
-//       await recording.stopAndUnloadAsync();
-//       const { sound, status } = await recording.createNewLoadedSoundAsync();
-//       const allRecordings = [...recordings];
-//       allRecordings.push({
-//         sound: sound,
-//         duration: getDurationFormatted(status.durationMillis),
-//         file: recording.getURI(),
-//       });
-//       setRecordings(allRecordings);
-
-//       // Voice.start("en-US");
-//     } catch (err) {
-//       clearRecordings();
-//       console.error("Failed to stop recording: ", err);
-//     }
-//   } else {
-//     console.error("Recording is not started.");
-//   }
-//   clearRecordings();
-// };
-
-
-// useEffect(() => {
-//   // Check if there's a new recording added to the recordings array
-//   // If so, automatically play the last recorded sound
-//   if (recordings.length > 0) {
-//     const lastRecording = recordings[recordings.length - 1];
-//     lastRecording.sound.replayAsync();
-//     clearRecordings();
-//   }
-// }, [recordings]);
-
-// function getDurationFormatted(milliseconds) {
-//   const minutes = milliseconds / 1000 / 60;
-//   const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-//   return seconds < 10
-//     ? `${Math.floor(minutes)}:0${seconds}`
-//     : `${Math.floor(minutes)}:${seconds}`;
-// }
-
-// function clearRecordings() {
-//   setRecordings([]);
-// }
-
-// const [isModalVisible, setIsModalVisible] = useState(false);
-// // const patientId = 333
-// const { patientId, clickCount } = route.params || {};
-// const navigation = useNavigation();
-// const [popCount, setPopCount] = useState(0);
-
-// useEffect(() => {
-//   setPopCount(clickCount);
-// }, []);
-
-
-// import * as Speech from "expo-speech";
-// import Voice from "react-native-voice";
-// import {
-//   requestPermissionsAsync,
-//   startSpeechToTextAsync,
-//   stopSpeechToTextAsync,
-// } from "expo-speech";
-
-export default function Notification() {
-  const navigation = useNavigation();
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isButtonVisible, setButtonVisible] = useState(false);
-  //text to speech
-  const [textToSpeak, setTextToSpeak] = useState("");
-
-  //speech to text expo speech reg
-  // const [recognizedText, setRecognizedText] = useState("");
-  // const [isListening, setIsListening] = useState(false);
-
-  //speech to text expo speech api
-  const [isListening, setIsListening] = useState(false);
-  const [transcription, setTranscription] = useState("");
-  //text to speech
-  const speak = () => {
-    if (textToSpeak) {
-      Speech.speak(textToSpeak, { language: "th" });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
     }
-  };
+    console.log("query response", response)
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error querying model:", error);
+    return null;
+  }
+}
+let result = "";
+async function answer(data) {
+  try {
+    const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่อนและผู้ช่วยตอบคำถาม ตอบคำถามแบบกระชับ และเข้าใจง่าย <</SYS>>${data}[/INST]`;
+    console.log(prompt);
+    const response = await fetch(
+      "https://e31a-2001-fb1-17-16cd-1987-7975-9bbf-8e80.ngrok-free.app/completion",
+      {
+        headers: {
+          // Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+          "bypass-tunnel-reminder": "1", // Adding bypass-tunnel-reminder header
+        },
+        method: "POST",
+        body: JSON.stringify({
+          prompt: prompt,
+          n_predict: 50,
+          temperature: 0.32,
+          top_k: 40
+        }),
+      }
+    );
 
-  //speech to text ----> expo speech api
-  const handleStartListening = async () => {
-    try {
-      await requestPermissionsAsync(); // Request microphone permissions
-      await startSpeechToTextAsync({
-        language: "en-US", // Specify the language for speech recognition
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
+    }
+
+    result = await response.json();
+    console.log(result.content);
+
+    return result.content;
+  } catch (error) {
+    console.error("Error answer model:", error);
+    return null;
+  }
+}
+async function setSpeaker() {
+  console.log("speaker!!!!!!!!")
+  try {
+      await Audio.setAudioOutputModeAsync({
+        allowsRecordingIOS: false,
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+        playsInSilentModeIOS: true,
       });
-      setIsListening(true);
-    } catch (error) {
-      console.error("Error starting speech recognition:", error);
-    }
-  };
+  } catch (error) {
+      console.log('เกิดข้อผิดพลาดในการตั้งค่าลำโพง:', error);
+  }
+}
 
-  const handleStopListening = async () => {
-    try {
-      const result = await stopSpeechToTextAsync();
-      setTranscription(result);
-      setIsListening(false);
-    } catch (error) {
-      console.error("Error stopping speech recognition:", error);
-    }
-  };
+export default function Notification({ route }) {
+  const navigation = useNavigation();
+  const [isModalVisible, setModalVisible] = useState(true);
+  const [isButtonVisible, setButtonVisible] = useState(false);
 
+  const [recording, setRecording] = useState(null);
+  const [recordingStatus, setRecordingStatus] = useState("idle");
+  const [audioPermission, setAudioPermission] = useState(null);
+  const [transcript, setTranscript] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [first, setFirst] = useState(true);
+  const [avatar, setAvatar] = useState('wave')
+  const positiveMax = 2
+  const neutralMax = 2
+  const negativeMax = 2
+  const { patient_id, mood_detection_id } = route.params || {};
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log(patient_id, mood_detection_id);
+
+  let avatarSource; 
+  const changeAvatar = () => {
+    console.log("change",avatar)
+    setTimeout(() => {
+      setAvatar('standby');
+     }, 16000); 
+  }
+  switch (avatar) {
+    case 'wave':
+      console.log("wave avatar")
+      avatarSource = waveAvatar;
+      changeAvatar()
+      break;
+    case 'happy':
+      console.log("happy avatar")
+      let positive = [happy1Avatar, happy2Avatar]
+      let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
+      avatarSource = happyAvatar
+      changeAvatar()
+      break;
+    case 'sad':
+      console.log("sad avatar")
+      let negative = [negative1Avatar, negative2Avatar]
+      let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
+      avatarSource = negativeAvatar
+      changeAvatar()
+      break;
+    case 'normal':
+      console.log("normal avatar")
+      let neutral = [neutral1Avatar, neutral2Avatar]
+      let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
+      avatarSource = neutralAvatar
+      changeAvatar()
+      break;
+    default:
+      avatarSource = standbyAvatar;
+  }
+
+
+  useEffect(() => { 
+    switch (avatar) {
+      case 'wave':
+        console.log("waveeffect avatar")
+        avatarSource = waveAvatar;
+        changeAvatar()
+        break;
+      case 'happy':
+        console.log("happyeffect avatar")
+        let positive = [happy1Avatar, happy2Avatar]
+        let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
+        avatarSource = happyAvatar
+        changeAvatar()
+        break;
+      case 'sad':
+        console.log("sadeffect avatar")
+        let negative = [negative1Avatar, negative2Avatar]
+        let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
+        avatarSource = negativeAvatar
+        changeAvatar()
+        break;
+      case 'normal':
+        console.log("normaleffect avatar")
+        let neutral = [neutral1Avatar, neutral2Avatar]
+        let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
+        avatarSource = neutralAvatar
+        changeAvatar()
+        break;
+      default:
+        avatarSource = standbyAvatar;
+    }
+  }, [avatar]);
   useEffect(() => {
+    // Get recording permission upon first render
+    async function getPermission() {
+      try {
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission Granted: " + permission.granted);
+        setAudioPermission(permission.granted);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // Call function to get recording permission
+    getPermission();
+    // Cleanup upon unmounting
     return () => {
-      stopSpeechToTextAsync(); // Stop speech recognition when the component unmounts
+      if (recording) {
+        stopRecording();
+      }
     };
   }, []);
-  // speech to text ----> react native cli
-  // const startSpeechToText = async () => {
-  //   try {
-  //     setIsListening(true);
-  //     await Voice.start("en-US");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
-  // const stopSpeechToText = async () => {
-  //   try {
-  //     setIsListening(false);
-  //     await Voice.stop();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  async function startRecording() {
+    try {
+      // Needed for iOS
+      if (audioPermission) {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+      }
 
-  // Voice.onSpeechResults = (e) => {
-  //   setRecognizedText(e.value[0]);
-  // };
+      const newRecording = new Audio.Recording();
+      console.log("Starting Recording");
+      await newRecording.prepareToRecordAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      await newRecording.startAsync();
+      setRecording(newRecording);
+      setRecordingStatus("recording");
+    } catch (error) {
+      setRecording(null);
+      setRecordingStatus("stopped");
+      console.error("Failed to start recording", error);
+    }
+  }
 
-  handleLogin = async () => { };
+  const loadingData = () => {
+    setIsLoading(!isLoading);
+    console.log(isLoading)
+  };
+
+  async function stopRecording() {
+    try {
+      if (recordingStatus === "recording") {
+        console.log("Stopping Recording");
+        await recording.stopAndUnloadAsync();
+        await loadingData();
+        const recordingUri = recording.getURI();
+        console.log("Recording URI:", recordingUri);
+        // Call speech to text API after recording stops
+        await convertSpeechToText(recordingUri);
+        // Reset states
+        setRecording(null);
+        setRecordingStatus("stopped");
+      }
+    } catch (error) {
+      console.error("Failed to stop recording", error);
+    }
+  }
+
+  async function convertSpeechToText(audioPath) {
+    try {
+      const fileType = "audio/3gpp";
+      console.log("Audio file path:", audioPath);
+      const formData = {
+        file: audioPath,
+      };
+      console.log("param", formData);
+
+      let response = "";
+      let responseText = "";
+      let responseAnswer = "";
+      try {
+        response = await FileSystem.uploadAsync(
+          path + "/speech",
+          audioPath,
+          {
+            httpMethod: "POST",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: "file", // Must match the field expected by your server
+          }
+        );
+        console.log("Upload result:", response);
+      } catch (e) {
+        console.error("Upload error:", e);
+      }
+      console.log("response", response.body);
+      setTranscript(response.body);
+      // console.log("word : ", transcript);
+
+      if(response.body != "\"\""){
+        // console.log("empty",response.body)
+        responseText = await performSentimentAnalysis(response.body);
+      responseAnswer = await answer(response.body);
+      console.log(responseAnswer);
+      // Speech.speak(responseAnswer, { language: "th" });
+      // setTextToSpeak(responseAnswer)
+    
+      // setSpeaker()
+      speak(responseAnswer)
+      setAvatar(responseText)
+      }
+      setIsLoading(false);  
+    } catch (error) {
+      console.error("Failed to convert speech to text:", error);
+      Alert.alert("Error", "Failed to convert speech to text");
+    }
+  }
+
+  async function handleRecordButtonPress() {
+    if (recording) {
+      await stopRecording(recording.getURI());
+      // console.log(appleCount,meatCount,riceCount,fishCount);
+    } else {
+      await startRecording();
+    }
+  }
+
+  async function performSentimentAnalysis(text) {
+    try {
+      console.log("inputtext", text);
+      const sentimentResult = await query({ inputs: text });
+      console.log("try", sentimentResult);
+      let maxScore = -1;
+      let maxLabel = null;
+      sentimentResult[0].forEach((result) => {
+        if (result.score > maxScore) {
+          maxScore = result.score;
+          maxLabel = result.label;
+        }
+      });
+
+      const labelMeanings = {
+        LABEL_0: "sad",
+        LABEL_1: "happy",
+        LABEL_2: "normal",
+      };
+      
+      console.log(labelMeanings[maxLabel]);
+     
+      // await updateLabel(patientId, maxLabel);
+      console.log(maxLabel, mood_detection_id);
+      try {
+        const updateMoodResponse = await axios.put("/update_mood", {
+          maxLabel: maxLabel,
+          mood_detection_id: mood_detection_id,
+        });
+
+
+        console.log("Update mood response:", updateMoodResponse.data);
+      } catch (error) {
+        console.error("Failed to update mood:", error);
+        // Handle error accordingly
+      }
+
+      return labelMeanings[maxLabel];
+    } catch (error) {
+      console.error("Failed to perform sentiment analysis:", error);
+      return null;
+    }
+  }
+  //text to speech
+  const speak = async (text) => {
+    console.log("ss", text);
+    if (text) {
+       Speech.speak(text, { language: "th-TH" });
+    }
+    
+  };
+  
+  useEffect(() => {
+setSpeaker()
+  }, []); 
   useEffect(() => {
     console.log("Avatar Screen");
+    const onFocus = navigation.addListener("focus", async () => {
+    //  setSpeaker();
+     speak("สวัสดีจ้า ยินดีต้อนรับ");
+     setTimeout(() => {
+     setAvatar("standby");
+    }, 6000); 
+    setFirst(false)
+      
+      axios
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
+      console.log("Screen is focused");
+    });
+    return onFocus;
   }, []);
 
   const toggleModal = () => {
@@ -239,6 +460,7 @@ export default function Notification() {
           >
             How To Talk with Sa-Mind
           </Text>
+          {isAndroid ?
           <Text
             style={{
               fontSize: moderateScale(16.69),
@@ -246,9 +468,25 @@ export default function Notification() {
               textAlign: "center",
             }}
           >
-            วิธีใช้งาน{"\n"}สามารถเริ่มพูดคุยได้โดยการพูด{"\n"}WakeWord
-            รอน้องตอบ{"\n"} แล้วคุยกับน้องได้เลย !!!
+            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อพูดคุยกับน้องสมาย {'\n'}
+            รอน้องตอบ และเพลิดเพลินไปกับ{'\n'}การคุยกับน้องได้เลย !!!
           </Text>
+          : (
+            <View>
+            <Text
+            style={{
+              fontSize: moderateScale(16.69),
+              // fontSize: 17,
+              textAlign: "center",
+            }}
+          >
+            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อ พูดคุยกับน้องสมาย {'\n'}เปิด control center กดที่ไอคอน<Svg width={35} height={25} fill="#d6d6d6" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#d6d6d6" stroke-width="0.00024000000000000003">
+        <Path d="M11.9082.1836c-2.8774.0227-5.7566 1.0743-8.045 3.1719-4.8816 4.4748-5.1662 12.0812-.6913 16.9629.2034.244.4473.4473.6914.6914.122.0813.2861.083.4082-.0391l.5293-.6113c.122-.122.122-.3252 0-.4473C.5293 15.9661.2438 9.254 4.2305 4.9824 8.2172.711 14.8887.4274 19.1602 4.4141c4.2714 3.9867 4.555 10.6562.5683 14.9277-.2034.2034-.365.4076-.5683.5703-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.1204.4472.039 4.8817-4.5155 5.1663-12.0811.6914-16.9628-2.3989-2.5934-5.6588-3.889-8.9199-3.8633zm.3867 3.5176C10.0982 3.63 7.8715 4.3932 6.1426 6c-3.4579 3.2138-3.661 8.6242-.4473 12.082.122.122.2435.2842.4063.4063.122.122.3252.122.4472 0l.5293-.6094c.122-.122.122-.3252 0-.4473-1.4238-1.3424-2.2773-3.2547-2.2773-5.248 0-3.946 3.2122-7.1602 7.1582-7.1602 3.946 0 7.1601 3.2532 7.1601 7.1993 0 1.9526-.8144 3.8665-2.2382 5.209-.122.122-.122.3252 0 .4472l.5293.6094c.122.122.3252.163.4472.041 3.4579-3.2545 3.622-8.6652.4082-12.123-1.6069-1.729-3.774-2.634-5.9707-2.7051zm-.2656 3.3164c-1.3221-.0204-2.654.4662-3.6914 1.4629-2.0747 1.9933-2.1145 5.2475-.1211 7.3222l.121.123c.1221.1221.3253.1221.4474 0l.5293-.6112c.122-.122.122-.3253 0-.4473-.6916-.6916-1.0977-1.6666-1.0977-2.6836a3.732 3.732 0 013.7422-3.7422 3.732 3.732 0 013.7422 3.7422c0 1.017-.4064 1.9513-1.1387 2.6836-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.122.4473 0 2.034-1.9934 2.1164-5.2476.123-7.3223-.9967-1.0373-2.3107-1.5656-3.6328-1.586zm.0059 7.7441c-.1373-.005-.2803.0448-.4024.1465l-.039.041-7.1602 8.0547c-.1627.2034-.1624.488.041.6914.0814.0814.2019.123.2832.123h14.3613c.2441 0 .4883-.2035.4883-.4882 0-.122-.0397-.2448-.121-.3262l-7.0801-8.0547c-.1018-.122-.2338-.1824-.3711-.1875Z" />
+      </Svg>และเปลี่ยนเป็น speaker  
+            รอน้องตอบ และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
+       </Text>
+            </View>
+          )}
           <TouchableOpacity
             style={styles.buttonInfo}
             onPress={toggleModal}
@@ -260,7 +498,7 @@ export default function Notification() {
       </Modal>
 
       <Image
-        source={require("../assets/a1.gif")}
+        source={avatarSource}
         style={{
           width: horizontalScale(337),
           // width: 350,
@@ -272,47 +510,55 @@ export default function Notification() {
         }}
       />
 
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.button}
-          onPressIn={handleStartRecording}
-          onPressOut={handleStopRecording}
+      <TouchableOpacity
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 6,
+          paddingHorizontal: 12,
+          gap: 8,
+          height: 40,
+          width: 150,
+          backgroundColor: isLoading ? "#888888" : "#1b1b1cde",
+          borderRadius: 20,
+          cursor: "pointer",
+          flexDirection: "row",
+          marginBottom: 20,
+        }}
+        onPress={handleRecordButtonPress}
+        disabled={isLoading}
+      >
+        <Feather
+          name="mic"
+          size={20}
+          color={isLoading ? "#000000" : recording ? "#FF342B" : "#000000"}
+        />
+        <Svg
+          width="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#FF342B"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <Text style={styles.buttonText}>
-            {isRecording ? "Recording..." : "Hold to Record"}
-          </Text>
-        </TouchableOpacity>
-        {/* <Text style={styles.transcriptionText}>{transcription}</Text> */}
-        {/* Display recording lines */}
-        {/* {getRecordingLines()} */}
-      </View>
-
-      {/* speech to text ---> expo speech api */}
-      {/* <View>
-        <Button
-          title={isListening ? "Stop Listening" : "Start Listening"}
-          onPress={isListening ? handleStopListening : handleStartListening}
-        />
-        <Text>{transcription}</Text>
-      </View> */}
-      {/* speech to text ---> react native cli*/}
-      {/* <View>
-        <Button
-          title={isListening ? "Stop Listening" : "Start Listening"}
-          onPress={isListening ? stopSpeechToText : startSpeechToText}
-        />
-        <Text>{recognizedText}</Text>
-      </View> */}
-
-      {/* text to speech */}
-      {/* <View>
-        <TextInput
-          placeholder="Enter text to speak"
-          value={textToSpeak}
-          onChangeText={(text) => setTextToSpeak(text)}
-        />
-        <Button title="Speak" onPress={speak} />
-      </View> */}
+          <Rect y="3" x="9" width="6" height="11" rx="3" />
+          <Path d="M12 18V21" />
+          <Path d="M8 21H16" />
+          <Path d="M19 11C19 14.866 15.865 18 12 18C8.134 18 5 14.866 5 11" />
+        </Svg>
+        <Text
+          style={{
+            lineHeight: 20,
+            fontSize: 17,
+            color: isLoading ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
+            letterSpacing: 1,
+          }}
+        >
+          {isLoading ? "Waiting" : recording ? "Recording" : "Record"}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -348,5 +594,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
+  },
+  button: {
+    backgroundColor: "#2196f3",
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
   },
 });

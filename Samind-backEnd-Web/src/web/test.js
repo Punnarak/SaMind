@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
@@ -84,7 +85,7 @@ router.use(bodyParser.json());
 //         });
 // });
 
-router.post('/allTest', (req, res) => {
+router.post('/allTest', auth, (req, res) => {
     const therapistId = req.body.therapist_id; // Use req.body to get parameters from the request body
     let query = `
         SELECT
@@ -156,7 +157,7 @@ router.post('/allTest', (req, res) => {
 //       });
 // });
 
-router.post('/viewOneQuestion', (req, res) => {
+router.post('/viewOneQuestion', auth, (req, res) => {
     const type = req.body.type; // Get the type from the JSON body
     const therapistId = req.body.therapistId; // Get the therapistId from the JSON body
 
@@ -337,7 +338,7 @@ router.post('/viewOneQuestion', (req, res) => {
 //     }
 // });
 
-router.post('/questionAdd', async (req, res) => {
+router.post('/questionAdd', auth, async (req, res) => {
     const requestData = req.body;
     const therapistId = requestData.therapist_id || ''; // Extract therapist_id from request data
     const description = requestData.description || ''; // Extract description from request data
@@ -494,7 +495,7 @@ router.post('/questionAdd', async (req, res) => {
 //     }
 // });
 
-router.post('/questionUpdate', async (req, res) => {
+router.post('/questionUpdate', auth, async (req, res) => {
     const requestData = req.body;
     const therapistId = requestData.therapist_id || '';
     const description = requestData.description || '';
@@ -553,9 +554,7 @@ router.post('/questionUpdate', async (req, res) => {
     }
 });
 
-
-
-router.delete('/questionsDel', (req, res) => {
+router.delete('/questionsDel', auth, (req, res) => {
     const type = req.body.type; // Get the type from the request body
     const therapistId = req.body.therapistId; // Get the therapist_id from the request body
   
@@ -703,7 +702,7 @@ router.delete('/questionsDel', (req, res) => {
 //         });
 // });
 
-router.post('/therapistSendTest', (req, res) => {
+router.post('/therapistSendTest', auth, (req, res) => {
     const therapistId = req.body.therapistId;
     const testName = req.body.testName;
     const patientIds = req.body.patientId;
@@ -772,14 +771,5 @@ router.post('/therapistSendTest', (req, res) => {
             res.status(500).json({ error: 'An error occurred' });
         });
 });
-
-
-
-
-
-
-
-
-  
 
 module.exports = router;

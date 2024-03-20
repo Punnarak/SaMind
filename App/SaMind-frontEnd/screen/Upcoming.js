@@ -15,7 +15,8 @@ import moment from "moment";
 import UpcomingBox from "../upcomingbox";
 import AssignmentBox from "../AssigmentBox";
 // import assignData from "../assignData";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Upcoming({ route }) {
   const navigation = useNavigation();
@@ -26,6 +27,17 @@ export default function Upcoming({ route }) {
 
   useEffect(() => {
     console.log("Upcoming Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     const dateStrings = [year + "-" + month + "-" + date];
     console.log(dateStrings);
     const dateFormat = "YYYY-MM-DD";
@@ -51,6 +63,7 @@ export default function Upcoming({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
+      return onFocus
   }, []);
 
   console.log("date--> " + date);

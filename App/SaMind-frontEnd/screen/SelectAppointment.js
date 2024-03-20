@@ -19,7 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
 import moment from "moment";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Login({ route }) {
   const navigation = useNavigation();
@@ -40,10 +41,9 @@ export default function Login({ route }) {
   const [doctorName, setDoctorName] = useState(null);
   const [showdate, setshowdate] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
-
+  const [disabled, setDisabled] = useState(false);
   const { date, month, year, patientId } = route.params || {};
-  const [timeValue, setTimeValue] = useState();
-  const time = [
+  const [time, setTime] = useState([
     { id: 1, name: "0:00-1:00 ", value: "0:00" },
     { id: 2, name: "0:30-1:30 ", value: "0:30" },
     { id: 3, name: "1:00-2:00 ", value: "1:00" },
@@ -91,7 +91,7 @@ export default function Login({ route }) {
     { id: 45, name: "22:00-23:00 ", value: "22:00" },
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
-  ];
+  ])
 
   const DrName = [
     { id: 1, name: "A", value: "A" },
@@ -110,6 +110,9 @@ export default function Login({ route }) {
     navigation.navigate("Appointmentscreen", { patientId });
   };
   const toggleSubmit = () => {
+    console.log('toggle submit',selectedValue)
+    if(selectedValue && selectedValue != 'time not available'){
+    setTimeError("")
     setConfirmModal(!confirmModal);
     const dateApi = date + "-" + (month + 1) + "-" + year;
     const param = {
@@ -130,12 +133,15 @@ export default function Login({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
+    }else{
+      setTimeError("*")
+    }
   };
   const toggleModal = () => {
     setSubmit(!submit);
   };
   const handleSubmit = () => {
-    if (selectedValue) {
+    if (selectedValue && selectedValue != 'time not available') {
       setTimeError("");
       const dateString = year + "-" + (month + 1) + "-" + date;
 
@@ -221,6 +227,39 @@ export default function Login({ route }) {
   };
   useEffect(() => {
     console.log("Select Appointment Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+
+
+    let param2 = {
+      patientID: patientId,
+      date: year + "-" + (month + 1) + "-" + date
+    }
+    console.log(param2)
+    axios
+      .post("/appointShowTime", param2)
+      .then((response) => {
+        console.log("data:", response.data);
+        if(response.data === '-'){
+          setSelectedValue("time not available")
+          setDisabled(true)
+        }else{
+           setTime(response.data)
+           setDisabled(false)
+        }
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
     const param = {
       patientId: patientId,
     };
@@ -236,6 +275,7 @@ export default function Login({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
+      return onFocus;
   }, []);
 
   return (
@@ -276,7 +316,7 @@ export default function Login({ route }) {
           editable={false}
           value={selectedValue ? selectedValue : ""}
         />
-        <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker}>
+        <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker} disabled={disabled}>
           <Ionicons
             name="chevron-back-outline"
             style={{

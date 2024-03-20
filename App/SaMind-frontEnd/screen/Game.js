@@ -7,141 +7,96 @@ import {
   Image,
   TouchableWithoutFeedback,
   Dimensions,
-  ProgressBarAndroid,
+  // ProgressBarAndroid,
   ImageBackground,
   Modal,
 } from "react-native";
+import ProgressBar from "react-native-progress/Bar";
 import { useNavigation } from "@react-navigation/native";
-import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
-
-import Voice from "@react-native-community/voice";
+import * as FileSystem from "expo-file-system";
+import { Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import Svg, { Rect, Path } from "react-native-svg";
 
 const windowWidth = Dimensions.get("window").width;
 
+async function query(data) {
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/woranit/samind-sentiment",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error querying model:", error);
+    return null;
+  }
+}
+
 const PopcatGame = ({ route }) => {
-  const [recording, setRecording] = useState();
-  const [recordings, setRecordings] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [transcription, setTranscription] = useState("");
-
-  // Start recording when button is pressed
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-        setRecording(recording);
-        await recording.startAsync();
-      }
-    } catch (err) {
-      // console.error("Failed to start recording: ", err);
-    }
-  };
-
-  // Stop recording when button is released
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    // Check if recording is defined
-    if (recording) {
-      try {
-        await recording.stopAndUnloadAsync();
-        const { sound, status } = await recording.createNewLoadedSoundAsync();
-        const allRecordings = [...recordings];
-        allRecordings.push({
-          sound: sound,
-          duration: getDurationFormatted(status.durationMillis),
-          file: recording.getURI(),
-        });
-        setRecordings(allRecordings);
-
-        // Voice.start("en-US");
-      } catch (err) {
-        clearRecordings();
-        console.error("Failed to stop recording: ", err);
-      }
-    } else {
-      console.error("Recording is not started.");
-    }
-    clearRecordings();
-  };
-
-  // useEffect(() => {
-  //   Voice.onSpeechResults = (e) => {
-  //     setTranscription(e.value[0]); // Set the transcription in the state
-  //   };
-
-  //   return () => {
-  //     Voice.destroy().then(Voice.removeAllListeners);
-  //   };
-  // }, []);
-
-  useEffect(() => {
-    // Check if there's a new recording added to the recordings array
-    // If so, automatically play the last recorded sound
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      lastRecording.sound.replayAsync();
-      clearRecordings();
-    }
-  }, [recordings]);
-
-  function getDurationFormatted(milliseconds) {
-    const minutes = milliseconds / 1000 / 60;
-    const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-    return seconds < 10
-      ? `${Math.floor(minutes)}:0${seconds}`
-      : `${Math.floor(minutes)}:${seconds}`;
-  }
-
-  // function getRecordingLines() {
-  //   return recordings.map((recordingLine, index) => {
-  //     return (
-  //       <View key={index} style={styles.row}>
-  //         <Text style={styles.fill}>
-  //           Recording #{index + 1} | {recordingLine.duration}
-  //         </Text>
-  //         <TouchableOpacity
-  //           style={styles.button}
-  //           onPress={() => {
-  //             recordingLine.sound.replayAsync();
-  //             clearRecordings();
-  //           }}
-  //         >
-  //           {/* <Text style={styles.buttonText}>Play</Text> */}
-  //         </TouchableOpacity>
-  //       </View>
-  //     );
-  //   });
-  // }
-
-  function clearRecordings() {
-    setRecordings([]);
-  }
-
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isInfoVisible, setIsInfoVisible] = useState(false);
   // const patientId = 333
-  const { patientId,clickCount } = route.params || {};
-  const navigation = useNavigation();
   const [popCount, setPopCount] = useState(0);
+  const { patientId, clickCount } = route.params || {};
+  // const { patientId } = route.params || {};
+  const navigation = useNavigation();
+  const [isButtonVisible, setButtonVisible] = useState(false);
+  const [isLoadingSound, setIsLoadingSound] = useState(false);
+
+  const loadingData = () => {
+    setIsLoadingSound(!isLoadingSound);
+    // console.log("kao ", isLoadingSound)
+  };
 
   useEffect(() => {
     setPopCount(clickCount);
-  }, []);
+  }, [clickCount]);
+
+  const updateLabel = async (patientId, maxLabel) => {
+    try {
+      // Make a request to your API to update the patient's label
+      const response = await axios.put("/update_patient_label", {
+        patient_id: patientId,
+        max_label: maxLabel,
+      });
+
+      if (response.status === 200) {
+        console.log("Label updated successfully emotion is ", maxLabel);
+        // Now that label is updated, perform further actions if needed
+      } else {
+        console.error("Failed to update label:", response.status);
+        // Handle error accordingly
+      }
+    } catch (error) {
+      console.error("Error updating label:", error);
+      // Handle error accordingly
+    }
+  };
 
   const [imageSource, setImageSource] = useState(
     require("../assets/egg1.png") // Initial image
   );
-  const [swipeDirection, setSwipeDirection] = useState(null);
+
   const [progress1, setProgress1] = useState(1);
   const [progress2, setProgress2] = useState(1);
   const [progress3, setProgress3] = useState(1);
@@ -155,8 +110,181 @@ const PopcatGame = ({ route }) => {
   const [gameData, setGameData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [sentiment, setSentiment] = useState(null);
+
+  const [recording, setRecording] = useState(null);
+  const [recordingStatus, setRecordingStatus] = useState("idle");
+  const [audioPermission, setAudioPermission] = useState(null);
+  const [transcript, setTranscript] = useState("");
+
+  useEffect(() => {
+    // Get recording permission upon first render
+    async function getPermission() {
+      try {
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission Granted: " + permission.granted);
+        setAudioPermission(permission.granted);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // Call function to get recording permission
+    getPermission();
+    // Cleanup upon unmounting
+    return () => {
+      if (recording) {
+        stopRecording();
+      }
+    };
+  }, []);
+
+  async function startRecording() {
+    try {
+      // Needed for iOS
+      if (audioPermission) {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+      }
+
+      const newRecording = new Audio.Recording();
+      console.log("Starting Recording");
+      await newRecording.prepareToRecordAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      await newRecording.startAsync();
+      setRecording(newRecording);
+      setRecordingStatus("recording");
+    } catch (error) {
+      console.error("Failed to start recording", error);
+    }
+  }
+
+  async function stopRecording() {
+    try {
+      if (recordingStatus === "recording") {
+        console.log("Stopping Recording");
+        await recording.stopAndUnloadAsync();
+        const recordingUri = recording.getURI();
+        console.log("Recording URI:", recordingUri);
+        await loadingData();
+        console.log("kao ", isLoadingSound)
+        // Call speech to text API after recording stops
+        await convertSpeechToText(recordingUri);
+        // Reset states
+        setRecording(null);
+        setRecordingStatus("stopped");
+      }
+    } catch (error) {
+      console.error("Failed to stop recording", error);
+    }
+  }
+
+  async function convertSpeechToText(audioPath) {
+    try {
+      const fileType = "audio/3gpp";
+      console.log("Audio file path:", audioPath);
+      const formData = {
+        file: audioPath,
+      };
+      console.log("param", formData);
+
+      let response = "";
+      let responseText = "";
+      try {
+        response = await FileSystem.uploadAsync(
+          "http://192.168.1.101:4343/speech",
+          audioPath,
+          {
+            httpMethod: "POST",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: "file", // Must match the field expected by your server
+          }
+        );
+        console.log("Upload result:", response);
+      } catch (e) {
+        console.error("Upload error:", e);
+      }
+      console.log("response", response.body);
+      setTranscript(response.body);
+      // console.log("word : ", transcript);
+      responseText = await performSentimentAnalysis(response.body);
+    } catch (error) {
+      console.error("Failed to convert speech to text:", error);
+      Alert.alert("Error", "Failed to convert speech to text");
+    }
+  }
+
+  async function handleRecordButtonPress() {
+    if (recording) {
+      await stopRecording(recording.getURI());
+      // console.log(appleCount,meatCount,riceCount,fishCount);
+    } else {
+      await startRecording();
+    }
+  }
+
+  async function performSentimentAnalysis(text) {
+    try {
+      console.log("inputtext", text);
+      const sentimentResult = await query({ inputs: text });
+      console.log("try", sentimentResult);
+      let maxScore = -1;
+      let maxLabel = null;
+      sentimentResult[0].forEach((result) => {
+        if (result.score > maxScore) {
+          maxScore = result.score;
+          maxLabel = result.label;
+        }
+      });
+
+      const labelMeanings = {
+        LABEL_0: "sad",
+        LABEL_1: "happy",
+        LABEL_2: "normal",
+      };
+
+      console.log(labelMeanings[maxLabel]);
+      await updateLabel(patientId, maxLabel);
+
+      if (maxLabel === "LABEL_1") {
+        const randomFood = Math.floor(Math.random() * 4); // Generate a random number between 0 and 3
+        switch (randomFood) {
+          case 0:
+            setAppleCount((prevCount) => prevCount + 1);
+            break;
+          case 1:
+            setMeatCount((prevCount) => prevCount + 1);
+            break;
+          case 2:
+            setRiceCount((prevCount) => prevCount + 1);
+            break;
+          case 3:
+            setFishCount((prevCount) => prevCount + 1);
+            break;
+          default:
+            break;
+        }
+      }
+      setIsLoadingSound(false)
+      return labelMeanings[maxLabel];
+    } catch (error) {
+      setIsLoadingSound(false)
+      console.error("Failed to perform sentiment analysis:", error);
+      return null;
+    }
+  }
+
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  const toggleInfo = () => {
+    setIsInfoVisible(!isInfoVisible);
+    setButtonVisible(!isButtonVisible);
+    console.log(isInfoVisible);
   };
 
   const handleEatingButtonPress = () => {
@@ -206,8 +334,6 @@ const PopcatGame = ({ route }) => {
       const parsedmeat = parseInt(gameData[0].meat);
       const parsedapple = parseInt(gameData[0].apple);
 
-      console.log(parsedClickCount);
-
       setProgress1(parsedHealthBar);
       setProgress2(parsedHungryBar);
       setProgress3(parsedStaminaBar);
@@ -240,11 +366,9 @@ const PopcatGame = ({ route }) => {
       );
     } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 100) {
+    } else if (popCount >= 500 && popCount < 100) {
       setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/penguinidle.gif"));
+    } else setImageSource(require("../assets/monster/penguinidle.gif"));
   }, [popCount]);
 
   useEffect(() => {
@@ -407,14 +531,11 @@ const PopcatGame = ({ route }) => {
           ? require("../assets/egg31.png")
           : require("../assets/egg32.png")
       );
-    } 
-    else if (popCount >= 200 && popCount < 500) {
+    } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 1000) {
+    } else if (popCount >= 500 && popCount < 1000) {
       setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else
-    setImageSource(require("../assets/monster/dogidle.gif"));
+    } else setImageSource(require("../assets/monster/dogidle.gif"));
   };
 
   const handlePressOut = () => {
@@ -426,11 +547,11 @@ const PopcatGame = ({ route }) => {
       setImageSource(require("../assets/egg3.png"));
     } else if (popCount >= 200 && popCount < 500) {
       setImageSource(require("../assets/monster/pigidle.gif"));
-    }
-      else if (popCount >= 500 && popCount < 1000) {
+    } else if (popCount >= 500 && popCount < 1000) {
       setImageSource(require("../assets/monster/penguinfight.gif"));
-    } else
-    {setImageSource(require("../assets/monster/dogfight.gif"));}
+    } else {
+      setImageSource(require("../assets/monster/dogfight.gif"));
+    }
     setPopCount((prevCount) => prevCount + 1);
   };
 
@@ -530,6 +651,69 @@ const PopcatGame = ({ route }) => {
       style={{ width: "100%", resizeMode: "cover", flex: 1 }}
     >
       {/* <View style={styles.backgroundContainer}> */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: 20,
+          marginTop: 54,
+        }}
+      >
+        <Ionicons
+          name="chevron-back-outline"
+          size={30}
+          color="#3987FD"
+          onPress={() => navigation.goBack()}
+        />
+        <Feather name={"info"} size={25} color="#569AFF" onPress={toggleInfo} />
+      </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isInfoVisible}
+        onRequestClose={() => {
+          toggleInfo();
+        }}
+      >
+        <View style={styles.modalBackground}>
+          {/* <ImageBackground
+                  source={require("../assets/bedroom.jpg")}
+                  style={{ resizeMode: "fit", flex: 1 }}
+                > */}
+          <TouchableWithoutFeedback onPress={toggleInfo}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalViewRow}>
+                <Text
+                  style={{
+                    fontSize: moderateScale(16),
+                    // fontSize: 16,
+                    marginTop: 35,
+                    color: "#569AFF",
+                    fontWeight: "bold",
+                    marginBottom: 45,
+                  }}
+                >
+                  How To Play
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: moderateScale(14),
+                    // fontSize: 17,
+                    textAlign: "center",
+                  }}
+                >
+                  คลิ๊กเพื่อฟักไข่ {"\n"} ให้อาหารน้อง เล่นเกม และเรียนกับน้อง{" "}
+                  {"\n"} พูดให้กำลังใจน้อง {"\n"} ไปเลี้ยงน้องกัน
+                </Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+          {/* </ImageBackground> */}
+        </View>
+      </Modal>
       <View style={styles.container}>
         {sleepMode && (
           <View style={styles.sleepModeOverlay}>
@@ -542,21 +726,57 @@ const PopcatGame = ({ route }) => {
         >
           <Image source={imageSource} style={styles.popcatImage} />
         </TouchableWithoutFeedback>
-        <Text style={styles.countText}>{popCount}</Text>
-        <View style={styles.container}>
-          <TouchableOpacity
-            style={styles.button}
-            onPressIn={handleStartRecording}
-            onPressOut={handleStopRecording}
-          >
-            <Text style={styles.buttonText}>
-              {isRecording ? "Recording..." : "Hold to Record"}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.transcriptionText}>{transcription}</Text>
-          {/* Display recording lines */}
-          {/* {getRecordingLines()} */}
-        </View>
+       {/*  <Text style={styles.countText}>{popCount}</Text> */}
+        <TouchableOpacity
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 6,
+          paddingHorizontal: 12,
+          gap: 8,
+          height: 40,
+          width: 150,
+          backgroundColor: isLoadingSound ? "#888888" : "#1b1b1cde",
+          borderRadius: 20,
+          cursor: "pointer",
+          flexDirection: "row",
+          marginBottom: 20,
+        }}
+        onPress={handleRecordButtonPress}
+        disabled={isLoadingSound}
+      >
+        <Feather
+          name="mic"
+          size={20}
+          color={isLoadingSound ? "#000000" : recording ? "#FF342B" : "#000000"}
+        />
+        <Svg
+          width="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#FF342B"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <Rect y="3" x="9" width="6" height="11" rx="3" />
+          <Path d="M12 18V21" />
+          <Path d="M8 21H16" />
+          <Path d="M19 11C19 14.866 15.865 18 12 18C8.134 18 5 14.866 5 11" />
+        </Svg>
+        <Text
+          style={{
+            lineHeight: 20,
+            fontSize: 17,
+            color: isLoadingSound ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
+            fontFamily: "sans-serif",
+            letterSpacing: 1,
+          }}
+        >
+          {isLoadingSound ? "Waiting" : recording ? "Recording" : "Record"}
+        </Text>
+      </TouchableOpacity>
         <View style={styles.progressBars}>
           <View
             style={{
@@ -572,11 +792,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Health
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress1}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="red"
               progressBarStyle={{ height: 20 }}
             />
@@ -595,11 +815,11 @@ const PopcatGame = ({ route }) => {
             <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
               Hungry
             </Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress2}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="orange"
               progressBarStyle={{ height: 20 }}
             />
@@ -616,11 +836,11 @@ const PopcatGame = ({ route }) => {
             }}
           >
             <Text style={styles.progressBarLabel}>Stamina</Text>
-            <ProgressBarAndroid
+            <ProgressBar
               styleAttr="Horizontal"
               progress={progress3}
               indeterminate={false}
-              style={{ flex: 1 }}
+              // style={{ flex: 1 }}
               color="grey"
               progressBarStyle={{ height: 20 }}
             />
@@ -667,7 +887,12 @@ const PopcatGame = ({ route }) => {
                     <View style={styles.modalViewRow}>
                       <View style={styles.foodOptionsRow}>
                         {/* First Row */}
-                        <View style={[styles.row, {marginRight:30, marginBottom:20}]}>
+                        <View
+                          style={[
+                            styles.row,
+                            { marginRight: 30, marginBottom: 20 },
+                          ]}
+                        >
                           <TouchableOpacity
                             style={[
                               styles.modalButton,
@@ -696,7 +921,7 @@ const PopcatGame = ({ route }) => {
                           </TouchableOpacity>
                         </View>
                         {/* Second Row */}
-                        <View style={[styles.row, {marginLeft:30}]}>
+                        <View style={[styles.row, { marginLeft: 30 }]}>
                           <TouchableOpacity
                             style={[
                               styles.modalButton,
@@ -806,7 +1031,7 @@ const PopcatGame = ({ route }) => {
                 },
               ]}
               onPress={handleGame4Press}
-              disabled={popCount <= 0}
+              disabled={popCount < 200}
             >
               <Text style={styles.buttonText}>Sleep</Text>
             </TouchableOpacity>
@@ -830,7 +1055,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   popcatImage: {
-    marginTop: 150,
+    marginTop: 20,
     width: 200,
     height: 200,
     marginBottom: 20,
@@ -924,14 +1149,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
   },
-  modalButton: {
-    backgroundColor: "#2196f3",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    elevation: 2,
-    marginBottom: 10,
-  },
+  // modalButton: {
+  //   backgroundColor: "#2196f3",
+  //   borderRadius: 20,
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 20,
+  //   elevation: 2,
+  //   marginBottom: 10,
+  // },
   modalBackground: {
     flex: 1,
   },
@@ -949,7 +1174,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    width: "90%"
+    width: "90%",
   },
   bottomRightTextContainer: {
     position: "absolute",
@@ -962,6 +1187,56 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontSize: 12, // Adjust the font size here
     textAlign: "right", // Align the text to the right
+  },
+  Modal: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderColor: "#3987FD",
+    borderWidth: 5,
+    borderRadius: 8,
+    marginHorizontal: horizontalScale(16.5),
+    // marginHorizontal: "5%",
+  },
+  buttonInfo: {
+    marginTop: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    backgroundColor: "#569AFF",
+    width: horizontalScale(177),
+    // width: "60%",
+    marginBottom: 15,
+  },
+
+  buttonGame: {
+    position: 'relative',
+    width: 150,
+    borderWidth: 0,
+    borderRadius: 5,
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    transitionDuration: '0.2s',
+    opacity: 0.8,
+    letterSpacing: 1,
+    shadowColor: '#c0392b',
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 8,
+  },
+  buttonTextGame: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

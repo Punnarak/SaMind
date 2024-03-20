@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const client = require('./connection.js');
+const secret = require("./auth.js").secret;
+const auth = require("./auth.js").authorization;
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = 'YmFja0VuZC1Mb2dpbi1TYU1pbmQ=' //backEnd-Login-SaMind encode by base64
+
 
 router.use(bodyParser.json());
 
@@ -428,7 +430,7 @@ router.use(bodyParser.json());
 //   }
 // });
 
-router.post('/adAllTestHistory', async (req, res) => {
+router.post('/adAllTestHistory', auth, async (req, res) => {
   try {
     const { patientID } = req.body;
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -516,19 +518,7 @@ router.post('/adAllTestHistory', async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-router.post('/adTherapistAll', (req, res) => {
+router.post('/adTherapistAll', auth, (req, res) => {
   const { hospitalName } = req.body;
 
   let query = 'SELECT fname, lname FROM therapist WHERE admin = $1 AND hospital_name = $2';
@@ -649,7 +639,7 @@ router.post('/adTherapistAll', (req, res) => {
 //   }
 // });
 
-router.post('/adCreatePatient', async (req, res) => {
+router.post('/adCreatePatient', auth, async (req, res) => {
   try {
     const {
       fname,
@@ -1230,7 +1220,7 @@ router.post('/adCreatePatient', async (req, res) => {
 //       });
 // });
 
-router.post('/adPatientView', (req, res) => {
+router.post('/adPatientView', auth, (req, res) => {
   const hospitalName = req.body.hospitalName;
 
   // Query to get patient details along with therapist's name, gender, email, born, and phone
@@ -1254,61 +1244,72 @@ router.post('/adPatientView', (req, res) => {
           // Loop through each patient to fetch mood data and construct the output object
           patientResult.rows.forEach(patient => {
               const patientID = patient.patient_id;
-              const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
-                                        COALESCE(negative, '0%') AS negative,
-                                        COALESCE(neutral, '0%') AS neutral
-                                 FROM public.avatar_mood_detection
-                                 WHERE patient_id = $1`;
+              const moodQuery = `SELECT COALESCE(positive_percent, '0') AS positive,
+                                        COALESCE(nagative_percent, '0') AS negative,
+                                        COALESCE(neutral_percent, '0') AS neutral
+                                 FROM public.avatar
+                                 WHERE patient_id = $1 ORDER BY date DESC LIMIT 1`;
 
-              client.query(moodQuery, [patientID])
-                  .then(moodResult => {
-                      let mood = '-'; // Default mood to '-' if no mood data is available
+              client
+                .query(moodQuery, [patientID])
+                .then((moodResult) => {
+                  let mood = "-"; // Default mood to '-' if no mood data is available
 
-                      if (moodResult.rows.length > 0) {
-                          // Determine the most detected mood
-                          const moodData = moodResult.rows[0];
-                          let maxPercentage = 0;
+                  if (moodResult.rows.length > 0) {
+                    // Determine the most detected mood
+                    const moodData = moodResult.rows[0];
+                    let highestValue = Math.max(
+                      parseFloat(moodData.positive),
+                      parseFloat(moodData.negative),
+                      parseFloat(moodData.neutral)
+                    );
 
-                          for (const [key, value] of Object.entries(moodData)) {
-                              const percentage = parseInt(value);
-                              if (percentage > maxPercentage) {
-                                  maxPercentage = percentage;
-                                  mood = key;
-                              }
-                          }
-                      }
+                    if (highestValue === parseFloat(moodData.positive)) {
+                      mood = "positive";
+                    } else if (highestValue === parseFloat(moodData.negative)) {
+                      mood = "negative";
+                    } else {
+                      mood = "neutral";
+                    }
+                  }
 
-                      // Format the born date to DD/MM/YYYY format
-                      const bornDate = patient.born ? new Date(patient.born).toLocaleDateString('en-GB') : '';
+                  // Format the born date to DD/MM/YYYY format
+                  const bornDate = patient.born
+                    ? new Date(patient.born).toLocaleDateString("en-GB")
+                    : "";
 
-                      // Construct the output object for the current patient
-                      const patientOutput = {
-                          "No": counter.toString().padStart(2, '0'),
-                          "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
-                          "patientID": `PID${patientID}`,
-                          "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
-                          "gender": patient.gender ? "male" : "female",
-                          "age": patient.age,
-                          "born": bornDate,
-                          "phone": patient.phone,
-                          "email": patient.email,
-                          "mood": mood
-                      };
+                  // Construct the output object for the current patient
+                  const patientOutput = {
+                    No: counter.toString().padStart(2, "0"),
+                    therapistName: `${patient.therapist_fname} ${patient.therapist_lname}`,
+                    patientID: `PID${patientID}`,
+                    patientName: `${patient.patient_fname} ${patient.patient_lname}`,
+                    gender: patient.gender ? "male" : "female",
+                    age: patient.age,
+                    born: bornDate,
+                    phone: patient.phone,
+                    email: patient.email,
+                    mood: mood,
+                  };
 
-                      // Push the output object to the array
-                      output.push(patientOutput);
+                  // Push the output object to the array
+                  output.push(patientOutput);
 
-                      counter++; // Increment the counter for the next patient
+                  counter++; // Increment the counter for the next patient
 
-                      // If all patients are processed, send the response
-                      if (output.length === patientResult.rows.length) {
-                          res.json(output);
-                      }
-                  })
-                  .catch(moodErr => {
-                      console.error('Error fetching mood data:', moodErr);
-                      res.status(500).json({ error: 'An error occurred while fetching mood data' });
-                  });
+                  // If all patients are processed, send the response
+                  if (output.length === patientResult.rows.length) {
+                    res.json(output);
+                  }
+                })
+                .catch((moodErr) => {
+                  console.error("Error fetching mood data:", moodErr);
+                  res
+                    .status(500)
+                    .json({
+                      error: "An error occurred while fetching mood data",
+                    });
+                });
           });
       })
       .catch(err => {
@@ -1567,7 +1568,7 @@ router.post('/adPatientView', (req, res) => {
 //   }
 // });
 
-router.post('/adPersonalData', async (req, res) => {
+router.post('/adPersonalData', auth, async (req, res) => {
     const { patientID } = req.body;
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -1655,7 +1656,13 @@ router.post('/adPersonalData', async (req, res) => {
             : "-";
 
         // Extract mood from the data
-        const mood = patientData.mood ? patientData.mood : "-";
+        let mood = "-";
+        let avatarMood = "-";
+        if (patientData.mood) {
+            const moodData = await getAvatarMoodDetection(numericPatientID);
+            mood = moodData ? getHighestMood(moodData.avatarMoodDetec) : "-";
+            avatarMood = moodData ? moodData.mood : "-";
+        }
 
         // Fetch additional data
         const avgMoodResult = await getAverageScores(numericPatientID);
@@ -1690,13 +1697,12 @@ router.post('/adPersonalData', async (req, res) => {
             nextAppointment: formattedNextAppointment,
             tel: patientData.tel,
             email: patientData.email,
-            mood,
-            avgMood: moodText, // Set avgMood based on calculated mood text
+            mood: avatarMood,
+            avgMood: moodText,
             dateBetween: avgMoodResult.dateBetween,
             historyTest: historyTestResult.historyTest,
             dateAvatarMoodDetec: avatarMoodDetectionResult.date,
-            // Check if avatarMoodDetectionResult contains mood data
-            avatarMood: mood,
+            avatarMood,
         };
 
         // Send the response
@@ -1784,15 +1790,85 @@ function getMonthName(month) {
   }
 
 //function getHistoryTest
+// async function getHistoryTest(patientId) {
+//   const query = `
+//       SELECT score, type, date_time
+//       FROM test_score
+//       WHERE answer IS NULL
+//       ORDER BY date_time DESC
+//       LIMIT 2
+//     `;
+//   const queryParams = [];
+
+//   try {
+//     const result = await client.query(query, queryParams);
+
+//     if (result.rows.length === 0) {
+//       return { error: "No history test data found." };
+//     }
+
+//     const modifiedResult = {
+//       historyTest: {},
+//     };
+
+//     result.rows.forEach((row, index) => {
+//       const { type, date_time } = row;
+//       let resultText = "";
+
+//       if (type === "PHQ9") {
+//         const resultValue = parseInt(row.score, 10);
+//         if (resultValue < 7) {
+//           resultText =
+//             "ท่านไม่มีอาการซึมเศร้าหรือมีอาการซึมเศร้าในระดับน้อยมาก";
+//         } else if (resultValue >= 7 && resultValue <= 12) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับน้อย";
+//         } else if (resultValue >= 13 && resultValue <= 18) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับปานกลาง";
+//         } else if (resultValue >= 19) {
+//           resultText = "ท่านมีอาการซึมเศร้าในระดับรุนแรง";
+//         }
+//       } else if (type === "2Q") {
+//         const resultValue = parseInt(row.score, 10);
+//         resultText =
+//           resultValue !== 0
+//             ? "ท่านมีแนวโน้มเป็นโรคซึมเศร้า"
+//             : "ท่านไม่มีแนวโน้มเป็นโรคซึมเศร้า";
+//       }
+
+//       const formattedDate = `${date_time.getDate()} ${getMonthName(
+//         date_time.getMonth()
+//       )} ${date_time.getFullYear()}`;
+
+//       modifiedResult.historyTest[`type${index + 1}`] = type;
+//       modifiedResult.historyTest[`result${index + 1}`] = resultText;
+//       modifiedResult.historyTest[`date${index + 1}`] = formattedDate;
+//     });
+
+//     // Include dateAvatar information
+//     if (result.rows.length > 0) {
+//       const dateAvatar = result.rows[0].date_time;
+//       modifiedResult.dateAvatar = `${dateAvatar.getDate()} ${getMonthName(
+//         dateAvatar.getMonth()
+//       )} ${dateAvatar.getFullYear()} at ${dateAvatar.getHours()}:${dateAvatar.getMinutes()}:${dateAvatar.getSeconds()}`;
+//     }
+
+//     return modifiedResult;
+//   } catch (err) {
+//     console.error("Error executing query:", err);
+//     return { error: "An error occurred while fetching history test data." };
+//   }
+// }
+
 async function getHistoryTest(patientId) {
   const query = `
       SELECT score, type, date_time
       FROM test_score
       WHERE answer IS NULL
+      AND patient_id = $1  -- Filter by patient_id
       ORDER BY date_time DESC
       LIMIT 2
     `;
-  const queryParams = [];
+  const queryParams = [patientId];
 
   try {
     const result = await client.query(query, queryParams);
@@ -1854,40 +1930,75 @@ async function getHistoryTest(patientId) {
 }
 
 //function getMood
+// async function getAvatarMoodDetection(patientId) {
+//     const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
+//     const queryParams = [patientId];
+
+//     try {
+//         const result = await client.query(query, queryParams);
+
+//         // Check if there is no data returned
+//         if (result.rows.length === 0) {
+//             // If no data is found, return a default mood
+//             return { date: null, avatarMoodDetec: null, mood: 'neutral' };
+//         }
+
+//         const { date, positive, negative, neutral } = result.rows[0];
+
+//         // Determine the mood with the highest value
+//         let avatarMood = '';
+//         let highestValue = Math.max(parseFloat(positive), parseFloat(negative), parseFloat(neutral));
+//         if (positive === highestValue) {
+//             avatarMood = 'positive';
+//         } else if (negative === highestValue) {
+//             avatarMood = 'negative';
+//         } else {
+//             avatarMood = 'neutral';
+//         }
+
+//         // Format the date
+//         const formattedDate = formatDate(date);
+
+//         return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
+//     } catch (err) {
+//         console.error('Error executing query:', err);
+//         return { error: 'An error occurred while fetching avatar mood detection data.' };
+//     }
+// }
+
 async function getAvatarMoodDetection(patientId) {
-    const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
-    const queryParams = [patientId];
+  const query = 'SELECT date, positive_percent, nagative_percent, neutral_percent FROM avatar WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
+  const queryParams = [patientId];
 
-    try {
-        const result = await client.query(query, queryParams);
+  try {
+    const result = await client.query(query, queryParams);
 
-        // Check if there is no data returned
-        if (result.rows.length === 0) {
-            // If no data is found, return a default mood
-            return { date: null, avatarMoodDetec: null, mood: 'neutral' };
-        }
-
-        const { date, positive, negative, neutral } = result.rows[0];
-
-        // Determine the mood with the highest value
-        let avatarMood = '';
-        let highestValue = Math.max(parseFloat(positive), parseFloat(negative), parseFloat(neutral));
-        if (positive === highestValue) {
-            avatarMood = 'positive';
-        } else if (negative === highestValue) {
-            avatarMood = 'negative';
-        } else {
-            avatarMood = 'neutral';
-        }
-
-        // Format the date
-        const formattedDate = formatDate(date);
-
-        return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
-    } catch (err) {
-        console.error('Error executing query:', err);
-        return { error: 'An error occurred while fetching avatar mood detection data.' };
+    if (result.rows.length === 0) {
+      // If no data is found, return a default mood
+      return { date: null, avatarMoodDetec: null, mood: 'neutral' };
     }
+
+    const { date, positive_percent, nagative_percent, neutral_percent } = result.rows[0];
+
+    // Determine the mood with the highest value
+    let avatarMood = '';
+    let highestValue = Math.max(parseFloat(positive_percent), parseFloat(nagative_percent), parseFloat(neutral_percent));
+    if (highestValue === positive_percent) {
+      avatarMood = 'positive';
+    } else if (highestValue === nagative_percent) {
+      avatarMood = 'negative';
+    } else {
+      avatarMood = 'neutral';
+    }
+
+    // Format the date using the formatDate function
+    const formattedDate = formatDate(date);
+
+    return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
+  } catch (err) {
+    console.error('Error executing query:', err);
+    return { error: 'An error occurred while fetching avatar mood detection data.' };
+  }
 }
 
 // Modified formatDate function to remove the time part
@@ -2062,7 +2173,7 @@ function formatDate(timestamp) {
 //     }
 // });
 
-router.post('/adEditPersonalData', async (req, res) => {
+router.post('/adEditPersonalData', auth, async (req, res) => {
   const { patientID, fname, lname, phone, email, password, therapistName, gender } = req.body;
 
   // Extract numeric part of patientID
@@ -2138,8 +2249,6 @@ router.post('/adEditPersonalData', async (req, res) => {
 });
 
 
-
-
 // router.post('/viewPersonalData', (req, res) => {
 //   const { patientID } = req.body;
 //   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
@@ -2211,7 +2320,7 @@ router.post('/adEditPersonalData', async (req, res) => {
 //     });
 // });
 
-router.post('/adViewPersonalData', (req, res) => {
+router.post('/adViewPersonalData', auth, (req, res) => {
   const { patientID } = req.body;
   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
   const formattedPatientID = `PID${numericPatientID}`;
@@ -2272,7 +2381,7 @@ router.post('/adViewPersonalData', (req, res) => {
 //       });
 //   });
 
-router.post('/adDeletePatient', (req, res) => {
+router.post('/adDeletePatient', auth, (req, res) => {
   const { patientID } = req.body;
   const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
@@ -2321,9 +2430,6 @@ router.post('/adDeletePatient', (req, res) => {
     });
   });
 });
-
-
-
 
 
 module.exports = router;

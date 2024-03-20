@@ -12,7 +12,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Profile({ route }) {
   const { patientId, update } = route.params || {};
@@ -25,6 +26,14 @@ export default function Profile({ route }) {
 
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
+        axios
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       const param = {
         patient_id: patientId,
       };

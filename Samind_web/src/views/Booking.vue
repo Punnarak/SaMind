@@ -175,19 +175,14 @@ export default {
       selectedStartTime: null,
       selectedEndTime: null,
       timeOption: [
-        "10:30",
+      "08:00",
+        "09:00",
+        "10:00",
         "11:00",
-        "11:30",
         "12:00",
-        "12:30",
         "13:00",
-        "13:30",
         "14:00",
-        "14:30",
         "15:00",
-        "15:30",
-        "16:00",
-        "16:30",
       ],
       selectStartTimetRules: [
         (value) => {
@@ -208,12 +203,38 @@ export default {
   created() {
     // Access the bookday parameter from the route
     this.bookday = this.$route.query.bookday; // Set it to an empty string if not provided
+
+    let date = this.bookday.split('/')
+    date = date[2] + "-"+ date[1] + "-" + date[0]
+    const dateFormat = new Date(date);
+  const year = dateFormat.getFullYear();
+  const month = (dateFormat.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateFormat.getDate().toString().padStart(2, '0');
     console.log("this.bookday", this.bookday);
     const param = {
+      therapistID: localStorage.getItem("id"),
+      date: year + "-"+ month + "-" + day
+    };
+    console.log("param",param)
+    let param2 = {
       therapist_id: localStorage.getItem("id"),
     };
     axios
-      .post("/patientList", param, {
+      .post("/appointShowTime", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("time", response.data);
+        this.timeOption = response.data.time
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    axios
+      .post("/patientList", param2, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

@@ -4,13 +4,25 @@ import { StyleSheet, Text, View, ImageBackground } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-
+import { axios, axiospython } from "./axios.js";
 export default function Notification({ route }) {
   const { patientId } = route.params || {};
   const navigation = useNavigation();
 
   useEffect(() => {
     console.log("General Test Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
+    return onFocus
   }, []);
 
   return (

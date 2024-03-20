@@ -22,7 +22,8 @@ import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 
 export default function Library({ route }) {
   const navigation = useNavigation();
@@ -119,6 +120,17 @@ export default function Library({ route }) {
   ]);
   useEffect(() => {
     console.log("Library Screen", patientId, hospitalName);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     let param = {
       hospitalName: hospitalName,
     };
@@ -145,6 +157,7 @@ export default function Library({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
+      return onFocus
   }, [links]);
   let links = data;
   // const defaultLinks =

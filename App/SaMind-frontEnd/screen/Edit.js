@@ -15,7 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import axios from "./axios.js";
+// import axios from "./axios.js";
+import { axios, axiospython } from "./axios.js";
 const isIOS = Platform.OS === "ios";
 
 export default function EditProfile({ route }) {
@@ -112,9 +113,21 @@ export default function EditProfile({ route }) {
   };
   useEffect(() => {
     console.log("Edit Profile Screen", patientId);
+    const onFocus = navigation.addListener("focus", () => {
+      axios
+      .post("/refreshToken")
+      .then((response) => {
+        console.log("refresh Token success", response.data);
+      })
+      .catch((error) => {
+        console.error("Axios error:", error);
+      });
+      console.log("Screen is focused");
+    });
     setName(data.fname ? data.fname : "Punya");
     setSurname(data.lname ? data.lname : "Hasinanan");
     setEmail(data.email ? data.email : "pun@gmail.com");
+    return onFocus
   }, []);
   useEffect(() => {
     if (email != "") {

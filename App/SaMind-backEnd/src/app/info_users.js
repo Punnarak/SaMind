@@ -92,7 +92,7 @@ router.post('/update_info_user', auth, async (req, res) => {
 });
 
 //merge upper 2 api
-router.post('/update_info', auth, async (req, res) => {
+router.post('/update_info'/*, auth*/, async (req, res) => {
   const { patient_id, email, fname, lname, password } = req.body;
 
   if (!patient_id || !email) {
