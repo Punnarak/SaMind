@@ -688,11 +688,11 @@ router.post('/appointShowTime', auth, (req, res) => {
 //     });
 // });
 
-router.post('/appointShowTimeChange', auth, (req, res) => {
+router.post('/appointShowTimeChange', (req, res) => {
   const patientID = req.body.patientID;
   const date = req.body.date; // Assuming date is sent in the request body
   const startHour = 8; // Start hour for available appointments
-  const endHour = 15; // End hour for available appointments
+  const endHour = 16; // End hour for available appointments
 
   // Query to retrieve therapist_id associated with the provided patientID
   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';

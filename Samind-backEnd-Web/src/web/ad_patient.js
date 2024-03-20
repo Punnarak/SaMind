@@ -1244,61 +1244,72 @@ router.post('/adPatientView', auth, (req, res) => {
           // Loop through each patient to fetch mood data and construct the output object
           patientResult.rows.forEach(patient => {
               const patientID = patient.patient_id;
-              const moodQuery = `SELECT COALESCE(positive, '0%') AS positive,
-                                        COALESCE(negative, '0%') AS negative,
-                                        COALESCE(neutral, '0%') AS neutral
-                                 FROM public.avatar_mood_detection
-                                 WHERE patient_id = $1`;
+              const moodQuery = `SELECT COALESCE(positive_percent, '0') AS positive,
+                                        COALESCE(nagative_percent, '0') AS negative,
+                                        COALESCE(neutral_percent, '0') AS neutral
+                                 FROM public.avatar
+                                 WHERE patient_id = $1 ORDER BY date DESC LIMIT 1`;
 
-              client.query(moodQuery, [patientID])
-                  .then(moodResult => {
-                      let mood = '-'; // Default mood to '-' if no mood data is available
+              client
+                .query(moodQuery, [patientID])
+                .then((moodResult) => {
+                  let mood = "-"; // Default mood to '-' if no mood data is available
 
-                      if (moodResult.rows.length > 0) {
-                          // Determine the most detected mood
-                          const moodData = moodResult.rows[0];
-                          let maxPercentage = 0;
+                  if (moodResult.rows.length > 0) {
+                    // Determine the most detected mood
+                    const moodData = moodResult.rows[0];
+                    let highestValue = Math.max(
+                      parseFloat(moodData.positive),
+                      parseFloat(moodData.negative),
+                      parseFloat(moodData.neutral)
+                    );
 
-                          for (const [key, value] of Object.entries(moodData)) {
-                              const percentage = parseInt(value);
-                              if (percentage > maxPercentage) {
-                                  maxPercentage = percentage;
-                                  mood = key;
-                              }
-                          }
-                      }
+                    if (highestValue === parseFloat(moodData.positive)) {
+                      mood = "positive";
+                    } else if (highestValue === parseFloat(moodData.negative)) {
+                      mood = "negative";
+                    } else {
+                      mood = "neutral";
+                    }
+                  }
 
-                      // Format the born date to DD/MM/YYYY format
-                      const bornDate = patient.born ? new Date(patient.born).toLocaleDateString('en-GB') : '';
+                  // Format the born date to DD/MM/YYYY format
+                  const bornDate = patient.born
+                    ? new Date(patient.born).toLocaleDateString("en-GB")
+                    : "";
 
-                      // Construct the output object for the current patient
-                      const patientOutput = {
-                          "No": counter.toString().padStart(2, '0'),
-                          "therapistName": `${patient.therapist_fname} ${patient.therapist_lname}`,
-                          "patientID": `PID${patientID}`,
-                          "patientName": `${patient.patient_fname} ${patient.patient_lname}`,
-                          "gender": patient.gender ? "male" : "female",
-                          "age": patient.age,
-                          "born": bornDate,
-                          "phone": patient.phone,
-                          "email": patient.email,
-                          "mood": mood
-                      };
+                  // Construct the output object for the current patient
+                  const patientOutput = {
+                    No: counter.toString().padStart(2, "0"),
+                    therapistName: `${patient.therapist_fname} ${patient.therapist_lname}`,
+                    patientID: `PID${patientID}`,
+                    patientName: `${patient.patient_fname} ${patient.patient_lname}`,
+                    gender: patient.gender ? "male" : "female",
+                    age: patient.age,
+                    born: bornDate,
+                    phone: patient.phone,
+                    email: patient.email,
+                    mood: mood,
+                  };
 
-                      // Push the output object to the array
-                      output.push(patientOutput);
+                  // Push the output object to the array
+                  output.push(patientOutput);
 
-                      counter++; // Increment the counter for the next patient
+                  counter++; // Increment the counter for the next patient
 
-                      // If all patients are processed, send the response
-                      if (output.length === patientResult.rows.length) {
-                          res.json(output);
-                      }
-                  })
-                  .catch(moodErr => {
-                      console.error('Error fetching mood data:', moodErr);
-                      res.status(500).json({ error: 'An error occurred while fetching mood data' });
-                  });
+                  // If all patients are processed, send the response
+                  if (output.length === patientResult.rows.length) {
+                    res.json(output);
+                  }
+                })
+                .catch((moodErr) => {
+                  console.error("Error fetching mood data:", moodErr);
+                  res
+                    .status(500)
+                    .json({
+                      error: "An error occurred while fetching mood data",
+                    });
+                });
           });
       })
       .catch(err => {
@@ -1645,7 +1656,13 @@ router.post('/adPersonalData', auth, async (req, res) => {
             : "-";
 
         // Extract mood from the data
-        const mood = patientData.mood ? patientData.mood : "-";
+        let mood = "-";
+        let avatarMood = "-";
+        if (patientData.mood) {
+            const moodData = await getAvatarMoodDetection(numericPatientID);
+            mood = moodData ? getHighestMood(moodData.avatarMoodDetec) : "-";
+            avatarMood = moodData ? moodData.mood : "-";
+        }
 
         // Fetch additional data
         const avgMoodResult = await getAverageScores(numericPatientID);
@@ -1680,13 +1697,12 @@ router.post('/adPersonalData', auth, async (req, res) => {
             nextAppointment: formattedNextAppointment,
             tel: patientData.tel,
             email: patientData.email,
-            mood,
-            avgMood: moodText, // Set avgMood based on calculated mood text
+            mood: avatarMood,
+            avgMood: moodText,
             dateBetween: avgMoodResult.dateBetween,
             historyTest: historyTestResult.historyTest,
             dateAvatarMoodDetec: avatarMoodDetectionResult.date,
-            // Check if avatarMoodDetectionResult contains mood data
-            avatarMood: mood,
+            avatarMood,
         };
 
         // Send the response
@@ -1913,42 +1929,76 @@ async function getHistoryTest(patientId) {
   }
 }
 
-
 //function getMood
+// async function getAvatarMoodDetection(patientId) {
+//     const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
+//     const queryParams = [patientId];
+
+//     try {
+//         const result = await client.query(query, queryParams);
+
+//         // Check if there is no data returned
+//         if (result.rows.length === 0) {
+//             // If no data is found, return a default mood
+//             return { date: null, avatarMoodDetec: null, mood: 'neutral' };
+//         }
+
+//         const { date, positive, negative, neutral } = result.rows[0];
+
+//         // Determine the mood with the highest value
+//         let avatarMood = '';
+//         let highestValue = Math.max(parseFloat(positive), parseFloat(negative), parseFloat(neutral));
+//         if (positive === highestValue) {
+//             avatarMood = 'positive';
+//         } else if (negative === highestValue) {
+//             avatarMood = 'negative';
+//         } else {
+//             avatarMood = 'neutral';
+//         }
+
+//         // Format the date
+//         const formattedDate = formatDate(date);
+
+//         return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
+//     } catch (err) {
+//         console.error('Error executing query:', err);
+//         return { error: 'An error occurred while fetching avatar mood detection data.' };
+//     }
+// }
+
 async function getAvatarMoodDetection(patientId) {
-    const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
-    const queryParams = [patientId];
+  const query = 'SELECT date, positive_percent, nagative_percent, neutral_percent FROM avatar WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
+  const queryParams = [patientId];
 
-    try {
-        const result = await client.query(query, queryParams);
+  try {
+    const result = await client.query(query, queryParams);
 
-        // Check if there is no data returned
-        if (result.rows.length === 0) {
-            // If no data is found, return a default mood
-            return { date: null, avatarMoodDetec: null, mood: 'neutral' };
-        }
-
-        const { date, positive, negative, neutral } = result.rows[0];
-
-        // Determine the mood with the highest value
-        let avatarMood = '';
-        let highestValue = Math.max(parseFloat(positive), parseFloat(negative), parseFloat(neutral));
-        if (positive === highestValue) {
-            avatarMood = 'positive';
-        } else if (negative === highestValue) {
-            avatarMood = 'negative';
-        } else {
-            avatarMood = 'neutral';
-        }
-
-        // Format the date
-        const formattedDate = formatDate(date);
-
-        return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
-    } catch (err) {
-        console.error('Error executing query:', err);
-        return { error: 'An error occurred while fetching avatar mood detection data.' };
+    if (result.rows.length === 0) {
+      // If no data is found, return a default mood
+      return { date: null, avatarMoodDetec: null, mood: 'neutral' };
     }
+
+    const { date, positive_percent, nagative_percent, neutral_percent } = result.rows[0];
+
+    // Determine the mood with the highest value
+    let avatarMood = '';
+    let highestValue = Math.max(parseFloat(positive_percent), parseFloat(nagative_percent), parseFloat(neutral_percent));
+    if (highestValue === positive_percent) {
+      avatarMood = 'positive';
+    } else if (highestValue === nagative_percent) {
+      avatarMood = 'negative';
+    } else {
+      avatarMood = 'neutral';
+    }
+
+    // Format the date using the formatDate function
+    const formattedDate = formatDate(date);
+
+    return { date: formattedDate, avatarMoodDetec: `${highestValue}%`, mood: avatarMood };
+  } catch (err) {
+    console.error('Error executing query:', err);
+    return { error: 'An error occurred while fetching avatar mood detection data.' };
+  }
 }
 
 // Modified formatDate function to remove the time part

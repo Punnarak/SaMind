@@ -590,8 +590,35 @@ async function getHistoryTest(patientId) {
 //   }
 // }
 
+// async function getAvatarMoodDetection(patientId) {
+//   const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1';
+//   const queryParams = [patientId];
+
+//   try {
+//     const result = await client.query(query, queryParams);
+
+//     if (result.rows.length === 0) {
+//       return { error: 'No avatar mood detection data found.' };
+//     }
+
+//     const transformedResult = result.rows.map(row => ({
+//       date: formatDate(row.date),
+//       avatarMoodDetec: {
+//         positive: row.positive,
+//         negative: row.negative,
+//         neutral: row.neutral
+//       }
+//     }))[0];
+
+//     return transformedResult;
+//   } catch (err) {
+//     console.error('Error executing query:', err);
+//     return { error: 'An error occurred while fetching avatar mood detection data.' };
+//   }
+// }
+
 async function getAvatarMoodDetection(patientId) {
-  const query = 'SELECT date, positive, negative, neutral FROM avatar_mood_detection WHERE patient_id = $1';
+  const query = 'SELECT date, positive_percent, nagative_percent, neutral_percent FROM avatar WHERE patient_id = $1 ORDER BY date DESC LIMIT 1';
   const queryParams = [patientId];
 
   try {
@@ -604,9 +631,9 @@ async function getAvatarMoodDetection(patientId) {
     const transformedResult = result.rows.map(row => ({
       date: formatDate(row.date),
       avatarMoodDetec: {
-        positive: row.positive,
-        negative: row.negative,
-        neutral: row.neutral
+        positive: `${row.positive_percent}%`,
+        negative: `${row.nagative_percent}%`,
+        neutral: `${row.neutral_percent}%`
       }
     }))[0];
 
@@ -616,8 +643,6 @@ async function getAvatarMoodDetection(patientId) {
     return { error: 'An error occurred while fetching avatar mood detection data.' };
   }
 }
-
-
 
 // Function to format date as "2 December 2023 at 23:37:57"
 function formatDate(timestamp) {
