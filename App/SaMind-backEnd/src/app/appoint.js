@@ -283,7 +283,7 @@ router.post('/appointConfig', auth, (req, res) => {
 //     });
 // });
 
-router.post('/appointShowTime', auth, (req, res) => {
+router.post('/appointShowTime', (req, res) => {
   const patientID = req.body.patientID;
   const date = req.body.date; // Assuming date is sent in the request body
   const startHour = 8; // Start hour for available appointments
@@ -339,414 +339,63 @@ router.post('/appointShowTime', auth, (req, res) => {
     });
 });
 
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve existing appointments for the specified date and confirm column containing "W" or "Y"
-//   const query = 'SELECT "time", "change_time" FROM public.appointment_new2 WHERE (date = $1 AND confirm IN ($2, $3)) OR (change_date = $4 AND change_time IS NOT NULL)';
-//   const queryParams = [date, "W", "Y", date];
-
-//   client.query(query, queryParams)
-//     .then(result => {
-//       // Extract existing appointment times
-//       const existingTimes = result.rows.map(row => row.change_time || row.time);
-
-//       // Generate available appointment times
-//       const availableTimes = [];
-//       for (let hour = startHour; hour < endHour; hour++) {
-//         const time = `${hour.toString().padStart(2, '0')}:00`;
-//         // Check if the time is available and not already in existing appointments
-//         if (time !== '12:00' && !existingTimes.find(existingTime => existingTime.startsWith(time))) {
-//           availableTimes.push(time);
-//         }
-//       }
-
-//       // Check if all appointment slots are full
-//       const isFull = availableTimes.length === 0;
-
-//       // Send response based on availability
-//       if (isFull) {
-//         res.json({ time: "Time is full" });
-//       } else {
-//         res.json({ time: availableTimes });
-//       }
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-// old api can use 
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve existing appointments for the specified date and confirm column containing "W" or "Y"
-//   const query = 'SELECT "time", "change_time" FROM public.appointment_new2 WHERE (date = $1 AND confirm IN ($2, $3)) OR (change_date = $4 AND change_time IS NOT NULL)';
-//   const queryParams = [date, "W", "Y", date];
-
-//   client.query(query, queryParams)
-//     .then(result => {
-//       // Extract existing appointment times
-//       const existingTimes = result.rows.map(row => row.change_time || row.time);
-
-//       // Generate available appointment times
-//       const availableTimes = [];
-//       for (let hour = startHour; hour < endHour; hour++) {
-//         const startTime = `${hour.toString().padStart(2, '0')}:00`;
-//         const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-//         const name = `${startTime}-${endTime} `;
-//         // Check if the time range is available and not already in existing appointments
-//         if (startTime !== '12:00' && !existingTimes.find(existingTime => existingTime.startsWith(startTime))) {
-//           availableTimes.push({ id: availableTimes.length + 1, name, value: startTime });
-//         }
-//       }
-
-//       // Check if all appointment slots are full
-//       const isFull = availableTimes.length === 0;
-
-//       // Send response based on availability
-//       if (isFull) {
-//         res.json("-");
-//       } else {
-//         res.json(availableTimes);
-//       }
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const patientID = req.body.patientID;
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve therapist_id associated with the provided patientID
-//   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';
-//   const therapistQueryParams = [patientID];
-
-//   // Query to retrieve existing appointments for the specified date and confirm column containing "W" or "Y" or with change_date and change_time
-//   const query = `
-//     SELECT "time", "change_time" 
-//     FROM public.appointment_new2 
-//     WHERE (date = $1 AND confirm IN ($2, $3)) OR (change_date = $4 AND change_time IS NOT NULL) 
-//     AND therapist_id IN (${therapistQuery})
-//   `;
-//   const queryParams = [date, "W", "Y", date];
-
-//   client.query(therapistQuery, therapistQueryParams)
-//     .then(therapistResult => {
-//       const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
-
-//       // Concatenate therapistIDs into the main query
-//       const formattedTherapistIDs = therapistIDs.map((_, index) => `$${index + 5}`).join(', ');
-//       const fullQuery = `
-//         SELECT "time", "change_time" 
-//         FROM public.appointment_new2 
-//         WHERE (date = $1 AND confirm IN ($2, $3)) OR (change_date = $4 AND change_time IS NOT NULL) 
-//         AND therapist_id IN (${formattedTherapistIDs})
-//       `;
-
-//       client.query(fullQuery, [...queryParams, ...therapistIDs])
-//         .then(result => {
-//           // Extract existing appointment times
-//           const existingTimes = result.rows.map(row => row.change_time || row.time);
-
-//           // Generate available appointment times
-//           const availableTimes = [];
-//           for (let hour = startHour; hour < endHour; hour++) {
-//             const startTime = `${hour.toString().padStart(2, '0')}:00`;
-//             const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-//             const name = `${startTime}-${endTime} `;
-//             // Check if the time range is available and not already in existing appointments
-//             if (startTime !== '12:00' && !existingTimes.find(existingTime => existingTime.startsWith(startTime))) {
-//               availableTimes.push({ id: availableTimes.length + 1, name, value: startTime });
-//             }
-//           }
-
-//           // Check if all appointment slots are full
-//           const isFull = availableTimes.length === 0;
-
-//           // Send response based on availability
-//           if (isFull) {
-//             res.json("-");
-//           } else {
-//             res.json(availableTimes);
-//           }
-//         })
-//         .catch(err => {
-//           console.error('Error executing query:', err);
-//           res.status(500).json({ error: 'An error occurred' });
-//         });
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const patientID = req.body.patientID;
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve therapist_id associated with the provided patientID
-//   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';
-//   const therapistQueryParams = [patientID];
-
-//   client.query(therapistQuery, therapistQueryParams)
-//     .then(therapistResult => {
-//       const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
-
-//       // Query to retrieve existing appointments for the specified date, therapistID, and confirm column containing "W" or "Y"
-//       const query = `
-//         SELECT "time"
-//         FROM public.appointment_new2
-//         WHERE (
-//           (date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4)) OR
-//           (change_date = $1 AND change_time IS NOT NULL AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4))
-//         )`;
-//       const queryParams = [date, therapistIDs, "W", "Y"];
-
-//       client.query(query, queryParams)
-//         .then(result => {
-//           // Extract existing appointment times
-//           const existingTimes = result.rows.map(row => row.time);
-
-//           // Generate available appointment times
-//           const availableTimes = [];
-//           for (let hour = startHour; hour < endHour; hour++) {
-//             const startTime = `${hour.toString().padStart(2, '0')}:00`;
-//             const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-//             const name = `${startTime}-${endTime} `;
-//             // Check if the time range is available, not "12:00", and not already in existing appointments
-//             if (startTime !== '12:00' && !existingTimes.find(existingTime => existingTime >= startTime && existingTime < endTime)) {
-//               availableTimes.push({ id: availableTimes.length + 1, name, value: startTime });
-//             }
-//           }
-
-//           // Check if all appointment slots are full
-//           const isFull = availableTimes.length === 0;
-
-//           // Send response based on availability
-//           if (isFull) {
-//             res.json("-");
-//           } else {
-//             res.json(availableTimes);
-//           }
-//         })
-//         .catch(err => {
-//           console.error('Error executing query:', err);
-//           res.status(500).json({ error: 'An error occurred' });
-//         });
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const patientID = req.body.patientID;
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve therapist_id associated with the provided patientID
-//   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';
-//   const therapistQueryParams = [patientID];
-
-//   client.query(therapistQuery, therapistQueryParams)
-//     .then(therapistResult => {
-//       const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
-
-//       // Query to retrieve existing appointments for the specified date, therapistID, and confirm column containing "W" or "Y"
-//       const query = `
-//         SELECT "time"
-//         FROM public.appointment_new2
-//         WHERE (
-//           (date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4)) OR
-//           (change_date = $1 AND change_time IS NOT NULL AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4))
-//         )`;
-//       const queryParams = [date, therapistIDs, "W", "Y"];
-
-//       client.query(query, queryParams)
-//         .then(result => {
-//           // Extract existing appointment times
-//           const existingTimes = result.rows.map(row => row.time);
-
-//           // Generate available appointment times
-//           const availableTimes = [];
-//           for (let hour = startHour; hour < endHour; hour++) {
-//             const startTime = `${hour.toString().padStart(2, '0')}:00`;
-//             const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-//             const name = `${startTime}-${endTime} `;
-//             // Check if the time range is available, not "12:00", and not already in existing appointments
-//             if (
-//               startTime !== '12:00' &&
-//               !existingTimes.find(
-//                 existingTime => existingTime >= startTime && existingTime < endTime
-//               )
-//             ) {
-//               availableTimes.push({ id: availableTimes.length + 1, name, value: startTime });
-//             }
-//           }
-
-//           // Check if all appointment slots are full
-//           const isFull = availableTimes.length === 0;
-
-//           // Send response based on availability
-//           if (isFull) {
-//             res.json("-");
-//           } else {
-//             res.json(availableTimes);
-//           }
-//         })
-//         .catch(err => {
-//           console.error('Error executing query:', err);
-//           res.status(500).json({ error: 'An error occurred' });
-//         });
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
-// router.post('/appointShowTimeChange', (req, res) => {
-//   const patientID = req.body.patientID;
-//   const date = req.body.date; // Assuming date is sent in the request body
-//   const startHour = 8; // Start hour for available appointments
-//   const endHour = 16; // End hour for available appointments
-
-//   // Query to retrieve therapist_id associated with the provided patientID
-//   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';
-//   const therapistQueryParams = [patientID];
-
-//   client.query(therapistQuery, therapistQueryParams)
-//     .then(therapistResult => {
-//       const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
-
-//       // Query to retrieve existing appointments for the specified date, therapistID, and confirm column containing "W" or "Y"
-//       const query = `
-//         SELECT "time"
-//         FROM public.appointment_new2
-//         WHERE (
-//           (date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4)) OR
-//           (change_date = $1 AND change_time IS NOT NULL AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4))
-//         )`;
-//       const queryParams = [date, therapistIDs, "W", "Y"];
-
-//       client.query(query, queryParams)
-//         .then(result => {
-//           // Extract existing appointment times
-//           const existingTimes = result.rows.map(row => row.time);
-
-//           // Generate available appointment times
-//           const availableTimes = [];
-//           for (let hour = startHour; hour < endHour; hour++) {
-//             const startTime = `${hour.toString().padStart(2, '0')}:00`;
-//             const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-//             const name = `${startTime}-${endTime} `;
-//             // Check if the time range is available, not "12:00", and not already in existing appointments
-//             if (
-//               startTime !== '12:00' &&
-//               !existingTimes.find(
-//                 existingTime => existingTime >= startTime && existingTime < endTime
-//               )
-//             ) {
-//               availableTimes.push({ id: availableTimes.length + 1, name, value: startTime });
-//             }
-//           }
-
-//           // Check if all appointment slots are full
-//           const isFull = availableTimes.length === 0;
-
-//           // Send response based on availability
-//           if (isFull) {
-//             res.json("-");
-//           } else {
-//             res.json(availableTimes);
-//           }
-//         })
-//         .catch(err => {
-//           console.error('Error executing query:', err);
-//           res.status(500).json({ error: 'An error occurred' });
-//         });
-//     })
-//     .catch(err => {
-//       console.error('Error executing query:', err);
-//       res.status(500).json({ error: 'An error occurred' });
-//     });
-// });
-
 router.post('/appointShowTimeChange', (req, res) => {
   const patientID = req.body.patientID;
-  const date = req.body.date; // Assuming date is sent in the request body
-  const startHour = 8; // Start hour for available appointments
-  const endHour = 16; // End hour for available appointments
+  const date = req.body.date;
+  const predefinedTimes = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00"];
+  let therapistIDs; // Declare therapistIDs in the outer scope
 
-  // Query to retrieve therapist_id associated with the provided patientID
+  // Step 1: Retrieve therapist_id associated with the patientID
   const therapistQuery = 'SELECT DISTINCT therapist_id FROM public.appointment_new2 WHERE patient_id = $1';
   const therapistQueryParams = [patientID];
 
   client.query(therapistQuery, therapistQueryParams)
     .then(therapistResult => {
-      const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
+      therapistIDs = therapistResult.rows.map(row => row.therapist_id); // Assign therapistIDs
 
-      // Query to retrieve existing appointments for the specified date, therapistID, and confirm column containing "W" or "Y"
-      const query = `
-        SELECT "time"
-        FROM public.appointment_new2
-        WHERE (
-          (date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4)) OR
-          (change_date = $1 AND change_time IS NOT NULL AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4))
-        )`;
-      const queryParams = [date, therapistIDs, "W", "Y"];
+      // Step 2: Query regular appointment times for the specified date and therapistIDs
+      const regularQuery = `
+        SELECT "time" FROM public.appointment_new2 
+        WHERE date = $1 AND therapist_id = ANY($2::int[])
+      `;
+      const regularQueryParams = [date, therapistIDs];
 
-      client.query(query, queryParams)
-        .then(result => {
-          // Extract existing appointment times
-          const existingTimes = result.rows.map(row => row.time);
+      // Step 3: Execute the query for regular appointment times
+      return client.query(regularQuery, regularQueryParams);
+    })
+    .then(regularResult => {
+      const regularTimes = regularResult.rows.map(row => row.time).filter(time => time !== null);
 
-          // Generate available appointment times
-          const availableTimes = [];
-          for (let hour = startHour; hour < endHour; hour++) {
-            const startTime = `${hour.toString().padStart(2, '0')}:00`;
-            const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
-            const name = `${startTime}-${endTime} `;
-            // Check if the time range is available, not "12:00", and not already in existing appointments
-            if (
-              startTime !== '12:00' &&
-              !existingTimes.find(
-                existingTime => existingTime >= startTime && existingTime <= endTime
-              )
-            ) {
-              availableTimes.push({ id: availableTimes.length+1, name, value: startTime });
-            }
-          }
+      // Step 4: Query changed appointment times for the specified date and therapistIDs
+      const changedQuery = `
+        SELECT "change_time" FROM public.appointment_new2 
+        WHERE change_date = $1 AND therapist_id = ANY($2::int[])
+      `;
+      const changedQueryParams = [date, therapistIDs];
 
-          // Check if all appointment slots are full
-          const isFull = availableTimes.length === 0;
+      // Step 5: Execute the query for changed appointment times
+      return client.query(changedQuery, changedQueryParams)
+        .then(changedResult => {
+          const changedTimes = changedResult.rows.map(row => row.change_time).filter(time => time !== null);
 
-          // Send response based on availability
-          if (isFull) {
-            res.json("-");
-          } else {
+          // Step 6: Combine regular and changed appointment times
+          const existingTimes = [...regularTimes, ...changedTimes]
+            .map(time => time.split(":").slice(0, 2).join(":")); // Extract HH:MM
+
+          // Step 7: Find available appointment times
+          const availableTimes = predefinedTimes.filter(time => !existingTimes.includes(time))
+            .map((time, index) => ({
+              id: index + 1,
+              name: `${time}-${parseInt(time) + 1}:00 `,
+              value: time
+            }));
+
+          // Step 8: Respond with available appointment times or "-"
+          if (availableTimes.length > 0) {
             res.json(availableTimes);
+          } else {
+            res.json("-");
           }
-        })
-        .catch(err => {
-          console.error('Error executing query:', err);
-          res.status(500).json({ error: 'An error occurred' });
         });
     })
     .catch(err => {
