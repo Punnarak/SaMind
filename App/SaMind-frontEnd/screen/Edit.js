@@ -89,7 +89,7 @@ export default function EditProfile({ route }) {
           console.error("Axios error:", error);
         });
       console.log("Save Complete");
-      navigation.navigate("Profilescreen", { patientId, update });
+      navigation.navigate("Homescreen", { patientId, update });
     }
   };
 

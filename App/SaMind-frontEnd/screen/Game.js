@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import ProgressBar from "react-native-progress/Bar";
 import { useNavigation } from "@react-navigation/native";
-import { axios, axiospython } from "./axios.js";
+import { axios, axiospython,path } from "./axios.js";
 import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
@@ -195,7 +195,7 @@ const PopcatGame = ({ route }) => {
       let responseText = "";
       try {
         response = await FileSystem.uploadAsync(
-          "http://192.168.1.101:4343/speech",
+          path+"/speech",
           audioPath,
           {
             httpMethod: "POST",
@@ -770,7 +770,7 @@ const PopcatGame = ({ route }) => {
             lineHeight: 20,
             fontSize: 17,
             color: isLoadingSound ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
-            fontFamily: "sans-serif",
+            // fontFamily: "sans-serif",
             letterSpacing: 1,
           }}
         >
