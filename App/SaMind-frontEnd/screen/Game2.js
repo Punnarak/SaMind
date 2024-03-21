@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Image,ImageBackground, TouchableOpacity, Dimensions, Modal, TouchableWithoutFeedback} from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+  Dimensions,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Alert } from "react-native"
-import { axios} from "./axios.js";
+import { Alert } from "react-native";
+import { axios } from "./axios.js";
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
@@ -29,83 +41,280 @@ const Gamescreen = ({ route }) => {
 
   const updateStaminaBar = async () => {
     try {
-      const response = await axios.put('/update_stamina_bar_de', { decrementAmount:30 ,patient_id: patientId });
+      const response = await axios.put("/update_stamina_bar_de", {
+        decrementAmount: 30,
+        patient_id: patientId,
+      });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
-      console.error('Error updating health bar:', error);
+      console.error("Error updating health bar:", error);
     }
   };
 
   const updateHungryBar = async () => {
     try {
-      const response = await axios.put('/update_hungry_bar_de', { decrementAmount:30 ,patient_id: patientId });
+      const response = await axios.put("/update_hungry_bar_de", {
+        decrementAmount: 30,
+        patient_id: patientId,
+      });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
-      console.error('Error updating health bar:', error);
+      console.error("Error updating health bar:", error);
     }
   };
 
-
   const updateScore = async () => {
     try {
-      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: (6-attempts)*10 });
+      const response = await axios.put("/update_click_count", {
+        patient_id: patientId,
+        click_count: (6 - attempts) * 10,
+      });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
-      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 10 });
+      const response = await axios.put("/update_click_count", {
+        patient_id: patientId,
+        click_count: 10,
+      });
     }
   };
 
   const generateRandomWord = () => {
     const words = [
-      "apple", "hippo", "lucky", "phone", "mango",
-      "water", "happy", "tiger", "house", "dream",
-      "night", "stars", "happy", "sunny", "cloud",
-      "toast", "smile", "music", "beach", "fruits",
-      "peace", "light", "birds", "heart", "river",
-      "laugh", "funny", "color", "smell", "taste",
-      "sight", "touch", "books", "bread", "cakes",
-      "dusty", "frost", "angel", "fairy", "magic",
-      "shine", "spark", "waves", "ocean", "flame",
-      "earth", "clean", "fresh", "quiet", "still",
-      "peace", "dream", "faith", "grace", "angel",
-      "heart", "happy", "sunny", "smile", "grace",
-      "music", "dance", "joyful", "party", "sweet",
-      "smart", "swift", "brave", "strong", "proud",
-      "cheer", "glory", "honor", "trust", "truth",
-      "light", "shine", "calm", "warm", "clear",
-      "bloom", "flower", "green", "smile", "laugh",
-      "lucky", "charm", "magic", "angel", "peace",
-      "dream", "heart", "faith", "grace", "happy",
-      "sunny", "music", "dance", "joyful", "party",
-      "sweet", "smart", "swift", "brave", "strong",
-      "proud", "cheer", "glory", "honor", "trust",
-      "truth", "light", "shine", "calm", "warm",
-      "clear", "bloom", "flower", "green", "smile",
-      "laugh", "lucky", "charm", "magic", "angel",
-      "peace", "dream", "heart", "faith", "grace",
-      "happy", "sunny", "music", "dance", "joyful",
-      "party", "sweet", "smart", "swift", "brave",
-      "strong", "proud", "cheer", "glory", "honor",
-      "trust", "truth", "light", "shine", "calm",
-      "warm", "clear", "bloom", "flower", "green",
-      "smile", "laugh", "lucky", "charm", "magic",
-      "angel", "peace", "dream", "heart", "faith",
-      "grace", "happy", "sunny", "music", "dance",
-      "joyful", "party", "sweet", "smart", "swift",
-      "brave", "strong", "proud", "cheer", "glory",
-      "honor", "trust", "truth", "light", "shine",
-      "calm", "warm", "clear", "bloom", "flower",
-      "green", "smile", "laugh", "lucky", "charm",
-      "magic", "angel", "peace", "dream", "heart",
-      "faith", "grace", "happy", "sunny", "music",
-      "dance", "joyful", "party", "sweet", "smart",
-      "swift", "brave", "strong", "proud", "cheer",
-      "glory", "honor", "trust", "truth", "light",
-      "shine", "calm", "warm", "clear", "bloom",
-      "flower", "green", "smile", "laugh", "lucky",
-      "charm", "magic", "angel"
+      "apple",
+      "hippo",
+      "lucky",
+      "phone",
+      "mango",
+      "water",
+      "happy",
+      "tiger",
+      "house",
+      "dream",
+      "night",
+      "stars",
+      "happy",
+      "sunny",
+      "cloud",
+      "toast",
+      "smile",
+      "music",
+      "beach",
+      "fruits",
+      "peace",
+      "light",
+      "birds",
+      "heart",
+      "river",
+      "laugh",
+      "funny",
+      "color",
+      "smell",
+      "taste",
+      "sight",
+      "touch",
+      "books",
+      "bread",
+      "cakes",
+      "dusty",
+      "frost",
+      "angel",
+      "fairy",
+      "magic",
+      "shine",
+      "spark",
+      "waves",
+      "ocean",
+      "flame",
+      "earth",
+      "clean",
+      "fresh",
+      "quiet",
+      "still",
+      "peace",
+      "dream",
+      "faith",
+      "grace",
+      "angel",
+      "heart",
+      "happy",
+      "sunny",
+      "smile",
+      "grace",
+      "music",
+      "dance",
+      "joyful",
+      "party",
+      "sweet",
+      "smart",
+      "swift",
+      "brave",
+      "strong",
+      "proud",
+      "cheer",
+      "glory",
+      "honor",
+      "trust",
+      "truth",
+      "light",
+      "shine",
+      "calm",
+      "warm",
+      "clear",
+      "bloom",
+      "flower",
+      "green",
+      "smile",
+      "laugh",
+      "lucky",
+      "charm",
+      "magic",
+      "angel",
+      "peace",
+      "dream",
+      "heart",
+      "faith",
+      "grace",
+      "happy",
+      "sunny",
+      "music",
+      "dance",
+      "joyful",
+      "party",
+      "sweet",
+      "smart",
+      "swift",
+      "brave",
+      "strong",
+      "proud",
+      "cheer",
+      "glory",
+      "honor",
+      "trust",
+      "truth",
+      "light",
+      "shine",
+      "calm",
+      "warm",
+      "clear",
+      "bloom",
+      "flower",
+      "green",
+      "smile",
+      "laugh",
+      "lucky",
+      "charm",
+      "magic",
+      "angel",
+      "peace",
+      "dream",
+      "heart",
+      "faith",
+      "grace",
+      "happy",
+      "sunny",
+      "music",
+      "dance",
+      "joyful",
+      "party",
+      "sweet",
+      "smart",
+      "swift",
+      "brave",
+      "strong",
+      "proud",
+      "cheer",
+      "glory",
+      "honor",
+      "trust",
+      "truth",
+      "light",
+      "shine",
+      "calm",
+      "warm",
+      "clear",
+      "bloom",
+      "flower",
+      "green",
+      "smile",
+      "laugh",
+      "lucky",
+      "charm",
+      "magic",
+      "angel",
+      "peace",
+      "dream",
+      "heart",
+      "faith",
+      "grace",
+      "happy",
+      "sunny",
+      "music",
+      "dance",
+      "joyful",
+      "party",
+      "sweet",
+      "smart",
+      "swift",
+      "brave",
+      "strong",
+      "proud",
+      "cheer",
+      "glory",
+      "honor",
+      "trust",
+      "truth",
+      "light",
+      "shine",
+      "calm",
+      "warm",
+      "clear",
+      "bloom",
+      "flower",
+      "green",
+      "smile",
+      "laugh",
+      "lucky",
+      "charm",
+      "magic",
+      "angel",
+      "peace",
+      "dream",
+      "heart",
+      "faith",
+      "grace",
+      "happy",
+      "sunny",
+      "music",
+      "dance",
+      "joyful",
+      "party",
+      "sweet",
+      "smart",
+      "swift",
+      "brave",
+      "strong",
+      "proud",
+      "cheer",
+      "glory",
+      "honor",
+      "trust",
+      "truth",
+      "light",
+      "shine",
+      "calm",
+      "warm",
+      "clear",
+      "bloom",
+      "flower",
+      "green",
+      "smile",
+      "laugh",
+      "lucky",
+      "charm",
+      "magic",
+      "angel",
     ];
-    
+
     const randomIndex = Math.floor(Math.random() * words.length);
     return words[randomIndex];
   };
@@ -149,9 +358,8 @@ const Gamescreen = ({ route }) => {
         color = "green";
       } else if (isCorrectLetter && !isInCorrectPosition) {
         color = "yellow";
-      }
-      else{
-        color="red";
+      } else {
+        color = "red";
       }
 
       return (
@@ -162,30 +370,30 @@ const Gamescreen = ({ route }) => {
     });
 
     if (lowerCaseGuess === lowerCaseTargetWord) {
-        Alert.alert(
-            `Congratulations! It's ${lowerCaseTargetWord} !!!.`,
-            `You guessed the word in ${attempts + 1} attempts.`,
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  setTargetWord(generateRandomWord());
-                  setAttempts(0);
-                  setEnteredWords([]);
-                  updateStaminaBar();
-                  updateScore();
-                  updateHungryBar();
-                  navigation.goBack();
-                },
-              },
-            ]
-          );
-    //   alert(`Congratulations! You guessed the word in ${attempts + 1} attempts.`);
-    //   setShouldNavigate(true);
-    // //   navigation.goBack();
-    //   setTargetWord(generateRandomWord());
-    //   setAttempts(0);
-    //   setEnteredWords([]);
+      Alert.alert(
+        `Congratulations! It's ${lowerCaseTargetWord} !!!.`,
+        `You guessed the word in ${attempts + 1} attempts.`,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setTargetWord(generateRandomWord());
+              setAttempts(0);
+              setEnteredWords([]);
+              updateStaminaBar();
+              updateScore();
+              updateHungryBar();
+              navigation.goBack();
+            },
+          },
+        ]
+      );
+      //   alert(`Congratulations! You guessed the word in ${attempts + 1} attempts.`);
+      //   setShouldNavigate(true);
+      // //   navigation.goBack();
+      //   setTargetWord(generateRandomWord());
+      //   setAttempts(0);
+      //   setEnteredWords([]);
     } else {
       const formattedEnteredWord = (
         <View key={enteredWords.length} style={styles.highlightedWord}>
@@ -200,21 +408,17 @@ const Gamescreen = ({ route }) => {
       setAttempts(newAttempts);
 
       if (newAttempts === 5) {
-        Alert.alert(
-            "Game Over <3",
-            `The correct answer was: ${targetWord}`,
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  setTargetWord(generateRandomWord());
-                  setAttempts(0);
-                  setEnteredWords([]);
-                  navigation.goBack();
-                },
-              },
-            ]
-          );
+        Alert.alert("Game Over <3", `The correct answer was: ${targetWord}`, [
+          {
+            text: "OK",
+            onPress: () => {
+              setTargetWord(generateRandomWord());
+              setAttempts(0);
+              setEnteredWords([]);
+              navigation.goBack();
+            },
+          },
+        ]);
         // alert(`Game Over! The correct answer was: ${targetWord}`);
         // setShouldNavigate(true);
         // // navigation.goBack();
@@ -241,27 +445,33 @@ const Gamescreen = ({ route }) => {
   return (
     <ImageBackground
       source={require("../assets/room.jpg")}
-      style={{ width: "100%", height: "100%", resizeMode: "cover", flex: 1, justifyContent: "center", alignItems: "center" }}
+      style={{
+        width: "100%",
+        height: "100%",
+        resizeMode: "cover",
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
       <View
-  style={{
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 54,
-  }}
->
-  <Ionicons
-    name="chevron-back-outline"
-    size={30}
-    color="#3987FD"
-    onPress={() => navigation.goBack()}
-  />
-  <View style={{ flex: 1 }} />
-  <Feather name={"info"} size={25} color="#569AFF" onPress={toggleInfo} />
-</View>
-
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: 20,
+          marginTop: 54,
+        }}
+      >
+        <Ionicons
+          name="chevron-back-outline"
+          size={30}
+          color="#3987FD"
+          onPress={() => navigation.goBack()}
+        />
+        <View style={{ flex: 1 }} />
+        <Feather name={"info"} size={25} color="#569AFF" onPress={toggleInfo} />
+      </View>
 
       <Modal
         animationType="slide"
@@ -300,8 +510,8 @@ const Gamescreen = ({ route }) => {
                     textAlign: "center",
                   }}
                 >
-                  สำหรับหน้านี้ {"\n"} มาทายคำศัพท์ภาษาอังกฤษกัน โดยเป็นภาษาอังกฤษ ที่มี 5 ตัวอักษร{" "}
-                  {"\n"}
+                  สำหรับหน้านี้ {"\n"} มาทายคำศัพท์ภาษาอังกฤษกัน
+                  โดยเป็นภาษาอังกฤษ ที่มี 5 ตัวอักษร {"\n"}
                 </Text>
 
                 <Text
@@ -312,8 +522,7 @@ const Gamescreen = ({ route }) => {
                     textAlign: "center",
                   }}
                 >
-                  สีเขียว {" "} หมายถึงตัวอักษรนั้นมีจริงและวางถูกตำแหน่ง{" "}
-                  {"\n"}
+                  สีเขียว หมายถึงตัวอักษรนั้นมีจริงและวางถูกตำแหน่ง {"\n"}
                 </Text>
                 <Text
                   style={{
@@ -323,8 +532,7 @@ const Gamescreen = ({ route }) => {
                     textAlign: "center",
                   }}
                 >
-                  สีเหลือง {" "} หมายถึงตัวอักษรนั้นมีจริงแต่วางผิดตำแหน่ง{" "}
-                  {"\n"}
+                  สีเหลือง หมายถึงตัวอักษรนั้นมีจริงแต่วางผิดตำแหน่ง {"\n"}
                 </Text>
                 <Text
                   style={{
@@ -334,16 +542,15 @@ const Gamescreen = ({ route }) => {
                     textAlign: "center",
                   }}
                 >
-                  สีแดง {" "} หมายถึงตัวอักษรไม่มีอยู่จริงในคำนี้{" "}
-                  {"\n"}
+                  สีแดง หมายถึงตัวอักษรไม่มีอยู่จริงในคำนี้ {"\n"}
                 </Text>
                 <TouchableOpacity
-                style={styles.confirmb}
-                onPress={toggleInfo}
-                isVisible={isInfoVisible}
-              >
-                <Text style={styles.text}>I understand</Text>
-              </TouchableOpacity>
+                  style={styles.confirmb}
+                  onPress={toggleInfo}
+                  isVisible={isInfoVisible}
+                >
+                  <Text style={styles.text}>I understand</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -351,13 +558,13 @@ const Gamescreen = ({ route }) => {
         </View>
       </Modal>
       <View style={styles.wrapper}>
-      <Image
-    source={require("../assets/clock.gif")}
-    style={{ width: 200, height: 200 }} // Adjust width and height as needed
-  />
+        <Image
+          source={require("../assets/clock.gif")}
+          style={{ width: 200, height: 200 }} // Adjust width and height as needed
+        />
         <View style={styles.container}>
           <Text style={styles.heading}>Wordle Game</Text>
-          <Text style={{ color: 'white' }}>Attempts: {attempts}</Text>
+          <Text style={{ color: "white" }}>Attempts: {attempts}</Text>
           <TextInput
             style={styles.input}
             onChangeText={(text) => setGuess(text)}
@@ -366,8 +573,8 @@ const Gamescreen = ({ route }) => {
             placeholderTextColor="rgba(255, 255, 255, 0.5)"
           />
           <Button title="Guess" onPress={handleGuess} />
-          <Text style={styles.answer}>Answer: {targetWord}</Text>
-  
+          {/* <Text style={styles.answer}>Answer: {targetWord}</Text> */}
+
           <View style={styles.enteredWordsContainer}>
             <Text style={styles.enteredWordsLabel}>Entered Words:</Text>
             <View style={styles.enteredWordsList}>{enteredWords}</View>
@@ -392,16 +599,16 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     margin: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    color:"white",
+    color: "white",
     marginBottom: 20,
   },
   input: {
-    color:"white",
+    color: "white",
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
@@ -428,7 +635,7 @@ const styles = StyleSheet.create({
   },
   enteredWordsList: {
     fontSize: 16,
-    flexDirection: "column-reverse", 
+    flexDirection: "column-reverse",
     fontWeight: "bold",
     marginTop: 5,
   },
