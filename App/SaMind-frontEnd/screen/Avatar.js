@@ -24,10 +24,14 @@ import waveAvatar from "../assets/wave.gif";
 import standbyAvatar from "../assets/standby.gif";
 import happy1Avatar from "../assets/happy1.gif";
 import happy2Avatar from "../assets/happy2.gif";
+import happy3Avatar from "../assets/happy3.gif";
 import negative1Avatar from "../assets/negative1.gif";
 import negative2Avatar from "../assets/negative2.gif";
+import negative3Avatar from "../assets/negative3.gif";
 import neutral1Avatar from "../assets/neutral1.gif";
 import neutral2Avatar from "../assets/neutral2.gif";
+import neutral3Avatar from "../assets/neutral3.gif";
+
 import Svg, { Rect, Path } from "react-native-svg";
 const isAndroid = Platform.OS === "android";
 const windowWidth = Dimensions.get("window").width;
@@ -75,8 +79,8 @@ async function answer(data) {
         method: "POST",
         body: JSON.stringify({
           prompt: prompt,
-          n_predict: 80,
-          temperature: 0.5,
+          n_predict: 40,
+          temperature: 0.32,
           top_k: 40,
         }),
       }
@@ -146,21 +150,21 @@ export default function Notification({ route }) {
       break;
     case "happy":
       console.log("happy avatar");
-      let positive = [happy1Avatar, happy2Avatar];
+      let positive = [happy1Avatar, happy2Avatar, happy3Avatar];
       let happyAvatar = positive[Math.floor(Math.random() * positiveMax)]; // index+1
       avatarSource = happyAvatar;
       changeAvatar();
       break;
     case "sad":
       console.log("sad avatar");
-      let negative = [negative1Avatar, negative2Avatar];
+      let negative = [negative1Avatar, negative2Avatar, negative3Avatar];
       let negativeAvatar = negative[Math.floor(Math.random() * negativeMax)]; // index+1
       avatarSource = negativeAvatar;
       changeAvatar();
       break;
     case "normal":
       console.log("normal avatar");
-      let neutral = [neutral1Avatar, neutral2Avatar];
+      let neutral = [neutral1Avatar, neutral2Avatar, neutral3Avatar];
       let neutralAvatar = neutral[Math.floor(Math.random() * neutralMax)]; // index+1
       avatarSource = neutralAvatar;
       changeAvatar();
@@ -178,21 +182,21 @@ export default function Notification({ route }) {
         break;
       case "happy":
         console.log("happyeffect avatar");
-        let positive = [happy1Avatar, happy2Avatar];
+        let positive = [happy1Avatar, happy2Avatar, happy3Avatar];
         let happyAvatar = positive[Math.floor(Math.random() * positiveMax)]; // index+1
         avatarSource = happyAvatar;
         changeAvatar();
         break;
       case "sad":
         console.log("sadeffect avatar");
-        let negative = [negative1Avatar, negative2Avatar];
+        let negative = [negative1Avatar, negative2Avatar, negative3Avatar];
         let negativeAvatar = negative[Math.floor(Math.random() * negativeMax)]; // index+1
         avatarSource = negativeAvatar;
         changeAvatar();
         break;
       case "normal":
         console.log("normaleffect avatar");
-        let neutral = [neutral1Avatar, neutral2Avatar];
+        let neutral = [neutral1Avatar, neutral2Avatar, neutral3Avatar];
         let neutralAvatar = neutral[Math.floor(Math.random() * neutralMax)]; // index+1
         avatarSource = neutralAvatar;
         changeAvatar();
@@ -307,7 +311,30 @@ export default function Notification({ route }) {
         // setTextToSpeak(responseAnswer)
 
         // setSpeaker()
-        speak(responseAnswer);
+
+        let filteredAnswer = await responseAnswer.replace(
+          /ๆๆๆ|ๆๆ|\s\d\s|d|อิอิอิอิอิ|\s|ย&\s|ยย|ย/g,
+          ""
+        );
+        filteredAnswer = await responseAnswer.replace(
+          /หน้ายิ้มหน้ายิ้ม|ตายิ้ม|หน้ายิ้มตายิ้ม|ตายิ้มตายิ้ม/g,
+          ""
+        );
+        filteredAnswer = await responseAnswer.replace(/t|TT/g, "");
+        filteredAnswer = await responseAnswer.replace(
+          /\s3\s|333|33|\s4\s|444|44|\s2\s|222|22|\s1\s|111|11|\s6\s|666|66|\s7\s|777|77|\s8\s|888|88|\s9\s|999|99|\s0\s|000|00/g,
+          ""
+        );
+        filteredAnswer = responseAnswer.replace(/5/g, "ห้า");
+
+        console.log("filteredAnswer", filteredAnswer);
+
+        if (filteredAnswer.includes("[/INST]")) {
+          speak(filteredAnswer.split("[/INST]")[0]);
+        } else {
+          speak(filteredAnswer);
+        }
+
         setAvatar(responseText);
       }
       setIsLoading(false);
@@ -426,7 +453,7 @@ export default function Notification({ route }) {
         <Ionicons
           name="chevron-back-outline"
           size={30}
-          color="#3987FD"
+          color={recording ? "rgba(86, 154, 255, 0.52)" : "#3987FD"}
           style={{
             marginRight: "80%",
           }}
