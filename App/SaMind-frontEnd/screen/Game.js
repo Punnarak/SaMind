@@ -48,14 +48,13 @@ async function query(data) {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error querying model:", error);
-    return null;
+    return result
   }
 }
 
 const PopcatGame = ({ route }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isInfoVisible, setIsInfoVisible] = useState(false);
+  const [isInfoVisible, setIsInfoVisible] = useState(true);
   // const patientId = 333
   const [popCount, setPopCount] = useState(0);
   const { patientId, clickCount } = route.params || {};
@@ -117,6 +116,39 @@ const PopcatGame = ({ route }) => {
   const [recordingStatus, setRecordingStatus] = useState("idle");
   const [audioPermission, setAudioPermission] = useState(null);
   const [transcript, setTranscript] = useState("");
+
+  const calculateLevelAndProgress = (popCount) => {
+    // Define your thresholds
+    const thresholds = [0, 200, 500, 1000];
+    let currentLevel = 0;
+    let prevThreshold = 0;
+    let nextThreshold = thresholds[0];
+    
+    // Find the current level and its thresholds
+    for (let i = 0; i < thresholds.length; i++) {
+      if (popCount >= thresholds[i]) {
+        currentLevel = i + 1;
+        prevThreshold = thresholds[i];
+        nextThreshold = thresholds[i + 1] || thresholds[thresholds.length - 1];
+      } else {
+        break;
+      }
+    }
+    
+    // Calculate the progress within the current level
+    let levelProgress = 0; // Initialize to 0
+if (nextThreshold !== prevThreshold) {
+  levelProgress = (popCount - prevThreshold) / (nextThreshold - prevThreshold);
+}
+
+    levelProgress = Math.max(0, Math.min(levelProgress, 1));
+    
+    return { currentLevel, levelProgress };
+  };
+  
+
+  const { currentLevel, levelProgress  } = calculateLevelAndProgress(popCount);
+
 
   useEffect(() => {
     // Get recording permission upon first render
@@ -255,15 +287,19 @@ const PopcatGame = ({ route }) => {
         switch (randomFood) {
           case 0:
             setAppleCount((prevCount) => prevCount + 1);
+            alert("You got an Apple!");
             break;
           case 1:
             setMeatCount((prevCount) => prevCount + 1);
+            alert("You got an Meat!");
             break;
           case 2:
             setRiceCount((prevCount) => prevCount + 1);
+            alert("You got an Rice!");
             break;
           case 3:
             setFishCount((prevCount) => prevCount + 1);
+            alert("You got an Fish!");
             break;
           default:
             break;
@@ -273,8 +309,7 @@ const PopcatGame = ({ route }) => {
       return labelMeanings[maxLabel];
     } catch (error) {
       setIsLoadingSound(false)
-      console.error("Failed to perform sentiment analysis:", error);
-      return null;
+      return "normal";
     }
   }
 
@@ -347,64 +382,85 @@ const PopcatGame = ({ route }) => {
   }, [gameData]);
 
   useEffect(() => {
-    if (popCount < 50) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg11.png")
-          : require("../assets/egg12.png")
-      );
-    } else if (popCount >= 50 && popCount < 125) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg21.png")
-          : require("../assets/egg22.png")
-      );
-    } else if (popCount >= 125 && popCount < 200) {
-      setImageSource(
-        popCount % 2 === 1
-          ? require("../assets/egg31.png")
-          : require("../assets/egg32.png")
-      );
-    } else if (popCount >= 200 && popCount < 500) {
-      setImageSource(require("../assets/monster/pigidle.gif"));
-    } else if (popCount >= 500 && popCount < 100) {
-      setImageSource(require("../assets/monster/penguinidle.gif"));
-    } else setImageSource(require("../assets/monster/penguinidle.gif"));
-  }, [popCount]);
+    if (sleepMode) {
+      setImageSource(require("../assets/hide.gif"));
+    } else {
+      if (popCount < 50) {
+        setImageSource(
+          popCount % 2 === 1
+            ? require("../assets/egg11.png")
+            : require("../assets/egg12.png")
+        );
+      } else if (popCount >= 50 && popCount < 125) {
+        setImageSource(
+          popCount % 2 === 1
+            ? require("../assets/egg21.png")
+            : require("../assets/egg22.png")
+        );
+      } else if (popCount >= 125 && popCount < 200) {
+        setImageSource(
+          popCount % 2 === 1
+            ? require("../assets/egg31.png")
+            : require("../assets/egg32.png")
+        );
+      } else if (popCount >= 200 && popCount < 500) {
+        setImageSource(require("../assets/monster/pigidle.gif"));
+      } else if (popCount >= 500 && popCount < 1000) {
+        setImageSource(require("../assets/monster/penguinidle.gif"));
+      } else setImageSource(require("../assets/monster/dogidle.gif"));
+    }
+  }, [popCount, sleepMode]);
+
+  useEffect(() => {
+    if (progress1 === 0) {
+      setImageSource(require("../assets/grave.gif"));
+    }
+  }, [progress1]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // if (progress2 <= 0 && progress3 <= 0) {
-      //   setProgress1((prevProgress) => Math.max(0, prevProgress - 0.001));
-      // } else if (progress2 >= 0.5 && progress3 >= 0.5) {
-      //   setProgress1((prevProgress) => Math.min(1, prevProgress + 0.01));
-      // }
+      if (progress2 <= 0.3 || progress3 <= 0.3) {
+        setProgress1((prevProgress) => Math.max(0, prevProgress - 0.0001));
+      } else if (progress2 >= 0.5 && progress3 >= 0.5) {
+        setProgress1((prevProgress) => Math.min(1, prevProgress + 0.001));
+      }
 
-      // setProgress2((prevProgress) => {
-      //   if (popCount >= 200) {
-      //     return Math.max(0, prevProgress - 0.001);
-      //   } else {
-      //     return 1;
-      //   }
-      // });
-      if (sleepMode) {
-        // {
-        //   setProgress3((prevProgress) => {
-        //     if (popCount >= 200) {
-        //       return Math.max(0, prevProgress - 0.0001);
-        //     } else {
-        //       return 1;
-        //     }
-        //   });
-        // }
-        // else
+      setProgress2((prevProgress) => {
+        if (popCount >= 200) {
+          return Math.max(0, prevProgress - 0.0001);
+        } else {
+          return 1;
+        }
+      });
+      if (!sleepMode) {
+        {
+          setProgress3((prevProgress) => {
+            if (popCount >= 200) {
+              return Math.max(0, prevProgress - 0.0001);
+            } else {
+              return 1;
+            }
+          })
+        }
+        // elses
         // Increase the stamina bar continuously when in sleep mode
-        setProgress3((prevProgress) => Math.min(1, prevProgress + 0.001));
+        // setProgress3((prevProgress) => Math.min(1, prevProgress + 0.001));
+      }
+      else 
+      {
+        setProgress3((prevProgress) => {
+          if (popCount >= 200) {
+            return Math.min(1, prevProgress + 0.001);
+          } else {
+            return 1;
+          }
+        })
       }
     }, 100);
 
     return () => clearInterval(interval);
   }, [popCount, sleepMode]);
+  
 
   useEffect(() => {
     // Function to update data when navigating away from the page
@@ -451,13 +507,17 @@ const PopcatGame = ({ route }) => {
     meatCount,
     sleepMode,
   ]);
-
+// progress1 = health, progress2 = hungry, progress3 = stamina
   // useEffect(() => {
   //   const interval1 = setInterval(() => {
   //     setProgress1((prevProgress) => {
-  //       if (popCount >= 20) {
+  //       if (popCount >= 20 && progress2<0.3 && progress3<0.3 ) {
   //         return Math.max(0, prevProgress - 0.01);
-  //       } else {
+  //       }
+  //       else if(popCount >= 20 && progress2>=0.3 && progress3>=0.3){
+  //         return Math.max(0, prevProgress + 0.01);
+  //       }
+  //        else {
   //         return 1;
   //       }
   //     });
@@ -512,8 +572,10 @@ const PopcatGame = ({ route }) => {
   //     clearInterval(interval3);
   //   };
   // }, [popCount]);
+  const [isPressed, setIsPressed] = useState(false);
 
   const handlePressIn = () => {
+    setIsPressed(true);
     if (popCount < 50) {
       setImageSource(
         popCount % 2 === 1
@@ -540,6 +602,7 @@ const PopcatGame = ({ route }) => {
   };
 
   const handlePressOut = () => {
+    setIsPressed(false);
     if (popCount < 50) {
       setImageSource(require("../assets/egg1.png"));
     } else if (popCount >= 50 && popCount < 125) {
@@ -572,7 +635,7 @@ const PopcatGame = ({ route }) => {
   const enterSleepMode = () => {
     setSleepMode(true);
     // Increase the stamina bar
-    setProgress3((prevProgress) => Math.min(1, prevProgress + 0.1));
+    // setProgress3((prevProgress) => Math.min(1, prevProgress + 0.1));
   };
 
   const exitSleepMode = () => {
@@ -667,6 +730,13 @@ const PopcatGame = ({ route }) => {
           color="#3987FD"
           onPress={() => navigation.goBack()}
         />
+        <TouchableOpacity
+              style={[styles.button, { width: windowWidth / 2 - 25 }]}
+              onPress={restartGame}
+              disabled={sleepMode}
+            >
+              <Text style={styles.buttonText}>Restart</Text>
+            </TouchableOpacity>
         <Feather name={"info"} size={25} color="#569AFF" onPress={toggleInfo} />
       </View>
 
@@ -701,14 +771,33 @@ const PopcatGame = ({ route }) => {
 
                 <Text
                   style={{
-                    fontSize: moderateScale(14),
+                    fontSize: moderateScale(12),
                     // fontSize: 17,
                     textAlign: "center",
                   }}
                 >
-                  คลิ๊กเพื่อฟักไข่ {"\n"} ให้อาหารน้อง เล่นเกม และเรียนกับน้อง{" "}
-                  {"\n"} พูดให้กำลังใจน้อง {"\n"} ไปเลี้ยงน้องกัน
+                  คลิ๊กเพื่อฟักไข่ {"\n"} ไม่ว่าจะกดที่ตัวน้อง ให้อาหารน้อง เล่นเกม หรือเรียนกับน้อง {"\n"}ก็จะมีแต้มให้น้อง level up เพื่อ evolution{" "}
+                  {"\n"} ถ้าอาหารหมดเราสามารถหาอาหารได้โดยการพูดสิ่งดี ๆ กับน้องก็จะได้อาหารมา{"\n"}{"\n"}
                 </Text>
+
+                <Text
+                  style={{
+                    fontSize: moderateScale(12),
+                    color : "red",
+                    // fontSize: 17,
+                    textAlign: "center",
+                  }}
+                >
+                 ระวังอย่าให้น้องเลือดหมดหลอดนะ น้องจะเลือดลดถ้าหลอดอาหารกับพลังงานต่ำเกินไป{"\n"}{"\n"}
+                </Text>
+
+                <TouchableOpacity
+                style={styles.confirmb}
+                onPress={toggleInfo}
+                isVisible={isInfoVisible}
+              >
+                <Text style={styles.text}>ไปเลี้ยงน้องกันเลย!!!</Text>
+              </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -721,12 +810,42 @@ const PopcatGame = ({ route }) => {
             {/* <Text style={styles.sleepModeText}>Sleep Mode</Text> */}
           </View>
         )}
+        <View style={styles.progressBars}>
+          <View
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              marginLeft: "5%",
+              marginRight: "5%",
+              paddingHorizontal: 10,
+            }}
+          >
+            <Text style={[styles.progressBarLabel, { marginRight: 10 }]}>
+              Level {currentLevel}
+            </Text>
+            <ProgressBar
+              styleAttr="Horizontal"
+              progress={levelProgress}
+              indeterminate={false}
+              // style={{ flex: 1 }}
+              color="blue"
+              progressBarStyle={{ height: 20 }}
+            />
+          </View>
+        </View>
         <TouchableWithoutFeedback
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
+          disabled={progress1 === 0||sleepMode}
         >
-          <Image source={imageSource} style={styles.popcatImage} />
+          <Image source={imageSource} style={[
+      styles.popcatImage,
+      isPressed && styles.popcatImagePressed,
+    ]} />
         </TouchableWithoutFeedback>
+        
         {/* <Text style={styles.countText}>{popCount}</Text> */}
         <TouchableOpacity
         style={{
@@ -736,8 +855,8 @@ const PopcatGame = ({ route }) => {
           padding: 6,
           paddingHorizontal: 12,
           gap: 8,
-          height: 40,
-          width: 150,
+          height: 100,
+          width: 200,
           backgroundColor: isLoadingSound ? "#888888" : "#1b1b1cde",
           borderRadius: 20,
           cursor: "pointer",
@@ -749,7 +868,7 @@ const PopcatGame = ({ route }) => {
       >
         <Feather
           name="mic"
-          size={20}
+          size={50}
           color={isLoadingSound ? "#000000" : recording ? "#FF342B" : "#000000"}
         />
         <Svg
@@ -849,24 +968,24 @@ const PopcatGame = ({ route }) => {
         </View>
         <View style={styles.buttonsContainer}>
           <View style={styles.row}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.button, { width: windowWidth / 2 - 25 }]}
               onPress={restartGame}
               disabled={sleepMode}
             >
               <Text style={styles.buttonText}>Restart</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={[
                 styles.button,
                 {
                   width: windowWidth / 2 - 25,
                   backgroundColor:
-                    popCount < 200 || sleepMode ? "#9e9e9e" : "#ff8000",
+                    popCount < 200 || sleepMode ||progress1 == 0? "#9e9e9e" : "#ff8000",
                 },
               ]}
               onPress={popCount <= 0 ? null : () => handleEatingButtonPress()}
-              disabled={popCount <= 0 || sleepMode}
+              disabled={popCount <= 0 || sleepMode ||progress1 == 0}
             >
               <Icon name="cutlery" type="font-awesome" color="#fff" size={20} marginRight={10} />
               <Text style={styles.buttonText}>Eating</Text>
@@ -970,7 +1089,8 @@ const PopcatGame = ({ route }) => {
                 {
                   width: windowWidth / 2 - 25,
                   backgroundColor:
-                    popCount < 200 || sleepMode || progress3 < 0.15
+                    popCount < 200 || sleepMode || progress3 < 0.15 ||
+                    progress2 < 0.15 ||progress1 == 0
                       ? "#9e9e9e"
                       : "#009999",
                 },
@@ -985,6 +1105,7 @@ const PopcatGame = ({ route }) => {
                 sleepMode ||
                 progress3 < 0.15 ||
                 progress2 < 0.15
+                ||progress1 == 0
               }
             >
               <Icon name="gamepad" type="font-awesome" color="#fff" size={20} marginRight={10} />
@@ -992,13 +1113,13 @@ const PopcatGame = ({ route }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.button, { width: windowWidth / 2 - 25 }]}
               onPress={() => navigation.navigate("Homescreen", { patientId })}
               // disabled={sleepMode}
             >
               <Text style={styles.buttonText}>Quit</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={[
                 styles.button,
@@ -1008,7 +1129,7 @@ const PopcatGame = ({ route }) => {
                     popCount < 200 ||
                     sleepMode ||
                     progress3 < 0.1 ||
-                    progress2 < 0.1
+                    progress2 < 0.1 ||progress1 == 0
                       ? "#9e9e9e"
                       : "#cc00cc",
                 },
@@ -1017,10 +1138,10 @@ const PopcatGame = ({ route }) => {
                 popCount <= 0
                   ? null
                   : () =>
-                      navigation.navigate("Phq9gametestscreen", { patientId })
+                      navigation.navigate("Game2", { patientId })
               }
               disabled={
-                popCount <= 0 || sleepMode || progress3 < 0.1 || progress2 < 0.1
+                popCount <= 0 || sleepMode || progress3 < 0.1 || progress2 < 0.1 ||progress1 == 0
               }
             >
               <Icon name="book" type="font-awesome" color="#fff" size={20} marginRight={10}  />
@@ -1031,11 +1152,11 @@ const PopcatGame = ({ route }) => {
                 styles.button,
                 {
                   width: windowWidth / 2 - 25,
-                  backgroundColor: popCount < 200 ? "#9e9e9e" : "#4c0099",
+                  backgroundColor: popCount < 200||progress1 == 0 ? "#9e9e9e" : "#4c0099",
                 },
               ]}
               onPress={handleGame4Press}
-              disabled={popCount < 200}
+              disabled={popCount < 200 ||progress1 == 0}
             >
               <Icon name="bed" type="font-awesome" color="#fff" size={20}  marginRight={10} />
               <Text style={styles.buttonText}>Sleep</Text>
@@ -1064,6 +1185,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginBottom: 20,
+  },
+  popcatImagePressed: {
+    marginTop: 0,
+    width: 250,
+    height: 250,
+    marginBottom:0,
   },
   countText: {
     fontSize: 24,
@@ -1245,6 +1372,26 @@ const styles = StyleSheet.create({
   buttonTextGame: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  confirmb: {
+    marginTop: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    backgroundColor: "#569AFF",
+    width: "65%",
+    marginBottom: 2,
+  },
+  text: {
+    fontSize: moderateScale(12),
+    // fontSize: 15,
+    lineHeight: verticalScale(20.2),
+    // lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
   },
 });
 
