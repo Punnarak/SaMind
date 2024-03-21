@@ -13,16 +13,16 @@ export default function Notification({ route }) {
     console.log("General Test Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
-    return onFocus
+    return onFocus;
   }, []);
 
   return (
@@ -151,7 +151,7 @@ export default function Notification({ route }) {
             style={styles.picul}
             size={25}
             color="#222222"
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("Notiscreen", { patientId })}
           />
           <Feather
             name="smile"
