@@ -67,13 +67,13 @@ export default function Home({ route }) {
     console.log("Home Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
       fetchData();
       console.log("mood", selectedMenu);
@@ -86,43 +86,52 @@ export default function Home({ route }) {
     try {
       // Make a request to your API to update timeplay
       console.log("storage", patientId);
-      const response = await axios.put('/update_timeplay', { patient_id: patientId });
-  
+      const response = await axios.put("/update_timeplay", {
+        patient_id: patientId,
+      });
+
       if (response.status === 200) {
-        console.log('Timeplay updated successfully');
+        console.log("Timeplay updated successfully");
         // Now that timeplay is updated, get click count
-        const clickCountResponse = await axios.get('/get_click_count', { params: { patient_id: patientId } });
-        
+        const clickCountResponse = await axios.get("/get_click_count", {
+          params: { patient_id: patientId },
+        });
+
         // Extract click count from the response
         const clickCount = clickCountResponse.data.click_count;
-  
-        console.log('Click count:', clickCount);
-  
+
+        console.log("Click count:", clickCount);
+
         // Now navigate to the Gamescreen with patientId and clickCount
         navigation.navigate("Gamescreen", { patientId, clickCount });
       } else {
-        console.error('Failed to update timeplay:', response.status);
+        console.error("Failed to update timeplay:", response.status);
         // Handle error accordingly
       }
     } catch (error) {
-      console.error('Error updating timeplay:', error);
+      console.error("Error updating timeplay:", error);
       // Handle error accordingly
     }
   };
 
   const navigateToAvatarscreen = async () => {
     try {
-      const response = await axios.post('/talk_with_avatar', { patient_id: patientId });
+      const response = await axios.post("/talk_with_avatar", {
+        patient_id: patientId,
+      });
       if (response.status === 201) {
         const { patient_id, mood_detection_id } = response.data.data;
-        console.log( patient_id, mood_detection_id)
+        console.log(patient_id, mood_detection_id);
         // navigation.navigate("Avatarscreen")
         navigation.navigate("Avatarscreen", { patient_id, mood_detection_id });
       } else {
-        console.error('Failed to insert data into avatar table:', response.status);
+        console.error(
+          "Failed to insert data into avatar table:",
+          response.status
+        );
       }
     } catch (error) {
-      console.error('Error inserting data into avatar table:', error);
+      console.error("Error inserting data into avatar table:", error);
     }
   };
 
@@ -173,7 +182,7 @@ export default function Home({ route }) {
         }}
       >
         <View style={styles.boxlevel}>
-          <Text style={styles.level}>LV.1 Beginner</Text>
+          <Text style={styles.level}>Sa-Mind</Text>
         </View>
         <TouchableOpacity
           style={styles.boxper}
@@ -498,12 +507,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#3C9BF2",
     borderColor: "#3C9BF2",
+    // borderColor: "#C6E3FF",
+    // backgroundColor: "#C6E3FF",
     borderRadius: 21,
     // padding: "3%",
     padding: 11.5,
     marginTop: 58,
     // marginRight: horizontalScale(187.5),
-    marginRight: "50%",
+    marginRight: "59%",
     // marginRight: 500,
     marginBottom: verticalScale(15),
     // marginBottom: "4%",
@@ -513,6 +524,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(15),
     // fontSize: 15,
     color: "white",
+    // color: "#C6E3FF",
     fontWeight: "bold",
   },
   // Feature Text
