@@ -65,7 +65,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่อนและผู้ช่วยตอบคำถาม ตอบคำถามแบบกระชับ และเข้าใจง่าย <</SYS>>${data}[/INST]`;
     console.log(prompt);
     const response = await fetch(
-      "https://e31a-2001-fb1-17-16cd-1987-7975-9bbf-8e80.ngrok-free.app/completion",
+      "https://8e37-2001-fb1-16-95d2-19b5-57cd-ade1-26b7.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
@@ -75,8 +75,8 @@ async function answer(data) {
         method: "POST",
         body: JSON.stringify({
           prompt: prompt,
-          n_predict: 50,
-          temperature: 0.32,
+          n_predict: 80,
+          temperature: 0.5,
           top_k: 40
         }),
       }

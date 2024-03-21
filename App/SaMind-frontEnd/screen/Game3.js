@@ -431,7 +431,7 @@ export default function SpeechToTextPage() {
   // });
 let response = ''
   try {
-     response = await FileSystem.uploadAsync("http://192.168.1.101:4343/speech", audioPath, {
+     response = await FileSystem.uploadAsync("http://192.168.1.38:4343/speech", audioPath, {
       httpMethod: 'POST',
       uploadType: FileSystem.FileSystemUploadType.MULTIPART,
       fieldName: 'file', // Must match the field expected by your server

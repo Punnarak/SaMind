@@ -639,6 +639,113 @@ router.post('/adTherapistAll', auth, (req, res) => {
 //   }
 // });
 
+// router.post('/adCreatePatient', auth, async (req, res) => {
+//   try {
+//     const {
+//       fname,
+//       lname,
+//       phone,
+//       gender,
+//       born,
+//       email,
+//       password,
+//       therapistName
+//     } = req.body;
+
+//     // Hash password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Convert frontend date format to database date format
+//     const [month, day, year] = born.split('/');
+//     const formattedBorn = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+//     // Calculate age from date of birth
+//     const dob = new Date(formattedBorn);
+//     const ageDate = new Date(Date.now() - dob.getTime());
+//     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+
+//     // Fetch therapist data
+//     const therapistQuery = `
+//       SELECT therapist_id, hospital_name 
+//       FROM therapist 
+//       WHERE fname = $1 AND lname = $2`;
+//     const therapistResult = await client.query(therapistQuery, [
+//       therapistName.split(' ')[0],
+//       therapistName.split(' ')[1]
+//     ]);
+
+//     const therapistData = therapistResult.rows[0];
+//     if (!therapistData) {
+//       return res.status(404).json({ error: 'Therapist not found' });
+//     }
+
+//     // Convert gender to boolean
+//     const isMale = gender.toLowerCase() === 'male';
+
+//     // Insert patient data
+//     const insertPatientQuery = `
+//       INSERT INTO public.patient (
+//         patient_id,
+//         email,
+//         fname,
+//         lname,
+//         age,
+//         gender,
+//         phone,
+//         level,
+//         hospital_name,
+//         therapist_id,
+//         start_date,
+//         born
+//       ) VALUES (
+//         NEXTVAL('patient_id_seq'),
+//         $1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10
+//       ) RETURNING patient_id`;
+
+//     const insertPatientParams = [
+//       email,
+//       fname,
+//       lname,
+//       age,
+//       isMale,
+//       phone,
+//       'level', // Adjust this accordingly
+//       therapistData.hospital_name,
+//       therapistData.therapist_id,
+//       formattedBorn // Use formattedBorn here
+//     ];
+
+//     const insertedPatient = await client.query(insertPatientQuery, insertPatientParams);
+//     const patientId = insertedPatient.rows[0].patient_id;
+
+//     // Insert user data
+//     const insertUserQuery = `
+//       INSERT INTO public.users (
+//         users_id,
+//         email,
+//         password,
+//         patient_id,
+//         verify_user
+//       ) VALUES (
+//         NEXTVAL('users_id_seq'),
+//         $1, $2, $3, 'N'
+//       )`;
+
+//     const insertUserParams = [
+//       email,
+//       hashedPassword,
+//       patientId
+//     ];
+
+//     await client.query(insertUserQuery, insertUserParams);
+
+//     res.status(201).json({ patient_id: patientId });
+//   } catch (error) {
+//     console.error('Error executing query:', error);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+
 router.post('/adCreatePatient', auth, async (req, res) => {
   try {
     const {
@@ -651,19 +758,19 @@ router.post('/adCreatePatient', auth, async (req, res) => {
       password,
       therapistName
     } = req.body;
-
+    console.log("req",req.body)
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Convert frontend date format to database date format
-    const [month, day, year] = born.split('/');
+    const [day, month, year] = born.split('/'); // Adjusted the order of splitting
     const formattedBorn = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 
     // Calculate age from date of birth
     const dob = new Date(formattedBorn);
     const ageDate = new Date(Date.now() - dob.getTime());
     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-
+    
     // Fetch therapist data
     const therapistQuery = `
       SELECT therapist_id, hospital_name 
@@ -706,7 +813,7 @@ router.post('/adCreatePatient', auth, async (req, res) => {
       email,
       fname,
       lname,
-      age,
+      age, // Changed age to the calculated age
       isMale,
       phone,
       'level', // Adjust this accordingly
@@ -745,6 +852,7 @@ router.post('/adCreatePatient', auth, async (req, res) => {
     res.status(500).json({ error: 'An error occurred' });
   }
 });
+
 
 
 // router.post('/adPatientView', (req, res) => {

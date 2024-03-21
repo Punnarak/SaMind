@@ -87,7 +87,7 @@ function isValidEmail(email) {
 router.post("/login", jsonParser, async function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
-
+  
   const query = {
     text: "SELECT * FROM therapist WHERE email = $1",
     values: [email],
