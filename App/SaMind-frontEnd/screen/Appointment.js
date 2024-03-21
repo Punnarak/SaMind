@@ -464,6 +464,7 @@ export default function Calendar({ route }) {
                       {showDatePicker ? (
                         <DateTimePicker
                           testID="dateTimePicker"
+                          minimumDate={new Date()}
                           value={newAppointment}
                           mode="date"
                           is24Hour={true}
@@ -502,6 +503,7 @@ export default function Calendar({ route }) {
                       />
                       <DateTimePicker
                         testID="dateTimePicker"
+                        minimumDate={new Date()}
                         value={newAppointment}
                         mode="date"
                         is24Hour={true}
