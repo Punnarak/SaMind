@@ -91,7 +91,7 @@ export default function Login({ route }) {
     { id: 45, name: "22:00-23:00 ", value: "22:00" },
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
-  ])
+  ]);
 
   const DrName = [
     { id: 1, name: "A", value: "A" },
@@ -110,38 +110,38 @@ export default function Login({ route }) {
     navigation.navigate("Appointmentscreen", { patientId });
   };
   const toggleSubmit = () => {
-    console.log('toggle submit',selectedValue)
-    if(selectedValue && selectedValue != 'time not available'){
-    setTimeError("")
-    setConfirmModal(!confirmModal);
-    const dateApi = date + "-" + (month + 1) + "-" + year;
-    const param = {
-      therapistName: doctorName,
-      patientId: patientId,
-      patientName: name,
-      date: dateApi,
-      time: selectedValue,
-      patientPhone: tel,
-    };
-    console.log(param);
-    axios
-      .post("/appointSelect", param)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
-    }else{
-      setTimeError("*")
+    console.log("toggle submit", selectedValue);
+    if (selectedValue && selectedValue != "time not available") {
+      setTimeError("");
+      setConfirmModal(!confirmModal);
+      const dateApi = date + "-" + (month + 1) + "-" + year;
+      const param = {
+        therapistName: doctorName,
+        patientId: patientId,
+        patientName: name,
+        date: dateApi,
+        time: selectedValue,
+        patientPhone: tel,
+      };
+      console.log(param);
+      axios
+        .post("/appointSelect", param)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          // Handle any errors here
+          console.error("Axios error:", error);
+        });
+    } else {
+      setTimeError("*");
     }
   };
   const toggleModal = () => {
     setSubmit(!submit);
   };
   const handleSubmit = () => {
-    if (selectedValue && selectedValue != 'time not available') {
+    if (selectedValue && selectedValue != "time not available") {
       setTimeError("");
       const dateString = year + "-" + (month + 1) + "-" + date;
 
@@ -229,32 +229,31 @@ export default function Login({ route }) {
     console.log("Select Appointment Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
 
-
     let param2 = {
       patientID: patientId,
-      date: year + "-" + (month + 1) + "-" + date
-    }
-    console.log(param2)
+      date: year + "-" + (month + 1) + "-" + date,
+    };
+    console.log(param2);
     axios
       .post("/appointShowTime", param2)
       .then((response) => {
         console.log("data:", response.data);
-        if(response.data === '-'){
-          setSelectedValue("time not available")
-          setDisabled(true)
-        }else{
-           setTime(response.data)
-           setDisabled(false)
+        if (response.data === "-") {
+          setSelectedValue("time not available");
+          setDisabled(true);
+        } else {
+          setTime(response.data);
+          setDisabled(false);
         }
       })
       .catch((error) => {
@@ -275,7 +274,7 @@ export default function Login({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus;
+    return onFocus;
   }, []);
 
   return (
@@ -316,7 +315,11 @@ export default function Login({ route }) {
           editable={false}
           value={selectedValue ? selectedValue : ""}
         />
-        <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker} disabled={disabled}>
+        <TouchableOpacity
+          style={[styles.eyeI]}
+          onPress={togglePicker}
+          disabled={disabled}
+        >
           <Ionicons
             name="chevron-back-outline"
             style={{
@@ -397,7 +400,7 @@ export default function Login({ route }) {
           editable={false}
           placeholder="0890222255"
           placeholderTextColor={"rgba(86, 154, 255, 0.52)"}
-          secureTextEntry={passwordVisibility}
+          // secureTextEntry={passwordVisibility}
           style={styles.TextInput}
           value={tel}
           onChangeText={setTel}
