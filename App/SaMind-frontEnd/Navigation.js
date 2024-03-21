@@ -26,7 +26,6 @@ import Phq9testscreen from "./screen/Phq9";
 import Q2testscreen from "./screen/Q2";
 import Gamescreen from "./screen/Game";
 
-
 import Game1 from "./screen/Game1";
 import Game2 from "./screen/Game2";
 import Game3 from "./screen/Game3";
@@ -67,7 +66,12 @@ const MainStack = () => {
       <Stack.Screen
         name="Homescreen"
         component={Homescreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          // headerLeft: () => null,
+          gestureEnabled: false,
+          // gestureDirection: "null",
+        }}
       />
       <Stack.Screen
         name="Dashboardscreen"
@@ -142,7 +146,7 @@ const MainStack = () => {
       <Stack.Screen
         name="Avatarscreen"
         component={Avatarscreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Profilescreen"
