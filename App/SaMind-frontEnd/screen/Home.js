@@ -104,6 +104,7 @@ export default function Home({ route }) {
 
         // Now navigate to the Gamescreen with patientId and clickCount
         navigation.navigate("Gamescreen", { patientId, clickCount });
+        // navigation.navigate("Game2", { patientId });
       } else {
         console.error("Failed to update timeplay:", response.status);
         // Handle error accordingly

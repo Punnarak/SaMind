@@ -154,26 +154,26 @@ export default function Notificationgame({ route }) {
   ]);
 
   let questions = [];
-  useEffect(() => {
-    console.log("PHQ9 Test Screen");
-    // Make a GET request to fetch data from "/question?type=test2"
-    axios
-      .get("/question?type=PHQ9")
-      .then((response) => {
-        // Set the fetched data in your state
-        // response.data = [];
-        if (response.data.length != 0) {
-          console.log("in");
-          setData(response.data);
-        }
+  // useEffect(() => {
+  //   console.log("PHQ9 Test Screen");
+  //   // Make a GET request to fetch data from "/question?type=test2"
+  //   axios
+  //     .get("/question?type=PHQ9")
+  //     .then((response) => {
+  //       // Set the fetched data in your state
+  //       // response.data = [];
+  //       if (response.data.length != 0) {
+  //         console.log("in");
+  //         setData(response.data);
+  //       }
 
-        console.log(response.data, response.data.length);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
-  }, []);
+  //       console.log(response.data, response.data.length);
+  //     })
+  //     .catch((error) => {
+  //       // Handle any errors here
+  //       console.error("Axios error:", error);
+  //     });
+  // }, []);
   questions = data;
   // const questions =
 
@@ -184,8 +184,11 @@ export default function Notificationgame({ route }) {
     setModal(!modal);
     setScore(0);
     updateStaminaBar();
+    console.log("stapass")
     updateHungryBar();
+    console.log("hunpass")
     updateScore();
+    console.log("scopass")
     navigation.navigate("Gamescreen", { patientId });
   };
 
@@ -249,15 +252,15 @@ export default function Notificationgame({ route }) {
       type: "PHQ9",
       patient_id: patientId,
     };
-    axios
-      .post("/score_question_post", param)
-      .then((response) => {
-        console.log("submit success", response.data);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Axios error:", error);
-      });
+    // axios
+    //   .post("/score_question_post", param)
+    //   .then((response) => {
+    //     console.log("submit success", response.data);
+    //   })
+    //   .catch((error) => {
+    //     // Handle any errors here
+    //     console.error("Axios error:", error);
+    //   });
     setModal(!modal);
   };
 
