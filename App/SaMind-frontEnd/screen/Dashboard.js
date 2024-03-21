@@ -26,13 +26,13 @@ export default function Dashboard({ route }) {
     console.log("Dashboard Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
@@ -63,9 +63,19 @@ export default function Dashboard({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
+  useEffect(() => {
+    if (data) {
+      if (data.historyTest.hasOwnProperty("type1")) {
+        handleColor1(data.historyTest.type1, data.historyTest.result1);
+      }
+      if (data.historyTest.hasOwnProperty("type2")) {
+        handleColor2(data.historyTest.type2, data.historyTest.result2);
+      }
+    }
+  }, [data, color1, color2]);
   const setMood = (mood) => {
     mood = parseFloat(mood);
     mood = mood.toFixed(0);
@@ -112,6 +122,8 @@ export default function Dashboard({ route }) {
     if (type === "2Q") {
       if (result.includes("ไม่มีแนวโน้ม")) {
         setColor2("green");
+      } else if (result.includes("มีแนวโน้ม")) {
+        setColor2("red");
       } else if (result == 0) {
         setColor2("red");
       }
@@ -781,6 +793,7 @@ export default function Dashboard({ route }) {
                     fontSize: 10,
                     color: color1,
                     fontWeight: "bold",
+                    width: "50%",
                   }}
                 >
                   {data.historyTest && data.historyTest.result1 !== null
@@ -862,6 +875,7 @@ export default function Dashboard({ route }) {
                     fontSize: 10,
                     color: color2,
                     fontWeight: "bold",
+                    width: "50%",
                   }}
                 >
                   {data.historyTest && data.historyTest.result2 !== null
