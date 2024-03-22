@@ -921,6 +921,7 @@ export default {
           })
           .then((response) => {
             console.log("Create success", response.data);
+            window.location.reload();
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -937,7 +938,6 @@ export default {
         this.checkEmail = false;
         this.createPopup = false;
         this.checkBirthDate = false;
-        window.location.reload();
       }
     },
     handleEditAccount(patient) {
