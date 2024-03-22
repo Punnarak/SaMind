@@ -60,7 +60,7 @@
             }"
             @click="
               {
-                (sortDirection = 'desc'), (this.sortType = 'desc');
+                (sortDirection = 'desc'), (sortType = 'desc');
               }
             "
           >
@@ -70,7 +70,7 @@
             :style="{
               'background-color': sortType === 'asc' ? '#C9C9C9' : 'white',
             }"
-            @click="(sortDirection = 'asc'), (this.sortType = 'asc')"
+            @click="(sortDirection = 'asc'), (sortType = 'asc')"
           >
             <span class="pl-2">Oldest first</span>
           </v-list-item>
@@ -102,7 +102,7 @@
               @click="() => {
                 const selectedItem = historyInfo.find(test => item.columns.testName === test.testName && item.columns.date === test.date);
                 if (selectedItem) {
-                  this.$router.push({
+                  $router.push({
                     path: '/dashboard/testresult',
                     query: {
                       testName: selectedItem.testName,

@@ -13,7 +13,7 @@
           size="x-large"
           variant="flat"
           style="font-family: 'Inter', 'sans-serif'"
-          @Click="this.$router.go(-1)"
+          @Click="$router.go(-1)"
         >
           <v-icon style="margin-right: 10px">mdi-arrow-left</v-icon>Back
         </v-btn>

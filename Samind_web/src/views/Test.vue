@@ -74,7 +74,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ this.selectTest.columns.testname }} ?</slot
+                    {{ selectTest.columns.testname }} ?</slot
                   >
                 </div>
 
@@ -107,7 +107,7 @@
               <div class="modal-container send">
                 <div class="modal-header send-popup-header" align="start">
                   <slot class="popupheader" name="header"
-                    >Send “{{ this.selectTest.columns.testname }}”
+                    >Send “{{ selectTest.columns.testname }}”
                   </slot>
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>

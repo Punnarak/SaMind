@@ -68,7 +68,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ this.selectTherapist.columns.name }} ?</slot
+                    {{ selectTherapist.columns.name }} ?</slot
                   >
                 </div>
 

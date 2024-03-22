@@ -62,7 +62,7 @@
           size="30px"
           style="margin-right: 20px"
           @click="
-            this.$router.push({
+            $router.push({
               path: 'patientdashboard',
               query: {
                 patientId: item.columns.patientId,
@@ -102,7 +102,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ this.selectPatient.columns.name }} ?</slot
+                    {{ selectPatient.columns.name }} ?</slot
                   >
                 </div>
 
@@ -921,6 +921,7 @@ export default {
           })
           .then((response) => {
             console.log("Create success", response.data);
+            window.location.reload();
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -937,7 +938,6 @@ export default {
         this.checkEmail = false;
         this.createPopup = false;
         this.checkBirthDate = false;
-        window.location.reload();
       }
     },
     handleEditAccount(patient) {

@@ -3,11 +3,11 @@
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> LIBRARY </v-col>
       <v-col class="calendar-type" cols="4" align="center">
-        <button @click="(menu = 'carousel'), this.dataEachMenu()">
+        <button @click="(menu = 'carousel'), dataEachMenu()">
           CAROUSEL
         </button>
-        <button @click="(menu = 'tip'), this.dataEachMenu()">TIP</button>
-        <button @click="(menu = 'link'), this.dataEachMenu()">LINK</button>
+        <button @click="(menu = 'tip'), dataEachMenu()">TIP</button>
+        <button @click="(menu = 'link'), dataEachMenu()">LINK</button>
       </v-col>
     </v-row>
     <v-col class="px-10" v-if="menu == 'carousel'">
@@ -55,7 +55,7 @@
         </template>
         <template v-slot:item.url="{ item }"
           ><label class="url-label">{{
-            this.showLink(item.columns.url)
+            showLink(item.columns.url)
           }}</label>
         </template>
         <template v-slot:item.action="{ item }">
@@ -613,7 +613,7 @@
       >
         <template v-slot:item.url="{ item }"
           ><label class="url-label">{{
-            this.showLink(item.columns.url)
+            showLink(item.columns.url)
           }}</label>
         </template>
         <template v-slot:item.action="{ item }">
@@ -748,7 +748,7 @@
                   <div class="modal-body" style="margin-top: 6px" align="start">
                     <slot name="body"
                       >Are you sure you want to delete :
-                      {{ this.select.columns.title }} ?</slot
+                      {{ select.columns.title }} ?</slot
                     >
                   </div>
 
@@ -1145,7 +1145,7 @@
                 class="popupheader"
                 style="font-weight: bolder"
                 name="header"
-                >Edit Link: {{ this.select.columns.name }}</slot
+                >Edit Link: {{ select.columns.name }}</slot
               >
               <v-icon @click="editPopup = false">mdi-close</v-icon>
             </div>
