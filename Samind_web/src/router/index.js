@@ -1,3 +1,4 @@
+import axios from "../axios.js";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -86,8 +87,28 @@ const router = createRouter({
           props: true,
         },
       ],
+      meta: { authRequired: true },
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  try {
+    const res = await axios.post("/refreshToken");
+    const isSignedIn = res.status == 200;
+    if (to.meta.authRequired && !isSignedIn) {
+      return next("/signin");
+    }
+    if (isSignedIn) {
+      if (to.path == "/" || to.path == "/signin") {
+        return next("/dashboard/managepatient");
+      }
+    }
+  } catch (err) {
+    if (to.path == "/signin" || to.path == "/") return next();
+    return next("/signin");
+  }
+  return next();
 });
 
 export default router;
