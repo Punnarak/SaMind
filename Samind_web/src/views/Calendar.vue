@@ -87,7 +87,7 @@
                         >
                           <label
                             class="text mr-8"
-                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px"
                             >Request</label
                           >
                           <label
@@ -274,7 +274,7 @@
                         >
                           <label
                             class="text mr-8"
-                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px"
                             >To</label
                           >
                           <label
