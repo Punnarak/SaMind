@@ -61,7 +61,7 @@
           prepend-icon="mdi-message-text"
           title="Support"
           @click="
-            this.$router.push({
+            $router.push({
               path: `/support`,
             })
           "
@@ -137,7 +137,7 @@
           prepend-icon="mdi-message-text"
           title="Support"
           @click="
-            this.$router.push({
+            $router.push({
               path: `/support`,
             })
           "
@@ -158,7 +158,7 @@
     <v-btn icon>
       <v-icon>mdi-bell-outline</v-icon>
     </v-btn>
-    <span class="ml-3">{{ this.firstName }} {{ this.lastName }}</span>
+    <span class="ml-3">{{ firstName }} {{ lastName }}</span>
     <v-icon class="ml-3">mdi-account</v-icon>
     <v-menu>
       <template v-slot:activator="{ props }">
@@ -169,7 +169,7 @@
       <v-list>
         <v-list-item
           @click="
-            this.$router.push({
+            $router.push({
               path: `/editaccount`,
             })
           "

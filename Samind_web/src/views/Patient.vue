@@ -47,7 +47,7 @@
           color="blue"
           size="30px"
           @click="
-            this.$router.push({
+            $router.push({
               path: 'patientdashboard',
               query: {
                 patientId: item.columns.patientId,

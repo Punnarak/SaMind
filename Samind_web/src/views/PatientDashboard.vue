@@ -159,18 +159,18 @@
                   <label class="testdate ml-2">{{ testDate }}</label>
                 </v-col></v-chip
               ></v-col
-            ><v-col v-if="this.scoretest1" cols="26" sm="6" md="4">
+            ><v-col v-if="scoretest1" cols="26" sm="6" md="4">
               <label class="title mr-16" style="font-weight: bold"
                 >Score Test
               </label>
               <span class="mr-16 ml-16"></span>
 
               <label
-                v-if="this.scoretest1"
+                v-if="scoretest1"
                 class="hyper mr-16"
                 style="font-weight: bold"
                 @click="
-                  this.$router.push({
+                  $router.push({
                     path: 'patienttesthistory',
                     query: {
                       patientName: patientName,
@@ -199,7 +199,7 @@
                     margin-left: -10px;
                   "
                 >
-                  <v-list-item v-if="this.scoretest1">
+                  <v-list-item v-if="scoretest1">
                     <v-row
                       style="
                         background-color: rgba(228, 228, 228, 0.4);
@@ -225,7 +225,7 @@
                     style="color: rgb(255, 255, 255)"
                   ></v-divider>
 
-                  <v-list-item v-if="this.scoretest2">
+                  <v-list-item v-if="scoretest2">
                     <v-row
                       style="
                         background-color: rgba(228, 228, 228, 0.4);
@@ -339,7 +339,7 @@
                 class="hyper mr-16"
                 style="font-weight: bold"
                 @click="
-                  this.$router.push({
+                  $router.push({
                     path: 'patienttesthistory',
                     query: {
                       patientName: patientName,

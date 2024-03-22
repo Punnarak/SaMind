@@ -62,7 +62,7 @@
           size="30px"
           style="margin-right: 20px"
           @click="
-            this.$router.push({
+            $router.push({
               path: 'patientdashboard',
               query: {
                 patientId: item.columns.patientId,
@@ -102,7 +102,7 @@
                 <div class="modal-body" style="margin-top: 6px" align="start">
                   <slot name="body"
                     >Are you sure you want to delete :
-                    {{ this.selectPatient.columns.name }} ?</slot
+                    {{ selectPatient.columns.name }} ?</slot
                   >
                 </div>
 
