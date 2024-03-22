@@ -8,7 +8,7 @@
 import axios from "axios";
 
 const HTTP = axios.create({
-  baseURL: "http://192.168.1.38:4301",
+  baseURL: "http://localhost:4301",
   withCredentials: true, // Send cookies with requests
 });
 
