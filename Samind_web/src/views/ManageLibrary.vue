@@ -52,6 +52,9 @@
             style="width: 275px; height: 190px"
           />
         </template>
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.url="{ item }"
           ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
@@ -328,6 +331,9 @@
         class="elevation-1"
         style="border-radius: 10px"
       >
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.imageUrl="{ item }">
           <img
             :src="item.columns.imageUrl"
@@ -610,6 +616,9 @@
         class="elevation-1"
         style="border-radius: 10px"
       >
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.url="{ item }"
           ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
