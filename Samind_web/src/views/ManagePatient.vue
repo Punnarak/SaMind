@@ -92,7 +92,7 @@
           <div v-if="deletePopup" class="modal-mask">
             <div class="modal-wrapper">
               <div class="modal-container delete">
-                <div class="modal-header" align="start">
+                <div class="modal-header" align="left">
                   <slot class="popupheader" name="header">Confirm delete</slot>
                 </div>
                 <v-divider
@@ -100,7 +100,7 @@
                   color="black"
                   style="opacity: 1"
                 ></v-divider>
-                <div class="modal-body" style="margin-top: 6px" align="start">
+                <div class="modal-body" style="margin-top: 6px" align="left">
                   <slot name="body"
                     >Are you sure you want to delete :
                     {{ selectPatient.columns.name }} ?</slot
@@ -1149,7 +1149,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.1);
   display: table;
   transition: opacity 0.3s ease;
 }
