@@ -21,6 +21,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredPatients"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px"
     >
