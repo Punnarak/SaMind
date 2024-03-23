@@ -14,7 +14,7 @@
         ></v-text-field>
       </v-col>
       <v-spacer></v-spacer>
-      <v-col cols="2">
+      <v-col cols="2.5">
         <v-btn
           rounded="xl"
           class="text-none mx-auto"
@@ -35,6 +35,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredPatients"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px"
     >

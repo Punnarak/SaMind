@@ -3,9 +3,7 @@
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> LIBRARY </v-col>
       <v-col class="calendar-type" cols="4" align="center">
-        <button @click="(menu = 'carousel'), dataEachMenu()">
-          CAROUSEL
-        </button>
+        <button @click="(menu = 'carousel'), dataEachMenu()">CAROUSEL</button>
         <button @click="(menu = 'tip'), dataEachMenu()">TIP</button>
         <button @click="(menu = 'link'), dataEachMenu()">LINK</button>
       </v-col>
@@ -44,6 +42,7 @@
         v-model:page="carouselPage"
         :headers="carouselHeader"
         :items="filteredCarousel"
+        :items-per-page="carouselPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
@@ -54,9 +53,7 @@
           />
         </template>
         <template v-slot:item.url="{ item }"
-          ><label class="url-label">{{
-            showLink(item.columns.url)
-          }}</label>
+          ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
         <template v-slot:item.action="{ item }">
           <v-btn
@@ -327,6 +324,7 @@
         v-model:page="tipPage"
         :headers="tipHeader"
         :items="filteredTip"
+        :items-per-page="tipPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
@@ -608,13 +606,12 @@
         v-model:page="linkPage"
         :headers="linkHeader"
         :items="filteredLink"
+        :items-per-page="linkPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
         <template v-slot:item.url="{ item }"
-          ><label class="url-label">{{
-            showLink(item.columns.url)
-          }}</label>
+          ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
         <template v-slot:item.action="{ item }">
           <v-btn

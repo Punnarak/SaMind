@@ -14,7 +14,7 @@
         ></v-text-field>
       </v-col>
       <v-spacer></v-spacer>
-      <v-col cols="2">
+      <v-col cols="2.5">
         <v-btn
           rounded="xl"
           class="text-none mx-auto"
