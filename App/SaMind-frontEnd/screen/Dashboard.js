@@ -994,7 +994,7 @@ export default function Dashboard({ route }) {
                   zIndex: -1,
                 }}
               >
-                <View style={styles.perbox}>
+                <View style={styles.perboxn}>
                   <Text style={styles.moodN}>Neutral</Text>
                   <Text style={styles.moodper}>
                     {data.avatarMoodDetec &&
@@ -1292,10 +1292,22 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: -1,
   },
+  perboxn: {
+    alignItems: "center",
+    marginLeft: "47%",
+    marginTop: "-3%",
+    borderWidth: 1,
+    paddingVertical: "2%",
+    backgroundColor: "#F9E5DB",
+    borderColor: "#F9E5DB",
+    borderRadius: 10,
+    width: "100%",
+    zIndex: -1,
+  },
   perboxa: {
     alignItems: "center",
     marginLeft: "60%",
-    marginTop: "25%",
+    marginTop: "0%",
     borderWidth: 1,
     paddingVertical: "2%",
     backgroundColor: "#F9E5DB",
