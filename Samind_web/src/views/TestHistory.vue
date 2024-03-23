@@ -99,21 +99,27 @@
           >
             <v-chip
               color="blue"
-              @click="() => {
-                const selectedItem = historyInfo.find(test => item.columns.testName === test.testName && item.columns.date === test.date);
-                if (selectedItem) {
-                  $router.push({
-                    path: '/dashboard/testresult',
-                    query: {
-                      testName: selectedItem.testName,
-                      description: selectedItem.description,
-                      questions: JSON.stringify(selectedItem.question)}
-              
-              });
-          } else {
-              console.error('No matching item found');
-          }
-      }"
+              @click="
+                () => {
+                  const selectedItem = historyInfo.find(
+                    (test) =>
+                      item.columns.testName === test.testName &&
+                      item.columns.date === test.date
+                  );
+                  if (selectedItem) {
+                    $router.push({
+                      path: '/dashboard/testresult',
+                      query: {
+                        testName: selectedItem.testName,
+                        description: selectedItem.description,
+                        questions: JSON.stringify(selectedItem.question),
+                      },
+                    });
+                  } else {
+                    console.error('No matching item found');
+                  }
+                }
+              "
             >
               see result
             </v-chip>
@@ -151,7 +157,6 @@
 </template>
 
 <script setup>
-
 // onMounted(async () => {
 //   try {
 //     let url = "/question";
@@ -165,7 +170,6 @@
 //     console.error("Error fetching products:", error);
 //   }
 // });
-
 </script>
 <script>
 import { ref, computed, onMounted } from "vue";
@@ -179,7 +183,7 @@ const filteredHistorys = computed(() => {
   );
 
   return sortHistorys(info).map((item, index) => {
-    const displayIndex = (index + 1).toString().padStart(2, '0'); // Format index as '01', '02', etc.
+    const displayIndex = (index + 1).toString().padStart(2, "0"); // Format index as '01', '02', etc.
     return { ...item, id: displayIndex };
   });
 });
@@ -255,7 +259,7 @@ let historys = ref([
     result: "-",
     date: "Oct 18, 2023 13:00",
   },
-])
+]);
 function getColor(result, test) {
   if (test === "PHQ9") {
     if (result < 7) {
@@ -271,9 +275,9 @@ function getColor(result, test) {
 
   if (test === "2Q") {
     if (result != 0) {
-      return "#11dd66";
-    } else if (result == 0) {
       return "#FFDE59";
+    } else if (result == 0) {
+      return "#11dd66";
     }
   }
 }
@@ -300,7 +304,7 @@ function getResult(result, test) {
   }
 }
 
-let historyInfo = ref([])
+let historyInfo = ref([]);
 export default {
   data() {
     return {
@@ -314,32 +318,30 @@ export default {
     this.patientId = this.$route.query.patientId;
 
     let param = {
-      patientID: this.patientId
-}
-console.log(param)
-      axios
-    .post("/adAllTestHistory", param, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-    .then((response) => {
-      console.log("All Test History", this.patientId,response.data);
-      historys.value = response.data.map((test,index) => ({
-        id: test.No,
-        testName: test.testName,
-        result: test.result,
-        date: test.date,
-      }));
+      patientID: this.patientId,
+    };
+    console.log(param);
+    axios
+      .post("/adAllTestHistory", param, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("All Test History", this.patientId, response.data);
+        historys.value = response.data.map((test, index) => ({
+          id: test.No,
+          testName: test.testName,
+          result: test.result,
+          date: test.date,
+        }));
 
-      historyInfo.value = response.data
-      
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-
+        historyInfo.value = response.data;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   },
   methods: {},
 };
