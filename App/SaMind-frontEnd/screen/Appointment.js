@@ -89,10 +89,12 @@ export default function Calendar({ route }) {
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ]);
   const [disabled, setDisabled] = useState(false);
+  const [click, setClick] = useState(new Date());
   console.log("Calendar Screen", patientId);
 
   const queryTime = () => {
-    if (newAppString !== "") {
+    console.log("ppp", newAppString);
+    if (newAppString != "") {
       d = newAppString.split("-");
       let param = {
         patientID: patientId,
@@ -110,6 +112,7 @@ export default function Calendar({ route }) {
           } else {
             setTime(response.data);
             setDisabled(false);
+            console.log(response.data);
           }
         })
         .catch((error) => {
@@ -141,6 +144,7 @@ export default function Calendar({ route }) {
     }
   }, [selectedValue]);
   useEffect(() => {
+    console.log("useEffect", newAppString);
     queryTime();
     setDateError("");
     if (newAppString && (newAppString != null || newAppString != "")) {
@@ -190,6 +194,7 @@ export default function Calendar({ route }) {
   }, []);
   // }, [highlightedDates]);
   const handleDateSelected = (date, month, year, textColor) => {
+    setClick(new Date(year + "-" + (month + 1) + "-" + date));
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
     const dateString = year + "-" + (month + 1) + "-" + date;
     setOldDate(dateString);
@@ -232,6 +237,7 @@ export default function Calendar({ route }) {
         year,
         patientId,
       });
+      console.log("click", date + "-" + month + "-" + year);
     }
 
     const day = fulldate.getDay();
@@ -265,6 +271,7 @@ export default function Calendar({ route }) {
 
   const showPicker = () => {
     console.log("open picker");
+    //this
     setShowDatePicker(true);
   };
 
@@ -284,7 +291,12 @@ export default function Calendar({ route }) {
   };
 
   const toggleModal2 = () => {
+    console.log("toggle");
     setConfirm(!confirm);
+    const selectedDateFormatted = moment(new Date(click)).format("DD-MM-YYYY");
+    console.log("select", selectedDateFormatted);
+    setNewAppString(selectedDateFormatted);
+    setNewAppointment(new Date());
   };
 
   const submit = () => {
@@ -473,6 +485,7 @@ export default function Calendar({ route }) {
                             if (event.type === "set") {
                               const selectedDateFormatted =
                                 moment(selectedDate).format("DD-MM-YYYY");
+                              console.log("select", selectedDateFormatted);
                               setNewAppString(selectedDateFormatted);
                               setNewAppointment(selectedDate);
                             }
@@ -512,6 +525,10 @@ export default function Calendar({ route }) {
                           const currentDate = selectedDate || newAppointment;
                           console.log(currentDate);
                           setNewAppointment(currentDate);
+                          const selectedDateFormatted =
+                            moment(selectedDate).format("DD-MM-YYYY");
+                          console.log("select", selectedDateFormatted);
+                          setNewAppString(selectedDateFormatted);
                         }}
                         style={{
                           marginLeft: 5,
