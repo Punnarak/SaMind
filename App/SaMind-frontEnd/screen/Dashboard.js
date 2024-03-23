@@ -924,7 +924,7 @@ export default function Dashboard({ route }) {
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#99D9A4",
+                  backgroundColor: "#BEFD98",
                   borderRadius: 30,
                   resizeMode: "cover",
                 }}
@@ -951,15 +951,40 @@ export default function Dashboard({ route }) {
 
             <View style={styles.sad}>
               <Image
-                source={require("../assets/sad.png")}
+                source={require("../assets/neutral.png")}
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#D3D3D3",
+                  // backgroundColor: "#FAE98E",
                   borderRadius: 30,
                   resizeMode: "cover",
+                  zIndex: 1,
                 }}
               />
+              <Svg
+                style={{
+                  position: "absolute",
+                  width: 50,
+                  height: 50,
+                  resizeMode: "cover",
+                  zIndex: 0,
+                  left: 0,
+                  top: -2,
+                }}
+                width="50"
+                height="50"
+                viewBox="0 0 46 46"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Circle
+                  id="Ellipse 101"
+                  cx="23"
+                  cy="23"
+                  r="23"
+                  fill="#FAE98E"
+                />
+              </Svg>
               <View
                 style={{
                   flexDirection: "row",
@@ -1017,7 +1042,7 @@ export default function Dashboard({ route }) {
                   cx="23"
                   cy="23"
                   r="23"
-                  fill="#C0C0C0"
+                  fill="#F79292"
                 />
               </Svg>
               <View style={styles.angry}></View>
