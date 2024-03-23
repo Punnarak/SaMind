@@ -131,13 +131,13 @@
                   border-radius: 10px;
                 "
               >
-                <v-row>
+                <v-row v-if="moodResult === 'cheerful'">
                   <img
                     class="ml-5"
-                    src="../assets/dashboard/hicon.png"
+                    src="../assets/dashboard/m1.png"
                     style="
                       position: absolute;
-                      width: 50px;
+                      width: 55px;
                       z-index: 10;
                       margin-top: 0.8px;
                       margin-left: 0.5px;
@@ -146,6 +146,78 @@
                   <img
                     class="ml-5"
                     src="../assets/dashboard/ybg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodResult === 'happy'">
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/m2.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/ybg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodResult === 'soso'">
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/m3.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/vbg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodResult === 'bad'">
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/m4.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/vbadbg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodResult === 'terrible'">
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/m5.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: 0.8px;
+                      margin-left: 0.5px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/gbg.png"
                     style="width: 55px"
                   />
                 </v-row>
@@ -260,21 +332,57 @@
                   border-radius: 10px;
                 "
               >
-                <v-row>
+                <v-row v-if="moodDetect === 'positive'">
                   <img
-                    class="ml-5"
-                    src="../assets/dashboard/hicon.png"
+                    class=""
+                    src="../assets/dashboard/positive.png"
                     style="
                       position: absolute;
-                      width: 50px;
+                      width: 65px;
                       z-index: 10;
-                      margin-top: 0.8px;
-                      margin-left: 0.5px;
+                      margin-top: 0.7px;
+                      margin-left: 15px;
                     "
                   />
                   <img
                     class="ml-5"
-                    src="../assets/dashboard/ybg.png"
+                    src="../assets/dashboard/agbg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodDetect === 'neutral'">
+                  <img
+                    class=""
+                    src="../assets/dashboard/neutral.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: -1px;
+                      margin-left: 21px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/aybg.png"
+                    style="width: 55px"
+                  />
+                </v-row>
+                <v-row v-if="moodDetect === 'negative'">
+                  <img
+                    class=""
+                    src="../assets/dashboard/angry.png"
+                    style="
+                      position: absolute;
+                      width: 55px;
+                      z-index: 10;
+                      margin-top: -3px;
+                      margin-left: 23px;
+                    "
+                  />
+                  <img
+                    class="ml-5"
+                    src="../assets/dashboard/arbg.png"
                     style="width: 55px"
                   />
                 </v-row>
