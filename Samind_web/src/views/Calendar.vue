@@ -441,7 +441,6 @@
                     v-bind="props"
                     v-for="time in timesDayUse"
                     :key="time"
-                    class="event-day"
                     :style="getEventStyle(time)"
                   >
                     <div v-if="eventsDay[time]" class="event-details-day">
@@ -456,12 +455,6 @@
                     </div>
                   </div>
                 </template>
-                <v-list v-if="isListVisible" class="custom-list-style">
-                  <!-- Show v-list only if isListVisible is true -->
-                  <v-list-item @click="">
-                    <span class="pl-2">{{ eventsDay[time] }}</span>
-                  </v-list-item>
-                </v-list>
               </v-menu>
             </div>
           </div>
@@ -1041,23 +1034,23 @@ export default {
       const event = this.eventsDay[time];
       if (event) {
         const index = this.timesDayUse.indexOf(time);
-        const positionTop = (index + 5.7) * 30.1;
+        const positionTop = (index + 5.8) * 30;
         return {
           height: "60px",
           backgroundColor: "#3C9BF2",
           borderBottom: "1px solid #ccc",
           position: "absolute",
           top: `${positionTop}px`,
-          left: "435px",
+          left: "440px",
           right: "0",
           width: "950px",
           borderRadius: "15px",
         };
       }
       return {
-        height: "60px",
-        backgroundColor: "transparent",
-        borderBottom: "1px solid #ccc",
+        // height: "60px",
+        // backgroundColor: "transparent",
+        // borderBottom: "1px solid #ccc",
       };
     },
     toggleListVisibility(event) {
