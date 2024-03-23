@@ -92,6 +92,74 @@ router.post('/update_info_user', auth, async (req, res) => {
 });
 
 //merge upper 2 api
+// router.post('/update_info'/*, auth*/, async (req, res) => {
+//   const { patient_id, email, fname, lname, password } = req.body;
+
+//   if (!patient_id || !email) {
+//     return res.status(400).json({ error: 'patient_id and email are required fields.' });
+//   }
+
+//   // Update patient information
+//   const updatePatientFields = ['fname', 'lname'].filter(key => req.body[key] !== undefined);
+//   const updatePatientValues = updatePatientFields.map((key, index) => `${key} = $${index + 3}`).join(', ');
+
+//   const updatePatientQuery = `
+//     UPDATE patient
+//     SET email = $2, ${updatePatientValues}
+//     WHERE patient_id = $1
+//     RETURNING *;
+//   `;
+
+//   // Update user information
+//   if (password !== undefined) {
+//     // Hash the password before updating
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const updateUserQuery = `
+//       UPDATE users
+//       SET email = $2, password = $3
+//       WHERE patient_id = $1
+//       RETURNING *;
+//     `;
+
+//     try {
+//       const resultUser = await client.query(updateUserQuery, [patient_id, email, hashedPassword]);
+//       if (resultUser.rows.length > 0) {
+//         // User updated successfully, now update patient information
+//         try {
+//           const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
+//           if (resultPatient.rows.length > 0) {
+//             res.status(200).json(resultPatient.rows[0]);
+//           } else {
+//             res.status(404).json({ error: 'Patient not found.' });
+//           }
+//         } catch (errPatient) {
+//           console.error('Error executing patient update query:', errPatient);
+//           res.status(500).json({ error: 'An error occurred during patient update.' });
+//         }
+//       } else {
+//         res.status(404).json({ error: 'User not found.' });
+//       }
+//     } catch (errUser) {
+//       console.error('Error executing user update query:', errUser);
+//       res.status(500).json({ error: 'An error occurred during user update.' });
+//     }
+//   } else {
+//     // Update patient information only
+//     try {
+//       const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
+//       if (resultPatient.rows.length > 0) {
+//         res.status(200).json(resultPatient.rows[0]);
+//       } else {
+//         res.status(404).json({ error: 'Patient not found.' });
+//       }
+//     } catch (errPatient) {
+//       console.error('Error executing patient update query:', errPatient);
+//       res.status(500).json({ error: 'An error occurred during patient update.' });
+//     }
+//   }
+// });
+
 router.post('/update_info'/*, auth*/, async (req, res) => {
   const { patient_id, email, fname, lname, password } = req.body;
 
@@ -111,54 +179,53 @@ router.post('/update_info'/*, auth*/, async (req, res) => {
   `;
 
   // Update user information
-  if (password !== undefined) {
-    // Hash the password before updating
-    const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    if (password !== undefined && password !== '') {
+      // Hash the new password before updating
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      const updateUserQuery = `
+        UPDATE users
+        SET email = $2, password = $3
+        WHERE patient_id = $1
+        RETURNING *;
+      `;
+      
+      const resultUser = await client.query(updateUserQuery, [patient_id, email, hashedPassword]);
+      
+      if (resultUser.rows.length === 0) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
+    }
 
+    // If no new password provided, use the old password
     const updateUserQuery = `
       UPDATE users
-      SET email = $2, password = $3
+      SET email = $2
       WHERE patient_id = $1
       RETURNING *;
     `;
+    
+    const resultUser = await client.query(updateUserQuery, [patient_id, email]);
+    
+    if (resultUser.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    
+    // Patient information update
+    const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
 
-    try {
-      const resultUser = await client.query(updateUserQuery, [patient_id, email, hashedPassword]);
-      if (resultUser.rows.length > 0) {
-        // User updated successfully, now update patient information
-        try {
-          const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
-          if (resultPatient.rows.length > 0) {
-            res.status(200).json(resultPatient.rows[0]);
-          } else {
-            res.status(404).json({ error: 'Patient not found.' });
-          }
-        } catch (errPatient) {
-          console.error('Error executing patient update query:', errPatient);
-          res.status(500).json({ error: 'An error occurred during patient update.' });
-        }
-      } else {
-        res.status(404).json({ error: 'User not found.' });
-      }
-    } catch (errUser) {
-      console.error('Error executing user update query:', errUser);
-      res.status(500).json({ error: 'An error occurred during user update.' });
+    if (resultPatient.rows.length > 0) {
+      return res.status(200).json(resultPatient.rows[0]);
+    } else {
+      return res.status(404).json({ error: 'Patient not found.' });
     }
-  } else {
-    // Update patient information only
-    try {
-      const resultPatient = await client.query(updatePatientQuery, [patient_id, email, ...updatePatientFields.map(key => req.body[key])]);
-      if (resultPatient.rows.length > 0) {
-        res.status(200).json(resultPatient.rows[0]);
-      } else {
-        res.status(404).json({ error: 'Patient not found.' });
-      }
-    } catch (errPatient) {
-      console.error('Error executing patient update query:', errPatient);
-      res.status(500).json({ error: 'An error occurred during patient update.' });
-    }
+  } catch (err) {
+    console.error('Error updating information:', err);
+    return res.status(500).json({ error: 'An error occurred during update.' });
   }
 });
+
 
 
 // router.get('/info_patient_get', (req, res) => {
