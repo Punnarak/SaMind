@@ -280,12 +280,14 @@
                 </v-row>
                 <v-row>
                   <label
-                    class="moodresult ml-8"
+                    class="moodresult ml-8 mb-8"
                     style="font-weight: bold; font-size: 24px"
                     >{{ moodDetect }}</label
                   >
                   <br />
-                  <label class="testdate ml-5">{{ detectDate }}</label>
+                  <label class="testdate ml-10" style="margin-top: -30px">{{
+                    detectDate
+                  }}</label>
                 </v-row></v-chip
               ></v-col
             ></v-row
