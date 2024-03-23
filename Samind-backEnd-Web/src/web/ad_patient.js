@@ -1681,8 +1681,8 @@ router.post('/adPersonalData', auth, async (req, res) => {
     const numericPatientID = patientID.replace(/\D/g, ''); // Extract numeric part of patientID
 
     try {
-        // Query to fetch patient data
-        const patientQuery = `
+      // Query to fetch patient data
+      const patientQuery = `
             SELECT 
                 p.fname,
                 p.lname,
@@ -1711,110 +1711,122 @@ router.post('/adPersonalData', auth, async (req, res) => {
             WHERE 
                 p.patient_id = $1`;
 
-        const patientResult = await client.query(patientQuery, [numericPatientID]);
-        const patientData = patientResult.rows[0];
+      const patientResult = await client.query(patientQuery, [
+        numericPatientID,
+      ]);
+      const patientData = patientResult.rows[0];
 
-        if (!patientData) {
-            return res.status(404).json({ error: 'Patient not found' });
-        }
+      if (!patientData) {
+        return res.status(404).json({ error: "Patient not found" });
+      }
 
-        // Log the retrieved data for debugging
-        console.log('Retrieved patient data:', patientData);
+      // Log the retrieved data for debugging
+      console.log("Retrieved patient data:", patientData);
 
-        // Calculate age
-        const dob = new Date(patientData.born);
-        const age = Math.floor(
-          (new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000)
-        );
+      // Calculate age
+      const dob = new Date(patientData.born);
+      const age = Math.floor(
+        (new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000)
+      );
 
-        // Format date function
-        const formatDate = (dateString) => {
-            const date = new Date(dateString);
-            const day = date.getDate();
-            const month = date.toLocaleString("en-US", { month: "long" });
-            const year = date.getFullYear();
-            return `${day} ${month} ${year}`;
-        };
+      // Format date function
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.toLocaleString("en-US", { month: "long" });
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+      };
 
-        // Format gender
-        const gender = patientData.gender ? "male" : "female";
+      // Format gender
+      const gender = patientData.gender ? "male" : "female";
 
-        // Format born date
-        const born = formatDate(patientData.born);
+      // Format born date
+      const born = formatDate(patientData.born);
 
-        // Format start date
-        const start = formatDate(patientData.start);
+      // Format start date
+      const start = formatDate(patientData.start);
 
-        // Extract last appointment and next appointment
-        const lastAppointment = patientData.lastappointment; // Change to lowercase 'lastappointment'
-        const nextAppointment = patientData.nextappointment; // Change to lowercase 'nextappointment'
+      // Extract last appointment and next appointment
+      const lastAppointment = patientData.lastappointment; // Change to lowercase 'lastappointment'
+      const nextAppointment = patientData.nextappointment; // Change to lowercase 'nextappointment'
 
-        // Log the raw values of last and next appointment
-        console.log("Raw last appointment:", lastAppointment);
-        console.log("Raw next appointment:", nextAppointment);
+      // Log the raw values of last and next appointment
+      console.log("Raw last appointment:", lastAppointment);
+      console.log("Raw next appointment:", nextAppointment);
 
-        // Format last appointment
-        const formattedLastAppointment = lastAppointment
-            ? formatDate(lastAppointment)
-            : "-";
+      // // Format last appointment
+      // const formattedLastAppointment = lastAppointment
+      //     ? formatDate(lastAppointment)
+      //     : "-";
 
-        // Format next appointment
-        const formattedNextAppointment = nextAppointment
-            ? formatDate(nextAppointment)
-            : "-";
+      // // Format next appointment
+      // const formattedNextAppointment = nextAppointment
+      //     ? formatDate(nextAppointment)
+      //     : "-";
 
-        // Extract mood from the data
-        let mood = "-";
-        let avatarMood = "-";
-        if (patientData.mood) {
-            const moodData = await getAvatarMoodDetection(numericPatientID);
-            mood = moodData ? getHighestMood(moodData.avatarMoodDetec) : "-";
-            avatarMood = moodData ? moodData.mood : "-";
-        }
+      const formattedLastAppointment = lastAppointment !== null 
+        ? formatDate(lastAppointment) 
+        : "-";
 
-        // Fetch additional data
-        const avgMoodResult = await getAverageScores(numericPatientID);
-        const historyTestResult = await getHistoryTest(numericPatientID);
-        const avatarMoodDetectionResult = await getAvatarMoodDetection(numericPatientID);
+      const formattedNextAppointment = nextAppointment !== null 
+        ? formatDate(nextAppointment) 
+        : "-";
 
-        // Determine the mood text based on the average mood score
-        let moodText = "";
-        if (avgMoodResult.avgMood === null) {
-            moodText = "Unknown"; // Set a default mood text if the average mood is not available
-        } else if (avgMoodResult.avgMood < 2) {
-            moodText = "terrible";
-        } else if (avgMoodResult.avgMood >= 2 && avgMoodResult.avgMood < 3) {
-            moodText = "bad";
-        } else if (avgMoodResult.avgMood >= 3 && avgMoodResult.avgMood < 4) {
-            moodText = "soso";
-        } else if (avgMoodResult.avgMood >= 4 && avgMoodResult.avgMood < 5) {
-            moodText = "happy";
-        } else {
-            moodText = "cheerful";
-        }
+      // Extract mood from the data
+      let mood = "-";
+      let avatarMood = "-";
+      if (patientData.mood) {
+        const moodData = await getAvatarMoodDetection(numericPatientID);
+        mood = moodData ? moodData.avatarMoodDetec : "-";
+        avatarMood = moodData ? moodData.mood : "-";
+      }
 
-        // Prepare the response
-        const responseData = {
-            patientID,
-            name: `${patientData.fname} ${patientData.lname}`,
-            gender,
-            age,
-            born,
-            start,
-            lastAppointment: formattedLastAppointment,
-            nextAppointment: formattedNextAppointment,
-            tel: patientData.tel,
-            email: patientData.email,
-            mood: avatarMood,
-            avgMood: moodText,
-            dateBetween: avgMoodResult.dateBetween,
-            historyTest: historyTestResult.historyTest,
-            dateAvatarMoodDetec: avatarMoodDetectionResult.date,
-            avatarMood,
-        };
+      // Fetch additional data
+      const avgMoodResult = await getAverageScores(numericPatientID);
+      const historyTestResult = await getHistoryTest(numericPatientID);
+      const avatarMoodDetectionResult = await getAvatarMoodDetection(
+        numericPatientID
+      );
 
-        // Send the response
-        res.json(responseData);
+      // Determine the mood text based on the average mood score
+      let moodText = "";
+      if (avgMoodResult.avgMood === null) {
+        moodText = "Unknown"; // Set a default mood text if the average mood is not available
+      } else if (avgMoodResult.avgMood < 2) {
+        moodText = "terrible";
+      } else if (avgMoodResult.avgMood >= 2 && avgMoodResult.avgMood < 3) {
+        moodText = "bad";
+      } else if (avgMoodResult.avgMood >= 3 && avgMoodResult.avgMood < 4) {
+        moodText = "soso";
+      } else if (avgMoodResult.avgMood >= 4 && avgMoodResult.avgMood < 5) {
+        moodText = "happy";
+      } else {
+        moodText = "cheerful";
+      }
+
+      // Prepare the response
+      const responseData = {
+        patientID,
+        name: `${patientData.fname} ${patientData.lname}`,
+        gender,
+        age,
+        born,
+        start,
+        lastAppointment: formattedLastAppointment,
+        nextAppointment: formattedNextAppointment,
+        tel: patientData.tel,
+        email: patientData.email,
+        mood: avatarMood,
+        avgMood: moodText,
+        dateBetween: avgMoodResult.dateBetween,
+        historyTest: historyTestResult.historyTest,
+        dateAvatarMoodDetec: avatarMoodDetectionResult.date,
+        avatarMood,
+      };
+
+      // Send the response
+      res.json(responseData);
     } catch (error) {
         console.error('Error executing query:', error);
         res.status(500).json({ error: 'An error occurred' });
