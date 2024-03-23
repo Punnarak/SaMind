@@ -626,7 +626,7 @@ export default {
     return {
       // ใช้ใน request bar
       // count request
-      request: 1,
+      request: 0,
       //request Appointment info
       patients: [
         {
