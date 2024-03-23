@@ -202,7 +202,8 @@ class MyCalendar extends React.Component {
         if (
           item === currentDate &&
           currentMonth === this.state.activeDate.getMonth() &&
-          currentYear === this.state.activeDate.getFullYear()
+          currentYear === this.state.activeDate.getFullYear() &&
+          textColor !== "lightgray"
         ) {
           textColor = "#3987FD"; // กำหนดสีแดงสำหรับวันที่ปัจจุบันที่ตรงกันทั้งวันเดือนปี
         }
@@ -228,7 +229,8 @@ class MyCalendar extends React.Component {
                   ? "bold"
                   : item === currentDate &&
                     currentMonth === this.state.activeDate.getMonth() &&
-                    currentYear === this.state.activeDate.getFullYear()
+                    currentYear === this.state.activeDate.getFullYear() &&
+                    textColor !== "lightgray"
                   ? "900"
                   : "normal",
             }}
