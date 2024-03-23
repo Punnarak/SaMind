@@ -138,13 +138,23 @@ export default {
               console.log(response.data.user.role);
               localStorage.setItem("id", response.data.user.therapist_id);
               localStorage.setItem("role", response.data.user.role);
-              this.$router.push("/dashboard/patient");
-              console.log(
-                "Login success",
-                response.data.user.role,
-                localStorage.getItem("id"),
-                localStorage.getItem("role")
-              );
+              if (response.data.user.role === "therapist") {
+                this.$router.push("/dashboard/patient");
+                console.log(
+                  "Login success",
+                  response.data.user.role,
+                  localStorage.getItem("id"),
+                  localStorage.getItem("role")
+                );
+              } else if (response.data.user.role === "admin") {
+                this.$router.push("/dashboard/managepatient");
+                console.log(
+                  "Login success",
+                  response.data.user.role,
+                  localStorage.getItem("id"),
+                  localStorage.getItem("role")
+                );
+              }
             }
           })
           .catch((error) => {

@@ -8,7 +8,7 @@ import {
   TextInput,
   Button,
   Dimensions,
-  Platform
+  Platform,
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -19,15 +19,19 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython, path } from "./axios.js";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-import * as Speech from 'expo-speech';
-import waveAvatar from '../assets/wave.gif'
-import standbyAvatar from '../assets/standby.gif'
-import happy1Avatar from '../assets/happy1.gif'
-import happy2Avatar from '../assets/happy2.gif'
-import negative1Avatar from '../assets/negative1.gif'
-import negative2Avatar from '../assets/negative2.gif'
-import neutral1Avatar from '../assets/neutral1.gif'
-import neutral2Avatar from '../assets/neutral2.gif'
+import * as Speech from "expo-speech";
+import waveAvatar from "../assets/wave.gif";
+import standbyAvatar from "../assets/standby.gif";
+import happy1Avatar from "../assets/happy1.gif";
+import happy2Avatar from "../assets/happy2.gif";
+import happy3Avatar from "../assets/happy3.gif";
+import negative1Avatar from "../assets/negative1.gif";
+import negative2Avatar from "../assets/negative2.gif";
+import negative3Avatar from "../assets/negative3.gif";
+import neutral1Avatar from "../assets/neutral1.gif";
+import neutral2Avatar from "../assets/neutral2.gif";
+import neutral3Avatar from "../assets/neutral3.gif";
+
 import Svg, { Rect, Path } from "react-native-svg";
 const isAndroid = Platform.OS === "android";
 const windowWidth = Dimensions.get("window").width;
@@ -51,7 +55,7 @@ async function query(data) {
         `Failed to fetch data: ${response.status} ${response.statusText}`
       );
     }
-    console.log("query response", response)
+    console.log("query response", response);
     const result = await response.json();
     return result;
   } catch (error) {
@@ -75,9 +79,9 @@ async function answer(data) {
         method: "POST",
         body: JSON.stringify({
           prompt: prompt,
-          n_predict: 80,
-          temperature: 0.5,
-          top_k: 40
+          n_predict: 40,
+          temperature: 0.32,
+          top_k: 40,
         }),
       }
     );
@@ -98,15 +102,15 @@ async function answer(data) {
   }
 }
 async function setSpeaker() {
-  console.log("speaker!!!!!!!!")
+  console.log("speaker!!!!!!!!");
   try {
-      await Audio.setAudioOutputModeAsync({
-        allowsRecordingIOS: false,
-        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-        playsInSilentModeIOS: true,
-      });
+    await Audio.setAudioOutputModeAsync({
+      allowsRecordingIOS: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      playsInSilentModeIOS: true,
+    });
   } catch (error) {
-      console.log('เกิดข้อผิดพลาดในการตั้งค่าลำโพง:', error);
+    console.log("เกิดข้อผิดพลาดในการตั้งค่าลำโพง:", error);
   }
 }
 
@@ -121,82 +125,81 @@ export default function Notification({ route }) {
   const [transcript, setTranscript] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [first, setFirst] = useState(true);
-  const [avatar, setAvatar] = useState('wave')
-  const positiveMax = 2
-  const neutralMax = 2
-  const negativeMax = 2
+  const [avatar, setAvatar] = useState("wave");
+  const positiveMax = 2;
+  const neutralMax = 2;
+  const negativeMax = 2;
   const { patient_id, mood_detection_id } = route.params || {};
 
   const [isLoading, setIsLoading] = useState(false);
 
   console.log(patient_id, mood_detection_id);
 
-  let avatarSource; 
+  let avatarSource;
   const changeAvatar = () => {
-    console.log("change",avatar)
+    console.log("change", avatar);
     setTimeout(() => {
-      setAvatar('standby');
-     }, 16000); 
-  }
+      setAvatar("standby");
+    }, 16000);
+  };
   switch (avatar) {
-    case 'wave':
-      console.log("wave avatar")
+    case "wave":
+      console.log("wave avatar");
       avatarSource = waveAvatar;
-      changeAvatar()
+      changeAvatar();
       break;
-    case 'happy':
-      console.log("happy avatar")
-      let positive = [happy1Avatar, happy2Avatar]
-      let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
-      avatarSource = happyAvatar
-      changeAvatar()
+    case "happy":
+      console.log("happy avatar");
+      let positive = [happy1Avatar, happy2Avatar, happy3Avatar];
+      let happyAvatar = positive[Math.floor(Math.random() * positiveMax)]; // index+1
+      avatarSource = happyAvatar;
+      changeAvatar();
       break;
-    case 'sad':
-      console.log("sad avatar")
-      let negative = [negative1Avatar, negative2Avatar]
-      let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
-      avatarSource = negativeAvatar
-      changeAvatar()
+    case "sad":
+      console.log("sad avatar");
+      let negative = [negative1Avatar, negative2Avatar, negative3Avatar];
+      let negativeAvatar = negative[Math.floor(Math.random() * negativeMax)]; // index+1
+      avatarSource = negativeAvatar;
+      changeAvatar();
       break;
-    case 'normal':
-      console.log("normal avatar")
-      let neutral = [neutral1Avatar, neutral2Avatar]
-      let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
-      avatarSource = neutralAvatar
-      changeAvatar()
+    case "normal":
+      console.log("normal avatar");
+      let neutral = [neutral1Avatar, neutral2Avatar, neutral3Avatar];
+      let neutralAvatar = neutral[Math.floor(Math.random() * neutralMax)]; // index+1
+      avatarSource = neutralAvatar;
+      changeAvatar();
       break;
     default:
       avatarSource = standbyAvatar;
   }
 
-
-  useEffect(() => { 
+  useEffect(() => {
     switch (avatar) {
-      case 'wave':
-        console.log("waveeffect avatar")
+      case "wave":
+        console.log("waveeffect avatar");
         avatarSource = waveAvatar;
-        changeAvatar()
+        changeAvatar();
         break;
-      case 'happy':
-        console.log("happyeffect avatar")
-        let positive = [happy1Avatar, happy2Avatar]
-        let happyAvatar = positive[ Math.floor(Math.random() * positiveMax)] // index+1
-        avatarSource = happyAvatar
-        changeAvatar()
+      case "happy":
+        console.log("happyeffect avatar");
+        let positive = [happy1Avatar, happy2Avatar, happy3Avatar];
+        let happyAvatar = positive[Math.floor(Math.random() * positiveMax)]; // index+1
+        avatarSource = happyAvatar;
+        changeAvatar();
         break;
-      case 'sad':
-        console.log("sadeffect avatar")
-        let negative = [negative1Avatar, negative2Avatar]
-        let negativeAvatar = negative[ Math.floor(Math.random() * negativeMax)] // index+1
-        avatarSource = negativeAvatar
-        changeAvatar()
+      case "sad":
+        console.log("sadeffect avatar");
+        let negative = [negative1Avatar, negative2Avatar, negative3Avatar];
+        let negativeAvatar = negative[Math.floor(Math.random() * negativeMax)]; // index+1
+        avatarSource = negativeAvatar;
+        changeAvatar();
         break;
-      case 'normal':
-        console.log("normaleffect avatar")
-        let neutral = [neutral1Avatar, neutral2Avatar]
-        let neutralAvatar = neutral[ Math.floor(Math.random() * neutralMax)] // index+1
-        avatarSource = neutralAvatar
-        changeAvatar()
+      case "normal":
+        console.log("normaleffect avatar");
+        let neutral = [neutral1Avatar, neutral2Avatar, neutral3Avatar];
+        let neutralAvatar = neutral[Math.floor(Math.random() * neutralMax)]; // index+1
+        avatarSource = neutralAvatar;
+        changeAvatar();
         break;
       default:
         avatarSource = standbyAvatar;
@@ -251,7 +254,7 @@ export default function Notification({ route }) {
 
   const loadingData = () => {
     setIsLoading(!isLoading);
-    console.log(isLoading)
+    console.log(isLoading);
   };
 
   async function stopRecording() {
@@ -286,15 +289,11 @@ export default function Notification({ route }) {
       let responseText = "";
       let responseAnswer = "";
       try {
-        response = await FileSystem.uploadAsync(
-          path + "/speech",
-          audioPath,
-          {
-            httpMethod: "POST",
-            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-            fieldName: "file", // Must match the field expected by your server
-          }
-        );
+        response = await FileSystem.uploadAsync(path + "/speech", audioPath, {
+          httpMethod: "POST",
+          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+          fieldName: "file", // Must match the field expected by your server
+        });
         console.log("Upload result:", response);
       } catch (e) {
         console.error("Upload error:", e);
@@ -303,19 +302,42 @@ export default function Notification({ route }) {
       setTranscript(response.body);
       // console.log("word : ", transcript);
 
-      if(response.body != "\"\""){
+      if (response.body != '""') {
         // console.log("empty",response.body)
         responseText = await performSentimentAnalysis(response.body);
-      responseAnswer = await answer(response.body);
-      console.log(responseAnswer);
-      // Speech.speak(responseAnswer, { language: "th" });
-      // setTextToSpeak(responseAnswer)
-    
-      // setSpeaker()
-      speak(responseAnswer)
-      setAvatar(responseText)
+        responseAnswer = await answer(response.body);
+        console.log(responseAnswer);
+        // Speech.speak(responseAnswer, { language: "th" });
+        // setTextToSpeak(responseAnswer)
+
+        // setSpeaker()
+
+        let filteredAnswer = await responseAnswer.replace(
+          /ๆๆๆ|ๆๆ|\s\d\s|d|อิอิอิอิอิ|\s|ย&\s|ยย|ย/g,
+          ""
+        );
+        filteredAnswer = await responseAnswer.replace(
+          /หน้ายิ้มหน้ายิ้ม|ตายิ้ม|หน้ายิ้มตายิ้ม|ตายิ้มตายิ้ม/g,
+          ""
+        );
+        filteredAnswer = await responseAnswer.replace(/t|TT/g, "");
+        filteredAnswer = await responseAnswer.replace(
+          /\s3\s|333|33|\s4\s|444|44|\s2\s|222|22|\s1\s|111|11|\s6\s|666|66|\s7\s|777|77|\s8\s|888|88|\s9\s|999|99|\s0\s|000|00/g,
+          ""
+        );
+        filteredAnswer = responseAnswer.replace(/5/g, "ห้า");
+
+        console.log("filteredAnswer", filteredAnswer);
+
+        if (filteredAnswer.includes("[/INST]")) {
+          speak(filteredAnswer.split("[/INST]")[0]);
+        } else {
+          speak(filteredAnswer);
+        }
+
+        setAvatar(responseText);
       }
-      setIsLoading(false);  
+      setIsLoading(false);
     } catch (error) {
       console.error("Failed to convert speech to text:", error);
       Alert.alert("Error", "Failed to convert speech to text");
@@ -350,9 +372,9 @@ export default function Notification({ route }) {
         LABEL_1: "happy",
         LABEL_2: "normal",
       };
-      
+
       console.log(labelMeanings[maxLabel]);
-     
+
       // await updateLabel(patientId, maxLabel);
       console.log(maxLabel, mood_detection_id);
       try {
@@ -360,7 +382,6 @@ export default function Notification({ route }) {
           maxLabel: maxLabel,
           mood_detection_id: mood_detection_id,
         });
-
 
         console.log("Update mood response:", updateMoodResponse.data);
       } catch (error) {
@@ -378,24 +399,23 @@ export default function Notification({ route }) {
   const speak = async (text) => {
     console.log("ss", text);
     if (text) {
-       Speech.speak(text, { language: "th-TH" });
+      Speech.speak(text, { language: "th-TH" });
     }
-    
   };
-  
+
   useEffect(() => {
-setSpeaker()
-  }, []); 
+    setSpeaker();
+  }, []);
   useEffect(() => {
     console.log("Avatar Screen");
     const onFocus = navigation.addListener("focus", async () => {
-    //  setSpeaker();
-     speak("สวัสดีจ้า ยินดีต้อนรับ");
-     setTimeout(() => {
-     setAvatar("standby");
-    }, 6000); 
-    setFirst(false)
-      
+      //  setSpeaker();
+      speak("สวัสดีจ้า ยินดีต้อนรับ");
+      setTimeout(() => {
+        setAvatar("standby");
+      }, 6000);
+      setFirst(false);
+
       axios
         .post("/refreshToken")
         .then((response) => {
@@ -433,11 +453,11 @@ setSpeaker()
         <Ionicons
           name="chevron-back-outline"
           size={30}
-          color="#3987FD"
+          color={recording ? "rgba(86, 154, 255, 0.52)" : "#3987FD"}
           style={{
             marginRight: "80%",
           }}
-          onPress={() => navigation.goBack()}
+          onPress={() => (recording ? null : navigation.goBack())}
         />
         <Feather
           name={"info"}
@@ -460,31 +480,42 @@ setSpeaker()
           >
             How To Talk with Sa-Mind
           </Text>
-          {isAndroid ?
-          <Text
-            style={{
-              fontSize: moderateScale(16.69),
-              // fontSize: 17,
-              textAlign: "center",
-            }}
-          >
-            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อพูดคุยกับน้องสมาย {'\n'}
-            รอน้องตอบ และเพลิดเพลินไปกับ{'\n'}การคุยกับน้องได้เลย !!!
-          </Text>
-          : (
-            <View>
+          {isAndroid ? (
             <Text
-            style={{
-              fontSize: moderateScale(16.69),
-              // fontSize: 17,
-              textAlign: "center",
-            }}
-          >
-            วิธีใช้งาน{"\n"}กดปุ่ม  Record เพื่อ พูดคุยกับน้องสมาย {'\n'}เปิด control center กดที่ไอคอน<Svg width={35} height={25} fill="#d6d6d6" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#d6d6d6" stroke-width="0.00024000000000000003">
-        <Path d="M11.9082.1836c-2.8774.0227-5.7566 1.0743-8.045 3.1719-4.8816 4.4748-5.1662 12.0812-.6913 16.9629.2034.244.4473.4473.6914.6914.122.0813.2861.083.4082-.0391l.5293-.6113c.122-.122.122-.3252 0-.4473C.5293 15.9661.2438 9.254 4.2305 4.9824 8.2172.711 14.8887.4274 19.1602 4.4141c4.2714 3.9867 4.555 10.6562.5683 14.9277-.2034.2034-.365.4076-.5683.5703-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.1204.4472.039 4.8817-4.5155 5.1663-12.0811.6914-16.9628-2.3989-2.5934-5.6588-3.889-8.9199-3.8633zm.3867 3.5176C10.0982 3.63 7.8715 4.3932 6.1426 6c-3.4579 3.2138-3.661 8.6242-.4473 12.082.122.122.2435.2842.4063.4063.122.122.3252.122.4472 0l.5293-.6094c.122-.122.122-.3252 0-.4473-1.4238-1.3424-2.2773-3.2547-2.2773-5.248 0-3.946 3.2122-7.1602 7.1582-7.1602 3.946 0 7.1601 3.2532 7.1601 7.1993 0 1.9526-.8144 3.8665-2.2382 5.209-.122.122-.122.3252 0 .4472l.5293.6094c.122.122.3252.163.4472.041 3.4579-3.2545 3.622-8.6652.4082-12.123-1.6069-1.729-3.774-2.634-5.9707-2.7051zm-.2656 3.3164c-1.3221-.0204-2.654.4662-3.6914 1.4629-2.0747 1.9933-2.1145 5.2475-.1211 7.3222l.121.123c.1221.1221.3253.1221.4474 0l.5293-.6112c.122-.122.122-.3253 0-.4473-.6916-.6916-1.0977-1.6666-1.0977-2.6836a3.732 3.732 0 013.7422-3.7422 3.732 3.732 0 013.7422 3.7422c0 1.017-.4064 1.9513-1.1387 2.6836-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.122.4473 0 2.034-1.9934 2.1164-5.2476.123-7.3223-.9967-1.0373-2.3107-1.5656-3.6328-1.586zm.0059 7.7441c-.1373-.005-.2803.0448-.4024.1465l-.039.041-7.1602 8.0547c-.1627.2034-.1624.488.041.6914.0814.0814.2019.123.2832.123h14.3613c.2441 0 .4883-.2035.4883-.4882 0-.122-.0397-.2448-.121-.3262l-7.0801-8.0547c-.1018-.122-.2338-.1824-.3711-.1875Z" />
-      </Svg>และเปลี่ยนเป็น speaker  
-            รอน้องตอบ และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
-       </Text>
+              style={{
+                fontSize: moderateScale(16.69),
+                // fontSize: 17,
+                textAlign: "center",
+              }}
+            >
+              วิธีใช้งาน{"\n"}กดปุ่ม Record เพื่อพูดคุยกับน้องสมาย {"\n"}
+              รอน้องตอบ และเพลิดเพลินไปกับ{"\n"}การคุยกับน้องได้เลย !!!
+            </Text>
+          ) : (
+            <View>
+              <Text
+                style={{
+                  fontSize: moderateScale(16.69),
+                  // fontSize: 17,
+                  textAlign: "center",
+                }}
+              >
+                วิธีใช้งาน{"\n"}กดปุ่ม Record เพื่อ พูดคุยกับน้องสมาย {"\n"}เปิด
+                control center กดที่ไอคอน
+                <Svg
+                  width={35}
+                  height={25}
+                  fill="#d6d6d6"
+                  viewBox="0 0 24.00 24.00"
+                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="#d6d6d6"
+                  stroke-width="0.00024000000000000003"
+                >
+                  <Path d="M11.9082.1836c-2.8774.0227-5.7566 1.0743-8.045 3.1719-4.8816 4.4748-5.1662 12.0812-.6913 16.9629.2034.244.4473.4473.6914.6914.122.0813.2861.083.4082-.0391l.5293-.6113c.122-.122.122-.3252 0-.4473C.5293 15.9661.2438 9.254 4.2305 4.9824 8.2172.711 14.8887.4274 19.1602 4.4141c4.2714 3.9867 4.555 10.6562.5683 14.9277-.2034.2034-.365.4076-.5683.5703-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.1204.4472.039 4.8817-4.5155 5.1663-12.0811.6914-16.9628-2.3989-2.5934-5.6588-3.889-8.9199-3.8633zm.3867 3.5176C10.0982 3.63 7.8715 4.3932 6.1426 6c-3.4579 3.2138-3.661 8.6242-.4473 12.082.122.122.2435.2842.4063.4063.122.122.3252.122.4472 0l.5293-.6094c.122-.122.122-.3252 0-.4473-1.4238-1.3424-2.2773-3.2547-2.2773-5.248 0-3.946 3.2122-7.1602 7.1582-7.1602 3.946 0 7.1601 3.2532 7.1601 7.1993 0 1.9526-.8144 3.8665-2.2382 5.209-.122.122-.122.3252 0 .4472l.5293.6094c.122.122.3252.163.4472.041 3.4579-3.2545 3.622-8.6652.4082-12.123-1.6069-1.729-3.774-2.634-5.9707-2.7051zm-.2656 3.3164c-1.3221-.0204-2.654.4662-3.6914 1.4629-2.0747 1.9933-2.1145 5.2475-.1211 7.3222l.121.123c.1221.1221.3253.1221.4474 0l.5293-.6112c.122-.122.122-.3253 0-.4473-.6916-.6916-1.0977-1.6666-1.0977-2.6836a3.732 3.732 0 013.7422-3.7422 3.732 3.732 0 013.7422 3.7422c0 1.017-.4064 1.9513-1.1387 2.6836-.122.122-.122.3252 0 .4473l.5293.6113c.122.122.3252.122.4473 0 2.034-1.9934 2.1164-5.2476.123-7.3223-.9967-1.0373-2.3107-1.5656-3.6328-1.586zm.0059 7.7441c-.1373-.005-.2803.0448-.4024.1465l-.039.041-7.1602 8.0547c-.1627.2034-.1624.488.041.6914.0814.0814.2019.123.2832.123h14.3613c.2441 0 .4883-.2035.4883-.4882 0-.122-.0397-.2448-.121-.3262l-7.0801-8.0547c-.1018-.122-.2338-.1824-.3711-.1875Z" />
+                </Svg>
+                และเปลี่ยนเป็น speaker รอน้องตอบ
+                และเพลิดเพลินไปกับการคุยกับน้องได้เลย !!!
+              </Text>
             </View>
           )}
           <TouchableOpacity

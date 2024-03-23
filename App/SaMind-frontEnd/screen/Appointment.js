@@ -29,7 +29,7 @@ export default function Calendar({ route }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newAppointment, setNewAppointment] = useState(new Date());
   const [timeError, setTimeError] = useState(false);
-  const [dateError, setDateError] = useState('');
+  const [dateError, setDateError] = useState("");
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -87,35 +87,37 @@ export default function Calendar({ route }) {
     { id: 45, name: "22:00-23:00 ", value: "22:00" },
     { id: 46, name: "22:30-23:30 ", value: "22:30" },
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
-  ])
-  const [disabled, setDisabled] = useState(false)
+  ]);
+  const [disabled, setDisabled] = useState(false);
+  const [click, setClick] = useState(new Date());
   console.log("Calendar Screen", patientId);
-  
+
   const queryTime = () => {
-    if(newAppString !== ''){
-    d = newAppString.split("-")
-    let param = {
-      patientID: patientId,
-      date:d[2]+"-"+d[1]+"-"+d[0]
-    }
-    setSelectedTimeLabel(null)
-    console.log(newAppString,param)
-    axios
-      .post("/appointShowTimeChange", param)
-      .then((response) => {
-        console.log("data:", response.data);
-        if(response.data == '-'){
-          setSelectedTimeLabel('time not available')
-          setDisabled(true)
-        }else{
-          setTime(response.data)
-          setDisabled(false)
-        }
-       
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+    console.log("ppp", newAppString);
+    if (newAppString != "") {
+      d = newAppString.split("-");
+      let param = {
+        patientID: patientId,
+        date: d[2] + "-" + d[1] + "-" + d[0],
+      };
+      setSelectedTimeLabel(null);
+      console.log(newAppString, param);
+      axios
+        .post("/appointShowTimeChange", param)
+        .then((response) => {
+          console.log("data:", response.data);
+          if (response.data == "-") {
+            setSelectedTimeLabel("time not available");
+            setDisabled(true);
+          } else {
+            setTime(response.data);
+            setDisabled(false);
+            console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
     }
   };
 
@@ -142,26 +144,27 @@ export default function Calendar({ route }) {
     }
   }, [selectedValue]);
   useEffect(() => {
-   queryTime()  
-   setDateError("")
-   if( newAppString && (newAppString != null || newAppString != '')){
-    setDisabled(false)
-   }else{
-    setDisabled(true)
-   }
+    console.log("useEffect", newAppString);
+    queryTime();
+    setDateError("");
+    if (newAppString && (newAppString != null || newAppString != "")) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
   }, [newAppString]);
   useEffect(() => {
     console.log("Appointment Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       const param = {
         patient_id: patientId,
       };
@@ -191,6 +194,7 @@ export default function Calendar({ route }) {
   }, []);
   // }, [highlightedDates]);
   const handleDateSelected = (date, month, year, textColor) => {
+    setClick(new Date(year + "-" + (month + 1) + "-" + date));
     // ส่งข้อมูลวันที่ที่ถูกเลือกไปยังหน้า A
     const dateString = year + "-" + (month + 1) + "-" + date;
     setOldDate(dateString);
@@ -221,6 +225,7 @@ export default function Calendar({ route }) {
         }
       }
     } else if (
+      fulldate >= new Date() &&
       !isDateInHighlightedDates &&
       textColor === "black" &&
       textColor !== "lightgray"
@@ -232,6 +237,7 @@ export default function Calendar({ route }) {
         year,
         patientId,
       });
+      console.log("click", date + "-" + month + "-" + year);
     }
 
     const day = fulldate.getDay();
@@ -265,6 +271,7 @@ export default function Calendar({ route }) {
 
   const showPicker = () => {
     console.log("open picker");
+    //this
     setShowDatePicker(true);
   };
 
@@ -279,22 +286,30 @@ export default function Calendar({ route }) {
     setNewAppointment(new Date());
     setSelectedValue(null);
     setIsPickerVisible(false);
-    setNewAppString("")
-    setSelectedTimeLabel("")
+    setNewAppString("");
+    setSelectedTimeLabel("");
   };
 
   const toggleModal2 = () => {
+    console.log("toggle");
     setConfirm(!confirm);
+    const selectedDateFormatted = moment(new Date(click)).format("DD-MM-YYYY");
+    console.log("select", selectedDateFormatted);
+    setNewAppString(selectedDateFormatted);
+    setNewAppointment(new Date());
   };
 
   const submit = () => {
-    console.log("selectvalue",selectedValue)
-    if(newAppString && (newAppString != null || newAppString != '')){
-      setDateError("")
-    }else{
-      setDateError("*")
+    console.log("selectvalue", selectedValue);
+    if (newAppString && (newAppString != null || newAppString != "")) {
+      setDateError("");
+    } else {
+      setDateError("*");
     }
-    if (selectedValue && (selectedValue != null || selectedValue != '' || selectedValue != ' ')) {
+    if (
+      selectedValue &&
+      (selectedValue != null || selectedValue != "" || selectedValue != " ")
+    ) {
       console.log("confirm state", !confirm);
       setConfirm(!confirm);
       setWaitDocToCon(!waitDocToCon);
@@ -323,11 +338,10 @@ export default function Calendar({ route }) {
             newAppointment,
             selectedValue
           );
-          setNewAppointment(new Date())
-          setNewAppString("")
-          setSelectedValue("")
-          setSelectedTimeLabel("")
-          
+          setNewAppointment(new Date());
+          setNewAppString("");
+          setSelectedValue("");
+          setSelectedTimeLabel("");
         })
         .catch((error) => {
           // Handle any errors here
@@ -434,8 +448,8 @@ export default function Calendar({ route }) {
                         flexDirection: "row",
                         alignItems: "center",
                       }}
-                    > 
-                    <Text style={styles.errorDate}>{dateError}</Text>
+                    >
+                      <Text style={styles.errorDate}>{dateError}</Text>
                       <TextInput
                         placeholder="Select Date"
                         editable={false}
@@ -462,6 +476,7 @@ export default function Calendar({ route }) {
                       {showDatePicker ? (
                         <DateTimePicker
                           testID="dateTimePicker"
+                          minimumDate={new Date()}
                           value={newAppointment}
                           mode="date"
                           is24Hour={true}
@@ -470,6 +485,7 @@ export default function Calendar({ route }) {
                             if (event.type === "set") {
                               const selectedDateFormatted =
                                 moment(selectedDate).format("DD-MM-YYYY");
+                              console.log("select", selectedDateFormatted);
                               setNewAppString(selectedDateFormatted);
                               setNewAppointment(selectedDate);
                             }
@@ -492,8 +508,7 @@ export default function Calendar({ route }) {
                         flexDirection: "row",
                         alignItems: "center",
                       }}
-                    > 
-                    
+                    >
                       <Ionicons
                         name="calendar-outline"
                         size={25}
@@ -501,6 +516,7 @@ export default function Calendar({ route }) {
                       />
                       <DateTimePicker
                         testID="dateTimePicker"
+                        minimumDate={new Date()}
                         value={newAppointment}
                         mode="date"
                         is24Hour={true}
@@ -509,6 +525,10 @@ export default function Calendar({ route }) {
                           const currentDate = selectedDate || newAppointment;
                           console.log(currentDate);
                           setNewAppointment(currentDate);
+                          const selectedDateFormatted =
+                            moment(selectedDate).format("DD-MM-YYYY");
+                          console.log("select", selectedDateFormatted);
+                          setNewAppString(selectedDateFormatted);
                         }}
                         style={{
                           marginLeft: 5,
@@ -567,7 +587,11 @@ export default function Calendar({ route }) {
                     value={selectedTimeLabel ? selectedTimeLabel : ""}
                   />
                 </View>
-                <TouchableOpacity style={[styles.eyeI]} onPress={togglePicker} disabled={disabled}>
+                <TouchableOpacity
+                  style={[styles.eyeI]}
+                  onPress={togglePicker}
+                  disabled={disabled}
+                >
                   <Ionicons
                     name="chevron-back-outline"
                     style={{
@@ -871,7 +895,8 @@ const styles = StyleSheet.create({
     right: horizontalScale(-15),
     color: "red",
     zIndex: 1,
-  },errorDate: {
+  },
+  errorDate: {
     position: "absolute",
     ...Platform.select({
       android: {},

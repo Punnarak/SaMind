@@ -3,9 +3,7 @@
     <v-row align="center">
       <v-col cols="3" style="font-weight: 600"> LIBRARY </v-col>
       <v-col class="calendar-type" cols="4" align="center">
-        <button @click="(menu = 'carousel'), dataEachMenu()">
-          CAROUSEL
-        </button>
+        <button @click="(menu = 'carousel'), dataEachMenu()">CAROUSEL</button>
         <button @click="(menu = 'tip'), dataEachMenu()">TIP</button>
         <button @click="(menu = 'link'), dataEachMenu()">LINK</button>
       </v-col>
@@ -44,6 +42,7 @@
         v-model:page="carouselPage"
         :headers="carouselHeader"
         :items="filteredCarousel"
+        :items-per-page="carouselPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
@@ -53,10 +52,11 @@
             style="width: 275px; height: 190px"
           />
         </template>
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.url="{ item }"
-          ><label class="url-label">{{
-            showLink(item.columns.url)
-          }}</label>
+          ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
         <template v-slot:item.action="{ item }">
           <v-btn
@@ -95,7 +95,7 @@
                     >
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <v-col>
                         <div
@@ -152,7 +152,7 @@
                                 </v-col>
                               </div>
                               <div class="imageurl">
-                                <label class="text title">Image URL</label>
+                                <label class="text title">Image Link</label>
                                 <v-col
                                   style="margin-top: -10px; margin-left: -10px"
                                 >
@@ -227,7 +227,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -237,7 +237,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot
@@ -327,9 +327,13 @@
         v-model:page="tipPage"
         :headers="tipHeader"
         :items="filteredTip"
+        :items-per-page="tipPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.imageUrl="{ item }">
           <img
             :src="item.columns.imageUrl"
@@ -398,7 +402,7 @@
                     <v-icon @click="editTipPopup = false">mdi-close</v-icon>
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <v-col>
                         <div
@@ -433,7 +437,7 @@
                               </v-col>
 
                               <div class="url">
-                                <label class="text title">Image URL</label>
+                                <label class="text title">Image Link</label>
                                 <v-col
                                   style="margin-top: -10px; margin-left: -10px"
                                 >
@@ -507,7 +511,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -517,7 +521,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot
@@ -608,13 +612,15 @@
         v-model:page="linkPage"
         :headers="linkHeader"
         :items="filteredLink"
+        :items-per-page="linkPerPage"
         class="elevation-1"
         style="border-radius: 10px"
       >
+        <template v-slot:item.title="{ item }"
+          ><label class="title-label">{{ showLink(item.columns.title) }}</label>
+        </template>
         <template v-slot:item.url="{ item }"
-          ><label class="url-label">{{
-            showLink(item.columns.url)
-          }}</label>
+          ><label class="url-label">{{ showLink(item.columns.url) }}</label>
         </template>
         <template v-slot:item.action="{ item }">
           <v-btn
@@ -651,7 +657,7 @@
                     <v-icon @click="editLinkPopup = false">mdi-close</v-icon>
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <div style="display: flex; flex-direction: row">
                         <div class="title">
@@ -735,7 +741,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -745,7 +751,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot

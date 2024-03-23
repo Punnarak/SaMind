@@ -14,7 +14,7 @@
         ></v-text-field>
       </v-col>
       <v-spacer></v-spacer>
-      <v-col cols="2">
+      <v-col cols="2.5">
         <v-btn
           rounded="xl"
           class="text-none mx-auto"
@@ -35,6 +35,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredPatients"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px"
     >
@@ -91,7 +92,7 @@
           <div v-if="deletePopup" class="modal-mask">
             <div class="modal-wrapper">
               <div class="modal-container delete">
-                <div class="modal-header" align="start">
+                <div class="modal-header" align="left">
                   <slot class="popupheader" name="header">Confirm delete</slot>
                 </div>
                 <v-divider
@@ -99,7 +100,7 @@
                   color="black"
                   style="opacity: 1"
                 ></v-divider>
-                <div class="modal-body" style="margin-top: 6px" align="start">
+                <div class="modal-body" style="margin-top: 6px" align="left">
                   <slot name="body"
                     >Are you sure you want to delete :
                     {{ selectPatient.columns.name }} ?</slot
@@ -1148,7 +1149,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
   display: table;
   transition: opacity 0.3s ease;
 }
@@ -1166,7 +1167,7 @@ export default {
   background: #fff;
   margin: 0px auto;
   padding: 20px 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 .create {

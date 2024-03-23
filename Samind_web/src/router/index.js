@@ -101,7 +101,11 @@ router.beforeEach(async (to, from, next) => {
     }
     if (isSignedIn) {
       if (to.path == "/" || to.path == "/signin") {
-        return next("/dashboard/managepatient");
+        if (localStorage.getItem("role") === "admin") {
+          return next("/dashboard/managepatient");
+        } else if (localStorage.getItem("role") === "therapist") {
+          return next("/dashboard/patient");
+        }
       }
     }
   } catch (err) {

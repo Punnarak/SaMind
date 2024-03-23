@@ -14,7 +14,7 @@
         ></v-text-field>
       </v-col>
       <v-spacer></v-spacer>
-      <v-col cols="2">
+      <v-col cols="2.5">
         <v-btn
           rounded="xl"
           class="text-none mx-auto"
@@ -35,6 +35,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredPatients"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px"
     >
@@ -57,7 +58,7 @@
           <div v-if="deletePopup" class="modal-mask">
             <div class="modal-wrapper">
               <div class="modal-container delete">
-                <div class="modal-header" align="start">
+                <div class="modal-header" align="left">
                   <slot class="popupheader" name="header">Confirm delete</slot>
                 </div>
                 <v-divider
@@ -65,7 +66,7 @@
                   color="black"
                   style="opacity: 1"
                 ></v-divider>
-                <div class="modal-body" style="margin-top: 6px" align="start">
+                <div class="modal-body" style="margin-top: 6px" align="left">
                   <slot name="body"
                     >Are you sure you want to delete :
                     {{ selectTherapist.columns.name }} ?</slot

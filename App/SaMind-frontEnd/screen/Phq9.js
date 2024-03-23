@@ -130,13 +130,13 @@ export default function Notification({ route }) {
     console.log("PHQ9 Test Screen");
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
 
@@ -156,7 +156,7 @@ export default function Notification({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
   questions = data;
   // const questions =

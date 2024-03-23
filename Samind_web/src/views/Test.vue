@@ -34,6 +34,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredTest"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px; text-align: center"
     >
@@ -63,7 +64,7 @@
           <div v-if="deletePopup" class="modal-mask">
             <div class="modal-wrapper">
               <div class="modal-container delete">
-                <div class="modal-header" align="start">
+                <div class="modal-header" align="left">
                   <slot class="popupheader" name="header">Confirm delete</slot>
                 </div>
                 <v-divider
@@ -71,7 +72,7 @@
                   color="black"
                   style="opacity: 1"
                 ></v-divider>
-                <div class="modal-body" style="margin-top: 6px" align="start">
+                <div class="modal-body" style="margin-top: 6px" align="left">
                   <slot name="body"
                     >Are you sure you want to delete :
                     {{ selectTest.columns.testname }} ?</slot
@@ -112,7 +113,7 @@
                   <v-icon @click="sendPopup = false">mdi-close</v-icon>
                 </div>
 
-                <div class="modal-body" align="start">
+                <div class="modal-body" align="left">
                   <slot name="body"
                     ><v-text-field
                       class="mt-2 mb-3"
@@ -501,7 +502,7 @@
 
 <script>
 let checkedNames = ref([]);
-
+import moment from "moment";
 import axios from "../axios.js";
 export default {
   props: {
@@ -620,9 +621,12 @@ export default {
         this.dateValidate = true;
       }
 
+      // const inputDate = moment(new Date(year, month - 1, day)).format(
+      //   "DD/MM/YYYY"
+      // );
       const inputDate = new Date(year, month - 1, day);
       const currentDate = new Date();
-
+      // const currentDate = moment(new Date()).format("DD/MM/YYYY");
       if (
         inputDate.getDate() !== day ||
         inputDate.getMonth() !== month - 1 ||
@@ -964,7 +968,7 @@ const filteredTest = computed(() => {
 }
 
 .delete {
-  height: 150px;
+  height: 160px;
 }
 
 .send {

@@ -6,14 +6,14 @@ const CircleRadioButton = ({ selected, onPress }) => {
   return (
     <View
       style={{
-        width: 15,
-        height: 15,
+        width: 25,
+        height: 25,
         borderRadius: 12,
         borderWidth: 2,
         borderColor: selected ? "#D1C9C9" : "#D1C9C9",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 5,
+        marginBottom: 10,
       }}
       onTouchEnd={onPress} // เพิ่มการเชื่อมต่อกับ onPress
     >

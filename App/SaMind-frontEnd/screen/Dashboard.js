@@ -26,13 +26,13 @@ export default function Dashboard({ route }) {
     console.log("Dashboard Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
@@ -63,9 +63,19 @@ export default function Dashboard({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
+  useEffect(() => {
+    if (data) {
+      if (data.historyTest.hasOwnProperty("type1")) {
+        handleColor1(data.historyTest.type1, data.historyTest.result1);
+      }
+      if (data.historyTest.hasOwnProperty("type2")) {
+        handleColor2(data.historyTest.type2, data.historyTest.result2);
+      }
+    }
+  }, [data, color1, color2]);
   const setMood = (mood) => {
     mood = parseFloat(mood);
     mood = mood.toFixed(0);
@@ -112,6 +122,8 @@ export default function Dashboard({ route }) {
     if (type === "2Q") {
       if (result.includes("ไม่มีแนวโน้ม")) {
         setColor2("green");
+      } else if (result.includes("มีแนวโน้ม")) {
+        setColor2("red");
       } else if (result == 0) {
         setColor2("red");
       }
@@ -781,6 +793,7 @@ export default function Dashboard({ route }) {
                     fontSize: 10,
                     color: color1,
                     fontWeight: "bold",
+                    width: "50%",
                   }}
                 >
                   {data.historyTest && data.historyTest.result1 !== null
@@ -862,6 +875,7 @@ export default function Dashboard({ route }) {
                     fontSize: 10,
                     color: color2,
                     fontWeight: "bold",
+                    width: "50%",
                   }}
                 >
                   {data.historyTest && data.historyTest.result2 !== null
@@ -910,7 +924,7 @@ export default function Dashboard({ route }) {
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#99D9A4",
+                  backgroundColor: "#BEFD98",
                   borderRadius: 30,
                   resizeMode: "cover",
                 }}
@@ -937,15 +951,40 @@ export default function Dashboard({ route }) {
 
             <View style={styles.sad}>
               <Image
-                source={require("../assets/sad.png")}
+                source={require("../assets/neutral.png")}
                 style={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#D3D3D3",
+                  // backgroundColor: "#FAE98E",
                   borderRadius: 30,
                   resizeMode: "cover",
+                  zIndex: 1,
                 }}
               />
+              <Svg
+                style={{
+                  position: "absolute",
+                  width: 50,
+                  height: 50,
+                  resizeMode: "cover",
+                  zIndex: 0,
+                  left: 0,
+                  top: -2,
+                }}
+                width="50"
+                height="50"
+                viewBox="0 0 46 46"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Circle
+                  id="Ellipse 101"
+                  cx="23"
+                  cy="23"
+                  r="23"
+                  fill="#FAE98E"
+                />
+              </Svg>
               <View
                 style={{
                   flexDirection: "row",
@@ -955,7 +994,7 @@ export default function Dashboard({ route }) {
                   zIndex: -1,
                 }}
               >
-                <View style={styles.perbox}>
+                <View style={styles.perboxn}>
                   <Text style={styles.moodN}>Neutral</Text>
                   <Text style={styles.moodper}>
                     {data.avatarMoodDetec &&
@@ -1003,7 +1042,7 @@ export default function Dashboard({ route }) {
                   cx="23"
                   cy="23"
                   r="23"
-                  fill="#C0C0C0"
+                  fill="#F79292"
                 />
               </Svg>
               <View style={styles.angry}></View>
@@ -1253,10 +1292,22 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: -1,
   },
+  perboxn: {
+    alignItems: "center",
+    marginLeft: "47%",
+    marginTop: "-3%",
+    borderWidth: 1,
+    paddingVertical: "2%",
+    backgroundColor: "#F9E5DB",
+    borderColor: "#F9E5DB",
+    borderRadius: 10,
+    width: "100%",
+    zIndex: -1,
+  },
   perboxa: {
     alignItems: "center",
     marginLeft: "60%",
-    marginTop: "25%",
+    marginTop: "0%",
     borderWidth: 1,
     paddingVertical: "2%",
     backgroundColor: "#F9E5DB",

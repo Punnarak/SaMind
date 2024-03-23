@@ -126,11 +126,11 @@
 
 
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground, Modal } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground, Modal,Dimensions, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
-
+const windowWidth = Dimensions.get("window").width;
 const NumberGame = ({ route }) => {
   const navigation = useNavigation();
   const { patientId } = route.params || {};
@@ -142,6 +142,7 @@ const NumberGame = ({ route }) => {
   const [score, setScore] = useState(null);
   const [startGame, setStartGame] = useState(false); // State to track whether the game has started
   const [showModal, setShowModal] = useState(true); // State to control the visibility of the popup modal
+  const [wl, setwl] = useState(false)
 
   useEffect(() => {
     if (startGame) {
@@ -149,7 +150,7 @@ const NumberGame = ({ route }) => {
 
       const timerInterval = setInterval(() => {
         setTimeLeft((prevTime) => {
-          if (prevTime > 0 && !gameOver) {
+          if (prevTime > 0 && !gameOver && nextExpectedNumber != 16) {
             return prevTime - 1;
           } else {
             clearInterval(timerInterval);
@@ -181,7 +182,7 @@ const NumberGame = ({ route }) => {
 
   const updateStaminaBar = async () => {
     try {
-      const response = await axios.put('/update_stamina_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      const response = await axios.put('/update_stamina_bar_de', { decrementAmount:30 ,patient_id: patientId });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
       console.error('Error updating health bar:', error);
@@ -190,7 +191,7 @@ const NumberGame = ({ route }) => {
 
   const updateHungryBar = async () => {
     try {
-      const response = await axios.put('/update_hungry_bar_de', { decrementAmount:60 ,patient_id: patientId });
+      const response = await axios.put('/update_hungry_bar_de', { decrementAmount:30 ,patient_id: patientId });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
       console.error('Error updating health bar:', error);
@@ -201,10 +202,20 @@ const NumberGame = ({ route }) => {
   const updateScore = async () => {
     try {
       console.log(score);
-      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: score });
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 40 });
       console.log(response.data); // Logging the response for debugging
     } catch (error) {
-      console.error('Error updating score bar:', error);
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 10 });
+    }
+  };
+
+  const updateScore0 = async () => {
+    try {
+      console.log(score);
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 0 });
+      console.log(response.data); // Logging the response for debugging
+    } catch (error) {
+      const response = await axios.put('/update_click_count', { patient_id: patientId, click_count: 0 });
     }
   };
 
@@ -221,8 +232,9 @@ const NumberGame = ({ route }) => {
     if (!gameOver) {
       if (selectedNumber === nextExpectedNumber) {
         if (nextExpectedNumber === 16) {
+          setwl(true);
+          updateScore();
           // If 16 is clicked, the game is won
-          calculateScore();
           setGameOver(true); // Set game over to true for a win
         } else {
           // Otherwise, increment the expected number
@@ -231,8 +243,10 @@ const NumberGame = ({ route }) => {
           setClickedNumbers([...clickedNumbers, selectedNumber]);
         }
       } else {
+        setwl(false);
         // Incorrect number clicked, game over
-        calculateScore();
+        updateScore0();
+        // calculateScore();
         updateHealthBar();
         setScore(0);
         setGameOver(true);
@@ -250,7 +264,7 @@ const NumberGame = ({ route }) => {
   const conclusion = () => {
     if(nextExpectedNumber===16)
     {
-      calculateScore();
+      // calculateScore();
       updateScore();
     }
   }
@@ -293,20 +307,25 @@ const NumberGame = ({ route }) => {
           </View>
         </Modal>
         {gameOver ? (
-          <View>
-            <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
-              {nextExpectedNumber === 16 ? `You Win! Score: ${score !== null ? score : 0}` : 'Game Over! Score: 0'}
-            </Text>
-            <Button
-              title="Confirm"
-              onPress={() => {
-                conclusion();
-                updateStaminaBar();
-                updateHungryBar();
-                navigation.navigate("Gamescreen", { patientId });
-              }}
-            />
-          </View>
+          <View style={styles.gameOverContainer}>
+          <Text style={[styles.gameOverText, { color: nextExpectedNumber === 16 ? 'green' : 'red' }]}>
+            {nextExpectedNumber === 16 ? `You Win!` : 'Game Over! Score: 0'}
+          </Text>
+          <Button
+            title="Confirm"
+            onPress={() => {
+              if (wl) {
+                updateScore();
+              } else {
+                updateScore0();
+                updateHealthBar();
+              }
+              updateStaminaBar();
+              updateHungryBar();
+              navigation.navigate("Gamescreen", { patientId });
+            }}
+          />
+        </View>
         ) : (
           <View>
             <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
@@ -343,6 +362,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "red",
+    textAlign: "center", // Center text horizontally
+    textAlignVertical: "center"
   },
   timer: {
     fontSize: 18,
@@ -382,6 +403,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     textAlign: "center",
+  },
+  gameOverContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Example background color (adjust as needed)
+    padding: 20, // Adjust padding as needed
+    borderRadius: 10,
+    width:windowWidth/2, // Optional: add borderRadius for rounded corners
+    // Add any other styles you need for the container
   },
 });
 

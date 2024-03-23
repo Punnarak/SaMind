@@ -24,7 +24,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
-
+const isAndroid = Platform.OS === "android";
 export default function Library({ route }) {
   const navigation = useNavigation();
   const { patientId, hospitalName } = route.params || {};
@@ -122,13 +122,13 @@ export default function Library({ route }) {
     console.log("Library Screen", patientId, hospitalName);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     let param = {
@@ -157,7 +157,7 @@ export default function Library({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, [links]);
   let links = data;
   // const defaultLinks =
@@ -261,7 +261,7 @@ export default function Library({ route }) {
 
       <Ionicons
         name="search-outline"
-        size={25.7}
+        size={isAndroid ? 27.3 : 27.5}
         color="white"
         style={{
           borderWidth: 1,
@@ -270,7 +270,7 @@ export default function Library({ route }) {
           ...Platform.select({
             android: {
               // marginTop: verticalScale(-38.5),
-              marginTop: "-9.85%",
+              marginTop: "-9.84%",
             },
             ios: {
               marginTop: verticalScale(-36.2),

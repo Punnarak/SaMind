@@ -2,6 +2,7 @@ import * as React from "react";
 import * as RN from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "./Metrics";
+import moment from "moment-timezone";
 class MyCalendar extends React.Component {
   months = [
     "January",
@@ -201,9 +202,10 @@ class MyCalendar extends React.Component {
         if (
           item === currentDate &&
           currentMonth === this.state.activeDate.getMonth() &&
-          currentYear === this.state.activeDate.getFullYear()
+          currentYear === this.state.activeDate.getFullYear() &&
+          textColor !== "lightgray"
         ) {
-          // textColor = "blue"; // กำหนดสีแดงสำหรับวันที่ปัจจุบันที่ตรงกันทั้งวันเดือนปี
+          textColor = "#3987FD"; // กำหนดสีแดงสำหรับวันที่ปัจจุบันที่ตรงกันทั้งวันเดือนปี
         }
         return (
           <RN.Text
@@ -214,7 +216,23 @@ class MyCalendar extends React.Component {
               // height: 18,
               textAlign: "center",
               color: textColor,
-              fontWeight: rowIndex === 0 ? "bold" : "normal",
+              // backgroundColor:
+              //   item === currentDate &&
+              //   currentMonth === this.state.activeDate.getMonth() &&
+              //   currentYear === this.state.activeDate.getFullYear()
+              //     ? "#3987FD"
+              //     : null,
+              // borderRadius: 10,
+
+              fontWeight:
+                rowIndex === 0
+                  ? "bold"
+                  : item === currentDate &&
+                    currentMonth === this.state.activeDate.getMonth() &&
+                    currentYear === this.state.activeDate.getFullYear() &&
+                    textColor !== "lightgray"
+                  ? "900"
+                  : "normal",
             }}
             onPress={() => this._onPress(item, textColor)}
           >

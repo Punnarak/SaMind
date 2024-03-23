@@ -87,7 +87,7 @@
                         >
                           <label
                             class="text mr-8"
-                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px"
                             >Request</label
                           >
                           <label
@@ -274,7 +274,7 @@
                         >
                           <label
                             class="text mr-8"
-                            style="color: rgba(0, 191, 99, 1); font-size: 13px;'"
+                            style="color: rgba(0, 191, 99, 1); font-size: 13px"
                             >To</label
                           >
                           <label
@@ -441,9 +441,7 @@
                     v-bind="props"
                     v-for="time in timesDayUse"
                     :key="time"
-                    class="event-day"
                     :style="getEventStyle(time)"
-                    @click="toggleListVisibility($event)"
                   >
                     <div v-if="eventsDay[time]" class="event-details-day">
                       <span class="title-day">{{
@@ -457,12 +455,6 @@
                     </div>
                   </div>
                 </template>
-                <v-list v-if="isListVisible" class="custom-list-style">
-                  <!-- Show v-list only if isListVisible is true -->
-                  <v-list-item @click="">
-                    <span class="pl-2">{{ eventsDay[time] }}</span>
-                  </v-list-item>
-                </v-list>
               </v-menu>
             </div>
           </div>
@@ -548,6 +540,20 @@
             <div v-if="index < 7" class="day-label">{{ dayLabels[index] }}</div>
             <div v-if="index < 7" class="day-number-1fr">{{ cell.day }}</div>
             <div v-if="index >= 7" class="day-number">{{ cell.day }}</div>
+            <div
+              v-if="index < 7 && checkdate(cell.day, currentDate, cell)"
+              class="day-number"
+              style="font-weight: bold; color: #3c9bf2"
+            >
+              {{ cell.day }}
+            </div>
+            <div
+              v-if="index >= 7 && checkdate(cell.day, currentDate, cell)"
+              class="day-number"
+              style="font-weight: bold; color: #3c9bf2"
+            >
+              {{ cell.day }}
+            </div>
             <br />
 
             <!-- event -->
@@ -572,7 +578,7 @@
                 </label>
                 <br />
                 <label v-if="index == 0" class="event-info-name">{{
-                  event.patientName
+                  showName(event.patientName)
                 }}</label>
               </div>
             </div>
@@ -619,14 +625,14 @@ import { startOfWeek, endOfWeek, format } from "date-fns";
 import animationpath from "../assets/sending.json";
 import lottie from "lottie-web";
 import axios from "../axios.js";
-
+import moment from "moment";
 export default {
   components: {},
   data() {
     return {
       // ใช้ใน request bar
       // count request
-      request: 1,
+      request: 0,
       //request Appointment info
       patients: [
         {
@@ -693,14 +699,14 @@ export default {
       // ใช้เป็นตารางของ calendar day
       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       timesDay: [
-        "00:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-        "06:00",
-        "07:00",
+        // "00:00",
+        // "01:00",
+        // "02:00",
+        // "03:00",
+        // "04:00",
+        // "05:00",
+        // "06:00",
+        // "07:00",
         "08:00",
         "09:00",
         "10:00",
@@ -710,33 +716,33 @@ export default {
         "14:00",
         "15:00",
         "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00",
-        "24:00",
+        // "17:00",
+        // "18:00",
+        // "19:00",
+        // "20:00",
+        // "21:00",
+        // "22:00",
+        // "23:00",
+        // "24:00",
       ],
       // ใช้คูณหาตำแหน่งใน calendar day
       timesDayUse: [
-        "00:00",
-        "00:30",
-        "01:00",
-        "01:30",
-        "02:00",
-        "02:30",
-        "03:00",
-        "03:30",
-        "04:00",
-        "04:30",
-        "05:00",
-        "05:30",
-        "06:00",
-        "06:30",
-        "07:00",
-        "07:30",
+        // "00:00",
+        // "00:30",
+        // "01:00",
+        // "01:30",
+        // "02:00",
+        // "02:30",
+        // "03:00",
+        // "03:30",
+        // "04:00",
+        // "04:30",
+        // "05:00",
+        // "05:30",
+        // "06:00",
+        // "06:30",
+        // "07:00",
+        // "07:30",
         "08:00",
         "08:30",
         "09:00",
@@ -755,22 +761,22 @@ export default {
         "15:30",
         "16:00",
         "16:30",
-        "17:00",
-        "17:30",
-        "18:00",
-        "18:30",
-        "19:00",
-        "19:30",
-        "20:00",
-        "20:30",
-        "21:00",
-        "21:30",
-        "22:00",
-        "22:30",
-        "23:00",
-        "23:30",
-        "24:00",
-        "24:30",
+        // "17:00",
+        // "17:30",
+        // "18:00",
+        // "18:30",
+        // "19:00",
+        // "19:30",
+        // "20:00",
+        // "20:30",
+        // "21:00",
+        // "21:30",
+        // "22:00",
+        // "22:30",
+        // "23:00",
+        // "23:30",
+        // "24:00",
+        // "24:30",
       ],
       eventsDay: [],
       // {
@@ -866,14 +872,14 @@ export default {
         // "14:00",
         // "15:00",
         // "16:00",
-        "00:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-        "06:00",
-        "07:00",
+        // "00:00",
+        // "01:00",
+        // "02:00",
+        // "03:00",
+        // "04:00",
+        // "05:00",
+        // "06:00",
+        // "07:00",
         "08:00",
         "09:00",
         "10:00",
@@ -883,14 +889,14 @@ export default {
         "14:00",
         "15:00",
         "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00",
-        "24:00",
+        // "17:00",
+        // "18:00",
+        // "19:00",
+        // "20:00",
+        // "21:00",
+        // "22:00",
+        // "23:00",
+        // "24:00",
       ],
     };
   },
@@ -898,6 +904,13 @@ export default {
 
   methods: {
     //Calendar Main
+    showName(link) {
+      if (link.length > 10) {
+        return link.substring(0, 10) + "...";
+      } else {
+        return link;
+      }
+    },
     selectDay() {
       var windowWidth = window.innerWidth;
 
@@ -1021,23 +1034,23 @@ export default {
       const event = this.eventsDay[time];
       if (event) {
         const index = this.timesDayUse.indexOf(time);
-        const positionTop = (index + 5.7) * 30.1;
+        const positionTop = (index + 5.8) * 30;
         return {
           height: "60px",
           backgroundColor: "#3C9BF2",
           borderBottom: "1px solid #ccc",
           position: "absolute",
           top: `${positionTop}px`,
-          left: "435px",
+          left: "440px",
           right: "0",
           width: "950px",
           borderRadius: "15px",
         };
       }
       return {
-        height: "60px",
-        backgroundColor: "transparent",
-        borderBottom: "1px solid #ccc",
+        // height: "60px",
+        // backgroundColor: "transparent",
+        // borderBottom: "1px solid #ccc",
       };
     },
     toggleListVisibility(event) {
@@ -1421,6 +1434,37 @@ export default {
         });
 
       this.updateCalendar();
+    },
+    checkdate(day, currentDate, cell) {
+      let month = currentDate.getMonth(); // Months are zero-based
+      let year = currentDate.getFullYear();
+
+      if (cell.class === "day") {
+      } else if (cell.class === "prev-month-day") {
+        if (month === 0) {
+          month = 11; // December of previous year
+          year--;
+        } else {
+          month--;
+        }
+      } else if (cell.class === "next-month-day") {
+        if (month === 11) {
+          month = 0; // January of next year
+          year++;
+        } else {
+          month++;
+        }
+      }
+      console.log(
+        "boldddddddddd",
+        month,
+        moment(new Date(year, month, day)).format("DD-MM-YYYY"),
+        moment(new Date()).format("DD-MM-YYYY")
+      );
+      return (
+        moment(new Date(year, month, day)).format("DD-MM-YYYY") ==
+        moment(new Date()).format("DD-MM-YYYY")
+      );
     },
 
     bookClicked(day, currentDate, cell) {
