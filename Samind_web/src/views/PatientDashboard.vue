@@ -118,7 +118,7 @@
           <v-row>
             <v-col v-if="moodResult != 'Unknown'" cols="6" sm="5" md="4">
               <label class="title ml-3" style="font-weight: bold"
-                >Latest Dairy Test</label
+                >Latest Average Mood</label
               >
               <br />
               <v-chip
