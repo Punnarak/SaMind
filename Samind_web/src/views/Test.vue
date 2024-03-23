@@ -34,6 +34,7 @@
       v-model:page="page"
       :headers="headers"
       :items="filteredTest"
+      :items-per-page="itemsPerPage"
       class="elevation-1"
       style="border-radius: 10px; text-align: center"
     >
