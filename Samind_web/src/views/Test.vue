@@ -621,15 +621,16 @@ export default {
         this.dateValidate = true;
       }
 
-      const inputDate = moment(new Date(year, month - 1, day)).format(
-        "DD/MM/YYYY"
-      );
-      const currentDate = moment(new Date()).format("DD/MM/YYYY");
-
+      // const inputDate = moment(new Date(year, month - 1, day)).format(
+      //   "DD/MM/YYYY"
+      // );
+      const inputDate = new Date(year, month - 1, day);
+      const currentDate = new Date();
+      // const currentDate = moment(new Date()).format("DD/MM/YYYY");
       if (
-        // inputDate.getDate() !== day ||
-        // inputDate.getMonth() !== month - 1 ||
-        // inputDate.getFullYear() !== year ||
+        inputDate.getDate() !== day ||
+        inputDate.getMonth() !== month - 1 ||
+        inputDate.getFullYear() !== year ||
         inputDate < currentDate
       ) {
         this.dateValidate = false;
