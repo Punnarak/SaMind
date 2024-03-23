@@ -92,7 +92,7 @@
                     >
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <v-col>
                         <div
@@ -149,7 +149,7 @@
                                 </v-col>
                               </div>
                               <div class="imageurl">
-                                <label class="text title">Image URL</label>
+                                <label class="text title">Image Link</label>
                                 <v-col
                                   style="margin-top: -10px; margin-left: -10px"
                                 >
@@ -224,7 +224,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -234,7 +234,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot
@@ -396,7 +396,7 @@
                     <v-icon @click="editTipPopup = false">mdi-close</v-icon>
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <v-col>
                         <div
@@ -431,7 +431,7 @@
                               </v-col>
 
                               <div class="url">
-                                <label class="text title">Image URL</label>
+                                <label class="text title">Image Link</label>
                                 <v-col
                                   style="margin-top: -10px; margin-left: -10px"
                                 >
@@ -505,7 +505,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -515,7 +515,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot
@@ -648,7 +648,7 @@
                     <v-icon @click="editLinkPopup = false">mdi-close</v-icon>
                   </div>
 
-                  <div class="modal-body" align="start" style="left: 100px">
+                  <div class="modal-body" align="left" style="left: 100px">
                     <slot name="body">
                       <div style="display: flex; flex-direction: row">
                         <div class="title">
@@ -732,7 +732,7 @@
             <div v-if="deletePopup" class="modal-mask">
               <div class="modal-wrapper">
                 <div class="modal-container delete">
-                  <div class="modal-header" align="start">
+                  <div class="modal-header" align="left">
                     <slot class="popupheader" name="header"
                       >Confirm delete</slot
                     >
@@ -742,7 +742,7 @@
                     color="black"
                     style="opacity: 1"
                   ></v-divider>
-                  <div class="modal-body" style="margin-top: 6px" align="start">
+                  <div class="modal-body" style="margin-top: 6px" align="left">
                     <slot name="body"
                       >Are you sure you want to delete :
                       {{ select.columns.title }} ?</slot
