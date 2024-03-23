@@ -79,6 +79,7 @@ export default function EditProfile({ route }) {
         email: email,
         password: password,
       };
+      console.log("param have password", param);
       axios
         .post("/update_info", param)
         .then((response) => {
@@ -115,19 +116,19 @@ export default function EditProfile({ route }) {
     console.log("Edit Profile Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     setName(data.fname ? data.fname : "Punya");
     setSurname(data.lname ? data.lname : "Hasinanan");
     setEmail(data.email ? data.email : "pun@gmail.com");
-    return onFocus
+    return onFocus;
   }, []);
   useEffect(() => {
     if (email != "") {
