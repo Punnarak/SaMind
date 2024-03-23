@@ -548,6 +548,20 @@
             <div v-if="index < 7" class="day-label">{{ dayLabels[index] }}</div>
             <div v-if="index < 7" class="day-number-1fr">{{ cell.day }}</div>
             <div v-if="index >= 7" class="day-number">{{ cell.day }}</div>
+            <div
+              v-if="index < 7 && checkdate(cell.day, currentDate, cell)"
+              class="day-number"
+              style="font-weight: bold; color: #3c9bf2"
+            >
+              {{ cell.day }}
+            </div>
+            <div
+              v-if="index >= 7 && checkdate(cell.day, currentDate, cell)"
+              class="day-number"
+              style="font-weight: bold; color: #3c9bf2"
+            >
+              {{ cell.day }}
+            </div>
             <br />
 
             <!-- event -->
@@ -619,7 +633,7 @@ import { startOfWeek, endOfWeek, format } from "date-fns";
 import animationpath from "../assets/sending.json";
 import lottie from "lottie-web";
 import axios from "../axios.js";
-
+import moment from "moment";
 export default {
   components: {},
   data() {
@@ -1421,6 +1435,37 @@ export default {
         });
 
       this.updateCalendar();
+    },
+    checkdate(day, currentDate, cell) {
+      let month = currentDate.getMonth(); // Months are zero-based
+      let year = currentDate.getFullYear();
+
+      if (cell.class === "day") {
+      } else if (cell.class === "prev-month-day") {
+        if (month === 0) {
+          month = 11; // December of previous year
+          year--;
+        } else {
+          month--;
+        }
+      } else if (cell.class === "next-month-day") {
+        if (month === 11) {
+          month = 0; // January of next year
+          year++;
+        } else {
+          month++;
+        }
+      }
+      console.log(
+        "boldddddddddd",
+        month,
+        moment(new Date(year, month, day)).format("DD-MM-YYYY"),
+        moment(new Date()).format("DD-MM-YYYY")
+      );
+      return (
+        moment(new Date(year, month, day)).format("DD-MM-YYYY") ==
+        moment(new Date()).format("DD-MM-YYYY")
+      );
     },
 
     bookClicked(day, currentDate, cell) {
