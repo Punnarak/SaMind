@@ -431,21 +431,24 @@ function getColorResult(result, test) {
     if (result.includes("ปานกลาง")) {
       return "#FF914D";
     } else if (result.includes("น้อยมาก")) {
-      return "#FFDE59";
-    } else if (result.includes("น้อย")) {
       return "#11dd66";
+    } else if (result.includes("น้อย")) {
+      return "#FFDE59";
     } else if (result.includes("มาก")) {
       return "#FF5757";
     } else if (result.includes("ไม่มี")) {
       return "#11dd66";
+    } else if (result.includes("รุนแรง")) {
+      return "#FF5757";
     }
   }
 
   if (test === "2Q") {
-    if (result != 0) {
-      return "#11dd66";
-    } else if (result == 0) {
+    console.log("in 2q");
+    if (result.includes("มีแนวโน้ม")) {
       return "#FFDE59";
+    } else if (result.includes("ไม่มี")) {
+      return "#11dd66";
     }
   }
 }
@@ -519,6 +522,8 @@ export default {
         this.mood = response.data.mood;
         this.moodResult = response.data.avgMood;
         this.testDate = response.data.dateBetween;
+        this.moodDetect = response.data.avatarMood;
+        this.detectDate = response.data.dateAvatarMoodDetec;
         if (response.data && response.data.hasOwnProperty("historyTest")) {
           if (
             response.data.historyTest &&
@@ -553,8 +558,6 @@ export default {
           this.scoretest1 = null;
           this.scoretest2 = null;
         }
-        this.moodDetect = response.data.avatarMood;
-        this.detectDate = response.data.dateAvatarMoodDetec;
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -574,6 +577,10 @@ export default {
           return "ระดับน้อย";
         } else if (result.includes("ไม่มี")) {
           return "ไม่มีภาวะซึมเศร้า";
+        } else if (result.includes("มีแนวโน้ม")) {
+          return "มีแนวโน้มซึมเศร้า";
+        } else if (result.includes("รุนแรง")) {
+          return "ระดับรุนแรง";
         }
       }
     },
