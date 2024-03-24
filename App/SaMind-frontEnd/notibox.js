@@ -28,7 +28,7 @@ const NotificationBox = ({ item, index }) => {
             zIndex: 1,
             marginLeft: item.target !== "Calendarscreen" ? "90%" : "90%",
             left: item.target !== "Calendarscreen" ? 15 : 15,
-            marginTop: item.target !== "Calendarscreen" ? "8.5%" : "10.5%",
+            // marginTop: item.target !== "Calendarscreen" ? "8.5%" : "10.5%",
             transform: [{ rotateY: "180deg" }],
           }}
           onPress={() => navigation.navigate(item.target)}
@@ -47,12 +47,14 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: "3%",
     paddingVertical: "5%",
+    justifyContent: "center",
   },
 
   header: {
     fontSize: 16,
     color: "#569AFF",
     fontWeight: "bold",
+    width: "90%",
   },
   detail: { fontSize: 10, color: "#569AFF" },
 });
