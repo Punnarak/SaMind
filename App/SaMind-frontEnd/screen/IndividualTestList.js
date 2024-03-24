@@ -9,13 +9,10 @@ import {
   Image,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-// import assignData from "../upcomingData";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
-import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
+import { axios } from "./axios.js";
+import { horizontalScale } from "../Metrics";
 export default function IndividualTestList({ route }) {
   const { patientId, notiData } = route.params || {};
   const [individualTestList, setInividualTestList] = useState([]);
