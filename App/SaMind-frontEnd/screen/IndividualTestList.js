@@ -77,7 +77,7 @@ export default function IndividualTestList({ route }) {
 
       <View style={styles.container2}>
         <View style={styles.container3}>
-          <ScrollView style={{}}>
+          <ScrollView style={{ width: "100%" }}>
             {individualTestList.map((item, index) => (
               <View style={styles.box} item={item} index={index} key={index}>
                 <View
@@ -187,9 +187,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     width: "100%",
-    height: "77%",
     paddingTop: 25,
     flex: 1,
+    // height: verticalScale(210),
     paddingHorizontal: 30,
     borderRadius: 25,
     zIndex: 0,
@@ -198,8 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     // width: "790%"
-    width: "400%",
-    height: "77%",
+    width: "100%",
     paddingTop: 10,
     flex: 1,
     zIndex: 0,
