@@ -10,7 +10,7 @@ import axios from "axios";
 
 const HTTP = axios.create({
   // baseURL: "http://192.168.1.37:4343",
-  baseURL: "https://a066-49-229-132-157.ngrok-free.app",
+  baseURL: "https://ce0f-49-229-134-236.ngrok-free.app",
   // baseURL: "http://192.168.1.38:4343",
 });
 

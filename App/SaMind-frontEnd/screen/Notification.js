@@ -5,6 +5,8 @@ import {
   View,
   ScrollView,
   ImageBackground,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -12,9 +14,9 @@ import { useNavigation } from "@react-navigation/native";
 import NotiBox from "../notibox";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
-
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 export default function Notification({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   // const data = [
@@ -36,13 +38,13 @@ export default function Notification({ route }) {
     console.log("Notification Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
@@ -58,7 +60,7 @@ export default function Notification({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
   return (
@@ -98,13 +100,27 @@ export default function Notification({ route }) {
           ))}
         </ScrollView>
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.goBack()}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.goBack()}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}

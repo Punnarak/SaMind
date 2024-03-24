@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -17,10 +18,10 @@ import AssignmentBox from "../AssigmentBox";
 // import assignData from "../assignData";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
-
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 export default function Upcoming({ route }) {
   const navigation = useNavigation();
-  const { patientId, data, date, month, year } = route.params || {};
+  const { patientId, data, date, month, year, notiData } = route.params || {};
   const [datas, setData] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState("daily");
   const [assignData, setAssignData] = useState([]);
@@ -29,13 +30,13 @@ export default function Upcoming({ route }) {
     console.log("Upcoming Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const dateStrings = [year + "-" + month + "-" + date];
@@ -63,7 +64,7 @@ export default function Upcoming({ route }) {
         // Handle any errors here
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
   console.log("date--> " + date);
@@ -220,13 +221,31 @@ export default function Upcoming({ route }) {
       </View>
 
       <View style={styles.undertag}>
-        <Feather
-          name="bell"
-          style={styles.picul}
-          size={25}
-          color="#222222"
-          onPress={() => navigation.goBack()}
-        />
+        {notiData != 0 ? (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Notiscreen", { patientId, notiData })
+            }
+          >
+            <Image
+              source={require("../assets/notification.png")}
+              style={{
+                width: 25,
+                height: 25,
+                resizeMode: "cover",
+                marginLeft: horizontalScale(34),
+              }}
+            />
+          </TouchableOpacity>
+        ) : (
+          <Feather
+            name="bell"
+            style={styles.picul}
+            size={25}
+            color="#222222"
+            onPress={() => navigation.navigate("Notiscreen", { patientId })}
+          />
+        )}
         <Feather
           name="smile"
           style={styles.picur}

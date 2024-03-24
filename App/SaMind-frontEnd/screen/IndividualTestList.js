@@ -5,6 +5,8 @@ import {
   View,
   ImageBackground,
   ScrollView,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -13,9 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 // import assignData from "../upcomingData";
 // import axios from "./axios.js";
 import { axios, axiospython } from "./axios.js";
-
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 export default function IndividualTestList({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const [individualTestList, setInividualTestList] = useState([]);
   const navigation = useNavigation();
 
@@ -23,13 +25,13 @@ export default function IndividualTestList({ route }) {
     console.log("Individual Test List Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
@@ -47,7 +49,7 @@ export default function IndividualTestList({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
   return (
@@ -141,13 +143,31 @@ export default function IndividualTestList({ route }) {
           </ScrollView>
         </View>
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("NotinScreen")}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Notiscreen", { patientId, notiData })
+              }
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}
