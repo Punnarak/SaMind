@@ -6,6 +6,26 @@ const auth = require('./auth.js').authorization;
 
 router.use(bodyParser.json());
 
+const nodemailer = require("nodemailer");
+const randomstring = require("randomstring");
+
+const transporter = nodemailer.createTransport({
+  // requireTLS: true,
+  host: "smtp.gmail.com.",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "desmotest123@gmail.com",
+    pass: "uovg pqyt utur dvyz",
+  },
+});
+
+function isValidEmail(email) {
+  // Use a regular expression for basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 // router.post('/allTest', (req, res) => {
 //     const therapistId = req.body.therapist_id; // Use req.body to get parameters from the request body
 //     let query = `
@@ -702,7 +722,91 @@ router.delete('/questionsDel', auth, (req, res) => {
 //         });
 // });
 
-router.post("/therapistSendTest", auth, (req, res) => {
+// router.post("/therapistSendTest", auth, (req, res) => {
+//   const therapistId = req.body.therapistId;
+//   const testName = req.body.testName;
+//   const patientIds = req.body.patientId;
+//   const detail = req.body.detail; // Adding detail from request body
+//   const dueDate = req.body.dueDate; // Adding dueDate from request body
+
+//   // Parse dueDate string to a valid Date object
+//   const dueDateParts = dueDate.split("/");
+//   const dueDateFormatted = new Date(
+//     `${dueDateParts[2]}-${dueDateParts[1]}-${dueDateParts[0]}`
+//   );
+
+//   const createBy = therapistId;
+//   const createDate = new Date();
+//   // Remove milliseconds from the createDate
+//   createDate.setMilliseconds(0);
+//   const updateBy = therapistId;
+//   const updateDate = new Date(createDate.getTime() + 7 * 24 * 60 * 60 * 1000); // Adding 7 days
+//   // Remove milliseconds from the updateDate
+//   updateDate.setMilliseconds(0);
+
+//   // Prepare an array to store promises for each patient insertion
+//   const insertionPromises = [];
+
+//   // Iterate through each patient ID and create a promise for each insertion
+//   patientIds.forEach((patientId) => {
+//     // Convert patient ID to numeric format
+//     const numericPatientID = patientId.replace(/\D/g, "");
+
+//     const query = `
+//           INSERT INTO public.assignment (
+//               assign_id, 
+//               patient_id, 
+//               test_name, 
+//               status, 
+//               active_flag, 
+//               create_by, 
+//               create_date, 
+//               update_by, 
+//               update_date,
+//               detail, -- Adding detail column
+//               turn_in_before -- Adding turn_in_before column
+//           ) VALUES (
+//               NEXTVAL('assign_id_seq'), 
+//               $1, 
+//               $2, 
+//               'WAIT', 
+//               'Y', 
+//               $3, 
+//               $4, 
+//               $5, 
+//               $6,
+//               $7, -- Placeholder for detail
+//               $8  -- Placeholder for dueDate
+//           )
+//       `;
+
+//     const values = [
+//       numericPatientID, // Using converted numeric patient ID
+//       testName,
+//       createBy,
+//       createDate,
+//       updateBy,
+//       updateDate,
+//       detail,
+//       dueDateFormatted,
+//     ]; // Adding detail and dueDate to values
+
+//     const insertionPromise = client.query(query, values);
+//     insertionPromises.push(insertionPromise);
+//   });
+
+//   // Execute all insertion promises
+//   Promise.all(insertionPromises)
+//     .then(() => {
+//       res.json({ message: "Data inserted successfully" });
+//     })
+//     .catch((err) => {
+//       console.error("Error executing query:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
+router.post("/therapistSendTest", auth, async (req, res) => {
   const therapistId = req.body.therapistId;
   const testName = req.body.testName;
   const patientIds = req.body.patientId;
@@ -733,32 +837,32 @@ router.post("/therapistSendTest", auth, (req, res) => {
     const numericPatientID = patientId.replace(/\D/g, "");
 
     const query = `
-          INSERT INTO public.assignment (
-              assign_id, 
-              patient_id, 
-              test_name, 
-              status, 
-              active_flag, 
-              create_by, 
-              create_date, 
-              update_by, 
-              update_date,
-              detail, -- Adding detail column
-              turn_in_before -- Adding turn_in_before column
-          ) VALUES (
-              NEXTVAL('assign_id_seq'), 
-              $1, 
-              $2, 
-              'WAIT', 
-              'Y', 
-              $3, 
-              $4, 
-              $5, 
-              $6,
-              $7, -- Placeholder for detail
-              $8  -- Placeholder for dueDate
-          )
-      `;
+            INSERT INTO public.assignment (
+                assign_id, 
+                patient_id, 
+                test_name, 
+                status, 
+                active_flag, 
+                create_by, 
+                create_date, 
+                update_by, 
+                update_date,
+                detail, -- Adding detail column
+                turn_in_before -- Adding turn_in_before column
+            ) VALUES (
+                NEXTVAL('assign_id_seq'), 
+                $1, 
+                $2, 
+                'WAIT', 
+                'Y', 
+                $3, 
+                $4, 
+                $5, 
+                $6,
+                $7, -- Placeholder for detail
+                $8  -- Placeholder for dueDate
+            )
+        `;
 
     const values = [
       numericPatientID, // Using converted numeric patient ID
@@ -777,14 +881,42 @@ router.post("/therapistSendTest", auth, (req, res) => {
 
   // Execute all insertion promises
   Promise.all(insertionPromises)
-    .then(() => {
-      res.json({ message: "Data inserted successfully" });
+    .then(async () => {
+      // Send email to each patient
+      for (const patientId of patientIds) {
+        // Fetch patient email from the database based on patientId
+        const selectPatientEmailQuery =
+          "SELECT email FROM patient WHERE patient_id = $1";
+        const numericPatientId = patientId.replace(/\D/g, "");
+
+        try {
+          const patientEmailResult = await client.query(
+            selectPatientEmailQuery,
+            [numericPatientId]
+          );
+          const patientEmail = patientEmailResult.rows[0].email;
+
+          if (isValidEmail(patientEmail)) {
+            await transporter.sendMail({
+              from: "desmotest123@gmail.com",
+              to: patientEmail,
+              subject: "You have a new test from the therapist",
+              text: `You have a test: ${testName}\nDue date: ${dueDate}. Note: ${detail}`,
+              html: `<b>You have a test: ${testName}</b><br/>Due date: ${dueDate}<br/>Note: ${detail}`,
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching patient email:", error);
+        }
+      }
+
+      res.json({ message: "Data inserted successfully and emails sent" });
     })
     .catch((err) => {
       console.error("Error executing query:", err);
       res.status(500).json({ error: "An error occurred" });
     });
 });
-
+  
 
 module.exports = router;
