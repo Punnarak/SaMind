@@ -6,6 +6,26 @@ const auth = require("./auth.js").authorization;
 
 router.use(bodyParser.json());
 
+const nodemailer = require("nodemailer");
+const randomstring = require("randomstring");
+
+const transporter = nodemailer.createTransport({
+  // requireTLS: true,
+  host: "smtp.gmail.com.",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "desmotest123@gmail.com",
+    pass: "uovg pqyt utur dvyz",
+  },
+});
+
+function isValidEmail(email) {
+  // Use a regular expression for basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 // router.post('/appoint_post', (req, res) => {
 //     let { appointment_id, therapist_id, patient_id, date, time, create_by, confirm, type_appoint } = req.body;
 
@@ -119,16 +139,176 @@ router.use(bodyParser.json());
 //         });
 // });
 
-router.post("/therapistAddAppoint", auth, (req, res) => {
+// router.post("/therapistAddAppoint", auth, (req, res) => {
+//   let { therapistId, patientId, date, startTime, note } = req.body;
+
+//   if (!therapistId || !patientId || !date || !startTime) {
+//     return res
+//       .status(400)
+//       .json({
+//         error:
+//           "therapistId, patientId, date, and startTime are required fields.",
+//       });
+//   }
+
+//   // Convert date to the format expected by the database (yyyy-mm-dd)
+//   const [day, month, year] = date.split("/");
+//   const formattedDate = `${year}-${month}-${day}`;
+
+//   // Generate a unique identifier for appointment_id
+//   const generateAppointmentIdQuery =
+//     "SELECT NEXTVAL('appointment_id_seq') AS appointment_id";
+
+//   client
+//     .query(generateAppointmentIdQuery)
+//     .then((result) => {
+//       const appointmentId = result.rows[0].appointment_id;
+//       const currentDate = new Date();
+//       currentDate.setHours(currentDate.getHours() + 7); // Adding 7 hours to the current time
+//       const formattedCurrentDate = currentDate
+//         .toISOString()
+//         .slice(0, 19)
+//         .replace("T", " ");
+
+//       // Fetch hospital_name from patient table based on patientId
+//       const selectPatientQuery =
+//         "SELECT hospital_name FROM patient WHERE patient_id = $1";
+
+//       client
+//         .query(selectPatientQuery, [patientId])
+//         .then((patientResult) => {
+//           if (patientResult.rows.length > 0) {
+//             const hospitalName =
+//               patientResult.rows[0].hospital_name || "Unknown Hospital"; // Provide a default value if hospitalName is null
+//             const insertQuery = `
+//                             INSERT INTO appointment_new2 (
+//                                 appointment_id, therapist_id, patient_id, date, "time", description, location, confirm, active_flag, create_by, create_date, update_by, update_date
+//                             ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'Y', 'Y', $8, $9, $10, $11) RETURNING *
+//                         `;
+
+//             client
+//               .query(insertQuery, [
+//                 appointmentId,
+//                 therapistId,
+//                 patientId,
+//                 formattedDate,
+//                 startTime,
+//                 note,
+//                 hospitalName,
+//                 therapistId,
+//                 formattedCurrentDate,
+//                 therapistId,
+//                 formattedCurrentDate,
+//               ]) // Pass therapistId as both create_by and update_by
+//               .then((result) => {
+//                 res.status(201).json(result.rows[0]);
+//               })
+//               .catch((err) => {
+//                 console.error("Error executing query:", err);
+//                 res.status(500).json({ error: "An error occurred" });
+//               });
+//           } else {
+//             res.status(404).json({ error: "Patient not found" });
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error executing query:", err);
+//           res.status(500).json({ error: "An error occurred" });
+//         });
+//     })
+//     .catch((err) => {
+//       console.error("Error generating appointment_id:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
+// router.post("/therapistAddAppoint", auth, (req, res) => {
+//   let { therapistId, patientId, date, startTime, note } = req.body;
+
+//   if (!therapistId || !patientId || !date || !startTime) {
+//     return res.status(400).json({
+//       error: "therapistId, patientId, date, and startTime are required fields.",
+//     });
+//   }
+
+//   // Convert date to the format expected by the database (yyyy-mm-dd)
+//   const [day, month, year] = date.split("/");
+//   const formattedDate = `${year}-${month}-${day}`;
+
+//   // Generate a unique identifier for appointment_id
+//   const generateAppointmentIdQuery =
+//     "SELECT NEXTVAL('appointment_id_seq') AS appointment_id";
+
+//   client
+//     .query(generateAppointmentIdQuery)
+//     .then((result) => {
+//       const appointmentId = result.rows[0].appointment_id;
+//       const currentDate = new Date();
+//       currentDate.setHours(currentDate.getHours() + 7); // Adding 7 hours to the current time
+//       const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
+
+//       // Fetch hospital_name from patient table based on patientId
+//       const selectPatientQuery =
+//         "SELECT hospital_name FROM patient WHERE patient_id = $1";
+
+//       // Replacing non-digit characters in patientId to handle both types of IDs
+//       const numericPatientId = patientId.replace(/\D/g, '');
+
+//       client
+//         .query(selectPatientQuery, [numericPatientId])
+//         .then((patientResult) => {
+//           if (patientResult.rows.length > 0) {
+//             const hospitalName =
+//               patientResult.rows[0].hospital_name || "Unknown Hospital"; // Provide a default value if hospitalName is null
+//             const insertQuery = `
+//               INSERT INTO appointment_new2 (
+//                   appointment_id, therapist_id, patient_id, date, "time", description, location, confirm, active_flag, create_by, create_date, update_by, update_date
+//               ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'Y', 'Y', $8, $9, $10, $11) RETURNING *
+//             `;
+
+//             client
+//               .query(insertQuery, [
+//                 appointmentId,
+//                 therapistId,
+//                 numericPatientId, // Use numericPatientId here
+//                 formattedDate,
+//                 startTime,
+//                 note,
+//                 hospitalName,
+//                 therapistId,
+//                 formattedCurrentDate,
+//                 therapistId,
+//                 formattedCurrentDate,
+//               ]) // Pass therapistId as both create_by and update_by
+//               .then((result) => {
+//                 res.status(201).json(result.rows[0]);
+//               })
+//               .catch((err) => {
+//                 console.error("Error executing query:", err);
+//                 res.status(500).json({ error: "An error occurred" });
+//               });
+//           } else {
+//             res.status(404).json({ error: "Patient not found" });
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error executing query:", err);
+//           res.status(500).json({ error: "An error occurred" });
+//         });
+//     })
+//     .catch((err) => {
+//       console.error("Error generating appointment_id:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
+router.post("/therapistAddAppoint", auth, async (req, res) => {
   let { therapistId, patientId, date, startTime, note } = req.body;
 
   if (!therapistId || !patientId || !date || !startTime) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "therapistId, patientId, date, and startTime are required fields.",
-      });
+    return res.status(400).json({
+      error: "therapistId, patientId, date, and startTime are required fields.",
+    });
   }
 
   // Convert date to the format expected by the database (yyyy-mm-dd)
@@ -139,68 +319,73 @@ router.post("/therapistAddAppoint", auth, (req, res) => {
   const generateAppointmentIdQuery =
     "SELECT NEXTVAL('appointment_id_seq') AS appointment_id";
 
-  client
-    .query(generateAppointmentIdQuery)
-    .then((result) => {
-      const appointmentId = result.rows[0].appointment_id;
-      const currentDate = new Date();
-      currentDate.setHours(currentDate.getHours() + 7); // Adding 7 hours to the current time
-      const formattedCurrentDate = currentDate
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ");
+  try {
+    const result = await client.query(generateAppointmentIdQuery);
+    const appointmentId = result.rows[0].appointment_id;
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() + 7); // Adding 7 hours to the current time
+    const formattedCurrentDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
-      // Fetch hospital_name from patient table based on patientId
-      const selectPatientQuery =
-        "SELECT hospital_name FROM patient WHERE patient_id = $1";
+    // Fetch hospital_name from patient table based on patientId
+    const selectPatientQuery =
+      "SELECT hospital_name, email FROM patient WHERE patient_id = $1";
 
-      client
-        .query(selectPatientQuery, [patientId])
-        .then((patientResult) => {
-          if (patientResult.rows.length > 0) {
-            const hospitalName =
-              patientResult.rows[0].hospital_name || "Unknown Hospital"; // Provide a default value if hospitalName is null
-            const insertQuery = `
-                            INSERT INTO appointment_new2 (
-                                appointment_id, therapist_id, patient_id, date, "time", description, location, confirm, active_flag, create_by, create_date, update_by, update_date
-                            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'Y', 'Y', $8, $9, $10, $11) RETURNING *
-                        `;
+    // Replacing non-digit characters in patientId to handle both types of IDs
+    const numericPatientId = patientId.replace(/\D/g, "");
 
-            client
-              .query(insertQuery, [
-                appointmentId,
-                therapistId,
-                patientId,
-                formattedDate,
-                startTime,
-                note,
-                hospitalName,
-                therapistId,
-                formattedCurrentDate,
-                therapistId,
-                formattedCurrentDate,
-              ]) // Pass therapistId as both create_by and update_by
-              .then((result) => {
-                res.status(201).json(result.rows[0]);
-              })
-              .catch((err) => {
-                console.error("Error executing query:", err);
-                res.status(500).json({ error: "An error occurred" });
-              });
-          } else {
-            res.status(404).json({ error: "Patient not found" });
-          }
-        })
-        .catch((err) => {
-          console.error("Error executing query:", err);
-          res.status(500).json({ error: "An error occurred" });
+    const patientResult = await client.query(selectPatientQuery, [
+      numericPatientId,
+    ]);
+
+    if (patientResult.rows.length > 0) {
+      const hospitalName =
+        patientResult.rows[0].hospital_name || "Unknown Hospital"; // Provide a default value if hospitalName is null
+
+      // Send email to the patient
+      const email = patientResult.rows[0].email;
+      if (isValidEmail(email)) {
+        await transporter.sendMail({
+          from: "desmotest123@gmail.com",
+          to: email,
+          subject: "You have an appointment from the therapist",
+          text: `You have an appointment on ${date} at ${startTime}. \nNote: ${note}`,
+          html: `<b>You have an appointment on ${date} at ${startTime}.</b><br/> Note: ${note}`,
         });
-    })
-    .catch((err) => {
-      console.error("Error generating appointment_id:", err);
-      res.status(500).json({ error: "An error occurred" });
-    });
+      }
+
+      const insertQuery = `
+        INSERT INTO appointment_new2 (
+          appointment_id, therapist_id, patient_id, date, "time", description, location, confirm, active_flag, create_by, create_date, update_by, update_date
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'Y', 'Y', $8, $9, $10, $11) RETURNING *
+      `;
+
+      const result = await client.query(insertQuery, [
+        appointmentId,
+        therapistId,
+        numericPatientId, // Use numericPatientId here
+        formattedDate,
+        startTime,
+        note,
+        hospitalName,
+        therapistId,
+        formattedCurrentDate,
+        therapistId,
+        formattedCurrentDate,
+      ]); // Pass therapistId as both create_by and update_by
+
+      res.status(201).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: "Patient not found" });
+    }
+  } catch (err) {
+    console.error("Error executing query:", err);
+    res.status(500).json({ error: "An error occurred" });
+  }
 });
+
 
 // router.post('/appointmentRequestView', (req, res) => {
 //     const type = req.body.type; // Get the type from the JSON body
