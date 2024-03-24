@@ -145,6 +145,7 @@
                             color: rgba(60, 155, 242, 1);
                           "
                           @change="handleCheckboxChange(patient.patientId)"
+                          v-model="checkedNames"
                         />
                         <label class="ml-4">{{ patient.patientName }}</label>
                         <v-divider class="mt-3 mb-3" insert></v-divider>
@@ -502,6 +503,8 @@
 
 <script>
 let checkedNames = ref([]);
+let checkedNamesAfter = ref([]);
+import { watchEffect } from "vue";
 import moment from "moment";
 import axios from "../axios.js";
 export default {
@@ -578,18 +581,19 @@ export default {
       });
     },
     handleCheckboxChange(patientId) {
-      const index = checkedNames.value.indexOf(patientId);
-      console.log("index", index, patientId);
+      const index = checkedNamesAfter.value.indexOf(patientId);
       if (index === -1) {
-        // ---> จริงๆ เป็น index === -1 ---> ที่เป็น !== -1 ตอนนี้เพราะจะทำ demo
-        console.log("inn");
         // If the patientId is not in the array, add it
-        checkedNames.value.push(patientId);
+        checkedNamesAfter.value.push(patientId);
       } else {
         // If the patientId is already in the array, remove it
-        checkedNames.value.splice(index, 1);
+        checkedNamesAfter.value.splice(index, 1);
       }
-      console.log("checkName", checkedNames.value);
+      console.log(
+        "checkName, chekNameafter",
+        checkedNames.value,
+        checkedNamesAfter.value
+      );
     },
     dateValidation(value) {
       const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -743,6 +747,9 @@ export default {
       });
   },
 };
+watchEffect(() => {
+  checkedNames.value = [...checkedNamesAfter.value];
+});
 </script>
 <script setup>
 import { ref, onMounted, computed } from "vue";
