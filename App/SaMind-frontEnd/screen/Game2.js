@@ -105,6 +105,8 @@ const Gamescreen = ({ route }) => {
       "flower", "green", "smile", "laugh", "lucky",
       "charm", "magic", "angel"
     ];
+
+    // const words = ["glade"];
     
     const randomIndex = Math.floor(Math.random() * words.length);
     return words[randomIndex];
@@ -210,6 +212,8 @@ const Gamescreen = ({ route }) => {
                   setTargetWord(generateRandomWord());
                   setAttempts(0);
                   setEnteredWords([]);
+                  updateStaminaBar();
+                  updateHungryBar();
                   navigation.goBack();
                 },
               },
@@ -366,7 +370,7 @@ const Gamescreen = ({ route }) => {
             placeholderTextColor="rgba(255, 255, 255, 0.5)"
           />
           <Button title="Guess" onPress={handleGuess} />
-          <Text style={styles.answer}>Answer: {targetWord}</Text>
+          {/* <Text style={styles.answer}>Answer: {targetWord}</Text> */}
   
           <View style={styles.enteredWordsContainer}>
             <Text style={styles.enteredWordsLabel}>Entered Words:</Text>

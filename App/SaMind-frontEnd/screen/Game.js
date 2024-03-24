@@ -305,10 +305,15 @@ if (nextThreshold !== prevThreshold) {
             break;
         }
       }
+      else{
+        alert("Speak Someting better <3!");
+      }
       setIsLoadingSound(false)
       return labelMeanings[maxLabel];
     } catch (error) {
       setIsLoadingSound(false)
+      await updateLabel(patientId, "LABEL_2")
+      alert("Speak Someting better <3!");
       return "normal";
     }
   }
@@ -900,7 +905,7 @@ if (nextThreshold !== prevThreshold) {
             lineHeight: 20,
             fontSize: 17,
             color: isLoadingSound ? "#000000" : recording ? "#FF342B" : "#FFFFFF",
-            fontFamily: "sans-serif",
+            // fontFamily: "sans-serif",
             letterSpacing: 1,
           }}
         >
