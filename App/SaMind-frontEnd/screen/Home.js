@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import { Device } from "expo-device";
 import {
   StyleSheet,
   Text,
@@ -13,19 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Bar from "../Bar";
-
-// import data from "../notiData";
-// const getDeviceModel = () => {
-//   const modelName = Device.modelName;
-//   // Check if the model name indicates an Android device
-//   return modelName.toLowerCase().includes("android");
-// };
-
-// const isAndroid = getDeviceModel();
+import { axios } from "./axios.js";
 
 const isAndroid = Platform.OS === "android";
 
@@ -40,8 +27,6 @@ export default function Home({ route }) {
   const iconSize = isAndroid ? 48 : 57;
 
   const fetchData = async () => {
-    // const patient = await AsyncStorage.getItem("patientId");
-    // console.log("storage", patient);
     try {
       const response = await axios.post("/check_mood_per_day_get", {
         patient_id: patientId,
