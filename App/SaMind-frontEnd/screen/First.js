@@ -7,17 +7,12 @@ import CarouselCardItem, {
 } from "../CarouselCardItem";
 import { useNavigation } from "@react-navigation/native";
 import data from "../data";
-import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 
 const First = () => {
   const navigation = useNavigation();
   const [index, setIndex] = React.useState(0);
   const isCarousel = React.useRef(null);
 
-  // const patientId = 2;
-  // const hospitalName = "aaa";
-
-  
   useEffect(() => {
     console.log("First Screen");
   }, []);
