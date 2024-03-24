@@ -256,24 +256,149 @@ function formatDate(dateString) {
 //     });
 // });
 
+// router.post('/individual_test_post'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patient_id;
+//   const testName = req.body.test_name;
+
+//   // Use $1 and $2 as placeholders for the parameters in the query
+//   let query = `
+//     SELECT assignment.*, questionnaire_new2.no, questionnaire_new2.question, questionnaire_new2.options
+//     FROM assignment
+//     LEFT JOIN questionnaire_new2 ON questionnaire_new2.test_name = assignment.test_name
+//     WHERE assignment.patient_id = $1 AND assignment.test_name = $2 AND assignment.status = 'WAIT'
+//     ORDER BY questionnaire_new2.no
+//   `;
+
+//   // Log the generated SQL query
+//   console.log(query);
+
+//   // Pass an array of parameter values as the second argument to the query function
+//   client.query(query, [patientId, testName])
+//     .then(result => {
+//       const testData = result.rows;
+//       res.json(testData);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/individual_test_post'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patient_id;
+//   const testName = req.body.test_name;
+//   const turnInBefore = req.body.turnInBefore; // Added turnInBefore from request body
+
+//   // Convert the date format from "DD/MM/YYYY" to "YYYY-MM-DD"
+//   const formattedDate = turnInBefore.split('/').reverse().join('-');
+
+//   // Use $1, $2, and $3 as placeholders for the parameters in the query
+//   let query = `
+//     SELECT assignment.turn_in_before, questionnaire_new2.no, questionnaire_new2.question, questionnaire_new2.options
+//     FROM assignment
+//     LEFT JOIN questionnaire_new2 ON questionnaire_new2.test_name = assignment.test_name
+//     WHERE assignment.patient_id = $1 
+//     AND assignment.test_name = $2 
+//     AND assignment.status = 'WAIT'
+//     AND assignment.turn_in_before <= $3 -- Added condition for turn_in_before
+//     ORDER BY questionnaire_new2.no
+//   `;
+
+//   // Log the generated SQL query
+//   console.log(query);
+
+//   // Pass an array of parameter values as the second argument to the query function
+//   client.query(query, [patientId, testName, formattedDate]) // Passed formattedDate as a parameter
+//     .then(result => {
+//       const testData = result.rows;
+//       res.json(testData);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/individual_test_post'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patient_id;
+//   const testName = req.body.test_name;
+//   const turnInBefore = req.body.turnInBefore; // Added turnInBefore from request body
+
+//   // Convert the date format from "DD/MM/YYYY" to "YYYY-MM-DD"
+//   const formattedDate = turnInBefore.split('/').reverse().join('-');
+
+//   // Use $1, $2, and $3 as placeholders for the parameters in the query
+//   let query = `
+//     SELECT 
+//       assignment.*,
+//       questionnaire_new2.no,
+//       questionnaire_new2.question,
+//       questionnaire_new2.options
+//     FROM 
+//       assignment
+//     LEFT JOIN 
+//       questionnaire_new2 
+//     ON 
+//       questionnaire_new2.test_name = assignment.test_name
+//     WHERE 
+//       assignment.patient_id = $1 
+//       AND assignment.test_name = $2 
+//       AND assignment.status = 'WAIT'
+//       AND assignment.turn_in_before <= $3 -- Added condition for turn_in_before
+//     ORDER BY 
+//       questionnaire_new2.no
+//   `;
+
+//   // Log the generated SQL query
+//   console.log(query);
+
+//   // Pass an array of parameter values as the second argument to the query function
+//   client.query(query, [patientId, testName, formattedDate]) // Passed formattedDate as a parameter
+//     .then(result => {
+//       const testData = result.rows;
+//       res.json(testData);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
 router.post('/individual_test_post', auth, (req, res) => {
   const patientId = req.body.patient_id;
   const testName = req.body.test_name;
+  const turnInBefore = req.body.turnInBefore; // Added turnInBefore from request body
 
-  // Use $1 and $2 as placeholders for the parameters in the query
+  // Convert the date format from "DD/MM/YYYY" to "YYYY-MM-DD"
+  const formattedDate = turnInBefore.split('/').reverse().join('-');
+
+  // Use $1, $2, and $3 as placeholders for the parameters in the query
   let query = `
-    SELECT assignment.*, questionnaire_new2.no, questionnaire_new2.question, questionnaire_new2.options
-    FROM assignment
-    LEFT JOIN questionnaire_new2 ON questionnaire_new2.test_name = assignment.test_name
-    WHERE assignment.patient_id = $1 AND assignment.test_name = $2 AND assignment.status = 'WAIT'
-    ORDER BY questionnaire_new2.no
+    SELECT 
+      assignment.*,
+      questionnaire_new2.no,
+      questionnaire_new2.question,
+      questionnaire_new2.options
+    FROM 
+      assignment
+    LEFT JOIN 
+      questionnaire_new2 
+    ON 
+      questionnaire_new2.test_name = assignment.test_name
+    WHERE 
+      assignment.patient_id = $1 
+      AND assignment.test_name = $2 
+      AND assignment.status = 'WAIT'
+      AND DATE_TRUNC('day', assignment.turn_in_before) = $3::DATE -- Compare dates without time
+    ORDER BY 
+      questionnaire_new2.no
   `;
 
   // Log the generated SQL query
-  console.log(query);
+  // console.log(query);
 
   // Pass an array of parameter values as the second argument to the query function
-  client.query(query, [patientId, testName])
+  client.query(query, [patientId, testName, formattedDate]) // Passed formattedDate as a parameter
     .then(result => {
       const testData = result.rows;
       res.json(testData);
@@ -283,6 +408,7 @@ router.post('/individual_test_post', auth, (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 // router.post('/map_answer_individual_test', (req, res) => {
 //   const patientId = req.body.patient_id; // Assuming the patient_id is in the request body
@@ -366,41 +492,82 @@ router.post('/individual_test_post', auth, (req, res) => {
 //   }
 // });
 
+// router.post('/receive_answer_individual_post'/*, auth*/, async (req, res) => {
+//   const { type, patientId, answer } = req.body;
+
+//   if (!type || !patientId || !answer) {
+//     return res.status(400).json({ error: 'type, patientId, and answer are required fields.' });
+//   }
+
+//   // const currentDate = new Date();
+//   // const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
+//   var currentDate = new Date();
+//   var day = currentDate.getDate();
+//   var month = currentDate.getMonth() + 1; // To start the month from 1
+//   var year = currentDate.getFullYear();
+//   var hours = currentDate.getHours();
+//   var minutes = currentDate.getMinutes();
+//   var seconds = currentDate.getSeconds();
+//   var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+//   try {
+//     // Insert into the test_score table
+//     const generateScoreIdQuery = 'SELECT NEXTVAL(\'score_id_seq\') AS score_id';
+//     const insertQuery = 'INSERT INTO test_score (score_id, type, date_time, patient_id, answer) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+
+//     const scoreIdResult = await client.query(generateScoreIdQuery);
+//     const generatedScoreId = scoreIdResult.rows[0].score_id;
+//     const insertResult = await client.query(insertQuery, [generatedScoreId, type, formattedDate, patientId, answer]);
+
+//     // Update the assignment table
+//     const updateQuery = `
+//       UPDATE assignment
+//       SET status = 'DONE'
+//       WHERE patient_id = $1 AND test_name = $2 AND status = 'WAIT'
+//     `;
+
+//     const updateResult = await client.query(updateQuery, [patientId, type]);
+
+//     res.status(201).json({ insertResult: insertResult.rows[0], updateResult: updateResult.rows[0] });
+//   } catch (error) {
+//     console.error('Error executing query:', error);
+//     res.status(500).json({ error: `An error occurred while processing the request: ${error.message}` });
+//   }
+// });
+
 router.post('/receive_answer_individual_post', auth, async (req, res) => {
-  const { type, patientId, answer } = req.body;
+  const { type, patientId, answer, turnInBefore } = req.body;
 
-  if (!type || !patientId || !answer) {
-    return res.status(400).json({ error: 'type, patientId, and answer are required fields.' });
+  if (!type || !patientId || !answer || !turnInBefore) {
+    return res.status(400).json({ error: 'type, patientId, answer, and turnInBefore are required fields.' });
   }
-
-  // const currentDate = new Date();
-  // const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
-  var currentDate = new Date();
-  var day = currentDate.getDate();
-  var month = currentDate.getMonth() + 1; // To start the month from 1
-  var year = currentDate.getFullYear();
-  var hours = currentDate.getHours();
-  var minutes = currentDate.getMinutes();
-  var seconds = currentDate.getSeconds();
-  var formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
   try {
     // Insert into the test_score table
     const generateScoreIdQuery = 'SELECT NEXTVAL(\'score_id_seq\') AS score_id';
     const insertQuery = 'INSERT INTO test_score (score_id, type, date_time, patient_id, answer) VALUES ($1, $2, $3, $4, $5) RETURNING *';
 
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
+
     const scoreIdResult = await client.query(generateScoreIdQuery);
     const generatedScoreId = scoreIdResult.rows[0].score_id;
     const insertResult = await client.query(insertQuery, [generatedScoreId, type, formattedDate, patientId, answer]);
+
+    // Format the turnInBefore date
+    const formattedTurnInBefore = turnInBefore.split('/').reverse().join('-');
 
     // Update the assignment table
     const updateQuery = `
       UPDATE assignment
       SET status = 'DONE'
-      WHERE patient_id = $1 AND test_name = $2 AND status = 'WAIT'
+      WHERE patient_id = $1 
+      AND test_name = $2 
+      AND status = 'WAIT'
+      AND turn_in_before = $3
     `;
 
-    const updateResult = await client.query(updateQuery, [patientId, type]);
+    const updateResult = await client.query(updateQuery, [patientId, type, formattedTurnInBefore]);
 
     res.status(201).json({ insertResult: insertResult.rows[0], updateResult: updateResult.rows[0] });
   } catch (error) {
@@ -408,6 +575,8 @@ router.post('/receive_answer_individual_post', auth, async (req, res) => {
     res.status(500).json({ error: `An error occurred while processing the request: ${error.message}` });
   }
 });
+
+
 
 // router.post('/map_answer_individual_test', (req, res) => {
 //   const patientId = req.body.patient_id;
@@ -486,18 +655,155 @@ router.post('/receive_answer_individual_post', auth, async (req, res) => {
 //     });
 // });
 
-router.post('/map_answer_individual_test', auth, (req, res) => {
+// router.post('/map_answer_individual_test'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patientId;
+//   const testType = req.body.type;
+
+//   let query = `
+//     SELECT ts.answer, qn.no, qn.question, qn.options, qn.type
+//     FROM test_score ts
+//     LEFT JOIN questionnaire_new2 qn ON ts.type = qn.test_name AND ts.type = $1
+//     WHERE ts.patient_id = $2
+//   `;
+
+//   client.query(query, [testType, patientId])
+//     .then(result => {
+//       const mappedResults = result.rows.map(row => {
+//         const answerData = row.answer || {};
+//         const answerKeys = Object.keys(answerData);
+        
+//         // Assuming that options is an array
+//         const optionsArray = Array.isArray(row.options) ? row.options : [];
+//         const mappedOptions = answerKeys.map(key => {
+//           const selectedOption = optionsArray[key] || null; // Corrected array access
+//           return {
+//             no: row.no,
+//             question: row.question,
+//             options: selectedOption, // Corrected options mapping
+//             selectedOption: selectedOption,
+//             type: row.type,
+//           };
+//         });
+
+//         return mappedOptions;
+//       });
+
+//       const flattenedResults = [].concat(...mappedResults);
+
+//       res.json(flattenedResults);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/map_answer_individual_test'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patientId;
+//   const testType = req.body.type;
+
+//   let query = `
+//     SELECT ts.answer, qn.no, qn.question, qn.options, qn.test_name as type
+//     FROM test_score ts
+//     LEFT JOIN questionnaire_new2 qn ON ts.type = qn.test_name
+//     WHERE ts.patient_id = $1 AND ts.type = $2
+//   `;
+
+//   client.query(query, [patientId, testType])
+//     .then(result => {
+//       const mappedResults = result.rows.map(row => {
+//         const answerData = row.answer || {};
+//         const answerKeys = Object.keys(answerData);
+        
+//         // Assuming that options is an array
+//         const optionsArray = Array.isArray(row.options) ? row.options : [];
+//         const mappedOptions = answerKeys.map(key => {
+//           const selectedOption = optionsArray[key] || null; // Corrected array access
+//           return {
+//             no: row.no,
+//             question: row.question,
+//             options: selectedOption, // Corrected options mapping
+//             selectedOption: selectedOption,
+//             type: row.type,
+//           };
+//         });
+
+//         return mappedOptions;
+//       });
+
+//       const flattenedResults = [].concat(...mappedResults);
+
+//       res.json(flattenedResults);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+// router.post('/map_answer_individual_test'/*, auth*/, (req, res) => {
+//   const patientId = req.body.patientId;
+//   const testType = req.body.type;
+//   const turnInBefore = req.body.turnInBefore; // Added turnInBefore from request body
+
+//   // Convert the date format from "DD/MM/YYYY" to "YYYY-MM-DD"
+//   const formattedDate = turnInBefore.split('/').reverse().join('-');
+  
+//   let query = `
+//     SELECT ts.answer, qn.no, qn.question, qn.options, qn.test_name as type
+//     FROM test_score ts
+//     LEFT JOIN questionnaire_new2 qn ON ts.type = qn.test_name
+//     WHERE ts.patient_id = $1 AND ts.type = $2 AND DATE(ts.turn_in_before) = $3
+//   `;
+
+//   client.query(query, [patientId, testType, formattedDate])
+//     .then(result => {
+//       const mappedResults = result.rows.map(row => {
+//         const answerData = row.answer || {};
+//         const answerKeys = Object.keys(answerData);
+        
+//         // Assuming that options is an array
+//         const optionsArray = Array.isArray(row.options) ? row.options : [];
+//         const mappedOptions = answerKeys.map(key => {
+//           const selectedOption = optionsArray[key] || null; // Corrected array access
+//           return {
+//             no: row.no,
+//             question: row.question,
+//             options: selectedOption, // Corrected options mapping
+//             selectedOption: selectedOption,
+//             type: row.type,
+//           };
+//         });
+
+//         return mappedOptions;
+//       });
+
+//       const flattenedResults = [].concat(...mappedResults);
+
+//       res.json(flattenedResults);
+//     })
+//     .catch(err => {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     });
+// });
+
+router.post('/map_answer_individual_test'/*, auth*/, (req, res) => {
   const patientId = req.body.patientId;
   const testType = req.body.type;
+  const turnInBefore = req.body.turnInBefore; // Added turnInBefore from request body
 
+  // Convert the date format from "DD/MM/YYYY" to "YYYY-MM-DD"
+  const formattedDate = turnInBefore.split('/').reverse().join('-');
+  
   let query = `
-    SELECT ts.answer, qn.no, qn.question, qn.options, qn.type
+    SELECT ts.answer, qn.no, qn.question, qn.options, qn.test_name as type
     FROM test_score ts
-    LEFT JOIN questionnaire_new2 qn ON ts.type = qn.test_name AND ts.type = $1
-    WHERE ts.patient_id = $2
+    LEFT JOIN questionnaire_new2 qn ON ts.type = qn.test_name
+    WHERE ts.patient_id = $1 AND ts.type = $2 AND ts.turn_in_before = $3
   `;
 
-  client.query(query, [testType, patientId])
+  client.query(query, [patientId, testType, formattedDate])
     .then(result => {
       const mappedResults = result.rows.map(row => {
         const answerData = row.answer || {};
@@ -528,6 +834,7 @@ router.post('/map_answer_individual_test', auth, (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 router.post('/get_question_for_map', auth, (req, res) => {
   const type = req.query.test_name; // Get the id parameter from the query
