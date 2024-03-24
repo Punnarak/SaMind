@@ -96,7 +96,12 @@ export default function Notification({ route }) {
       <View style={styles.container2}>
         <ScrollView style={{}}>
           {data.map((item, index) => (
-            <NotiBox item={item} index={index} key={index} />
+            <NotiBox
+              item={item}
+              index={index}
+              key={index}
+              patientId={patientId}
+            />
           ))}
         </ScrollView>
         <View style={styles.undertag}>

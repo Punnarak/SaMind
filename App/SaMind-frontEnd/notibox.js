@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-const NotificationBox = ({ item, index }) => {
+const NotificationBox = ({ item, index, patientId }) => {
   const navigation = useNavigation();
   return (
     <View
@@ -31,7 +31,7 @@ const NotificationBox = ({ item, index }) => {
             // marginTop: item.target !== "Calendarscreen" ? "8.5%" : "10.5%",
             transform: [{ rotateY: "180deg" }],
           }}
-          onPress={() => navigation.navigate(item.target)}
+          onPress={() => navigation.navigate(item.target, { patientId })}
         />
       </View>
     </View>
