@@ -26,7 +26,12 @@ export default function Notification({ route }) {
 
   let questions = [];
   useEffect(() => {
-    console.log("Individaul Test Screen", patientId, item.testName);
+    console.log(
+      "Individaul Test Screen",
+      patientId,
+      item.testName,
+      item.turnInBefore
+    );
     const onFocus = navigation.addListener("focus", () => {
       axios
         .post("/refreshToken")
@@ -41,6 +46,7 @@ export default function Notification({ route }) {
     const param = {
       patient_id: patientId,
       test_name: item.testName,
+      turnInBefore: item.turnInBefore,
     };
     axios
       .post("/individual_test_post", param)
@@ -52,7 +58,7 @@ export default function Notification({ route }) {
         console.log(response.data, response.data.length);
       })
       .catch((error) => {
-        console.error("Axios error:", error);
+        console.error("Find Individual Test error:", error);
       });
     return onFocus;
   }, []);
