@@ -31,6 +31,10 @@ import negative3Avatar from "../assets/negative3.gif";
 import neutral1Avatar from "../assets/neutral1.gif";
 import neutral2Avatar from "../assets/neutral2.gif";
 import neutral3Avatar from "../assets/neutral3.gif";
+import empty1Avatar from "../assets/empty1.gif";
+import empty2Avatar from "../assets/empty2.gif";
+import empty3Avatar from "../assets/empty3.gif";
+import empty4Avatar from "../assets/empty4.gif";
 
 import Svg, { Rect, Path } from "react-native-svg";
 const isAndroid = Platform.OS === "android";
@@ -69,7 +73,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่อนและผู้ช่วยตอบคำถาม ตอบคำถามแบบกระชับ และเข้าใจง่าย <</SYS>>${data}[/INST]`;
     console.log(prompt);
     const response = await fetch(
-      "https://8e37-2001-fb1-16-95d2-19b5-57cd-ade1-26b7.ngrok-free.app/completion",
+      "https://informed-master-dragon.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
