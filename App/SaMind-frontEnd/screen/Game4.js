@@ -1,130 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
-
-// const ColorGame = () => {
-//   const [colors, setColors] = useState([]);
-//   const [correctColorIndex, setCorrectColorIndex] = useState(0);
-//   const [time, setTime] = useState(10);
-//   const [gameOver, setGameOver] = useState(false);
-
-//   useEffect(() => {
-//     generateRandomColors();
-//     const interval = setInterval(() => {
-//       setTime((prevTime) => {
-//         if (prevTime > 1) {
-//           return prevTime - 1;
-//         } else {
-//           setGameOver(true);
-//           clearInterval(interval);
-//           return 0;
-//         }
-//       });
-//     }, 1000);
-
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   const generateRandomColors = () => {
-//     const colorOptions = ["red", "blue", "green", "yellow", "pink"];
-
-//     // Randomly select a different color index
-//     let differentColorIndex = Math.floor(Math.random() * colorOptions.length);
-
-//     // Ensure that the different color is not the same as the previous round
-//     while (differentColorIndex === correctColorIndex) {
-//       differentColorIndex = Math.floor(Math.random() * colorOptions.length);
-//     }
-
-//     // Initialize the colors array with one instance of the different color and the rest with the same color
-//     const colorsArray = colorOptions.map((color, index) =>
-//       index === differentColorIndex
-//         ? colorOptions[differentColorIndex]
-//         : colorOptions[0] // You can change this to any other index if you want a different color
-//     );
-
-//     // Shuffle the colors array to randomize the positions
-//     for (let i = colorsArray.length - 1; i > 0; i--) {
-//       const j = Math.floor(Math.random() * (i + 1));
-//       [colorsArray[i], colorsArray[j]] = [colorsArray[j], colorsArray[i]];
-//     }
-
-//     // Set the correct color index to the index of the different color
-//     setCorrectColorIndex(differentColorIndex);
-
-//     // Set the colors array in the state
-//     setColors(colorsArray);
-//   };
-
-
-
-//   const handleColorSelection = (selectedIndex) => {
-//     if (selectedIndex === correctColorIndex) {
-//       generateRandomColors();
-//     } else {
-//         setGameOver(true);
-//     }
-//   };
-
-
-
-//   const resetGame = () => {
-//     setTime(10);
-//     setGameOver(false);
-//     generateRandomColors();
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.timer}>Time: {time}</Text>
-//       {gameOver ? (
-//         <View>
-//           <Text style={styles.gameOverText}>Game Over!</Text>
-//           <Button title="Play Again" onPress={resetGame} />
-//         </View>
-//       ) : (
-//         <View style={styles.colorGrid}>
-//           {colors.map((color, index) => (
-//             <TouchableOpacity
-//               key={index}
-//               style={{
-//                 flex: 1,
-//                 aspectRatio: 1,
-//                 backgroundColor: color,
-//                 margin: 5,
-//               }}
-//               onPress={() => handleColorSelection(index)}
-//             />
-//           ))}
-//         </View>
-//       )}
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   timer: {
-//     fontSize: 20,
-//     marginBottom: 10,
-//   },
-//   gameOverText: {
-//     fontSize: 24,
-//     fontWeight: "bold",
-//     marginBottom: 20,
-//   },
-//   colorGrid: {
-//     flexDirection: "row",
-//     marginBottom: 5,
-//   },
-// });
-
-// export default ColorGame;
-
-
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, ImageBackground, Modal,Dimensions, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -233,7 +106,7 @@ const NumberGame = ({ route }) => {
       if (selectedNumber === nextExpectedNumber) {
         if (nextExpectedNumber === 16) {
           setwl(true);
-          updateScore();
+          // updateScore();
           // If 16 is clicked, the game is won
           setGameOver(true); // Set game over to true for a win
         } else {
@@ -245,9 +118,9 @@ const NumberGame = ({ route }) => {
       } else {
         setwl(false);
         // Incorrect number clicked, game over
-        updateScore0();
+        // updateScore0();
         // calculateScore();
-        updateHealthBar();
+        // updateHealthBar();
         setScore(0);
         setGameOver(true);
       }
@@ -265,7 +138,7 @@ const NumberGame = ({ route }) => {
     if(nextExpectedNumber===16)
     {
       // calculateScore();
-      updateScore();
+      // updateScore();
     }
   }
 

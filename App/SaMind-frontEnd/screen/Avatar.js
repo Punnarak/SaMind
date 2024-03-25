@@ -62,7 +62,7 @@ async function query(data) {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Error querying model:", error);
+    // console.error("Error querying model:", error);
     return null;
   }
 }
@@ -423,8 +423,7 @@ export default function Notification({ route }) {
 
       return labelMeanings[maxLabel];
     } catch (error) {
-      console.error("Failed to perform sentiment analysis:", error);
-      return null;
+      return "normal";
     }
   }
   //text to speech
