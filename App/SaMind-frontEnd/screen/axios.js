@@ -1,16 +1,8 @@
-// import axios from "axios";
-// const HTTP = axios.create({
-//   // baseURL: "http://192.168.1.37:4343",
-//   // baseURL: "https://6ef0-49-229-130-189.ngrok-free.app",
-//   baseURL: "http://10.226.164.199:4343",
-// });
-// export default HTTP;
-
 import axios from "axios";
 
 const HTTP = axios.create({
   // baseURL: "http://192.168.1.37:4343",
-  baseURL: "https://ce0f-49-229-134-236.ngrok-free.app",
+  baseURL: "https://65f3-2001-fb1-16-95d2-99df-cf76-dd5f-b4.ngrok-free.app",
   // baseURL: "http://192.168.1.38:4343",
 });
 
