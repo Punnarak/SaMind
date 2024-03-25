@@ -356,9 +356,7 @@ export default function Notification({ route }) {
         setAvatar(responseText);
       } else {
         speak("ขออีกรอบได้ไหม สมายไม่ได้ยิน");
-        setTimeout(() => {
-          setAvatar("again");
-        }, 6000);
+        setAvatar("again");
       }
       setIsLoading(false);
     } catch (error) {
