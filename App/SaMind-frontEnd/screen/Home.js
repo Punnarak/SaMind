@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     //     marginTop: "8%",
     //   },
     //   ios: {
-    marginTop: "15%",
+    // marginTop: "15%",
     //   },
     // }),
 

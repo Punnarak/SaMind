@@ -344,7 +344,17 @@ export default function Notification({ route }) {
           ""
         );
         filteredAnswer = responseAnswer.replace(/5/g, "ห้า");
-
+        const n = 3;
+        let index = -1;
+        for (let i = 0; i < n; i++) {
+          index = filteredAnswer.indexOf(" ", index + 1);
+          if (index === -1) {
+            break;
+          }
+        }
+        if (index !== -1) {
+          filteredAnswer = filteredAnswer.substring(0, index);
+        }
         console.log("filteredAnswer", filteredAnswer);
 
         if (filteredAnswer.includes("[/INST]")) {
@@ -358,6 +368,7 @@ export default function Notification({ route }) {
         speak("ขออีกรอบได้ไหม สมายไม่ได้ยิน");
         setAvatar("again");
       }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Failed to convert speech to text:", error);

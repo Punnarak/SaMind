@@ -12,10 +12,8 @@ import {
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// export default function Dashboard() {
 export default function Dashboard({ route }) {
   const { patientId, notiData } = route.params || {};
   const navigation = useNavigation();
@@ -1382,7 +1380,6 @@ const styles = StyleSheet.create({
         position: "absolute",
         marginTop: "-1%",
         elevation: 10,
-        shadowColor: "black", // IOS
         shadowOffset: { height: 1, width: 1 }, // IOS
         shadowOpacity: 1, // IOS
         shadowRadius: 1, //IOS

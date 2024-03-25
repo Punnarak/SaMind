@@ -11,26 +11,17 @@ import {
   Image,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
-import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
-import usePasswordVisibility1 from "../usePasswordVisibility1";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import Modal from "react-native-modal";
 import moment from "moment";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 
 export default function Login({ route }) {
   const navigation = useNavigation();
-  const { passwordVisibility, togglePasswordVisibility } =
-    usePasswordVisibility();
-  const { passwordVisibility1, togglePasswordVisibility1 } =
-    usePasswordVisibility1();
   const [name, setName] = useState("");
   const [tel, setTel] = useState("");
-  const [Conpassword, setConPassword] = useState("");
   const [submit, setSubmit] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   //validate
@@ -93,15 +84,15 @@ export default function Login({ route }) {
     { id: 47, name: "23:00-24:00 ", value: "23:00" },
   ]);
 
-  const DrName = [
-    { id: 1, name: "A", value: "A" },
-    {
-      id: 2,
-      name: "B",
-      value: "B",
-    },
-    { id: 3, name: "C", value: "C" },
-  ];
+  // const DrName = [
+  //   { id: 1, name: "A", value: "A" },
+  //   {
+  //     id: 2,
+  //     name: "B",
+  //     value: "B",
+  //   },
+  //   { id: 3, name: "C", value: "C" },
+  // ];
 
   const toggleUnderstand = () => {
     setConfirmModal(!confirmModal);
@@ -196,18 +187,10 @@ export default function Login({ route }) {
   const togglePicker = () => {
     setIsPickerVisible(!isPickerVisible);
   };
-  const togglePickerN = () => {
-    setIsPickerVisibleN(!isPickerVisibleN);
-  };
   const handleItemPress = (itemValue) => {
     console.log("Time --> ", itemValue.value);
     setSelectedValue(itemValue.value);
     setIsPickerVisible(false);
-  };
-  const handleItemPressN = (itemValue) => {
-    console.log("Time --> ", itemValue);
-    setDoctorName(itemValue.name);
-    setIsPickerVisibleN(false);
   };
 
   const renderLink = ({ item }) => {
@@ -218,13 +201,6 @@ export default function Login({ route }) {
     );
   };
 
-  const renderLinkN = ({ item }) => {
-    return (
-      <Text style={styles.link} onPress={() => handleItemPressN(item)}>
-        {item.name}
-      </Text>
-    );
-  };
   useEffect(() => {
     console.log("Select Appointment Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
