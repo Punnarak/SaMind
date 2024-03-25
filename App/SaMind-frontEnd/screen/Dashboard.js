@@ -7,16 +7,15 @@ import {
   Image,
   ImageBackground,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// export default function Dashboard() {
 export default function Dashboard({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const navigation = useNavigation();
   const [data, setData] = useState("");
   const [moodCard, setMoodCard] = useState("no");
@@ -1076,13 +1075,29 @@ export default function Dashboard({ route }) {
         </View>
 
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("Notiscreen", { patientId })}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}
@@ -1295,7 +1310,7 @@ const styles = StyleSheet.create({
   perboxn: {
     alignItems: "center",
     marginLeft: "47%",
-    marginTop: "-3%",
+    marginTop: "0%",
     borderWidth: 1,
     paddingVertical: "2%",
     backgroundColor: "#F9E5DB",
@@ -1365,7 +1380,6 @@ const styles = StyleSheet.create({
         position: "absolute",
         marginTop: "-1%",
         elevation: 10,
-        shadowColor: "black", // IOS
         shadowOffset: { height: 1, width: 1 }, // IOS
         shadowOpacity: 1, // IOS
         shadowRadius: 1, //IOS

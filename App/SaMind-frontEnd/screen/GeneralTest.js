@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { axios, axiospython } from "./axios.js";
+import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 export default function Notification({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -146,13 +154,31 @@ export default function Notification({ route }) {
           </View>
         </View>
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("Notiscreen", { patientId })}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Notiscreen", { patientId, notiData })
+              }
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}

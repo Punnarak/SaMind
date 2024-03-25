@@ -12,11 +12,10 @@ import {
 } from "react-native";
 
 import Modal from "react-native-modal";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-import { axios, axiospython, path } from "./axios.js";
+import { axios, path } from "./axios.js";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as Speech from "expo-speech";
@@ -31,6 +30,10 @@ import negative3Avatar from "../assets/negative3.gif";
 import neutral1Avatar from "../assets/neutral1.gif";
 import neutral2Avatar from "../assets/neutral2.gif";
 import neutral3Avatar from "../assets/neutral3.gif";
+import again1Avatar from "../assets/empty1.gif";
+import again2Avatar from "../assets/empty2.gif";
+import again3Avatar from "../assets/empty3.gif";
+import again4Avatar from "../assets/empty4.gif";
 
 import Svg, { Rect, Path } from "react-native-svg";
 const isAndroid = Platform.OS === "android";
@@ -69,7 +72,7 @@ async function answer(data) {
     const prompt = `<s>[INST] <<SYS>> You are a friendly question answering assistant. Answer the question as truthful and helpful as possible สมายคือเพื่อนและผู้ช่วยตอบคำถาม ตอบคำถามแบบกระชับ และเข้าใจง่าย <</SYS>>${data}[/INST]`;
     console.log(prompt);
     const response = await fetch(
-      "https://8e37-2001-fb1-16-95d2-19b5-57cd-ade1-26b7.ngrok-free.app/completion",
+      "https://informed-master-dragon.ngrok-free.app/completion",
       {
         headers: {
           // Authorization: "Bearer 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",
@@ -126,9 +129,10 @@ export default function Notification({ route }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [first, setFirst] = useState(true);
   const [avatar, setAvatar] = useState("wave");
-  const positiveMax = 2;
-  const neutralMax = 2;
-  const negativeMax = 2;
+  const positiveMax = 3;
+  const neutralMax = 3;
+  const negativeMax = 3;
+  const againMax = 4;
   const { patient_id, mood_detection_id } = route.params || {};
 
   const [isLoading, setIsLoading] = useState(false);
@@ -169,6 +173,13 @@ export default function Notification({ route }) {
       avatarSource = neutralAvatar;
       changeAvatar();
       break;
+    case "again":
+      console.log("again avatar");
+      let again = [again1Avatar, again2Avatar, again3Avatar, again4Avatar];
+      let againAvatar = again[Math.floor(Math.random() * againMax)]; // index+1
+      avatarSource = againAvatar;
+      changeAvatar();
+      break;
     default:
       avatarSource = standbyAvatar;
   }
@@ -199,6 +210,13 @@ export default function Notification({ route }) {
         let neutral = [neutral1Avatar, neutral2Avatar, neutral3Avatar];
         let neutralAvatar = neutral[Math.floor(Math.random() * neutralMax)]; // index+1
         avatarSource = neutralAvatar;
+        changeAvatar();
+        break;
+      case "again":
+        console.log("again avatar");
+        let again = [again1Avatar, again2Avatar, again3Avatar, again4Avatar];
+        let againAvatar = again[Math.floor(Math.random() * againMax)]; // index+1
+        avatarSource = againAvatar;
         changeAvatar();
         break;
       default:
@@ -326,7 +344,17 @@ export default function Notification({ route }) {
           ""
         );
         filteredAnswer = responseAnswer.replace(/5/g, "ห้า");
-
+        const n = 3;
+        let index = -1;
+        for (let i = 0; i < n; i++) {
+          index = filteredAnswer.indexOf(" ", index + 1);
+          if (index === -1) {
+            break;
+          }
+        }
+        if (index !== -1) {
+          filteredAnswer = filteredAnswer.substring(0, index);
+        }
         console.log("filteredAnswer", filteredAnswer);
 
         if (filteredAnswer.includes("[/INST]")) {
@@ -336,7 +364,11 @@ export default function Notification({ route }) {
         }
 
         setAvatar(responseText);
+      } else {
+        speak("ขออีกรอบได้ไหม สมายไม่ได้ยิน");
+        setAvatar("again");
       }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Failed to convert speech to text:", error);

@@ -5,17 +5,16 @@ import {
   View,
   ImageBackground,
   ScrollView,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-// import assignData from "../upcomingData";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
-
+import { axios } from "./axios.js";
+import { horizontalScale } from "../Metrics";
 export default function IndividualTestList({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const [individualTestList, setInividualTestList] = useState([]);
   const navigation = useNavigation();
 
@@ -23,13 +22,13 @@ export default function IndividualTestList({ route }) {
     console.log("Individual Test List Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
@@ -47,7 +46,7 @@ export default function IndividualTestList({ route }) {
       .catch((error) => {
         console.error("Axios error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
 
   return (
@@ -75,7 +74,7 @@ export default function IndividualTestList({ route }) {
 
       <View style={styles.container2}>
         <View style={styles.container3}>
-          <ScrollView style={{}}>
+          <ScrollView style={{ width: "100%" }}>
             {individualTestList.map((item, index) => (
               <View style={styles.box} item={item} index={index} key={index}>
                 <View
@@ -141,13 +140,31 @@ export default function IndividualTestList({ route }) {
           </ScrollView>
         </View>
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("NotinScreen")}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Notiscreen", { patientId, notiData })
+              }
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}
@@ -167,9 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     width: "100%",
-    height: "77%",
     paddingTop: 25,
     flex: 1,
+    // height: verticalScale(210),
     paddingHorizontal: 30,
     borderRadius: 25,
     zIndex: 0,
@@ -178,8 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     // width: "790%"
-    width: "400%",
-    height: "77%",
+    width: "100%",
     paddingTop: 10,
     flex: 1,
     zIndex: 0,

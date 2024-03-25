@@ -9,7 +9,7 @@ import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 import { axios, axiospython } from "./axios.js";
 
 export default function Calendar({ route }) {
-  const { patientId } = route.params || {};
+  const { patientId, notiData } = route.params || {};
   const navigation = useNavigation();
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [highlightedDatesFormat, setHighlightedDatesFormat] = useState([]);
@@ -17,13 +17,13 @@ export default function Calendar({ route }) {
     console.log("Calendar Screen", patientId);
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     return onFocus;
@@ -85,6 +85,7 @@ export default function Calendar({ route }) {
           date,
           month,
           year,
+          notiData,
         });
       } catch (error) {
         // Handle any errors here

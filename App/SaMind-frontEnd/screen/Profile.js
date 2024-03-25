@@ -6,17 +6,15 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  Platform,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 
 export default function Profile({ route }) {
-  const { patientId, update } = route.params || {};
+  const { patientId } = route.params || {};
   const navigation = useNavigation();
   //info
   const [data, setData] = useState({});
@@ -26,7 +24,7 @@ export default function Profile({ route }) {
 
     const onFocus = navigation.addListener("focus", () => {
       console.log("Screen is focused");
-        axios
+      axios
         .post("/refreshToken")
         .then((response) => {
           console.log("refresh Token success", response.data);

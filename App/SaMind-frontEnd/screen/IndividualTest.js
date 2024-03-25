@@ -6,17 +6,14 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import RadioItem from "../RadioItem.js"; // เปลี่ยนเส้นทางไปที่ไฟล์ RadioItem.js
-import { horizontalScale, moderateScale, verticalScale } from "../Metrics.js";
+import { moderateScale, verticalScale } from "../Metrics.js";
 import Modal from "react-native-modal";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 
 export default function Notification({ route }) {
   const { patientId, item } = route.params || {};
@@ -29,38 +26,43 @@ export default function Notification({ route }) {
 
   let questions = [];
   useEffect(() => {
-    console.log("Individaul Test Screen", patientId, item.testName);
+    console.log(
+      "Individaul Test Screen",
+      patientId,
+      item.testName,
+      item.turnInBefore
+    );
     const onFocus = navigation.addListener("focus", () => {
       axios
-      .post("/refreshToken")
-      .then((response) => {
-        console.log("refresh Token success", response.data);
-      })
-      .catch((error) => {
-        console.error("Axios error:", error);
-      });
+        .post("/refreshToken")
+        .then((response) => {
+          console.log("refresh Token success", response.data);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
       console.log("Screen is focused");
     });
     const param = {
       patient_id: patientId,
       test_name: item.testName,
+      turnInBefore: item.turnInBefore,
     };
     axios
       .post("/individual_test_post", param)
       .then((response) => {
         if (response.data.length != 0) {
           console.log("in");
-          setData(response.data)
+          setData(response.data);
         }
         console.log(response.data, response.data.length);
       })
       .catch((error) => {
-        console.error("Axios error:", error);
+        console.error("Find Individual Test error:", error);
       });
-      return onFocus
+    return onFocus;
   }, []);
   questions = data;
-  // const questions =
 
   const toggleUnderstand = () => {
     setModal(!modal);
@@ -88,6 +90,7 @@ export default function Notification({ route }) {
         patientId: patientId,
         type: item.testName,
         answer: selectedOptions,
+        turnInBefore: item.turnInBefore,
       };
       axios
         .post("/receive_answer_individual_post", param)
@@ -140,7 +143,11 @@ export default function Notification({ route }) {
           <View>
             {questions.map((question) => (
               <View key={question.no}>
-                <Text style={styles.question}>{question.no}{". "}{question.question}</Text>
+                <Text style={styles.question}>
+                  {question.no}
+                  {". "}
+                  {question.question}
+                </Text>
                 {question.options.map((option) => (
                   <RadioItem
                     key={option}

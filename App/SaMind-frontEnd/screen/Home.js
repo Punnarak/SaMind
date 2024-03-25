@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import { Device } from "expo-device";
 import {
   StyleSheet,
   Text,
@@ -13,18 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import I from "react-native-vector-icons/MaterialIcons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// import data from "../notiData";
-// const getDeviceModel = () => {
-//   const modelName = Device.modelName;
-//   // Check if the model name indicates an Android device
-//   return modelName.toLowerCase().includes("android");
-// };
-
-// const isAndroid = getDeviceModel();
+import { axios } from "./axios.js";
 
 const isAndroid = Platform.OS === "android";
 
@@ -35,12 +23,10 @@ export default function Home({ route }) {
   const [checkIn, setCheckIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [fName, setFName] = useState("Punya");
-  // const [notiData, setNotiData] = useState(data);
+  const [notiData, setNotiData] = useState(false);
   const iconSize = isAndroid ? 48 : 57;
 
   const fetchData = async () => {
-    // const patient = await AsyncStorage.getItem("patientId");
-    // console.log("storage", patient);
     try {
       const response = await axios.post("/check_mood_per_day_get", {
         patient_id: patientId,
@@ -77,6 +63,19 @@ export default function Home({ route }) {
       console.log("Screen is focused");
       fetchData();
       console.log("mood", selectedMenu);
+      const param = {
+        patientId: patientId,
+      };
+      axios
+        .post("/notiApp", param)
+        .then((response) => {
+          console.log("in");
+          setNotiData(response.data.length);
+          console.log("data:", response.data.length);
+        })
+        .catch((error) => {
+          console.error("Axios error:", error);
+        });
     });
 
     return onFocus;
@@ -333,7 +332,7 @@ export default function Home({ route }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() =>
-                navigation.navigate("Calendarscreen", { patientId })
+                navigation.navigate("Calendarscreen", { patientId, notiData })
               }
             >
               <Text style={styles.Textb}>CALENDAR</Text>
@@ -356,7 +355,7 @@ export default function Home({ route }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() =>
-                navigation.navigate("Dashboardscreen", { patientId })
+                navigation.navigate("Dashboardscreen", { patientId, notiData })
               }
             >
               <Text style={styles.Textb}>DASHBOARD</Text>
@@ -394,6 +393,7 @@ export default function Home({ route }) {
                 navigation.navigate("Libraryscreen", {
                   patientId,
                   hospitalName,
+                  notiData,
                 })
               }
             >
@@ -407,7 +407,9 @@ export default function Home({ route }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("Testscreen", { patientId })}
+              onPress={() =>
+                navigation.navigate("Testscreen", { patientId, notiData })
+              }
             >
               <Text style={styles.Textb}>TEST</Text>
               <I
@@ -420,13 +422,31 @@ export default function Home({ route }) {
           </View>
         </View>
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("Notiscreen", { patientId })}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Notiscreen", { patientId, notiData })
+              }
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}
@@ -435,6 +455,12 @@ export default function Home({ route }) {
             onPress={() => navigateToAvatarscreen()}
           />
         </View>
+        {/* <Bar
+          patientId={patientId}
+          hospitalName={hospitalName}
+          navigateToAvatarscreen={navigateToAvatarscreen}
+          noti={notiData != 0 ? true : false}
+        /> */}
       </View>
     </View>
   );
@@ -501,7 +527,7 @@ const styles = StyleSheet.create({
     //     marginTop: "8%",
     //   },
     //   ios: {
-    marginTop: "15%",
+    // marginTop: "15%",
     //   },
     // }),
 

@@ -27,7 +27,7 @@ import { axios, axiospython } from "./axios.js";
 const isAndroid = Platform.OS === "android";
 export default function Library({ route }) {
   const navigation = useNavigation();
-  const { patientId, hospitalName } = route.params || {};
+  const { patientId, hospitalName, notiData } = route.params || {};
   const [searchText, setSearchText] = useState("");
   const [filteredLinks, setFilteredLinks] = useState([]);
   let [data, setData] = useState([
@@ -405,13 +405,31 @@ export default function Library({ route }) {
         {/* </View> */}
 
         <View style={styles.undertag}>
-          <Feather
-            name="bell"
-            style={styles.picul}
-            size={25}
-            color="#222222"
-            onPress={() => navigation.navigate("Notiscreen", { patientId })}
-          />
+          {notiData != 0 ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Notiscreen", { patientId, notiData })
+              }
+            >
+              <Image
+                source={require("../assets/notification.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  resizeMode: "cover",
+                  marginLeft: horizontalScale(34),
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Feather
+              name="bell"
+              style={styles.picul}
+              size={25}
+              color="#222222"
+              onPress={() => navigation.navigate("Notiscreen", { patientId })}
+            />
+          )}
           <Feather
             name="smile"
             style={styles.picur}
