@@ -4,21 +4,18 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   TouchableOpacity,
   TextInput,
   ImageBackground,
   Platform,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 import { Feather } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 const isIOS = Platform.OS === "ios";
-//View -> UIView
+
 export default function Login() {
   const navigation = useNavigation();
   const { passwordVisibility, togglePasswordVisibility } =
@@ -54,21 +51,6 @@ export default function Login() {
       validateEmail();
     }
   }, [email]);
-  const storePatientId = async (patientId) => {
-    console.log("storepatient", patientId);
-    try {
-      await AsyncStorage.setItem("patientId", patientId);
-    } catch (error) {
-      console.error("Error storing token:", error);
-    }
-  };
-  const storeToken = async (token) => {
-    try {
-      await AsyncStorage.setItem("token", token);
-    } catch (error) {
-      console.error("Error storing token:", error);
-    }
-  };
   const handleLoginPress = async () => {
     setPatientId();
     setHospitalName("");

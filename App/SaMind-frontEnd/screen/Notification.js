@@ -12,8 +12,7 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import NotiBox from "../notibox";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
 export default function Notification({ route }) {
   const { patientId, notiData } = route.params || {};
