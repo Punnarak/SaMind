@@ -1845,6 +1845,8 @@ export default {
   font-weight: 600;
   line-height: normal;
   letter-spacing: 0.54px;
+
+  margin-left: 40px;
 }
 </style>
 <style scoped>
