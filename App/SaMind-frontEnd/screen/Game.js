@@ -300,10 +300,15 @@ const PopcatGame = ({ route }) => {
             break;
         }
       }
+      else
+      {
+        alert("Speak Someting better <3!");
+      }
       setIsLoadingSound(false);
       return labelMeanings[maxLabel];
     } catch (error) {
       setIsLoadingSound(false);
+      alert("Speak Someting better <3!");
       return "normal";
     }
   }
