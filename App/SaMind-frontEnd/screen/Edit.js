@@ -9,14 +9,12 @@ import {
   Platform,
 } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import usePasswordVisibility from "../usePasswordVisibility";
 import { useNavigation } from "@react-navigation/native";
 import usePasswordVisibility1 from "../usePasswordVisibility1";
-import { Ionicons } from "@expo/vector-icons";
 import { horizontalScale, moderateScale, verticalScale } from "../Metrics";
-// import axios from "./axios.js";
-import { axios, axiospython } from "./axios.js";
+import { axios } from "./axios.js";
 const isIOS = Platform.OS === "ios";
 
 export default function EditProfile({ route }) {
@@ -70,7 +68,7 @@ export default function EditProfile({ route }) {
       surname &&
       email &&
       password === conPassword &&
-      checkEmail === true
+      checkEmail == true
     ) {
       const param = {
         patient_id: patientId,
@@ -497,7 +495,7 @@ const styles = StyleSheet.create({
       android: { marginTop: "1%", left: 57 },
       ios: { marginTop: "1%", left: 57 },
     }),
-    fontSize: this.emailError === "*" ? 20 : 20,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
     color: "red",
