@@ -90,6 +90,7 @@ export default function Notification({ route }) {
         patientId: patientId,
         type: item.testName,
         answer: selectedOptions,
+        turnInBefore: item.turnInBefore,
       };
       axios
         .post("/receive_answer_individual_post", param)
