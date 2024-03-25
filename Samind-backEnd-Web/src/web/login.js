@@ -18,6 +18,20 @@ const auth = require("./auth.js").authorization;
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 
+const rateLimit = require("express-rate-limit");
+
+// Rate limiting middleware
+// const limiter = rateLimit({
+//   windowMs: 5 * 60 * 1000, 
+//   max: 5,
+// });
+
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: "Too many requests, please try again later.123" // Message to be sent when limit is exceeded
+});
+
 const cookie = require('cookie');
 
 const transporter = nodemailer.createTransport({
@@ -132,6 +146,60 @@ router.post("/login", jsonParser, async function (req, res, next) {
     });
   }
 });
+
+// router.post("/login", limiter, jsonParser, async function (req, res, next) {
+//   const email = req.body.email;
+//   const password = req.body.password;
+  
+//   const query = {
+//     text: "SELECT * FROM therapist WHERE email = $1",
+//     values: [email],
+//   };
+
+//   try {
+//     const result = await client.query(query);
+
+//     if (result.rows.length === 0) {
+//       return res.json({ status: "error", message: "No user found" });
+//     }
+
+//     const therapist = result.rows[0];
+//     const hashedPassword = therapist.password;
+//     const isLocked = therapist.is_locked;
+
+//     if (isLocked) {
+//       return res.json({ status: "error", message: "Account is locked. Please contact support." });
+//     }
+
+//     // Use bcrypt.compare to check if the provided password matches the hashed password
+//     const isLogin = await bcrypt.compare(password, hashedPassword);
+
+//     if (isLogin) {
+//       const { therapist_id, fname, lname, phone, email, hospital_name, admin } = therapist;
+//       const role = admin === 'Y' ? 'admin' : 'therapist'; // Check admin column for role
+
+//       const token = jwt.sign({ therapist_id, email }, secret, {
+//         expiresIn: "1h",
+//       });
+
+//       return res
+//         .cookie("access_token", token, {
+//           httpOnly: true,
+//           secure: process.env.NODE_ENV === "production",
+//         })
+//         .status(200)
+//         .json({ status: "ok", message: "Login success", user: { therapist_id, fname, lname, phone, email, hospital_name, role } });
+//     } else {
+//       return res.json({ status: "error", message: "Login failed" });
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     return res.json({
+//       status: "error",
+//       message: "An error occurred during login",
+//     });
+//   }
+// });
 
 // router.post("/login", jsonParser, async function (req, res, next) {
 //   const email = req.body.email;
