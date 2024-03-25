@@ -63,7 +63,7 @@
             icon="mdi-magnify"
             color="blue"
             size="30px"
-            style="margin-right: 20px"
+            style="margin-left: -10px; margin-right: 20px"
             @click="openNewTab(item.columns.url)"
           />
           <v-btn
