@@ -786,6 +786,17 @@ const PopcatGame = ({ route }) => {
                 >
                   ระวังอย่าให้น้องเลือดหมดหลอดนะ
                   น้องจะเลือดลดถ้าหลอดอาหารกับพลังงานต่ำเกินไป{"\n"}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: moderateScale(12),
+                    color: "green",
+                    // fontSize: 17,
+                    textAlign: "center",
+                  }}
+                >
+                  แต่ถ้าน้องกินอิ่ม นอนพอ สุขภาพร่างกายเลือดน้องก็จะเพิ่มขึ้นนะ
+                  {"\n"}
                   {"\n"}
                 </Text>
 

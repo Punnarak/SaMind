@@ -233,7 +233,7 @@ const NumberGame = ({ route }) => {
       if (selectedNumber === nextExpectedNumber) {
         if (nextExpectedNumber === 16) {
           setwl(true);
-          updateScore();
+          // updateScore();
           // If 16 is clicked, the game is won
           setGameOver(true); // Set game over to true for a win
         } else {
@@ -245,7 +245,7 @@ const NumberGame = ({ route }) => {
       } else {
         setwl(false);
         // Incorrect number clicked, game over
-        updateScore0();
+        // updateScore0();
         // calculateScore();
         updateHealthBar();
         setScore(0);
@@ -265,7 +265,7 @@ const NumberGame = ({ route }) => {
     if(nextExpectedNumber===16)
     {
       // calculateScore();
-      updateScore();
+      // updateScore();
     }
   }
 

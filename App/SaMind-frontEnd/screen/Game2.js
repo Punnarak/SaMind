@@ -415,6 +415,8 @@ const Gamescreen = ({ route }) => {
               setTargetWord(generateRandomWord());
               setAttempts(0);
               setEnteredWords([]);
+              updateStaminaBar();
+              updateHungryBar();
               navigation.goBack();
             },
           },
