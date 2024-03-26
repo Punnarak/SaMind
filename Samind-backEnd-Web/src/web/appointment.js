@@ -741,7 +741,7 @@ router.post("/appointmentRequestView", auth, (req, res) => {
             patient p ON a.patient_id = p.patient_id
         WHERE 
             a.therapist_id = $1
-            AND a.confirm = 'W'
+            AND a.confirm IN ('PP','NA')
         ORDER BY 
             a.date, a.time`;
 
@@ -1300,7 +1300,7 @@ router.post("/appointmentRequestConfirm", auth, (req, res) => {
                            SET confirm = 'Y', 
                                date = $1,
                                time = $2
-                           WHERE confirm = 'W' AND patient_id = $3 AND date = $4 AND time = $5 AND change_date = $6 AND change_time = $7`;
+                           WHERE confirm IN ('PP','NA') AND patient_id = $3 AND date = $4 AND time = $5 AND change_date = $6 AND change_time = $7`;
       const queryParams = [
         formattedDateTo,
         formattedTimeTo,
@@ -1335,7 +1335,7 @@ router.post("/appointmentRequestConfirm", auth, (req, res) => {
       // If the confirmation status is 'N', update confirm directly
       const query = `UPDATE public.appointment_new2 
                            SET confirm = 'N'
-                           WHERE confirm = 'W' AND patient_id = $1 AND date = $2 AND time = $3`;
+                           WHERE confirm IN ('PP', 'NA') AND patient_id = $1 AND date = $2 AND time = $3`;
       const queryParams = [patientID, formattedDateFrom, formattedTimeFrom];
 
       // Execute the query
@@ -1369,7 +1369,7 @@ router.post("/appointmentRequestConfirm", auth, (req, res) => {
     // Construct SQL query to update data only when confirm is 'W' in the database
     const query = `UPDATE public.appointment_new2 
                        SET confirm = $1
-                       WHERE confirm = 'W' AND patient_id = $2 AND date = $3 AND time = $4`;
+                       WHERE confirm IN ('PP', 'NA') AND patient_id = $2 AND date = $3 AND time = $4`;
     const queryParams = [
       confirm,
       patientID,
@@ -1510,9 +1510,9 @@ router.post('/appointShowTime', auth, (req, res) => {
   const query = `
     SELECT "time" 
     FROM public.appointment_new2 
-    WHERE date = $1 AND therapist_id = $2 AND confirm IN ($3, $4)
+    WHERE date = $1 AND therapist_id = $2 AND confirm IN ($3, $4, $5)
   `;
-  const queryParams = [date, therapistID, "W", "Y"];
+  const queryParams = [date, therapistID, "PP", "NA", "Y"];
 
   client.query(query, queryParams)
     .then(result => {

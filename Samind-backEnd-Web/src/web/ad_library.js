@@ -407,8 +407,4 @@ router.post('/adLinkView', auth, (req, res) => {
     });
 });
 
-
-
-
-
 module.exports = router;

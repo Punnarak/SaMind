@@ -294,9 +294,10 @@ export default function Calendar({ route }) {
     console.log("toggle");
     setConfirm(!confirm);
     const selectedDateFormatted = moment(new Date(click)).format("DD-MM-YYYY");
+    const dateForApp = moment(new Date(click)).format("YYYY-MM-DD");
     console.log("select", selectedDateFormatted);
     setNewAppString(selectedDateFormatted);
-    setNewAppointment(new Date());
+    setNewAppointment(new Date(dateForApp));
   };
 
   const submit = () => {

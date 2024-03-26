@@ -296,16 +296,16 @@ router.post('/appointShowTime', (req, res) => {
   client.query(therapistQuery, therapistQueryParams)
     .then(therapistResult => {
       const therapistIDs = therapistResult.rows.map(row => row.therapist_id);
-
+      console.log(therapistIDs)
       // Query to retrieve existing appointments for the specified date, therapistID, and confirm column containing "W" or "Y"
-      const query = `SELECT "time" FROM public.appointment_new2 WHERE date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4)`;
-      const queryParams = [date, therapistIDs, "W", "Y"];
+      const query = `SELECT "time" FROM public.appointment_new2 WHERE date = $1 AND therapist_id = ANY($2::int[]) AND confirm IN ($3, $4, $5)`;
+      const queryParams = [date, therapistIDs, "PP","NA", "Y"];
 
       client.query(query, queryParams)
         .then(result => {
           // Extract existing appointment times
           const existingTimes = result.rows.map(row => row.time);
-
+          console.log(existingTimes)
           // Generate available appointment times
           const availableTimes = [];
           for (let hour = startHour; hour < endHour; hour++) {
@@ -339,7 +339,7 @@ router.post('/appointShowTime', (req, res) => {
     });
 });
 
-router.post('/appointShowTimeChange', (req, res) => {
+router.post('/appointShowTimeChange',auth, (req, res) => {
   const patientID = req.body.patientID;
   const date = req.body.date;
   const predefinedTimes = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00"];
@@ -598,7 +598,7 @@ router.post('/appointShowTimeChange', (req, res) => {
 //   return `${time}:00`; // Append seconds to match the 'HH:MM:SS' format
 // }
 
-router.post('/appointSelect', auth, (req, res) => {
+router.post('/appointSelect',auth, (req, res) => {
   // Extract data from the request body
   const { patientId, date, time } = req.body;
 
@@ -632,7 +632,7 @@ router.post('/appointSelect', auth, (req, res) => {
       (SELECT therapist_id FROM public.patient WHERE patient_id = $1), 
       $2, $3, $4, 
       (SELECT hospital_name FROM public.patient WHERE patient_id = $2), 
-      null, 'W', 'Y', $1, 
+      null, 'NA', 'Y', $1, 
       $5, 
       $1, 
       $5
@@ -838,7 +838,7 @@ function getCurrentDateTime() {
 //     });
 // });
 
-router.post('/appointChangeDateTime', auth, (req, res) => {
+router.post('/appointChangeDateTime', (req, res) => {
   const { patientID, oldDate, newDate, newTime } = req.body;
   
   // Check if patientID, oldDate, newDate, and newTime are provided
@@ -871,12 +871,12 @@ router.post('/appointChangeDateTime', auth, (req, res) => {
       change_date = $1, 
       change_time = $2,
       confirm = CASE 
-                  WHEN confirm = 'Y' THEN 'W'
+                  WHEN confirm = 'Y' THEN 'PP'
                   ELSE confirm
                 END,
       update_by = $3,
       update_date = $4
-    WHERE patient_id = $5 AND date = $6 AND confirm IN ('Y', 'W')
+    WHERE patient_id = $5 AND date = $6 AND confirm IN ('Y', 'PP')
   `;
   
   const values = [newDate, newTime, patientID, currentDate, patientID, oldDate];

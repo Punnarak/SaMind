@@ -859,8 +859,8 @@ router.post("/therapistSendTest", auth, async (req, res) => {
                 $4, 
                 $5, 
                 $6,
-                $7, -- Placeholder for detail
-                $8  -- Placeholder for dueDate
+                $7,
+                $8
             )
         `;
 
