@@ -56,40 +56,93 @@ router.post('/info_therapist', auth, (req, res) => {
       });
 });
   
-router.post('/update_info_therapist', auth, async (req, res) => {
-    const { therapist_id, fname, lname, password } = req.body; // Access therapist_id, fname, lname, password from request body
-    console.log(therapist_id, fname, lname, password)
-    if (!therapist_id) {
-      return res.status(400).json({ error: 'Therapist ID is required' });
-    }
+//old api can use 
+// router.post('/update_info_therapist'/*, auth*/, async (req, res) => {
+//     const { therapist_id, fname, lname, password } = req.body; // Access therapist_id, fname, lname, password from request body
+//     console.log(therapist_id, fname, lname, password)
+//     if (!therapist_id) {
+//       return res.status(400).json({ error: 'Therapist ID is required' });
+//     }
   
-    try {
-      // Convert password to string
-      const passwordString = String(password);
+//     try {
+//       // Convert password to string
+//       const passwordString = String(password);
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(passwordString, 10);
+//       // Hash the password
+//       const hashedPassword = await bcrypt.hash(passwordString, 10);
   
-      // Construct the UPDATE query
-      const query = `
-        UPDATE therapist 
-        SET fname = $1, lname = $2, password = $3
-        WHERE therapist_id = $4
+//       // Construct the UPDATE query
+//       const query = `
+//         UPDATE therapist 
+//         SET fname = $1, lname = $2, password = $3
+//         WHERE therapist_id = $4
+//       `;
+//       const queryParams = [fname, lname, hashedPassword, therapist_id];
+  
+//       // Execute the UPDATE query
+//       const result = await client.query(query, queryParams);
+  
+//       if (result.rowCount === 0) {
+//         return res.status(404).json({ error: 'Therapist not found' });
+//       }
+  
+//       res.json({ message: 'Therapist updated successfully' });
+//     } catch (err) {
+//       console.error('Error executing query:', err);
+//       res.status(500).json({ error: 'An error occurred' });
+//     }
+// });
+
+router.post('/update_info_therapist', auth, async (req, res) => {
+  const { therapist_id, fname, lname, password } = req.body; // Access therapist_id, fname, lname, password from request body
+  console.log(therapist_id, fname, lname, password)
+  if (!therapist_id) {
+    return res.status(400).json({ error: 'Therapist ID is required' });
+  }
+
+  try {
+    let hashedPassword;
+    if (password === '') {
+      // If password is empty, retrieve the old password from the database
+      const getPasswordQuery = `
+        SELECT password FROM therapist
+        WHERE therapist_id = $1
       `;
-      const queryParams = [fname, lname, hashedPassword, therapist_id];
-  
-      // Execute the UPDATE query
-      const result = await client.query(query, queryParams);
-  
-      if (result.rowCount === 0) {
+      const getPasswordParams = [therapist_id];
+      const getPasswordResult = await client.query(getPasswordQuery, getPasswordParams);
+      
+      if (getPasswordResult.rows.length === 0) {
         return res.status(404).json({ error: 'Therapist not found' });
       }
-  
-      res.json({ message: 'Therapist updated successfully' });
-    } catch (err) {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'An error occurred' });
+      
+      hashedPassword = getPasswordResult.rows[0].password;
+    } else {
+      // If password is provided, hash it
+      const passwordString = String(password);
+      hashedPassword = await bcrypt.hash(passwordString, 10);
     }
+
+    // Construct the UPDATE query
+    const query = `
+      UPDATE therapist 
+      SET fname = $1, lname = $2, password = $3
+      WHERE therapist_id = $4
+    `;
+    const queryParams = [fname, lname, hashedPassword, therapist_id];
+
+    // Execute the UPDATE query
+    const result = await client.query(query, queryParams);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Therapist not found' });
+    }
+
+    res.json({ message: 'Therapist updated successfully' });
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 });
+
 
 module.exports = router;
