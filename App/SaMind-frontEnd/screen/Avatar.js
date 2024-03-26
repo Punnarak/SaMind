@@ -144,7 +144,7 @@ export default function Notification({ route }) {
     console.log("change", avatar);
     setTimeout(() => {
       setAvatar("standby");
-    }, 16000);
+    }, 10500);
   };
   switch (avatar) {
     case "wave":
