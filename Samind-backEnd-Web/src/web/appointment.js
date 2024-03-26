@@ -660,9 +660,73 @@ router.post("/therapistAddAppoint", auth, async (req, res) => {
 //         });
 // });
 
+//api can use
+// router.post("/appointmentRequestView"/*, auth*/, (req, res) => {
+//   const therapist_id = req.body.therapist_id;
+//   let query = `
+//         SELECT 
+//             a.date,
+//             a.time,
+//             a.change_date,
+//             a.change_time,
+//             p.fname,
+//             p.lname,
+//             a.patient_id
+//         FROM 
+//             appointment_new2 a
+//         JOIN 
+//             patient p ON a.patient_id = p.patient_id
+//         WHERE 
+//             a.therapist_id = $1
+//             AND a.confirm = 'W'
+//         ORDER BY 
+//             a.date, a.time`;
+
+//   const queryParams = [therapist_id];
+
+//   client
+//     .query(query, queryParams)
+//     .then((result) => {
+//       const formattedResults = result.rows.map((row) => {
+//         const dateFrom = row.date ? formatDate(row.date) : "-";
+//         const timeFrom = row.time ? formatTime(row.time) : "-";
+//         const dateTo = row.change_date ? formatDate(row.change_date) : "-";
+//         const timeTo = row.change_time ? formatTime(row.change_time) : "-";
+//         const patientName = row.fname + " " + row.lname; // Concatenate fname and lname to get the full name
+//         return {
+//           patientID: row.patient_id,
+//           patientName: patientName,
+//           dateFrom: dateFrom,
+//           timeFrom: timeFrom,
+//           dateTo: dateTo,
+//           timeTo: timeTo,
+//         };
+//       });
+//       res.json(formattedResults);
+//     })
+//     .catch((err) => {
+//       console.error("Error executing query:", err);
+//       res.status(500).json({ error: "An error occurred" });
+//     });
+// });
+
 router.post("/appointmentRequestView", auth, (req, res) => {
   const therapist_id = req.body.therapist_id;
+  const currentDate = new Date(); // Get current date
+
   let query = `
+        UPDATE appointment_new2
+        SET confirm = 'N'
+        WHERE therapist_id = $1
+          AND (date < $2 OR (change_date IS NOT NULL AND change_date < $2))`;
+
+  const queryParams = [therapist_id, currentDate];
+
+  client
+    .query(query, queryParams)
+    .then(() => {
+      // Now fetch the filtered appointments
+      const selectQuery = `
         SELECT 
             a.date,
             a.time,
@@ -681,33 +745,37 @@ router.post("/appointmentRequestView", auth, (req, res) => {
         ORDER BY 
             a.date, a.time`;
 
-  const queryParams = [therapist_id];
-
-  client
-    .query(query, queryParams)
-    .then((result) => {
-      const formattedResults = result.rows.map((row) => {
-        const dateFrom = row.date ? formatDate(row.date) : "-";
-        const timeFrom = row.time ? formatTime(row.time) : "-";
-        const dateTo = row.change_date ? formatDate(row.change_date) : "-";
-        const timeTo = row.change_time ? formatTime(row.change_time) : "-";
-        const patientName = row.fname + " " + row.lname; // Concatenate fname and lname to get the full name
-        return {
-          patientID: row.patient_id,
-          patientName: patientName,
-          dateFrom: dateFrom,
-          timeFrom: timeFrom,
-          dateTo: dateTo,
-          timeTo: timeTo,
-        };
-      });
-      res.json(formattedResults);
+      client
+        .query(selectQuery, [therapist_id])
+        .then((result) => {
+          const formattedResults = result.rows.map((row) => {
+            const dateFrom = row.date ? formatDate(row.date) : "-";
+            const timeFrom = row.time ? formatTime(row.time) : "-";
+            const dateTo = row.change_date ? formatDate(row.change_date) : "-";
+            const timeTo = row.change_time ? formatTime(row.change_time) : "-";
+            const patientName = row.fname + " " + row.lname; // Concatenate fname and lname to get the full name
+            return {
+              patientID: row.patient_id,
+              patientName: patientName,
+              dateFrom: dateFrom,
+              timeFrom: timeFrom,
+              dateTo: dateTo,
+              timeTo: timeTo,
+            };
+          });
+          res.json(formattedResults);
+        })
+        .catch((err) => {
+          console.error("Error executing query:", err);
+          res.status(500).json({ error: "An error occurred" });
+        });
     })
     .catch((err) => {
       console.error("Error executing query:", err);
       res.status(500).json({ error: "An error occurred" });
     });
 });
+
 
 // function formatDate(dateString) {
 //     const date = new Date(dateString);
